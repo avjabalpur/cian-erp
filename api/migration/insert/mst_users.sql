@@ -1,0 +1,16 @@
+INSERT INTO mst_users (user_id,user_name,first_name,last_name,user_email,user_password,gender,profile_picture,user_type,is_dashboard,role_id,user_status,activation_code,imei_number,Is_skipped,zodiac_sign,fb_id,g_id,user_birth_date,register_date,email_verified) VALUES 
+ (1,'admin','Ravikant','Chavan','ravikant@cian.co','MTIzNDU2','1','731717764.jpg','2',1,1,'1','1514966087','',NULL,'',NULL,NULL,'0','0000-00-00 00:00:00',1),
+ (104,'MayaJadhav','Maya','Jadhav','maya@cian.co','TWF5YUAxMjM=','2',NULL,'2',NULL,5,'1','1546664052','',NULL,NULL,NULL,NULL,NULL,'2019-01-05 10:24:12',1),
+ (106,'Shruti','Shruti','Shirali','shruti@cian.co','U2hydXRpQDEyMw==','2',NULL,'2',NULL,2,'1','1546664466','',NULL,NULL,NULL,NULL,NULL,'2019-01-05 10:31:06',1),
+ (107,'Mayadevi','Mayadevi','Tate','mayadevi@cian.co','TWF5YWRldmlAMTIz','2',NULL,'2',NULL,2,'1','1546664553','',NULL,NULL,NULL,NULL,NULL,'2019-01-05 10:32:33',1),
+ (108,'Ashwini','Ashwini','K','regulatory1@cian.co','QXNod2luaUAxMjM=','2',NULL,'2',NULL,2,'1','1546664609','',NULL,NULL,NULL,NULL,NULL,'2019-01-05 10:33:29',1),
+ (109,'Rakesh','Rakesh','V.','rakesh@cian.co','UmFrZXNoQDEyMw==','1',NULL,'2',NULL,2,'1','1546664701','',NULL,NULL,NULL,NULL,NULL,'2019-01-05 10:35:01',1),
+ (110,'Sanam','Sana','Mansuri','fgpo@cian.co','U2FuYW1AMTIz','2',NULL,'2',NULL,4,'1','1546685172','',NULL,NULL,NULL,NULL,NULL,'2019-01-05 16:16:12',1),
+ (111,'Manali','Manali','Manali','manali@cian.co','TWFuYWxpQDEyMw==','2',NULL,'2',NULL,4,'1','1546685252','',NULL,NULL,NULL,NULL,NULL,'2019-01-05 16:17:32',1),
+ (112,'Appas','Appa','Shelke','appa@cian.co','QXBwYXNAMTIz','1',NULL,'2',NULL,4,'1','1546685360','',NULL,NULL,NULL,NULL,NULL,'2019-01-05 16:19:20',1),
+ (113,'Punam','Punam','Kothari','software2@cian.co','UHVuYW1AMTIz','2',NULL,'2',NULL,1,'1','1546685487','',NULL,NULL,NULL,NULL,NULL,'2019-01-05 16:21:27',1),
+ (114,'Khushbu','Khushbu','Shah','khushbu@cian.co','S2h1c2hidUAxMjM=','2',NULL,'2',NULL,3,'1','1546686290','',NULL,NULL,NULL,NULL,NULL,'2019-01-05 16:34:50',1),
+ (115,'Rehan','Rehan','Patel','rehan.patel@cian.co','UmVoYW5AMTIz','1',NULL,'2',NULL,3,'1','1546688761','',NULL,NULL,NULL,NULL,NULL,'2019-01-05 17:16:01',1),
+ (116,'Danish','Danish','Shaikh','danish@cian.co','RGFuaXNoQDEyMw==','1',NULL,'2',NULL,2,'1','1547283997','',NULL,NULL,NULL,NULL,NULL,'2019-01-12 14:36:37',1),
+ (117,'Deepa','Deepa','Evre','RA@cian.co','RGVlcGFAMTIz','2',NULL,'2',NULL,5,'1','1551689636','',NULL,NULL,NULL,NULL,NULL,'2019-03-04 14:23:56',1),
+ (118,'Suraj','Suraj','Zanwar','suraj@cian.co','U3VyYWpAMTIz','1',NULL,'2',NULL,6,'1','1552021473','',NULL,NULL,NULL,NULL,NULL,'2019-03-08 10:34:33',1);

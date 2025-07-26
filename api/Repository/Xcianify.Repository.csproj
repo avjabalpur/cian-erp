@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="DbContext\Scripts\AllTableScript.sql" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="DbContext\Scripts\AllTableScript.sql" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Dapper" Version="2.1.28" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Npgsql" Version="8.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Xcianify.Core.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Infrastructure/DbScripts/*.sql" />
+		<EmbeddedResource Include="Script\**\*.sql" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DbContext\Scripts\" />
+  </ItemGroup>
+
+</Project>
