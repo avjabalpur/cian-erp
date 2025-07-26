@@ -36,9 +36,5 @@ const salesNavigation = [
 ]
 
 export default function SalesLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <DashboardLayout navigation={salesNavigation} basePath="/sales" title="CIAN Pharma ERP - Sales">
-      {children}
-    </DashboardLayout>
-  )
+  return <>{children}</>
 }

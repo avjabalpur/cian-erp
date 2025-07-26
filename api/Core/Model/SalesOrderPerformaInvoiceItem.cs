@@ -1,0 +1,20 @@
+using System;
+
+namespace Xcianify.Core.Model
+{
+    public class SalesOrderPerformaInvoiceItem : BaseModel
+    {
+        public int Id { get; set; }
+        public int PerformaInvoiceId { get; set; }
+        public int? SalesOrderId { get; set; }
+        public int? ItemId { get; set; }
+        public string Composition { get; set; }
+        public string DosageName { get; set; }
+        public string ProductCast { get; set; }
+        public string PPackShort { get; set; }
+        public double? PQuantity { get; set; }
+        public double? PFocQty { get; set; }
+        public double? PBillingRate { get; set; }
+        public bool IsDeleted { get; set; }
+    }
+} 

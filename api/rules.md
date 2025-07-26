@@ -68,7 +68,6 @@
 - Use JWT Bearer authentication.
 - Store JWT key in config; must be at least 32 characters.
 - Add `[Authorize]` to controllers/actions for protected endpoints.
-- Use `[Authorize(Roles = "role")]` for role-based access.
 - Always hash passwords before storing.
 - Registration must check for duplicate emails and validate allowed roles.
 - Never expose password hashes in API responses.
@@ -87,9 +86,8 @@
 # UI Rules for Next.js/React/TypeScript Architecture
 
 ## 1. Project Structure
-- **app/(admin):** Protected routes requiring authentication.
-- **app/(sales):** Protected routes requiring authentication.
-- **app/(public):** Public routes accessible without authentication.
+- **app/(auth):** Protected routes requiring authentication.
+- **app/:** Public routes accessible without authentication.
 - **app/api:** Backend API routes and handlers.
 - **components:** Reusable UI components organized by feature or domain.
 - **lib:** Utility functions, helpers, and shared logic.
