@@ -3,26 +3,16 @@
 import { useState } from "react";
 import { useQueryState } from "nuqs";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "@/components/ui/calendar";
+import { Filter, X, Search } from "lucide-react";
+import React from "react";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { CalendarIcon, Filter, X, Search } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+  NuqsFormInput,
+  NuqsFormSelect,
+  NuqsFormDateInput,
+  type SelectOption
+} from "@/components/shared/filter";
 import {
   salesOrderStatusOptions,
   paymentTermOptions,
@@ -30,8 +20,7 @@ import {
   currentStatusOptions,
   sortOptions,
   sortOrderOptions,
-  salesOrderParsers,
-  type SelectOption
+  salesOrderParsers
 } from "@/lib/utils/sales-order-utils";
 
 interface SalesOrderFilterProps {
@@ -41,7 +30,10 @@ interface SalesOrderFilterProps {
 export function SalesOrderFilter({ onFilterChange }: SalesOrderFilterProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // nuqs query state hooks
+  // Get current user ID (you can replace this with your actual user context)
+  const currentUserId = 1; // TODO: Replace with actual current user ID from context
+
+  // nuqs query state hooks with default values
   const [page, setPage] = useQueryState("page", salesOrderParsers.page);
   const [pageSize, setPageSize] = useQueryState("pageSize", salesOrderParsers.pageSize);
   const [sortBy, setSortBy] = useQueryState("sortBy", salesOrderParsers.sortBy);
@@ -55,6 +47,13 @@ export function SalesOrderFilter({ onFilterChange }: SalesOrderFilterProps) {
   const [assignedDesigner, setAssignedDesigner] = useQueryState("assignedDesigner", salesOrderParsers.assignedDesigner);
   const [fromDate, setFromDate] = useQueryState("fromDate", salesOrderParsers.fromDate);
   const [toDate, setToDate] = useQueryState("toDate", salesOrderParsers.toDate);
+
+  // Set default assigned designer to current user if not set
+  React.useEffect(() => {
+    if (!assignedDesigner) {
+      setAssignedDesigner(currentUserId);
+    }
+  }, [assignedDesigner, currentUserId, setAssignedDesigner]);
 
   const clearFilters = () => {
     setSearch(null);
@@ -80,83 +79,33 @@ export function SalesOrderFilter({ onFilterChange }: SalesOrderFilterProps) {
     if (designUnder) count++;
     if (currentStatus) count++;
     if (isSubmitted !== null) count++;
-    if (assignedDesigner) count++;
+    if (assignedDesigner && assignedDesigner !== currentUserId) count++; // Only count if not current user
     if (fromDate) count++;
     if (toDate) count++;
     return count;
   };
 
-  const renderSelect = (
-    label: string,
-    value: any | null,
-    options: SelectOption[],
-    onChange: (value: string | null) => void,
-    placeholder?: string
-  ) => (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <Select value={value || ""} onValueChange={(val) => onChange(val || null)}>
-        <SelectTrigger>
-          <SelectValue placeholder={placeholder || `Select ${label}`} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="">All</SelectItem>
-          {options.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  );
-
-  const renderDatePicker = (
-    label: string,
-    date: Date | null,
-    onChange: (date: any | null) => void,
-    placeholder?: string
-  ) => (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className={cn(
-              "w-full justify-start text-left font-normal",
-              !date && "text-muted-foreground"
-            )}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {date ? format(date, "PPP") : placeholder || "Pick a date"}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0">
-          <Calendar
-            mode="single"
-            selected={date || undefined}
-            onSelect={onChange}
-            initialFocus
-          />
-        </PopoverContent>
-      </Popover>
-    </div>
-  );
+  const hasAnyFilters = () => {
+    return search || soStatus || paymentTerm || designUnder || currentStatus || 
+           isSubmitted !== null || (assignedDesigner && assignedDesigner !== currentUserId) || 
+           fromDate || toDate;
+  };
 
   return (
     <Card className="mb-6">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Filters
-            {getActiveFilterCount() > 0 && (
-              <Badge variant="secondary" className="ml-2">
-                {getActiveFilterCount()}
-              </Badge>
-            )}
-          </CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Filters
+              {getActiveFilterCount() > 0 && (
+                <Badge variant="secondary" className="ml-2">
+                  {getActiveFilterCount()}
+                </Badge>
+              )}
+            </CardTitle>
+          </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
@@ -165,16 +114,18 @@ export function SalesOrderFilter({ onFilterChange }: SalesOrderFilterProps) {
             >
               {isExpanded ? "Collapse" : "Expand"}
             </Button>
-            {getActiveFilterCount() > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={clearFilters}
-                className="text-red-600 hover:text-red-700"
-              >
-                <X className="h-4 w-4 mr-1" />
-                Clear
-              </Button>
+            {hasAnyFilters() && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="text-blue-600 hover:text-blue-700"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Clear Filters
+                </Button>
+              </>
             )}
           </div>
         </div>
@@ -183,110 +134,96 @@ export function SalesOrderFilter({ onFilterChange }: SalesOrderFilterProps) {
       <CardContent>
         {/* Basic Filters - Always Visible */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-          <div className="space-y-2">
-            <Label>Search</Label>
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search SO number, customer, item..."
-                value={search || ""}
-                onChange={(e) => setSearch(e.target.value || null)}
-                className="pl-10"
-              />
-            </div>
-          </div>
+          <NuqsFormInput
+            label="Search"
+            value={search}
+            onChange={setSearch}
+            placeholder="Search SO number, customer, item..."
+            icon={<Search />}
+          />
           
-          {renderSelect(
-            "Status",
-            soStatus,
-            salesOrderStatusOptions,
-            setSoStatus
-          )}
+          <NuqsFormSelect
+            label="Status"
+            value={soStatus}
+            onChange={setSoStatus}
+            options={salesOrderStatusOptions}
+          />
           
-          {renderSelect(
-            "Payment Term",
-            paymentTerm,
-            paymentTermOptions,
-            setPaymentTerm
-          )}
+          <NuqsFormSelect
+            label="Payment Term"
+            value={paymentTerm}
+            onChange={setPaymentTerm}
+            options={paymentTermOptions}
+          />
           
-          {renderSelect(
-            "Current Status",
-            currentStatus,
-            currentStatusOptions,
-            setCurrentStatus
-          )}
+          <NuqsFormSelect
+            label="Current Status"
+            value={currentStatus}
+            onChange={setCurrentStatus}
+            options={currentStatusOptions}
+          />
         </div>
 
         {/* Advanced Filters - Expandable */}
         {isExpanded && (
           <div className="space-y-4 pt-4 border-t">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {renderSelect(
-                "Design Under",
-                designUnder,
-                designUnderOptions,
-                setDesignUnder
-              )}
+              <NuqsFormSelect
+                label="Design Under"
+                value={designUnder}
+                onChange={setDesignUnder}
+                options={designUnderOptions}
+              />
               
-              <div className="space-y-2">
-                <Label>Submitted</Label>
-                <Select 
-                  value={isSubmitted?.toString() || ""} 
-                  onValueChange={(value) => setIsSubmitted(value === 'true' ? true : value === 'false' ? false : null)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="All" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">All</SelectItem>
-                    <SelectItem value="true">Yes</SelectItem>
-                    <SelectItem value="false">No</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <NuqsFormSelect
+                label="Submitted"
+                value={isSubmitted?.toString() || null}
+                onChange={(value) => setIsSubmitted(value === 'true' ? true : value === 'false' ? false : null)}
+                options={[
+                  { label: "Yes", value: "true" },
+                  { label: "No", value: "false" }
+                ]}
+              />
               
-              <div className="space-y-2">
-                <Label>Assigned Designer</Label>
-                <Input
-                  type="number"
-                  placeholder="Designer ID"
-                  value={assignedDesigner?.toString() || ""}
-                  onChange={(e) => setAssignedDesigner(e.target.value ? parseInt(e.target.value) : null)}
-                />
-              </div>
+              <NuqsFormInput
+                label="Assigned Designer"
+                value={assignedDesigner?.toString() || null}
+                onChange={(value) => setAssignedDesigner(value ? parseInt(value) : null)}
+                placeholder="Designer ID"
+                type="number"
+              />
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {renderDatePicker(
-                "From Date",
-                fromDate,
-                setFromDate,
-                "Select start date"
-              )}
+              <NuqsFormDateInput
+                label="From Date"
+                value={fromDate}
+                onChange={setFromDate}
+                placeholder="Select start date"
+              />
               
-              {renderDatePicker(
-                "To Date",
-                toDate,
-                setToDate,
-                "Select end date"
-              )}
+              <NuqsFormDateInput
+                label="To Date"
+                value={toDate}
+                onChange={setToDate}
+                placeholder="Select end date"
+              />
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {renderSelect(
-                "Sort By",
-                sortBy,
-                sortOptions,
-                setSortBy
-              )}
+              <NuqsFormSelect
+                label="Sort By"
+                value={sortBy}
+                onChange={setSortBy}
+                options={sortOptions}
+              />
               
-              {renderSelect(
-                "Sort Order",
-                sortOrder,
-                sortOrderOptions,
-                setSortOrder
-              )}
+              <NuqsFormSelect
+                label="Sort Order"
+                value={sortOrder as any}
+                onChange={setSortOrder}
+                options={sortOrderOptions}
+              />
             </div>
           </div>
         )}

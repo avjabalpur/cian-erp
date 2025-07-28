@@ -38,10 +38,8 @@ export default function SalesOrdersManagement() {
   const [search] = useQueryState("search", salesOrderParsers.search);
   const [soStatus] = useQueryState("soStatus", salesOrderParsers.soStatus);
   const [paymentTerm] = useQueryState("paymentTerm", salesOrderParsers.paymentTerm);
-  const [designUnder] = useQueryState("designUnder", salesOrderParsers.designUnder);
   const [currentStatus] = useQueryState("currentStatus", salesOrderParsers.currentStatus);
   const [isSubmitted] = useQueryState("isSubmitted", salesOrderParsers.isSubmitted);
-  const [assignedDesigner] = useQueryState("assignedDesigner", salesOrderParsers.assignedDesigner);
   const [fromDate] = useQueryState("fromDate", salesOrderParsers.fromDate);
   const [toDate] = useQueryState("toDate", salesOrderParsers.toDate);
 
@@ -51,10 +49,8 @@ export default function SalesOrdersManagement() {
     pageSize: pageSize || 10,
     status: soStatus || "",
     paymentTerm: paymentTerm || "",
-    designUnder: designUnder || "",
     currentStatus: currentStatus || "",
     isSubmitted: isSubmitted,
-    assignedDesigner: assignedDesigner,
     fromDate: fromDate?.toISOString().split('T')[0],
     toDate: toDate?.toISOString().split('T')[0],
     sortBy: sortBy || "created_at",
@@ -137,7 +133,7 @@ export default function SalesOrdersManagement() {
         </div>
       </div>
 
-      {/* <SalesOrderFilter onFilterChange={() => {}} /> */}
+      <SalesOrderFilter onFilterChange={() => {}} />
 
       <SalesOrdersTable
         salesOrders={salesOrders}

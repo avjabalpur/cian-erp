@@ -12,14 +12,11 @@ const getSalesOrders = async (params: any = {}): Promise<{ items: SalesOrder[]; 
   if (params.search) queryParams.append('search', params.search);
   if (params.status) queryParams.append('soStatus', params.status);
   if (params.paymentTerm) queryParams.append('paymentTerm', params.paymentTerm);
- /*  if (params.designUnder) queryParams.append('designUnder', params.designUnder);
   if (params.currentStatus) queryParams.append('currentStatus', params.currentStatus);
-  if (params.isSubmitted !== undefined) queryParams.append('isSubmitted', params.isSubmitted.toString());
-  if (params.assignedDesigner) queryParams.append('assignedDesigner', params.assignedDesigner.toString());
   if (params.fromDate) queryParams.append('fromDate', params.fromDate);
   if (params.toDate) queryParams.append('toDate', params.toDate);
   if (params.sortBy) queryParams.append('sortBy', params.sortBy);
-  if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder); */
+  if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
   
   const queryString = queryParams.toString();
   const url = queryString ? `/sales-order?${queryString}` : '/sales-order';
