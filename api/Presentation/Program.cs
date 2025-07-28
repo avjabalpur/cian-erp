@@ -185,6 +185,7 @@ builder.Services.AddScoped<ISalesOrderPerformaInvoiceItemRepository, SalesOrderP
 builder.Services.AddScoped<ISalesOrderQuotationRepository, SalesOrderQuotationRepository>();
 builder.Services.AddScoped<ISalesOrderQuotationItemRepository, SalesOrderQuotationItemRepository>();
 builder.Services.AddScoped<ISalesOrderSaveTransactionRepository, SalesOrderSaveTransactionRepository>();
+builder.Services.AddScoped<ISalesOrderStageRepository, SalesOrderStageRepository>();
 
 // Register Sales Order services
 builder.Services.AddScoped<ISalesOrderService, SalesOrderService>();
@@ -196,6 +197,7 @@ builder.Services.AddScoped<ISalesOrderPerformaInvoiceItemService, SalesOrderPerf
 builder.Services.AddScoped<ISalesOrderQuotationService, SalesOrderQuotationService>();
 builder.Services.AddScoped<ISalesOrderQuotationItemService, SalesOrderQuotationItemService>();
 builder.Services.AddScoped<ISalesOrderSaveTransactionService, SalesOrderSaveTransactionService>();
+builder.Services.AddScoped<ISalesOrderStageService, SalesOrderStageService>();
 
 // Add Controllers
 builder.Services.AddControllers();

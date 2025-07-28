@@ -12,17 +12,20 @@ namespace Xcianify.Presentation.Controllers
         private readonly ISalesOrderCommentService _commentService;
         private readonly ISalesOrderChatService _chatService;
         private readonly ISalesOrderDocumentService _documentService;
+        private readonly ISalesOrderStageService _stageService;
 
         public SalesOrderController(
             ISalesOrderService salesOrderService,
             ISalesOrderCommentService commentService,
             ISalesOrderChatService chatService,
-            ISalesOrderDocumentService documentService)
+            ISalesOrderDocumentService documentService,
+            ISalesOrderStageService stageService)
         {
             _salesOrderService = salesOrderService ?? throw new ArgumentNullException(nameof(salesOrderService));
             _commentService = commentService ?? throw new ArgumentNullException(nameof(commentService));
             _chatService = chatService ?? throw new ArgumentNullException(nameof(chatService));
             _documentService = documentService ?? throw new ArgumentNullException(nameof(documentService));
+            _stageService = stageService ?? throw new ArgumentNullException(nameof(stageService));
         }
 
         [HttpGet]
@@ -189,6 +192,52 @@ namespace Xcianify.Presentation.Controllers
         public async Task<IActionResult> DeleteDocument(int salesOrderId, int documentId)
         {
             await _documentService.DeleteDocumentAsync(documentId);
+            return NoContent();
+        }
+
+        // --- Sales Order Stages Endpoints ---
+
+        [HttpGet("{salesOrderId}/stages")]
+        public async Task<IActionResult> GetStages(int salesOrderId)
+        {
+            var stages = await _stageService.GetStagesBySalesOrderAsync(salesOrderId);
+            return Ok(stages);
+        }
+
+        [HttpPost("{salesOrderId}/stages")]
+        public async Task<IActionResult> CreateStage(int salesOrderId, [FromBody] CreateSalesOrderStageDto createStageDto)
+        {
+            createStageDto.SalesOrderId = salesOrderId;
+            var createdStage = await _stageService.CreateStageAsync(createStageDto);
+            return CreatedAtAction(nameof(GetStages), new { salesOrderId }, createdStage);
+        }
+
+        [HttpPut("{salesOrderId}/stages/{stageId}")]
+        public async Task<IActionResult> UpdateStage(int salesOrderId, int stageId, [FromBody] CreateSalesOrderStageDto updateStageDto)
+        {
+            updateStageDto.SalesOrderId = salesOrderId;
+            await _stageService.UpdateStageAsync(stageId, updateStageDto);
+            return NoContent();
+        }
+
+        [HttpDelete("{salesOrderId}/stages/{stageId}")]
+        public async Task<IActionResult> DeleteStage(int salesOrderId, int stageId)
+        {
+            await _stageService.DeleteStageAsync(stageId);
+            return NoContent();
+        }
+
+        [HttpPost("{salesOrderId}/stages/{stageName}/approve")]
+        public async Task<IActionResult> ApproveStage(int salesOrderId, string stageName)
+        {
+            await _stageService.ApproveStageAsync(salesOrderId, stageName);
+            return NoContent();
+        }
+
+        [HttpPost("{salesOrderId}/stages/{stageName}/reject")]
+        public async Task<IActionResult> RejectStage(int salesOrderId, string stageName)
+        {
+            await _stageService.RejectStageAsync(salesOrderId, stageName);
             return NoContent();
         }
     }

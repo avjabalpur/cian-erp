@@ -246,4 +246,23 @@ export interface CreateSalesOrderDocumentData {
   filePath: string;
   fileType?: string;
   metadata?: string;
+}
+
+export interface SalesOrderStage {
+  id: number;
+  salesOrderId: number;
+  stageName: string;
+  isApproved: boolean;
+  createdAt: string;
+  updatedAt?: string;
+  createdBy?: number;
+  createdByName?: string;
+  updatedBy?: number;
+  updatedByName?: string;
+}
+
+export interface CreateSalesOrderStageData {
+  salesOrderId: number;
+  stageName: string;
+  isApproved?: boolean;
 } 

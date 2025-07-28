@@ -7,7 +7,7 @@ import SalesOrdersTable from "./sales-orders-table"
 import { SalesOrderFilter } from "./sales-order-filter"
 import { useRouter } from "next/navigation"
 import { SalesOrder } from "@/types/sales-order"
-import { useSalesOrders, useDeleteSalesOrder } from "@/hooks/use-sales-orders"
+import { useSalesOrders, useDeleteSalesOrder } from "@/hooks/sales-order/use-sales-orders";
 import { Plus, Download, Upload } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
@@ -38,8 +38,10 @@ export default function SalesOrdersManagement() {
   const [search] = useQueryState("search", salesOrderParsers.search);
   const [soStatus] = useQueryState("soStatus", salesOrderParsers.soStatus);
   const [paymentTerm] = useQueryState("paymentTerm", salesOrderParsers.paymentTerm);
+  const [designUnder] = useQueryState("designUnder", salesOrderParsers.designUnder);
   const [currentStatus] = useQueryState("currentStatus", salesOrderParsers.currentStatus);
   const [isSubmitted] = useQueryState("isSubmitted", salesOrderParsers.isSubmitted);
+  const [assignedDesigner] = useQueryState("assignedDesigner", salesOrderParsers.assignedDesigner);
   const [fromDate] = useQueryState("fromDate", salesOrderParsers.fromDate);
   const [toDate] = useQueryState("toDate", salesOrderParsers.toDate);
 
@@ -49,8 +51,10 @@ export default function SalesOrdersManagement() {
     pageSize: pageSize || 10,
     status: soStatus || "",
     paymentTerm: paymentTerm || "",
+    designUnder: designUnder || "",
     currentStatus: currentStatus || "",
     isSubmitted: isSubmitted,
+    assignedDesigner: assignedDesigner,
     fromDate: fromDate?.toISOString().split('T')[0],
     toDate: toDate?.toISOString().split('T')[0],
     sortBy: sortBy || "created_at",

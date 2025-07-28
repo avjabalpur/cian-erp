@@ -1,12 +1,7 @@
 "use client"
 
-import { useMemo, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Search, Edit, Trash2, Eye, FileText, MessageSquare, Calculator } from "lucide-react"
+import { useMemo } from "react"
+import { FileText, MessageSquare, Calculator } from "lucide-react"
 import { Column } from "@/types/common"
 import { formatDate } from "@/lib/date-utils"
 import AdvancedTable from "../shared/advanced-table"
@@ -99,6 +94,12 @@ export default function SalesOrdersTable({
     onDelete: onDelete,
     customActions: [
       {
+        label: 'Details',
+        icon: FileText,
+        onClick: onView,
+        variant: 'default' as const,
+      },
+      {
         label: 'Comments',
         icon: MessageSquare,
         onClick: onViewComments,
@@ -116,7 +117,7 @@ export default function SalesOrdersTable({
         onClick: onViewDocuments,
         variant: 'outline' as const,
       },
-    ].filter(action => action.onClick), // Only show actions that have handlers
+    ]
   }
 
   return (
@@ -140,10 +141,10 @@ export default function SalesOrdersTable({
         totalCount={totalCount}
         onPaginationChange={onPaginationChange}
         // Server-side filtering and sorting
-        manualFiltering={true}
+        manualFiltering={false}
         manualSorting={true}
-        onGlobalFilterChange={onGlobalFilterChange}
-        onColumnFiltersChange={onColumnFiltersChange}
+    /*     onGlobalFilterChange={onGlobalFilterChange}
+        onColumnFiltersChange={onColumnFiltersChange} */
         onSortingChange={onSortingChange}
       />
     </div>

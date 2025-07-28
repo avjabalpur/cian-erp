@@ -48,6 +48,10 @@ namespace Xcianify.Core.Mappers
             // Item Sales Details mappings
             CreateMap<ItemSalesDetails, ItemSalesDetailsDto>().ReverseMap();
             CreateMap<ItemSalesDetails, CreateItemSalesDetailsDto>().ReverseMap();
+
+            // Sales Order Stage mappings
+            CreateMap<SalesOrderStage, SalesOrderStageDto>().ReverseMap();
+            CreateMap<SalesOrderStage, CreateSalesOrderStageDto>().ReverseMap();
         }
     }
 } 

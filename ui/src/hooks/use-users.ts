@@ -4,8 +4,14 @@ import { User, CreateUserData, UpdateUserData, UserRole } from '../types/user';
 
 // --- API Functions ---
 
-const getUsers = async (): Promise<User[]> => {
-  const { data } = await api.get('/users');
+const getUsers = async (params?: { 
+  pageNumber?: number; 
+  pageSize?: number; 
+  search?: string; 
+  status?: string; 
+  company?: string; 
+}): Promise<{ items: User[]; totalCount: number }> => {
+  const { data } = await api.get('/users', { params });
   return data;
 };
 
@@ -44,9 +50,9 @@ const removeUserRole = async (id: string, roleId: string): Promise<void> => {
 // --- Custom Hooks ---
 
 export const useUsers = ({ pageNumber = 1, pageSize = 10, status, search, company, columnFilters, sorting, globalFilter }: any = {}) => {
-  return useQuery<User[], Error>({
-    queryKey: ['users'],
-    queryFn: getUsers,
+  return useQuery<{ items: User[]; totalCount: number }, Error>({
+    queryKey: ['users', { pageNumber, pageSize, status, search, company }],
+    queryFn: () => getUsers({ pageNumber, pageSize, status, search, company }),
   });
 };
 

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Xcianify.Core.Domain.Repositories;
 using Xcianify.Core.Model;
+using Xcianify.Core.DTOs.User;
 using Xcianify.Repository.DbContext;
 
 namespace Xcianify.Repository
@@ -19,8 +20,64 @@ namespace Xcianify.Repository
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public async Task<(List<User> Items, int TotalCount)> GetAllAsync()
+        public async Task<(List<User> Items, int TotalCount)> GetAllAsync(UserFilterDto filterDto)
         {
+            var whereConditions = new List<string>();
+            var parameters = new DynamicParameters();
+
+            // Add search filter
+            if (!string.IsNullOrWhiteSpace(filterDto.Search))
+            {
+                whereConditions.Add("(LOWER(first_name) LIKE @Search OR LOWER(last_name) LIKE @Search OR LOWER(username) LIKE @Search OR LOWER(email) LIKE @Search OR CAST(id AS TEXT) LIKE @Search)");
+                parameters.Add("@Search", $"%{filterDto.Search.ToLower()}%");
+            }
+
+            // Add status filter
+            if (!string.IsNullOrWhiteSpace(filterDto.Status))
+            {
+                if (filterDto.Status.ToLower() == "active")
+                {
+                    whereConditions.Add("is_active = true");
+                }
+                else if (filterDto.Status.ToLower() == "inactive")
+                {
+                    whereConditions.Add("is_active = false");
+                }
+            }
+
+            // Add department filter
+            if (!string.IsNullOrWhiteSpace(filterDto.Department))
+            {
+                whereConditions.Add("LOWER(department) LIKE @Department");
+                parameters.Add("@Department", $"%{filterDto.Department.ToLower()}%");
+            }
+
+            // Add designation filter
+            if (!string.IsNullOrWhiteSpace(filterDto.Designation))
+            {
+                whereConditions.Add("LOWER(designation) LIKE @Designation");
+                parameters.Add("@Designation", $"%{filterDto.Designation.ToLower()}%");
+            }
+
+            // Add isActive filter
+            if (filterDto.IsActive.HasValue)
+            {
+                whereConditions.Add("is_active = @IsActive");
+                parameters.Add("@IsActive", filterDto.IsActive.Value);
+            }
+
+            // Add gender filter
+            if (!string.IsNullOrWhiteSpace(filterDto.Gender))
+            {
+                whereConditions.Add("LOWER(gender) = @Gender");
+                parameters.Add("@Gender", filterDto.Gender.ToLower());
+            }
+
+            var whereClause = whereConditions.Count > 0 ? $"WHERE {string.Join(" AND ", whereConditions)}" : "";
+
+            // Calculate offset for pagination
+            var offset = (filterDto.PageNumber - 1) * filterDto.PageSize;
+
             var query = $@"
                 SELECT 
                     id as id,
@@ -48,12 +105,17 @@ namespace Xcianify.Repository
                     created_by as createdBy,
                     updated_by as updatedBy
                 FROM {TableName}
-                ORDER BY created_at DESC;
+                {whereClause}
+                ORDER BY created_at DESC
+                LIMIT @PageSize OFFSET @Offset;
                 
-                SELECT COUNT(*) FROM {TableName};";
+                SELECT COUNT(*) FROM {TableName} {whereClause};";
+
+            parameters.Add("@PageSize", filterDto.PageSize);
+            parameters.Add("@Offset", offset);
 
             using var connection = _dbContext.GetConnection();
-            using var multi = await connection.QueryMultipleAsync(query);
+            using var multi = await connection.QueryMultipleAsync(query, parameters);
             var items = (await multi.ReadAsync<User>()).AsList();
             var totalCount = await multi.ReadFirstAsync<int>();
 

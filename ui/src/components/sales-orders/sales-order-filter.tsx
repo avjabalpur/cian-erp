@@ -2,17 +2,20 @@
 
 import { useState } from "react";
 import { useQueryState } from "nuqs";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Filter, X, Search } from "lucide-react";
+import { Search, User } from "lucide-react";
 import React from "react";
 import {
   NuqsFormInput,
   NuqsFormSelect,
   NuqsFormDateInput,
+  FilterWrapper,
   type SelectOption
 } from "@/components/shared/filter";
+import { UserLookup } from "@/components/shared/lookups";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import {
   salesOrderStatusOptions,
   paymentTermOptions,
@@ -27,8 +30,56 @@ interface SalesOrderFilterProps {
   onFilterChange: (filters: any) => void;
 }
 
+// Custom input component for assigned designer with lookup
+interface AssignedDesignerInputProps {
+  label: string;
+  value: number | null;
+  onChange: (value: number | null) => void;
+  placeholder?: string;
+  disabled?: boolean;
+  className?: string;
+  onLookupClick: () => void;
+}
+
+function AssignedDesignerInput({
+  label,
+  value,
+  onChange,
+  placeholder,
+  disabled = false,
+  className,
+  onLookupClick
+}: AssignedDesignerInputProps) {
+  return (
+    <div className={cn("space-y-2", className)}>
+      <Label>{label}</Label>
+      <div className="flex gap-2">
+        <Input
+          type="number"
+          placeholder={placeholder || "Enter designer ID"}
+          value={value?.toString() || ""}
+          onChange={(e) => onChange(e.target.value ? parseInt(e.target.value) : null)}
+          disabled={disabled}
+          className="flex-1"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={onLookupClick}
+          disabled={disabled}
+          title="Lookup Designer"
+        >
+          <User className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function SalesOrderFilter({ onFilterChange }: SalesOrderFilterProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [userLookupOpen, setUserLookupOpen] = useState(false);
 
   // Get current user ID (you can replace this with your actual user context)
   const currentUserId = 1; // TODO: Replace with actual current user ID from context
@@ -85,53 +136,19 @@ export function SalesOrderFilter({ onFilterChange }: SalesOrderFilterProps) {
     return count;
   };
 
-  const hasAnyFilters = () => {
-    return search || soStatus || paymentTerm || designUnder || currentStatus || 
-           isSubmitted !== null || (assignedDesigner && assignedDesigner !== currentUserId) || 
-           fromDate || toDate;
+  const handleUserSelect = (userId: number) => {
+    setAssignedDesigner(userId);
   };
 
   return (
-    <Card className="mb-6">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CardTitle className="flex items-center gap-2">
-              <Filter className="h-5 w-5" />
-              Filters
-              {getActiveFilterCount() > 0 && (
-                <Badge variant="secondary" className="ml-2">
-                  {getActiveFilterCount()}
-                </Badge>
-              )}
-            </CardTitle>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              {isExpanded ? "Collapse" : "Expand"}
-            </Button>
-            {hasAnyFilters() && (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={clearFilters}
-                  className="text-blue-600 hover:text-blue-700"
-                >
-                  <X className="h-4 w-4 mr-1" />
-                  Clear Filters
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-      </CardHeader>
-      
-      <CardContent>
+    <>
+      <FilterWrapper
+        title="Sales Order Filters"
+        activeFilterCount={getActiveFilterCount()}
+        onClearFilters={clearFilters}
+        isExpanded={isExpanded}
+        onToggleExpand={setIsExpanded}
+      >
         {/* Basic Filters - Always Visible */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <NuqsFormInput
@@ -185,12 +202,12 @@ export function SalesOrderFilter({ onFilterChange }: SalesOrderFilterProps) {
                 ]}
               />
               
-              <NuqsFormInput
+              <AssignedDesignerInput
                 label="Assigned Designer"
-                value={assignedDesigner?.toString() || null}
-                onChange={(value) => setAssignedDesigner(value ? parseInt(value) : null)}
-                placeholder="Designer ID"
-                type="number"
+                value={assignedDesigner}
+                onChange={setAssignedDesigner}
+                placeholder="Enter designer ID"
+                onLookupClick={() => setUserLookupOpen(true)}
               />
             </div>
             
@@ -227,7 +244,15 @@ export function SalesOrderFilter({ onFilterChange }: SalesOrderFilterProps) {
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </FilterWrapper>
+
+      {/* User Lookup Dialog */}
+      <UserLookup
+        isOpen={userLookupOpen}
+        onClose={() => setUserLookupOpen(false)}
+        onSelect={handleUserSelect}
+        title="Select Assigned Designer"
+      />
+    </>
   );
 } 

@@ -22,8 +22,8 @@ namespace Xcianify.Presentation.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUsers([FromQuery] UserFilterDto filterDto)
         {
-            var (items, _) = await _userService.GetAllUsersAsync(filterDto);
-            return Ok(items);
+            var (items, totalCount) = await _userService.GetAllUsersAsync(filterDto);
+            return Ok(new { items, totalCount });
         }
 
         [HttpGet("{id}")]

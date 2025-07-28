@@ -1,200 +1,205 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Edit, Trash2, Eye, Plus, Search, MessageSquare } from "lucide-react"
-import { formatDate } from "@/lib/date-utils"
-import type { SalesOrderComment } from "@/types/sales-order-extended"
-import { useCommentsBySalesOrder } from "@/hooks/use-sales-order-extended"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { MessageSquare, Plus, Edit, Trash2, Paperclip } from "lucide-react";
+import { useCommentsBySalesOrder, useCreateSalesOrderComment, useUpdateSalesOrderComment, useDeleteSalesOrderComment } from "@/hooks/sales-order/use-sales-order-comments";
+import type { SalesOrderComment, CreateSalesOrderCommentData } from "@/types/sales-order-extended";
+import { format } from "date-fns";
+import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 
-interface SalesOrderCommentsTableProps {
-  salesOrderId?: number
-  onView?: (comment: SalesOrderComment) => void
-  onEdit?: (comment: SalesOrderComment) => void
-  onDelete?: (id: number) => void
-  onCreate?: () => void
+interface SalesOrderCommentsProps {
+  salesOrderId: number;
 }
 
-export default function SalesOrderCommentsTable({
-  salesOrderId,
-  onView,
-  onEdit,
-  onDelete,
-  onCreate,
-}: SalesOrderCommentsTableProps) {
-  const [searchTerm, setSearchTerm] = useState("")
+export function SalesOrderComments({ salesOrderId }: SalesOrderCommentsProps) {
+  const [newComment, setNewComment] = useState("");
+  const [editingComment, setEditingComment] = useState<SalesOrderComment | null>(null);
+  const [editText, setEditText] = useState("");
+  
+  const { data: comments = [], isLoading, refetch } = useCommentsBySalesOrder(salesOrderId);
+  const createCommentMutation = useCreateSalesOrderComment();
+  const updateCommentMutation = useUpdateSalesOrderComment();
+  const deleteCommentMutation = useDeleteSalesOrderComment();
 
-  const {
-    data: comments = [],
-    isLoading,
-    error,
-  } = useCommentsBySalesOrder(salesOrderId || 0)
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
 
-  const filteredComments = comments.filter((comment: SalesOrderComment) =>
-    comment.comments.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    comment.status?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    comment.type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    comment.createdByName?.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+    const commentData: CreateSalesOrderCommentData = {
+      salesOrderId,
+      comments: newComment.trim(),
+    };
+
+    try {
+      await createCommentMutation.mutateAsync({ salesOrderId, data: commentData });
+      setNewComment("");
+      refetch();
+    } catch (error) {
+      console.error("Failed to add comment:", error);
+    }
+  };
+
+  const handleEditComment = async () => {
+    if (!editingComment || !editText.trim()) return;
+
+    const commentData: CreateSalesOrderCommentData = {
+      salesOrderId,
+      comments: editText.trim(),
+    };
+
+    try {
+      await updateCommentMutation.mutateAsync({ 
+        salesOrderId, 
+        commentId: editingComment.id, 
+        data: commentData 
+      });
+      setEditingComment(null);
+      setEditText("");
+      refetch();
+    } catch (error) {
+      console.error("Failed to update comment:", error);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: number) => {
+    try {
+      await deleteCommentMutation.mutateAsync({ salesOrderId, commentId });
+      refetch();
+    } catch (error) {
+      console.error("Failed to delete comment:", error);
+    }
+  };
+
+  const startEditing = (comment: SalesOrderComment) => {
+    setEditingComment(comment);
+    setEditText(comment.comments);
+  };
+
+  const cancelEditing = () => {
+    setEditingComment(null);
+    setEditText("");
+  };
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Comments</CardTitle>
-          <CardDescription>Loading comments...</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center h-32">
-            <p className="text-muted-foreground">Loading...</p>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Comments</CardTitle>
-          <CardDescription>Error loading comments</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center h-32">
-            <p className="text-red-500">Error loading comments</p>
-          </div>
-        </CardContent>
-      </Card>
-    )
+      <div className="flex items-center justify-center h-32">
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Comments</CardTitle>
-            <CardDescription>
-              {salesOrderId
-                ? "Comments for this sales order"
-                : "All sales order comments"
-              }
-            </CardDescription>
-          </div>
-          {onCreate && (
-            <Button onClick={onCreate} size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Comment
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search comments..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8"
-              />
-            </div>
-          </div>
 
-          {filteredComments.length === 0 ? (
-            <div className="flex items-center justify-center h-32">
-              <p className="text-muted-foreground">
-                {searchTerm ? "No comments found matching your search" : "No comments found"}
-              </p>
-            </div>
-          ) : (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Comment</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Created By</TableHead>
-                    <TableHead>Created At</TableHead>
-                    <TableHead className="w-[50px]">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredComments.map((comment: SalesOrderComment) => (
-                    <TableRow key={comment.id}>
-                      <TableCell className="max-w-[300px]">
-                        <div className="truncate" title={comment.comments}>
-                          {comment.comments}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {comment.type ? (
-                          <Badge variant="outline">{comment.type}</Badge>
-                        ) : (
-                          "-"
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {comment.status ? (
-                          <Badge variant={comment.status === "Active" ? "default" : "secondary"}>
-                            {comment.status}
-                          </Badge>
-                        ) : (
-                          "-"
-                        )}
-                      </TableCell>
-                      <TableCell>{comment.createdByName || "Unknown User"}</TableCell>
-                      <TableCell>{formatDate(comment.createdAt)}</TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <span className="sr-only">Open menu</span>
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {onView && (
-                              <DropdownMenuItem onClick={() => onView(comment)}>
-                                <Eye className="mr-2 h-4 w-4" />
-                                View
-                              </DropdownMenuItem>
-                            )}
-                            {onEdit && !comment.isDeleted && (
-                              <DropdownMenuItem onClick={() => onEdit(comment)}>
-                                <Edit className="mr-2 h-4 w-4" />
-                                Edit
-                              </DropdownMenuItem>
-                            )}
-                            {onDelete && !comment.isDeleted && (
-                              <DropdownMenuItem
-                                onClick={() => onDelete(comment.id)}
-                                className="text-red-600"
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
-                              </DropdownMenuItem>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
+    <Card>
+    <CardHeader>
+      <CardTitle className="flex justify-between items-center gap-2">
+       <div className="flex justify-between items-center gap-2">
+       <Paperclip className="h-5 w-5" />
+       Comments
+       </div>
+      </CardTitle>
+    </CardHeader>
+    <CardContent>
+    <div className="space-y-4">
+      {/* Add New Comment */}
+      <div className="space-y-2">
+        <Textarea
+          placeholder="Add a comment..."
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          className="min-h-[80px]"
+          disabled={createCommentMutation.isPending}
+        />
+        <div className="flex justify-end">
+          <Button
+            onClick={handleAddComment}
+            disabled={!newComment.trim() || createCommentMutation.isPending}
+            size="sm"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Comment
+          </Button>
         </div>
-      </CardContent>
-    </Card>
-  )
+      </div>
+
+      {/* Comments List */}
+      <ScrollArea className="border rounded-md p-4">
+        {comments.length === 0 ? (
+          <div className="text-center text-muted-foreground py-8">
+            No comments yet. Add the first comment!
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {comments.map((comment: SalesOrderComment) => (
+              <div key={comment.id} className="border-b pb-4 last:border-b-0">
+                {editingComment?.id === comment.id ? (
+                  <div className="space-y-2">
+                    <Textarea
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      className="min-h-[60px]"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        onClick={handleEditComment}
+                        disabled={updateCommentMutation.isPending}
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={cancelEditing}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-sm">
+                          {comment.createdByName || "Unknown User"}
+                        </span>
+                        <Badge variant="outline" className="text-xs">
+                          {format(new Date(comment.createdAt), "MMM dd, yyyy HH:mm")}
+                        </Badge>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => startEditing(comment)}
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteComment(comment.id)}
+                          disabled={deleteCommentMutation.isPending}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="text-sm">{comment.comments}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </ScrollArea>
+    </div>
+    </CardContent>
+  </Card>
+  
+  
+  );
 } 

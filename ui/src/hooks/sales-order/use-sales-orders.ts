@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../lib/api';
-import { SalesOrder, CreateSalesOrderData, UpdateSalesOrderData } from '../types/sales-order';
+import api from '../../lib/api';
+import { SalesOrder, 
+  CreateSalesOrderData,
+   UpdateSalesOrderData } from '../../types/sales-order';
 
 // --- API Functions ---
 

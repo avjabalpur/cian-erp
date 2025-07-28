@@ -26,7 +26,7 @@ namespace Xcianify.Services
 
         public async Task<(IEnumerable<UserDto> Items, int TotalCount)> GetAllUsersAsync(UserFilterDto filterDto)
         {
-            var (users, totalCount) = await _userRepository.GetAllAsync();
+            var (users, totalCount) = await _userRepository.GetAllAsync(filterDto);
             return (_mapper.Map<IEnumerable<UserDto>>(users), totalCount);
         }
 

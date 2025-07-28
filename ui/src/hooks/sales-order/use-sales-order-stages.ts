@@ -1,233 +1,36 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../lib/api';
+import api from '../../lib/api';
 import type { 
-  SalesOrderComment, 
-  CreateSalesOrderCommentData,
-  SalesOrderQuotation,
-  CreateSalesOrderQuotationData,
-  SalesOrderSaveTransaction,
-  CreateSalesOrderSaveTransactionData,
-  SalesOrderDocument,
-  CreateSalesOrderDocumentData,
-  SalesOrderPerformaInvoice,
-  CreateSalesOrderPerformaInvoiceData,
-  SalesOrderPerformaInvoiceItem,
-  CreateSalesOrderPerformaInvoiceItemData,
-  SalesOrderQuotationItem,
-  CreateSalesOrderQuotationItemData
-} from '../types/sales-order-extended';
+  SalesOrderStage,
+  CreateSalesOrderStageData
+} from '../../types/sales-order-extended';
 
-// --- Sales Order Comments API Functions ---
+// --- Sales Order Stages API Functions ---
 
-const getCommentsBySalesOrder = async (salesOrderId: number): Promise<SalesOrderComment[]> => {
-  const { data } = await api.get(`/sales-order/${salesOrderId}/comments`);
+const getStagesBySalesOrder = async (salesOrderId: number): Promise<SalesOrderStage[]> => {
+  const { data } = await api.get(`/sales-order/${salesOrderId}/stages`);
   return data;
 };
 
-const createSalesOrderComment = async (salesOrderId: number, commentData: CreateSalesOrderCommentData): Promise<SalesOrderComment> => {
-  const { data } = await api.post(`/sales-order/${salesOrderId}/comments`, commentData);
+const createSalesOrderStage = async (salesOrderId: number, stageData: CreateSalesOrderStageData): Promise<SalesOrderStage> => {
+  const { data } = await api.post(`/sales-order/${salesOrderId}/stages`, stageData);
   return data;
 };
 
-const updateSalesOrderComment = async (salesOrderId: number, commentId: number, commentData: CreateSalesOrderCommentData): Promise<void> => {
-  await api.put(`/sales-order/${salesOrderId}/comments/${commentId}`, commentData);
+const updateSalesOrderStage = async (salesOrderId: number, stageId: number, stageData: CreateSalesOrderStageData): Promise<void> => {
+  await api.put(`/sales-order/${salesOrderId}/stages/${stageId}`, stageData);
 };
 
-const deleteSalesOrderComment = async (salesOrderId: number, commentId: number): Promise<void> => {
-  await api.delete(`/sales-order/${salesOrderId}/comments/${commentId}`);
+const deleteSalesOrderStage = async (salesOrderId: number, stageId: number): Promise<void> => {
+  await api.delete(`/sales-order/${salesOrderId}/stages/${stageId}`);
 };
 
-// --- Sales Order Chat API Functions ---
-
-const getChatMessagesBySalesOrder = async (salesOrderId: number): Promise<any[]> => {
-  const { data } = await api.get(`/sales-order/${salesOrderId}/chat`);
-  return data;
+const approveStage = async (salesOrderId: number, stageName: string): Promise<void> => {
+  await api.post(`/sales-order/${salesOrderId}/stages/${encodeURIComponent(stageName)}/approve`);
 };
 
-const createSalesOrderChatMessage = async (salesOrderId: number, chatData: any): Promise<any> => {
-  const { data } = await api.post(`/sales-order/${salesOrderId}/chat`, chatData);
-  return data;
-};
-
-const updateSalesOrderChatMessage = async (salesOrderId: number, chatId: number, chatData: any): Promise<void> => {
-  await api.put(`/sales-order/${salesOrderId}/chat/${chatId}`, chatData);
-};
-
-const deleteSalesOrderChatMessage = async (salesOrderId: number, chatId: number): Promise<void> => {
-  await api.delete(`/sales-order/${salesOrderId}/chat/${chatId}`);
-};
-
-// --- Sales Order Documents API Functions ---
-
-const getDocumentsBySalesOrder = async (salesOrderId: number): Promise<SalesOrderDocument[]> => {
-  const { data } = await api.get(`/sales-order/${salesOrderId}/documents`);
-  return data;
-};
-
-const createSalesOrderDocument = async (salesOrderId: number, documentData: CreateSalesOrderDocumentData): Promise<SalesOrderDocument> => {
-  const { data } = await api.post(`/sales-order/${salesOrderId}/documents`, documentData);
-  return data;
-};
-
-const updateSalesOrderDocument = async (salesOrderId: number, documentId: number, documentData: CreateSalesOrderDocumentData): Promise<void> => {
-  await api.put(`/sales-order/${salesOrderId}/documents/${documentId}`, documentData);
-};
-
-const deleteSalesOrderDocument = async (salesOrderId: number, documentId: number): Promise<void> => {
-  await api.delete(`/sales-order/${salesOrderId}/documents/${documentId}`);
-};
-
-// --- Sales Order Performa Invoices API Functions ---
-
-const getSalesOrderPerformaInvoices = async (): Promise<SalesOrderPerformaInvoice[]> => {
-  const { data } = await api.get('/salesorderperformainvoice');
-  return data;
-};
-
-const getSalesOrderPerformaInvoiceById = async (id: number): Promise<SalesOrderPerformaInvoice | null> => {
-  if (!id) return null;
-  const { data } = await api.get(`/salesorderperformainvoice/${id}`);
-  return data;
-};
-
-const createSalesOrderPerformaInvoice = async (performaInvoiceData: CreateSalesOrderPerformaInvoiceData): Promise<SalesOrderPerformaInvoice> => {
-  const { data } = await api.post('/salesorderperformainvoice', performaInvoiceData);
-  return data;
-};
-
-const updateSalesOrderPerformaInvoice = async ({ id, ...performaInvoiceData }: { id: number; data: CreateSalesOrderPerformaInvoiceData }): Promise<void> => {
-  await api.put(`/salesorderperformainvoice/${id}`, performaInvoiceData.data);
-};
-
-const deleteSalesOrderPerformaInvoice = async (id: number): Promise<void> => {
-  await api.delete(`/salesorderperformainvoice/${id}`);
-};
-
-const getPerformaInvoiceByNumber = async (invoiceNumber: string): Promise<SalesOrderPerformaInvoice | null> => {
-  const { data } = await api.get(`/salesorderperformainvoice/number/${invoiceNumber}`);
-  return data;
-};
-
-const getPerformaInvoicesBySalesOrder = async (salesOrderId: number): Promise<SalesOrderPerformaInvoice[]> => {
-  const { data } = await api.get(`/salesorderperformainvoice/sales-order/${salesOrderId}`);
-  return data;
-};
-
-// --- Sales Order Performa Invoice Items API Functions ---
-
-const getPerformaInvoiceItemsByPerformaInvoice = async (performaInvoiceId: number): Promise<SalesOrderPerformaInvoiceItem[]> => {
-  const { data } = await api.get(`/salesorderperformainvoice/${performaInvoiceId}/items`);
-  return data;
-};
-
-const createSalesOrderPerformaInvoiceItem = async (performaInvoiceId: number, itemData: CreateSalesOrderPerformaInvoiceItemData): Promise<SalesOrderPerformaInvoiceItem> => {
-  const { data } = await api.post(`/salesorderperformainvoice/${performaInvoiceId}/items`, itemData);
-  return data;
-};
-
-const updateSalesOrderPerformaInvoiceItem = async (performaInvoiceId: number, itemId: number, itemData: CreateSalesOrderPerformaInvoiceItemData): Promise<void> => {
-  await api.put(`/salesorderperformainvoice/${performaInvoiceId}/items/${itemId}`, itemData);
-};
-
-const deleteSalesOrderPerformaInvoiceItem = async (performaInvoiceId: number, itemId: number): Promise<void> => {
-  await api.delete(`/salesorderperformainvoice/${performaInvoiceId}/items/${itemId}`);
-};
-
-// --- Sales Order Quotations API Functions ---
-
-const getSalesOrderQuotations = async (): Promise<SalesOrderQuotation[]> => {
-  const { data } = await api.get('/salesorderquotation');
-  return data;
-};
-
-const getSalesOrderQuotationById = async (id: number): Promise<SalesOrderQuotation | null> => {
-  if (!id) return null;
-  const { data } = await api.get(`/salesorderquotation/${id}`);
-  return data;
-};
-
-const createSalesOrderQuotation = async (quotationData: CreateSalesOrderQuotationData): Promise<SalesOrderQuotation> => {
-  const { data } = await api.post('/salesorderquotation', quotationData);
-  return data;
-};
-
-const updateSalesOrderQuotation = async ({ id, ...quotationData }: { id: number; data: CreateSalesOrderQuotationData }): Promise<void> => {
-  await api.put(`/salesorderquotation/${id}`, quotationData.data);
-};
-
-const deleteSalesOrderQuotation = async (id: number): Promise<void> => {
-  await api.delete(`/salesorderquotation/${id}`);
-};
-
-const getQuotationByNumber = async (quotationNumber: string): Promise<SalesOrderQuotation | null> => {
-  const { data } = await api.get(`/salesorderquotation/number/${quotationNumber}`);
-  return data;
-};
-
-const getQuotationsByCustomer = async (customerId: number): Promise<SalesOrderQuotation[]> => {
-  const { data } = await api.get(`/salesorderquotation/customer/${customerId}`);
-  return data;
-};
-
-const getQuotationsByOrganization = async (organizationId: number): Promise<SalesOrderQuotation[]> => {
-  const { data } = await api.get(`/salesorderquotation/organization/${organizationId}`);
-  return data;
-};
-
-const getQuotationsByDateRange = async (startDate: string, endDate: string): Promise<SalesOrderQuotation[]> => {
-  const { data } = await api.get(`/salesorderquotation/date-range?startDate=${startDate}&endDate=${endDate}`);
-  return data;
-};
-
-// --- Sales Order Quotation Items API Functions ---
-
-const getQuotationItemsByQuotation = async (quotationId: number): Promise<SalesOrderQuotationItem[]> => {
-  const { data } = await api.get(`/salesorderquotation/${quotationId}/items`);
-  return data;
-};
-
-const createSalesOrderQuotationItem = async (quotationId: number, itemData: CreateSalesOrderQuotationItemData): Promise<SalesOrderQuotationItem> => {
-  const { data } = await api.post(`/salesorderquotation/${quotationId}/items`, itemData);
-  return data;
-};
-
-const updateSalesOrderQuotationItem = async (quotationId: number, itemId: number, itemData: CreateSalesOrderQuotationItemData): Promise<void> => {
-  await api.put(`/salesorderquotation/${quotationId}/items/${itemId}`, itemData);
-};
-
-const deleteSalesOrderQuotationItem = async (quotationId: number, itemId: number): Promise<void> => {
-  await api.delete(`/salesorderquotation/${quotationId}/items/${itemId}`);
-};
-
-// --- Sales Order Save Transactions API Functions ---
-
-const getSalesOrderSaveTransactions = async (): Promise<SalesOrderSaveTransaction[]> => {
-  const { data } = await api.get('/salesordersavetransaction');
-  return data;
-};
-
-const getSalesOrderSaveTransactionById = async (id: number): Promise<SalesOrderSaveTransaction | null> => {
-  if (!id) return null;
-  const { data } = await api.get(`/salesordersavetransaction/${id}`);
-  return data;
-};
-
-const createSalesOrderSaveTransaction = async (saveTransactionData: CreateSalesOrderSaveTransactionData): Promise<SalesOrderSaveTransaction> => {
-  const { data } = await api.post('/salesordersavetransaction', saveTransactionData);
-  return data;
-};
-
-const updateSalesOrderSaveTransaction = async ({ id, ...saveTransactionData }: { id: number; data: CreateSalesOrderSaveTransactionData }): Promise<void> => {
-  await api.put(`/salesordersavetransaction/${id}`, saveTransactionData.data);
-};
-
-const deleteSalesOrderSaveTransaction = async (id: number): Promise<void> => {
-  await api.delete(`/salesordersavetransaction/${id}`);
-};
-
-const getSaveTransactionsBySalesOrder = async (salesOrderId: number): Promise<SalesOrderSaveTransaction[]> => {
-  const { data } = await api.get(`/salesordersavetransaction/sales-order/${salesOrderId}`);
-  return data;
+const rejectStage = async (salesOrderId: number, stageName: string): Promise<void> => {
+  await api.post(`/sales-order/${salesOrderId}/stages/${encodeURIComponent(stageName)}/reject`);
 };
 
 // --- Sales Order Comments Hooks ---
@@ -624,8 +427,68 @@ export const useDeleteSalesOrderSaveTransaction = () => {
 
 export const useSaveTransactionsBySalesOrder = (salesOrderId: number) => {
   return useQuery<SalesOrderSaveTransaction[], Error>({
-    queryKey: ['sales-order-save-transactions-by-sales-order', salesOrderId],
+    queryKey: ['sales-order-save-transactions', salesOrderId],
     queryFn: () => getSaveTransactionsBySalesOrder(salesOrderId),
     enabled: !!salesOrderId,
+  });
+};
+
+// --- Sales Order Stages Hooks ---
+
+export const useSalesOrderStages = (salesOrderId: number) => {
+  return useQuery<SalesOrderStage[], Error>({
+    queryKey: ['sales-order-stages', salesOrderId],
+    queryFn: () => getStagesBySalesOrder(salesOrderId),
+    enabled: !!salesOrderId,
+  });
+};
+
+export const useCreateSalesOrderStage = () => {
+  const queryClient = useQueryClient();
+  return useMutation<SalesOrderStage, Error, { salesOrderId: number; data: CreateSalesOrderStageData }>({
+    mutationFn: ({ salesOrderId, data }) => createSalesOrderStage(salesOrderId, data),
+    onSuccess: (_, { salesOrderId }) => {
+      queryClient.invalidateQueries({ queryKey: ['sales-order-stages', salesOrderId] });
+    },
+  });
+};
+
+export const useUpdateSalesOrderStage = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, { salesOrderId: number; stageId: number; data: CreateSalesOrderStageData }>({
+    mutationFn: ({ salesOrderId, stageId, data }) => updateSalesOrderStage(salesOrderId, stageId, data),
+    onSuccess: (_, { salesOrderId }) => {
+      queryClient.invalidateQueries({ queryKey: ['sales-order-stages', salesOrderId] });
+    },
+  });
+};
+
+export const useDeleteSalesOrderStage = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, { salesOrderId: number; stageId: number }>({
+    mutationFn: ({ salesOrderId, stageId }) => deleteSalesOrderStage(salesOrderId, stageId),
+    onSuccess: (_, { salesOrderId }) => {
+      queryClient.invalidateQueries({ queryKey: ['sales-order-stages', salesOrderId] });
+    },
+  });
+};
+
+export const useApproveStage = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, { salesOrderId: number; stageName: string }>({
+    mutationFn: ({ salesOrderId, stageName }) => approveStage(salesOrderId, stageName),
+    onSuccess: (_, { salesOrderId }) => {
+      queryClient.invalidateQueries({ queryKey: ['sales-order-stages', salesOrderId] });
+    },
+  });
+};
+
+export const useRejectStage = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, { salesOrderId: number; stageName: string }>({
+    mutationFn: ({ salesOrderId, stageName }) => rejectStage(salesOrderId, stageName),
+    onSuccess: (_, { salesOrderId }) => {
+      queryClient.invalidateQueries({ queryKey: ['sales-order-stages', salesOrderId] });
+    },
   });
 }; 
