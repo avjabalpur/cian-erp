@@ -869,14 +869,14 @@ CREATE TABLE IF NOT EXISTS purchase_order_chat (
   order_id INTEGER,
   comment TEXT,
   created_by INTEGER,
-  created_time TIMESTAMP NULL
+  created_at TIMESTAMP NULL
 );
 
 CREATE TABLE IF NOT EXISTS purchase_order_comments (
   id SERIAL PRIMARY KEY,
   order_id INTEGER,
   created_by INTEGER,
-  created_time TIMESTAMP NULL,
+  created_at TIMESTAMP NULL,
   comments VARCHAR(500),
   status VARCHAR(200),
   type VARCHAR(200),
@@ -890,9 +890,9 @@ CREATE TABLE IF NOT EXISTS purchase_order_comments (
 CREATE TABLE IF NOT EXISTS sales_orders (
   id SERIAL PRIMARY KEY,
   created_by INTEGER,
-  created_time TIMESTAMP NULL,
+  created_at TIMESTAMP NULL,
   updated_by INTEGER,
-  updated_time TIMESTAMP NULL,
+  updated_at TIMESTAMP NULL,
   current_status VARCHAR(200),
   comments TEXT,
   is_submitted INTEGER DEFAULT 0,
@@ -956,9 +956,9 @@ CREATE TABLE IF NOT EXISTS sales_order_stages (
   stage_name VARCHAR(200),
   is_approved INTEGER DEFAULT 0,
   created_by INTEGER,
-  created_time TIMESTAMP NULL,
+  created_at TIMESTAMP NULL,
   updated_by INTEGER,
-  updated_time TIMESTAMP NULL,
+  updated_at TIMESTAMP NULL,
   is_deleted INTEGER DEFAULT 0
 );
 
@@ -968,7 +968,9 @@ CREATE TABLE IF NOT EXISTS sales_order_chat (
   sales_order_id INTEGER,
   comment TEXT,
   created_by INTEGER,
-  created_time TIMESTAMP NULL,
+  created_at TIMESTAMP NULL,
+  updated_by INTEGER,
+  updated_at TIMESTAMP NULL,
   CONSTRAINT fk_sales_order
     FOREIGN KEY (sales_order_id) 
     REFERENCES sales_orders(id)
@@ -978,8 +980,10 @@ CREATE TABLE IF NOT EXISTS sales_order_chat (
 CREATE TABLE IF NOT EXISTS sales_order_comments (
   id SERIAL PRIMARY KEY,
   sales_order_id INTEGER,
-  created_by INTEGER,
-  created_time TIMESTAMP NULL,
+ created_by INTEGER,
+  created_at TIMESTAMP NULL,
+  updated_by INTEGER,
+  updated_at TIMESTAMP NULL,
   comments VARCHAR(500),
   status VARCHAR(200),
   type VARCHAR(200),
@@ -999,8 +1003,10 @@ CREATE TABLE IF NOT EXISTS sales_order_documents (
   file_type VARCHAR(100),
   metadata TEXT,
   is_deleted INTEGER DEFAULT 0,
-  created_by INTEGER,
-  created_time TIMESTAMP NULL,
+ created_by INTEGER,
+  created_at TIMESTAMP NULL,
+  updated_by INTEGER,
+  updated_at TIMESTAMP NULL,
   CONSTRAINT fk_sales_order_documents
     FOREIGN KEY (sales_order_id) 
     REFERENCES sales_orders(id)
@@ -1009,8 +1015,7 @@ CREATE TABLE IF NOT EXISTS sales_order_documents (
 
 CREATE TABLE IF NOT EXISTS sales_order_performa_invoice (
   id SERIAL PRIMARY KEY,
-  created_time TIMESTAMP NULL,
-  created_by INTEGER,
+ 
   is_deleted INTEGER DEFAULT 0,
   exporter_name VARCHAR(200),
   organization_name VARCHAR(200),
@@ -1034,7 +1039,11 @@ CREATE TABLE IF NOT EXISTS sales_order_performa_invoice (
   port_of_loading VARCHAR(60),
   additionalCharges TEXT,
   total_amount FLOAT,
-  previous_performa_invoice_id INTEGER DEFAULT 0
+  previous_performa_invoice_id INTEGER DEFAULT 0,
+  created_by INTEGER,
+  created_at TIMESTAMP NULL,
+  updated_by INTEGER,
+  updated_at TIMESTAMP NULL
 );
 
 CREATE TABLE IF NOT EXISTS sales_order_performa_invoice_items (
@@ -1049,13 +1058,15 @@ CREATE TABLE IF NOT EXISTS sales_order_performa_invoice_items (
   p_pack_short TEXT,
   p_quantity FLOAT,
   p_foc_qty FLOAT,
-  p_billing_rate FLOAT
+  p_billing_rate FLOAT,
+  created_by INTEGER,
+  created_at TIMESTAMP NULL,
+  updated_by INTEGER,
+  updated_at TIMESTAMP NULL
 );
 
 CREATE TABLE IF NOT EXISTS sales_order_quotation (
   id SERIAL PRIMARY KEY,
-  created_time TIMESTAMP NULL,
-  created_by INTEGER,
   is_deleted INTEGER DEFAULT 0,
   organization_id INTEGER,
   quotation_number VARCHAR(200),
@@ -1065,7 +1076,11 @@ CREATE TABLE IF NOT EXISTS sales_order_quotation (
   charges TEXT,
   total_amount FLOAT,
   advance_amount FLOAT,
-  prev_copy_quotation_id INTEGER DEFAULT 0
+  prev_copy_quotation_id INTEGER DEFAULT 0,
+  created_by INTEGER,
+  created_at TIMESTAMP NULL,
+  updated_by INTEGER,
+  updated_at TIMESTAMP NULL
 );
 
 CREATE TABLE IF NOT EXISTS sales_order_quotation_items (
@@ -1086,15 +1101,21 @@ CREATE TABLE IF NOT EXISTS sales_order_quotation_items (
   comments TEXT,
   tax_percent FLOAT,
   product_extra_charges FLOAT,
-  product_extra_charges_tax_percent FLOAT
+  product_extra_charges_tax_percent FLOAT,
+  created_by INTEGER,
+  created_at TIMESTAMP NULL,
+  updated_by INTEGER,
+  updated_at TIMESTAMP NULL
 );
 
 CREATE TABLE IF NOT EXISTS sales_order_save_transactions (
   id SERIAL PRIMARY KEY,
   sales_order_id INTEGER,
+  diff TEXT,
   created_by INTEGER,
-  created_time TIMESTAMP NULL,
-  diff TEXT
+  created_at TIMESTAMP NULL,
+  updated_by INTEGER,
+  updated_at TIMESTAMP NULL
 );
 
 

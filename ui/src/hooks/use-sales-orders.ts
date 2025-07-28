@@ -4,8 +4,27 @@ import { SalesOrder, CreateSalesOrderData, UpdateSalesOrderData } from '../types
 
 // --- API Functions ---
 
-const getSalesOrders = async (): Promise<SalesOrder[]> => {
-  const { data } = await api.get('/sales-order');
+const getSalesOrders = async (params: any = {}): Promise<{ items: SalesOrder[]; totalCount: number }> => {
+  const queryParams = new URLSearchParams();
+  
+  if (params.pageNumber) queryParams.append('page', params.pageNumber.toString());
+  if (params.pageSize) queryParams.append('pageSize', params.pageSize.toString());
+  if (params.search) queryParams.append('search', params.search);
+  if (params.status) queryParams.append('soStatus', params.status);
+  if (params.paymentTerm) queryParams.append('paymentTerm', params.paymentTerm);
+ /*  if (params.designUnder) queryParams.append('designUnder', params.designUnder);
+  if (params.currentStatus) queryParams.append('currentStatus', params.currentStatus);
+  if (params.isSubmitted !== undefined) queryParams.append('isSubmitted', params.isSubmitted.toString());
+  if (params.assignedDesigner) queryParams.append('assignedDesigner', params.assignedDesigner.toString());
+  if (params.fromDate) queryParams.append('fromDate', params.fromDate);
+  if (params.toDate) queryParams.append('toDate', params.toDate);
+  if (params.sortBy) queryParams.append('sortBy', params.sortBy);
+  if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder); */
+  
+  const queryString = queryParams.toString();
+  const url = queryString ? `/sales-order?${queryString}` : '/sales-order';
+  
+  const { data } = await api.get(url);
   return data;
 };
 
@@ -51,10 +70,10 @@ const getSalesOrdersByDateRange = async (startDate: string, endDate: string): Pr
 
 // --- Custom Hooks ---
 
-export const useSalesOrders = ({ pageNumber = 1, pageSize = 10, status, search, customerId, organizationId, fromDate, toDate, sortBy, sortOrder }: any = {}) => {
-  return useQuery<SalesOrder[], Error>({
-    queryKey: ['sales-orders', { pageNumber, pageSize, status, search, customerId, organizationId, fromDate, toDate, sortBy, sortOrder }],
-    queryFn: getSalesOrders,
+export const useSalesOrders = (params: any = {}) => {
+  return useQuery<{ items: SalesOrder[]; totalCount: number }, Error>({
+    queryKey: ['sales-orders', params],
+    queryFn: () => getSalesOrders(params),
   });
 };
 
@@ -99,7 +118,7 @@ export const useDeleteSalesOrder = () => {
 
 export const useSalesOrdersByStatus = (status: string) => {
   return useQuery<SalesOrder[], Error>({
-    queryKey: ['sales-orders-by-status', status],
+    queryKey: ['sales-orders', 'status', status],
     queryFn: () => getSalesOrdersByStatus(status),
     enabled: !!status,
   });
@@ -107,7 +126,7 @@ export const useSalesOrdersByStatus = (status: string) => {
 
 export const useSalesOrdersByCustomer = (customerId: number) => {
   return useQuery<SalesOrder[], Error>({
-    queryKey: ['sales-orders-by-customer', customerId],
+    queryKey: ['sales-orders', 'customer', customerId],
     queryFn: () => getSalesOrdersByCustomer(customerId),
     enabled: !!customerId,
   });
@@ -115,7 +134,7 @@ export const useSalesOrdersByCustomer = (customerId: number) => {
 
 export const useSalesOrdersByOrganization = (organizationId: number) => {
   return useQuery<SalesOrder[], Error>({
-    queryKey: ['sales-orders-by-organization', organizationId],
+    queryKey: ['sales-orders', 'organization', organizationId],
     queryFn: () => getSalesOrdersByOrganization(organizationId),
     enabled: !!organizationId,
   });
@@ -123,8 +142,8 @@ export const useSalesOrdersByOrganization = (organizationId: number) => {
 
 export const useSalesOrdersByDateRange = (startDate: string, endDate: string) => {
   return useQuery<SalesOrder[], Error>({
-    queryKey: ['sales-orders-by-date-range', startDate, endDate],
+    queryKey: ['sales-orders', 'date-range', startDate, endDate],
     queryFn: () => getSalesOrdersByDateRange(startDate, endDate),
-    enabled: !!(startDate && endDate),
+    enabled: !!startDate && !!endDate,
   });
 }; 

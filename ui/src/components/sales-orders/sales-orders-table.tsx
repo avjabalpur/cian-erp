@@ -126,9 +126,9 @@ export default function SalesOrdersTable({
         columns={defaultColumns}
         columnMeta={columnMeta}
         isLoading={isLoading}
-        groupingEnabled={true}
-        globalFilterEnabled={true}
-        dragDropGroupingEnabled={true}
+        groupingEnabled={false}
+        globalFilterEnabled={false}
+        dragDropGroupingEnabled={false}
         onRowClick={onView}
         actionButtons={actionButtons}
         className="w-full"

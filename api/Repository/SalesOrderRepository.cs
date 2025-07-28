@@ -114,7 +114,7 @@ namespace Xcianify.Repository
                     so.*,
                     c.customer_name,
                     im.item_name,
-                    d.division_name,
+                    d.name,
                     u1.first_name || ' ' || u1.last_name as created_by_name,
                     u2.first_name || ' ' || u2.last_name as updated_by_name,
                     u3.first_name || ' ' || u3.last_name as assigned_designer_name
@@ -143,7 +143,7 @@ namespace Xcianify.Repository
                     so.*,
                     c.customer_name,
                     im.item_name,
-                    d.division_name,
+                    d.name,
                     u1.first_name || ' ' || u1.last_name as created_by_name,
                     u2.first_name || ' ' || u2.last_name as updated_by_name,
                     u3.first_name || ' ' || u3.last_name as assigned_designer_name
@@ -168,7 +168,7 @@ namespace Xcianify.Repository
                     so.*,
                     c.customer_name,
                     im.item_name,
-                    d.division_name,
+                    d.name,
                     u1.first_name || ' ' || u1.last_name as created_by_name,
                     u2.first_name || ' ' || u2.last_name as updated_by_name,
                     u3.first_name || ' ' || u3.last_name as assigned_designer_name
@@ -201,7 +201,7 @@ namespace Xcianify.Repository
                     label_drawing_ref_no, pm_outer_ctn_stock, pm_inner_ctn_stock, pm_foil_stock,
                     pm_leaflet_stock, pm_tube_stock, pm_label_stock, drug_approval_under,
                     current_status, comments, is_submitted, is_deleted, assigned_designer,
-                    plant_email_sent, created_by, created_time, updated_by, updated_time
+                    plant_email_sent, created_by, created_at, updated_by, updated_at
                 ) VALUES (
                     @SoNumber, @SoDate, @SoStatus, @OrganizationId, @CustomerId, @PaymentTerm,
                     @QuotationDate, @QuotationNo, @HsnCode, @ItemId, @DosageName, @DivisionId,
@@ -246,7 +246,7 @@ namespace Xcianify.Repository
                     pm_label_stock = @PmLabelStock, drug_approval_under = @DrugApprovalUnder,
                     current_status = @CurrentStatus, comments = @Comments, is_submitted = @IsSubmitted,
                     assigned_designer = @AssignedDesigner, plant_email_sent = @PlantEmailSent,
-                    updated_by = @UpdatedBy, updated_time = @UpdatedTime
+                    updated_by = @UpdatedBy, updated_at = @UpdatedAt
                 WHERE id = @Id AND is_deleted = 0
                 RETURNING *";
 
@@ -279,66 +279,6 @@ namespace Xcianify.Repository
             
             var count = await connection.QuerySingleAsync<int>(query, parameters);
             return count > 0;
-        }
-
-        public async Task<IEnumerable<SalesOrder>> GetByCustomerIdAsync(int customerId)
-        {
-            using var connection = _context.GetConnection();
-            
-            var query = @"
-                SELECT 
-                    so.*,
-                    c.customer_name,
-                    im.item_name,
-                    d.division_name
-                FROM sales_orders so
-                LEFT JOIN customers c ON so.customer_id = c.id
-                LEFT JOIN item_master im ON so.item_id = im.id
-                LEFT JOIN divisions d ON so.divisionid = d.id
-                WHERE so.customer_id = @CustomerId AND so.is_deleted = 0
-                ORDER BY so.created_time DESC";
-
-            return await connection.QueryAsync<SalesOrder>(query, new { CustomerId = customerId });
-        }
-
-        public async Task<IEnumerable<SalesOrder>> GetByOrganizationIdAsync(int organizationId)
-        {
-            using var connection = _context.GetConnection();
-            
-            var query = @"
-                SELECT 
-                    so.*,
-                    c.customer_name,
-                    im.item_name,
-                    d.division_name
-                FROM sales_orders so
-                LEFT JOIN customers c ON so.customer_id = c.id
-                LEFT JOIN item_master im ON so.item_id = im.id
-                LEFT JOIN divisions d ON so.divisionid = d.id
-                WHERE so.organization_id = @OrganizationId AND so.is_deleted = 0
-                ORDER BY so.created_time DESC";
-
-            return await connection.QueryAsync<SalesOrder>(query, new { OrganizationId = organizationId });
-        }
-
-        public async Task<IEnumerable<SalesOrder>> GetByStatusAsync(string status)
-        {
-            using var connection = _context.GetConnection();
-            
-            var query = @"
-                SELECT 
-                    so.*,
-                    c.customer_name,
-                    im.item_name,
-                    d.division_name
-                FROM sales_orders so
-                LEFT JOIN customers c ON so.customer_id = c.id
-                LEFT JOIN item_master im ON so.item_id = im.id
-                LEFT JOIN divisions d ON so.divisionid = d.id
-                WHERE so.so_status = @Status AND so.is_deleted = 0
-                ORDER BY so.created_time DESC";
-
-            return await connection.QueryAsync<SalesOrder>(query, new { Status = status });
         }
 
         public async Task<int> GetNextSoNumberAsync()

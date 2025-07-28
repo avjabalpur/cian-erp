@@ -27,7 +27,7 @@ namespace Xcianify.Repository
                     u1.first_name || ' ' || u1.last_name as created_by_name
                 FROM sales_order_save_transactions sost
                 LEFT JOIN users u1 ON sost.created_by = u1.id
-                ORDER BY sost.created_time DESC";
+                ORDER BY sost.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderSaveTransaction>(query);
         }
@@ -53,9 +53,9 @@ namespace Xcianify.Repository
             
             var query = @"
                 INSERT INTO sales_order_save_transactions (
-                    sales_order_id, diff, created_by, created_time
+                    sales_order_id, diff, created_by, created_at
                 ) VALUES (
-                    @SalesOrderId, @Diff, @CreatedBy, @CreatedTime
+                    @SalesOrderId, @Diff, @CreatedBy, @CreatedAt
                 ) RETURNING *";
 
             return await connection.QuerySingleAsync<SalesOrderSaveTransaction>(query, saveTransaction);
@@ -69,7 +69,7 @@ namespace Xcianify.Repository
                 UPDATE sales_order_save_transactions SET
                     diff = @Diff,
                     updated_by = @UpdatedBy,
-                    updated_time = @UpdatedTime
+                    updated_at = @UpdatedAt
                 WHERE id = @Id
                 RETURNING *";
 
@@ -104,7 +104,7 @@ namespace Xcianify.Repository
                 FROM sales_order_save_transactions sost
                 LEFT JOIN users u1 ON sost.created_by = u1.id
                 WHERE sost.sales_order_id = @SalesOrderId
-                ORDER BY sost.created_time DESC";
+                ORDER BY sost.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderSaveTransaction>(query, new { SalesOrderId = salesOrderId });
         }

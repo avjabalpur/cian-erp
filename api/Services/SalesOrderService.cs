@@ -23,13 +23,13 @@ namespace Xcianify.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<(IEnumerable<SalesOrderDto> Items, int TotalCount)> GetAllSalesOrdersAsync(SalesOrderFilterDto filterDto)
+        public async Task<(IEnumerable<SalesOrderDto> Items, int TotalCount)> GetAllAsync(SalesOrderFilterDto filterDto)
         {
             var (salesOrders, totalCount) = await _salesOrderRepository.GetAllAsync(filterDto);
             return (_mapper.Map<IEnumerable<SalesOrderDto>>(salesOrders), totalCount);
         }
 
-        public async Task<SalesOrderDto> GetSalesOrderByIdAsync(int id)
+        public async Task<SalesOrderDto> GetByIdAsync(int id)
         {
             var salesOrder = await _salesOrderRepository.GetByIdAsync(id);
             if (salesOrder == null)
@@ -38,7 +38,7 @@ namespace Xcianify.Services
             return _mapper.Map<SalesOrderDto>(salesOrder);
         }
 
-        public async Task<SalesOrderDto> GetSalesOrderBySoNumberAsync(string soNumber)
+        public async Task<SalesOrderDto> GetBySoNumberAsync(string soNumber)
         {
             var salesOrder = await _salesOrderRepository.GetBySoNumberAsync(soNumber);
             if (salesOrder == null)
@@ -47,7 +47,7 @@ namespace Xcianify.Services
             return _mapper.Map<SalesOrderDto>(salesOrder);
         }
 
-        public async Task<SalesOrderDto> CreateSalesOrderAsync(CreateSalesOrderDto salesOrderDto)
+        public async Task<SalesOrderDto> CreateAsync(CreateSalesOrderDto salesOrderDto)
         {
             // Check if SO number already exists
             if (await _salesOrderRepository.SoNumberExistsAsync(salesOrderDto.SoNumber))
@@ -63,7 +63,7 @@ namespace Xcianify.Services
             return _mapper.Map<SalesOrderDto>(createdSalesOrder);
         }
 
-        public async Task UpdateSalesOrderAsync(UpdateSalesOrderDto salesOrderDto)
+        public async Task UpdateAsync(UpdateSalesOrderDto salesOrderDto)
         {
             var existingSalesOrder = await _salesOrderRepository.GetByIdAsync(salesOrderDto.Id);
             if (existingSalesOrder == null)
@@ -82,7 +82,7 @@ namespace Xcianify.Services
             await _salesOrderRepository.UpdateAsync(existingSalesOrder);
         }
 
-        public async Task DeleteSalesOrderAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             var salesOrder = await _salesOrderRepository.GetByIdAsync(id);
             if (salesOrder == null)
@@ -91,31 +91,13 @@ namespace Xcianify.Services
             await _salesOrderRepository.DeleteAsync(id);
         }
 
-        public async Task<IEnumerable<SalesOrderDto>> GetSalesOrdersByCustomerAsync(int customerId)
-        {
-            var salesOrders = await _salesOrderRepository.GetByCustomerIdAsync(customerId);
-            return _mapper.Map<IEnumerable<SalesOrderDto>>(salesOrders);
-        }
-
-        public async Task<IEnumerable<SalesOrderDto>> GetSalesOrdersByOrganizationAsync(int organizationId)
-        {
-            var salesOrders = await _salesOrderRepository.GetByOrganizationIdAsync(organizationId);
-            return _mapper.Map<IEnumerable<SalesOrderDto>>(salesOrders);
-        }
-
-        public async Task<IEnumerable<SalesOrderDto>> GetSalesOrdersByStatusAsync(string status)
-        {
-            var salesOrders = await _salesOrderRepository.GetByStatusAsync(status);
-            return _mapper.Map<IEnumerable<SalesOrderDto>>(salesOrders);
-        }
-
         public async Task<string> GenerateSoNumberAsync()
         {
             var nextNumber = await _salesOrderRepository.GetNextSoNumberAsync();
             return $"SO{nextNumber:D6}";
         }
 
-        public async Task<bool> SubmitSalesOrderAsync(int id)
+        public async Task<bool> SubmitAsync(int id)
         {
             var salesOrder = await _salesOrderRepository.GetByIdAsync(id);
             if (salesOrder == null)
@@ -133,7 +115,7 @@ namespace Xcianify.Services
             return true;
         }
 
-        public async Task<bool> ApproveSalesOrderAsync(int id)
+        public async Task<bool> ApproveAsync(int id)
         {
             var salesOrder = await _salesOrderRepository.GetByIdAsync(id);
             if (salesOrder == null)
@@ -150,7 +132,7 @@ namespace Xcianify.Services
             return true;
         }
 
-        public async Task<bool> RejectSalesOrderAsync(int id)
+        public async Task<bool> RejectAsync(int id)
         {
             var salesOrder = await _salesOrderRepository.GetByIdAsync(id);
             if (salesOrder == null)

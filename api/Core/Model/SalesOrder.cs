@@ -10,13 +10,16 @@ namespace Xcianify.Core.Model
         public string SoStatus { get; set; }
         public int? OrganizationId { get; set; }
         public int? CustomerId { get; set; }
+        public string CustomerName { get; set; }
         public string PaymentTerm { get; set; }
         public DateTime? QuotationDate { get; set; }
         public string QuotationNo { get; set; }
         public string HsnCode { get; set; }
         public int? ItemId { get; set; }
+        public string ItemName { get; set; }
         public string DosageName { get; set; }
         public int? DivisionId { get; set; }
+        public string DivisionName { get; set; }
         public string DesignUnder { get; set; }
         public string PackingStyleDescription { get; set; }
         public string Composition { get; set; }
@@ -59,6 +62,7 @@ namespace Xcianify.Core.Model
         public bool IsSubmitted { get; set; }
         public bool IsDeleted { get; set; }
         public int? AssignedDesigner { get; set; }
+        public string AssignedDesignerName { get; set; }
         public bool? PlantEmailSent { get; set; }
     }
 } 

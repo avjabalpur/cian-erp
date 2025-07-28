@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using Xcianify.Core.Domain.Services;
 using Xcianify.Core.DTOs.SalesOrder;
+using Xcianify.Core.Domain.Services;
 
 namespace Xcianify.Presentation.Controllers
 {
-    [Route("api/[controller]")]
+    [ApiController]
+    [Route("api/sales-order-performa-invoice")]
     public class SalesOrderPerformaInvoiceController : BaseApiController
     {
         private readonly ISalesOrderPerformaInvoiceService _performaInvoiceService;
@@ -21,99 +22,50 @@ namespace Xcianify.Presentation.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            try
-            {
-                var performaInvoices = await _performaInvoiceService.GetAllPerformaInvoicesAsync();
-                return Ok(performaInvoices);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var performaInvoices = await _performaInvoiceService.GetAllPerformaInvoicesAsync();
+            return Ok(performaInvoices);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                var performaInvoice = await _performaInvoiceService.GetPerformaInvoiceByIdAsync(id);
-                return Ok(performaInvoice);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
-        }
-
-        [HttpGet("number/{invoiceNumber}")]
-        public async Task<IActionResult> GetByInvoiceNumber(string invoiceNumber)
-        {
-            try
-            {
-                var performaInvoice = await _performaInvoiceService.GetPerformaInvoiceByNumberAsync(invoiceNumber);
-                return Ok(performaInvoice);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var performaInvoice = await _performaInvoiceService.GetPerformaInvoiceByIdAsync(id);
+            return Ok(performaInvoice);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateSalesOrderPerformaInvoiceDto createPerformaInvoiceDto)
         {
-            try
-            {
-                var createdPerformaInvoice = await _performaInvoiceService.CreatePerformaInvoiceAsync(createPerformaInvoiceDto);
-                return CreatedAtAction(nameof(GetById), new { id = createdPerformaInvoice.Id }, createdPerformaInvoice);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var createdPerformaInvoice = await _performaInvoiceService.CreatePerformaInvoiceAsync(createPerformaInvoiceDto);
+            return CreatedAtAction(nameof(GetById), new { id = createdPerformaInvoice.Id }, createdPerformaInvoice);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] CreateSalesOrderPerformaInvoiceDto updatePerformaInvoiceDto)
         {
-            try
-            {
-                await _performaInvoiceService.UpdatePerformaInvoiceAsync(id, updatePerformaInvoiceDto);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            await _performaInvoiceService.UpdatePerformaInvoiceAsync(id, updatePerformaInvoiceDto);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                await _performaInvoiceService.DeletePerformaInvoiceAsync(id);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            await _performaInvoiceService.DeletePerformaInvoiceAsync(id);
+            return NoContent();
+        }
+
+        [HttpGet("number/{performaInvoiceNumber}")]
+        public async Task<IActionResult> GetByPerformaInvoiceNumber(string performaInvoiceNumber)
+        {
+            var performaInvoice = await _performaInvoiceService.GetPerformaInvoiceByNumberAsync(performaInvoiceNumber);
+            return Ok(performaInvoice);
         }
 
         [HttpGet("sales-order/{salesOrderId}")]
         public async Task<IActionResult> GetBySalesOrder(int salesOrderId)
         {
-            try
-            {
-                var performaInvoices = await _performaInvoiceService.GetPerformaInvoicesBySalesOrderAsync(salesOrderId);
-                return Ok(performaInvoices);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var performaInvoices = await _performaInvoiceService.GetPerformaInvoicesBySalesOrderAsync(salesOrderId);
+            return Ok(performaInvoices);
         }
 
         // --- Sales Order Performa Invoice Items Endpoints ---
@@ -121,59 +73,31 @@ namespace Xcianify.Presentation.Controllers
         [HttpGet("{performaInvoiceId}/items")]
         public async Task<IActionResult> GetItems(int performaInvoiceId)
         {
-            try
-            {
-                var items = await _performaInvoiceItemService.GetPerformaInvoiceItemsByPerformaInvoiceAsync(performaInvoiceId);
-                return Ok(items);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var items = await _performaInvoiceItemService.GetItemsByPerformaInvoiceAsync(performaInvoiceId);
+            return Ok(items);
         }
 
         [HttpPost("{performaInvoiceId}/items")]
         public async Task<IActionResult> CreateItem(int performaInvoiceId, [FromBody] CreateSalesOrderPerformaInvoiceItemDto createItemDto)
         {
-            try
-            {
-                createItemDto.PerformaInvoiceId = performaInvoiceId;
-                var createdItem = await _performaInvoiceItemService.CreatePerformaInvoiceItemAsync(createItemDto);
-                return CreatedAtAction(nameof(GetItems), new { performaInvoiceId }, createdItem);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            createItemDto.PerformaInvoiceId = performaInvoiceId;
+            var createdItem = await _performaInvoiceItemService.CreateItemAsync(createItemDto);
+            return CreatedAtAction(nameof(GetItems), new { performaInvoiceId }, createdItem);
         }
 
         [HttpPut("{performaInvoiceId}/items/{itemId}")]
         public async Task<IActionResult> UpdateItem(int performaInvoiceId, int itemId, [FromBody] CreateSalesOrderPerformaInvoiceItemDto updateItemDto)
         {
-            try
-            {
-                updateItemDto.PerformaInvoiceId = performaInvoiceId;
-                await _performaInvoiceItemService.UpdatePerformaInvoiceItemAsync(itemId, updateItemDto);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            updateItemDto.PerformaInvoiceId = performaInvoiceId;
+            await _performaInvoiceItemService.UpdateItemAsync(itemId, updateItemDto);
+            return NoContent();
         }
 
         [HttpDelete("{performaInvoiceId}/items/{itemId}")]
         public async Task<IActionResult> DeleteItem(int performaInvoiceId, int itemId)
         {
-            try
-            {
-                await _performaInvoiceItemService.DeletePerformaInvoiceItemAsync(itemId);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            await _performaInvoiceItemService.DeleteItemAsync(itemId);
+            return NoContent();
         }
     }
 } 

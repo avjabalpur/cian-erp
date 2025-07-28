@@ -117,13 +117,14 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// Register repositories
+// Register AutoMapper profiles
 builder.Services.AddAutoMapper(
     typeof(UserMapper),
     typeof(RoleMapper),
     typeof(PermissionMapper),
     typeof(OrganizationMapper),
-    typeof(ItemMasterMapper)
+    typeof(ItemMasterMapper),
+    typeof(SalesOrderMapper)
 );
 
 // Register repositories
@@ -139,7 +140,6 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 builder.Services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
-
 
 // Register services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -174,6 +174,28 @@ builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 // Register role-related services
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+
+// Register Sales Order repositories
+builder.Services.AddScoped<ISalesOrderRepository, SalesOrderRepository>();
+builder.Services.AddScoped<ISalesOrderCommentRepository, SalesOrderCommentRepository>();
+builder.Services.AddScoped<ISalesOrderChatRepository, SalesOrderChatRepository>();
+builder.Services.AddScoped<ISalesOrderDocumentRepository, SalesOrderDocumentRepository>();
+builder.Services.AddScoped<ISalesOrderPerformaInvoiceRepository, SalesOrderPerformaInvoiceRepository>();
+builder.Services.AddScoped<ISalesOrderPerformaInvoiceItemRepository, SalesOrderPerformaInvoiceItemRepository>();
+builder.Services.AddScoped<ISalesOrderQuotationRepository, SalesOrderQuotationRepository>();
+builder.Services.AddScoped<ISalesOrderQuotationItemRepository, SalesOrderQuotationItemRepository>();
+builder.Services.AddScoped<ISalesOrderSaveTransactionRepository, SalesOrderSaveTransactionRepository>();
+
+// Register Sales Order services
+builder.Services.AddScoped<ISalesOrderService, SalesOrderService>();
+builder.Services.AddScoped<ISalesOrderCommentService, SalesOrderCommentService>();
+builder.Services.AddScoped<ISalesOrderChatService, SalesOrderChatService>();
+builder.Services.AddScoped<ISalesOrderDocumentService, SalesOrderDocumentService>();
+builder.Services.AddScoped<ISalesOrderPerformaInvoiceService, SalesOrderPerformaInvoiceService>();
+builder.Services.AddScoped<ISalesOrderPerformaInvoiceItemService, SalesOrderPerformaInvoiceItemService>();
+builder.Services.AddScoped<ISalesOrderQuotationService, SalesOrderQuotationService>();
+builder.Services.AddScoped<ISalesOrderQuotationItemService, SalesOrderQuotationItemService>();
+builder.Services.AddScoped<ISalesOrderSaveTransactionService, SalesOrderSaveTransactionService>();
 
 // Add Controllers
 builder.Services.AddControllers();

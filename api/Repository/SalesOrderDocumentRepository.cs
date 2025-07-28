@@ -19,7 +19,7 @@ namespace Xcianify.Repository
 
         public async Task<IEnumerable<SalesOrderDocument>> GetAllAsync()
         {
-            using var connection = _context.CreateConnection();
+            using var connection = _context.GetConnection();
             
             var query = @"
                 SELECT 
@@ -30,14 +30,14 @@ namespace Xcianify.Repository
                 LEFT JOIN users u1 ON sod.created_by = u1.id
                 LEFT JOIN users u2 ON sod.updated_by = u2.id
                 WHERE sod.is_deleted = 0
-                ORDER BY sod.created_time DESC";
+                ORDER BY sod.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderDocument>(query);
         }
 
         public async Task<SalesOrderDocument> GetByIdAsync(int id)
         {
-            using var connection = _context.CreateConnection();
+            using var connection = _context.GetConnection();
             
             var query = @"
                 SELECT 
@@ -54,15 +54,15 @@ namespace Xcianify.Repository
 
         public async Task<SalesOrderDocument> AddAsync(SalesOrderDocument document)
         {
-            using var connection = _context.CreateConnection();
+            using var connection = _context.GetConnection();
             
             var query = @"
                 INSERT INTO sales_order_documents (
                     sales_order_id, tag, file_name, file_path, file_type, metadata, 
-                    created_by, created_time
+                    created_by, created_at
                 ) VALUES (
                     @SalesOrderId, @Tag, @FileName, @FilePath, @FileType, @Metadata,
-                    @CreatedBy, @CreatedTime
+                    @CreatedBy, @CreatedAt
                 ) RETURNING *";
 
             return await connection.QuerySingleAsync<SalesOrderDocument>(query, document);
@@ -70,7 +70,7 @@ namespace Xcianify.Repository
 
         public async Task<SalesOrderDocument> UpdateAsync(SalesOrderDocument document)
         {
-            using var connection = _context.CreateConnection();
+            using var connection = _context.GetConnection();
             
             var query = @"
                 UPDATE sales_order_documents SET
@@ -80,7 +80,7 @@ namespace Xcianify.Repository
                     file_type = @FileType,
                     metadata = @Metadata,
                     updated_by = @UpdatedBy,
-                    updated_time = @UpdatedTime
+                    updated_at = @UpdatedAt
                 WHERE id = @Id
                 RETURNING *";
 
@@ -89,7 +89,7 @@ namespace Xcianify.Repository
 
         public async Task DeleteAsync(int id)
         {
-            using var connection = _context.CreateConnection();
+            using var connection = _context.GetConnection();
             
             var query = "UPDATE sales_order_documents SET is_deleted = 1 WHERE id = @Id";
             await connection.ExecuteAsync(query, new { Id = id });
@@ -97,7 +97,7 @@ namespace Xcianify.Repository
 
         public async Task<bool> ExistsAsync(int id)
         {
-            using var connection = _context.CreateConnection();
+            using var connection = _context.GetConnection();
             
             var query = "SELECT COUNT(*) FROM sales_order_documents WHERE id = @Id AND is_deleted = 0";
             var count = await connection.QuerySingleAsync<int>(query, new { Id = id });
@@ -106,7 +106,7 @@ namespace Xcianify.Repository
 
         public async Task<IEnumerable<SalesOrderDocument>> GetBySalesOrderIdAsync(int salesOrderId)
         {
-            using var connection = _context.CreateConnection();
+            using var connection = _context.GetConnection();
             
             var query = @"
                 SELECT 
@@ -117,14 +117,14 @@ namespace Xcianify.Repository
                 LEFT JOIN users u1 ON sod.created_by = u1.id
                 LEFT JOIN users u2 ON sod.updated_by = u2.id
                 WHERE sod.sales_order_id = @SalesOrderId AND sod.is_deleted = 0
-                ORDER BY sod.created_time DESC";
+                ORDER BY sod.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderDocument>(query, new { SalesOrderId = salesOrderId });
         }
 
         public async Task<IEnumerable<SalesOrderDocument>> GetByTagAsync(string tag)
         {
-            using var connection = _context.CreateConnection();
+            using var connection = _context.GetConnection();
             
             var query = @"
                 SELECT 
@@ -135,14 +135,14 @@ namespace Xcianify.Repository
                 LEFT JOIN users u1 ON sod.created_by = u1.id
                 LEFT JOIN users u2 ON sod.updated_by = u2.id
                 WHERE sod.tag = @Tag AND sod.is_deleted = 0
-                ORDER BY sod.created_time DESC";
+                ORDER BY sod.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderDocument>(query, new { Tag = tag });
         }
 
         public async Task<IEnumerable<SalesOrderDocument>> GetByFileTypeAsync(string fileType)
         {
-            using var connection = _context.CreateConnection();
+            using var connection = _context.GetConnection();
             
             var query = @"
                 SELECT 
@@ -153,7 +153,7 @@ namespace Xcianify.Repository
                 LEFT JOIN users u1 ON sod.created_by = u1.id
                 LEFT JOIN users u2 ON sod.updated_by = u2.id
                 WHERE sod.file_type = @FileType AND sod.is_deleted = 0
-                ORDER BY sod.created_time DESC";
+                ORDER BY sod.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderDocument>(query, new { FileType = fileType });
         }

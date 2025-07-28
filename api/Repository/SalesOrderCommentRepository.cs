@@ -30,7 +30,7 @@ namespace Xcianify.Repository
                 LEFT JOIN users u1 ON soc.created_by = u1.id
                 LEFT JOIN users u2 ON soc.updated_by = u2.id
                 WHERE soc.is_deleted = 0
-                ORDER BY soc.created_time DESC";
+                ORDER BY soc.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderComment>(query);
         }
@@ -59,10 +59,10 @@ namespace Xcianify.Repository
             var query = @"
                 INSERT INTO sales_order_comments (
                     sales_order_id, comments, status, type, is_deleted, 
-                    created_by, created_time, updated_by, updated_time
+                    created_by, created_at, updated_by, updated_at
                 ) VALUES (
                     @SalesOrderId, @Comments, @Status, @Type, @IsDeleted,
-                    @CreatedBy, @CreatedTime, @UpdatedBy, @UpdatedTime
+                    @CreatedBy, @CreatedAt, @UpdatedBy, @UpdatedAt
                 ) RETURNING *";
 
             return await connection.QuerySingleAsync<SalesOrderComment>(query, comment);
@@ -78,7 +78,7 @@ namespace Xcianify.Repository
                     status = @Status,
                     type = @Type,
                     updated_by = @UpdatedBy,
-                    updated_time = @UpdatedTime
+                    updated_at = @UpdatedAt
                 WHERE id = @Id AND is_deleted = 0
                 RETURNING *";
 
@@ -115,7 +115,7 @@ namespace Xcianify.Repository
                 LEFT JOIN users u1 ON soc.created_by = u1.id
                 LEFT JOIN users u2 ON soc.updated_by = u2.id
                 WHERE soc.sales_order_id = @SalesOrderId AND soc.is_deleted = 0
-                ORDER BY soc.created_time DESC";
+                ORDER BY soc.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderComment>(query, new { SalesOrderId = salesOrderId });
         }
@@ -133,7 +133,7 @@ namespace Xcianify.Repository
                 LEFT JOIN users u1 ON soc.created_by = u1.id
                 LEFT JOIN users u2 ON soc.updated_by = u2.id
                 WHERE soc.status = @Status AND soc.is_deleted = 0
-                ORDER BY soc.created_time DESC";
+                ORDER BY soc.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderComment>(query, new { Status = status });
         }
@@ -151,7 +151,7 @@ namespace Xcianify.Repository
                 LEFT JOIN users u1 ON soc.created_by = u1.id
                 LEFT JOIN users u2 ON soc.updated_by = u2.id
                 WHERE soc.type = @Type AND soc.is_deleted = 0
-                ORDER BY soc.created_time DESC";
+                ORDER BY soc.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderComment>(query, new { Type = type });
         }

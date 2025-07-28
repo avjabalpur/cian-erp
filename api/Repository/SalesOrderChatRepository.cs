@@ -27,7 +27,7 @@ namespace Xcianify.Repository
                     u1.first_name || ' ' || u1.last_name as created_by_name
                 FROM sales_order_chat soc
                 LEFT JOIN users u1 ON soc.created_by = u1.id
-                ORDER BY soc.created_time DESC";
+                ORDER BY soc.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderChat>(query);
         }
@@ -53,9 +53,9 @@ namespace Xcianify.Repository
             
             var query = @"
                 INSERT INTO sales_order_chat (
-                    sales_order_id, comment, created_by, created_time
+                    sales_order_id, comment, created_by, created_at
                 ) VALUES (
-                    @SalesOrderId, @Comment, @CreatedBy, @CreatedTime
+                    @SalesOrderId, @Comment, @CreatedBy, @CreatedAt
                 ) RETURNING *";
 
             return await connection.QuerySingleAsync<SalesOrderChat>(query, chat);
@@ -69,7 +69,7 @@ namespace Xcianify.Repository
                 UPDATE sales_order_chat SET
                     comment = @Comment,
                     updated_by = @UpdatedBy,
-                    updated_time = @UpdatedTime
+                    updated_at = @UpdatedAt
                 WHERE id = @Id
                 RETURNING *";
 
@@ -104,7 +104,7 @@ namespace Xcianify.Repository
                 FROM sales_order_chat soc
                 LEFT JOIN users u1 ON soc.created_by = u1.id
                 WHERE soc.sales_order_id = @SalesOrderId
-                ORDER BY soc.created_time DESC";
+                ORDER BY soc.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderChat>(query, new { SalesOrderId = salesOrderId });
         }

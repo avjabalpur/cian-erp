@@ -6,18 +6,15 @@ namespace Xcianify.Core.Domain.Services
 {
     public interface ISalesOrderService
     {
-        Task<(IEnumerable<SalesOrderDto> Items, int TotalCount)> GetAllSalesOrdersAsync(SalesOrderFilterDto filterDto);
-        Task<SalesOrderDto> GetSalesOrderByIdAsync(int id);
-        Task<SalesOrderDto> GetSalesOrderBySoNumberAsync(string soNumber);
-        Task<SalesOrderDto> CreateSalesOrderAsync(CreateSalesOrderDto salesOrderDto);
-        Task UpdateSalesOrderAsync(UpdateSalesOrderDto salesOrderDto);
-        Task DeleteSalesOrderAsync(int id);
-        Task<IEnumerable<SalesOrderDto>> GetSalesOrdersByCustomerAsync(int customerId);
-        Task<IEnumerable<SalesOrderDto>> GetSalesOrdersByOrganizationAsync(int organizationId);
-        Task<IEnumerable<SalesOrderDto>> GetSalesOrdersByStatusAsync(string status);
+        Task<(IEnumerable<SalesOrderDto> Items, int TotalCount)> GetAllAsync(SalesOrderFilterDto filterDto);
+        Task<SalesOrderDto> GetByIdAsync(int id);
+        Task<SalesOrderDto> GetBySoNumberAsync(string soNumber);
+        Task<SalesOrderDto> CreateAsync(CreateSalesOrderDto salesOrderDto);
+        Task UpdateAsync(UpdateSalesOrderDto salesOrderDto);
+        Task DeleteAsync(int id);
         Task<string> GenerateSoNumberAsync();
-        Task<bool> SubmitSalesOrderAsync(int id);
-        Task<bool> ApproveSalesOrderAsync(int id);
-        Task<bool> RejectSalesOrderAsync(int id);
+        Task<bool> SubmitAsync(int id);
+        Task<bool> ApproveAsync(int id);
+        Task<bool> RejectAsync(int id);
     }
 } 

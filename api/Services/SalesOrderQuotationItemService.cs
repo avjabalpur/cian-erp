@@ -23,13 +23,13 @@ namespace Xcianify.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<IEnumerable<SalesOrderQuotationItemDto>> GetAllQuotationItemsAsync()
+        public async Task<IEnumerable<SalesOrderQuotationItemDto>> GetAllItemsAsync()
         {
             var quotationItems = await _quotationItemRepository.GetAllAsync();
             return _mapper.Map<IEnumerable<SalesOrderQuotationItemDto>>(quotationItems);
         }
 
-        public async Task<SalesOrderQuotationItemDto> GetQuotationItemByIdAsync(int id)
+        public async Task<SalesOrderQuotationItemDto> GetItemByIdAsync(int id)
         {
             var quotationItem = await _quotationItemRepository.GetByIdAsync(id);
             if (quotationItem == null)
@@ -38,7 +38,7 @@ namespace Xcianify.Services
             return _mapper.Map<SalesOrderQuotationItemDto>(quotationItem);
         }
 
-        public async Task<SalesOrderQuotationItemDto> CreateQuotationItemAsync(CreateSalesOrderQuotationItemDto quotationItemDto)
+        public async Task<SalesOrderQuotationItemDto> CreateItemAsync(CreateSalesOrderQuotationItemDto quotationItemDto)
         {
             var quotationItem = _mapper.Map<SalesOrderQuotationItem>(quotationItemDto);
             quotationItem.CreatedAt = DateTime.UtcNow;
@@ -49,7 +49,7 @@ namespace Xcianify.Services
             return _mapper.Map<SalesOrderQuotationItemDto>(createdQuotationItem);
         }
 
-        public async Task UpdateQuotationItemAsync(int id, CreateSalesOrderQuotationItemDto quotationItemDto)
+        public async Task UpdateItemAsync(int id, CreateSalesOrderQuotationItemDto quotationItemDto)
         {
             var existingQuotationItem = await _quotationItemRepository.GetByIdAsync(id);
             if (existingQuotationItem == null)
@@ -61,7 +61,7 @@ namespace Xcianify.Services
             await _quotationItemRepository.UpdateAsync(existingQuotationItem);
         }
 
-        public async Task DeleteQuotationItemAsync(int id)
+        public async Task DeleteItemAsync(int id)
         {
             var quotationItem = await _quotationItemRepository.GetByIdAsync(id);
             if (quotationItem == null)
@@ -70,13 +70,13 @@ namespace Xcianify.Services
             await _quotationItemRepository.DeleteAsync(id);
         }
 
-        public async Task<IEnumerable<SalesOrderQuotationItemDto>> GetQuotationItemsByQuotationAsync(int quotationId)
+        public async Task<IEnumerable<SalesOrderQuotationItemDto>> GetItemsByQuotationAsync(int quotationId)
         {
             var quotationItems = await _quotationItemRepository.GetByQuotationIdAsync(quotationId);
             return _mapper.Map<IEnumerable<SalesOrderQuotationItemDto>>(quotationItems);
         }
 
-        public async Task<IEnumerable<SalesOrderQuotationItemDto>> GetQuotationItemsBySalesOrderAsync(int salesOrderId)
+        public async Task<IEnumerable<SalesOrderQuotationItemDto>> GetItemsBySalesOrderAsync(int salesOrderId)
         {
             var quotationItems = await _quotationItemRepository.GetBySalesOrderIdAsync(salesOrderId);
             return _mapper.Map<IEnumerable<SalesOrderQuotationItemDto>>(quotationItems);

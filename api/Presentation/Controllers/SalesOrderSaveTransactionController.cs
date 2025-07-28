@@ -1,16 +1,11 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Xcianify.Core.Domain.Services;
 using Xcianify.Core.DTOs.SalesOrder;
+using Xcianify.Core.Domain.Services;
 
 namespace Xcianify.Presentation.Controllers
 {
-    [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/sales-order-transaction")]
     public class SalesOrderSaveTransactionController : BaseApiController
     {
         private readonly ISalesOrderSaveTransactionService _saveTransactionService;
@@ -23,85 +18,43 @@ namespace Xcianify.Presentation.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            try
-            {
-                var saveTransactions = await _saveTransactionService.GetAllSaveTransactionsAsync();
-                return Ok(saveTransactions);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var saveTransactions = await _saveTransactionService.GetAllSaveTransactionsAsync();
+            return Ok(saveTransactions);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                var saveTransaction = await _saveTransactionService.GetSaveTransactionByIdAsync(id);
-                return Ok(saveTransaction);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var saveTransaction = await _saveTransactionService.GetSaveTransactionByIdAsync(id);
+            return Ok(saveTransaction);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateSalesOrderSaveTransactionDto createSaveTransactionDto)
         {
-            try
-            {
-                var createdSaveTransaction = await _saveTransactionService.CreateSaveTransactionAsync(createSaveTransactionDto);
-                return CreatedAtAction(nameof(GetById), new { id = createdSaveTransaction.Id }, createdSaveTransaction);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var createdSaveTransaction = await _saveTransactionService.CreateSaveTransactionAsync(createSaveTransactionDto);
+            return CreatedAtAction(nameof(GetById), new { id = createdSaveTransaction.Id }, createdSaveTransaction);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] CreateSalesOrderSaveTransactionDto updateSaveTransactionDto)
         {
-            try
-            {
-                await _saveTransactionService.UpdateSaveTransactionAsync(id, updateSaveTransactionDto);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            await _saveTransactionService.UpdateSaveTransactionAsync(id, updateSaveTransactionDto);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                await _saveTransactionService.DeleteSaveTransactionAsync(id);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            await _saveTransactionService.DeleteSaveTransactionAsync(id);
+            return NoContent();
         }
 
         [HttpGet("sales-order/{salesOrderId}")]
         public async Task<IActionResult> GetBySalesOrder(int salesOrderId)
         {
-            try
-            {
-                var saveTransactions = await _saveTransactionService.GetSaveTransactionsBySalesOrderAsync(salesOrderId);
-                return Ok(saveTransactions);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var saveTransactions = await _saveTransactionService.GetSaveTransactionsBySalesOrderAsync(salesOrderId);
+            return Ok(saveTransactions);
         }
     }
 } 

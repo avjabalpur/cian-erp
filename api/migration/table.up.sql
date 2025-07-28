@@ -11,67 +11,54 @@ CREATE TABLE IF NOT EXISTS users (
   loccd varchar(45)
 ) ;
 
-
-CREATE TABLE IF NOT EXISTS sales_order_approval (
+CREATE TABLE IF NOT EXISTS sales_orders (
   id SERIAL PRIMARY KEY,
   created_by INTEGER,
-  created_time TIMESTAMP NULL,
+  created_at TIMESTAMP NULL,
   updated_by INTEGER,
-  updated_time TIMESTAMP NULL,
+  updated_at TIMESTAMP NULL,
   current_status VARCHAR(200),
   comments TEXT,
   is_submitted INTEGER DEFAULT 0,
   is_deleted INTEGER DEFAULT 0,
   assigned_designer INTEGER,
-  costing_approved INTEGER DEFAULT 0,
-  qa_approved INTEGER DEFAULT 0,
-  is_final_authorized INTEGER DEFAULT 0,
-  designer_approved INTEGER DEFAULT 0,
-  final_qa_approved INTEGER DEFAULT 0,
-  pm_approved INTEGER DEFAULT 0,
   plant_email_sent INTEGER,
-  sono VARCHAR(200),
-  so_date VARCHAR(200),
-  so_status VARCHAR(200),
-  manufacturer_name VARCHAR(200),
-  country VARCHAR(200),
-  customer_name VARCHAR(200),
-  customer_gst_no VARCHAR(200),
+  so_number VARCHAR(200),
+  so_date TIMESTAMP,
+  so_status TEXT CHECK (so_status IN ('new', 'repeat', 'revised')),
+  organization_id INTEGER,
+  customer_id INTEGER,
   payment_term VARCHAR(200),
-  quotation_date DATE,
+  quotation_date TIMESTAMP,
   quotation_no VARCHAR(200),
   hsn_code VARCHAR(200),
-  product_code VARCHAR(200),
-  product_cast VARCHAR(200),
-  product_name VARCHAR(200),
+  item_id INTEGER,
   dosage_name VARCHAR(200),
-  division VARCHAR(200),
+  divisionId INTEGER,
   design_under VARCHAR(200),
   packing_style_description TEXT,
   composition TEXT,
-  p_colour VARCHAR(200),
-  p_shelf_life VARCHAR(200),
-  p_pack_short VARCHAR(200),
-  p_tablet_type VARCHAR(200),
-  p_tablet_size VARCHAR(200),
-  p_change_part VARCHAR(200),
-  p_capsule_size VARCHAR(200),
-  p_shipper_size VARCHAR(200),
-  p_qty_per_shipper VARCHAR(200),
-  p_no_of_shipper VARCHAR(200),
-  p_flavour VARCHAR(200),
-  p_fragrance VARCHAR(200),
-  p_quantity VARCHAR(200),
-  p_foc_qty VARCHAR(20),
-  p_mrp VARCHAR(200),
-  p_billing_rate VARCHAR(200),
-  p_costing VARCHAR(200),
-  p_inventory_charges VARCHAR(200),
-  p_cylinder_charge VARCHAR(200),
-  p_palte_charges VARCHAR(200),
-  p_domino VARCHAR(200),
-  p_stereo VARCHAR(200),
-  p_shipper_drawing_ref_code VARCHAR(200),
+  pack_short VARCHAR(200),
+  tablet_type VARCHAR(200),
+  tablet_size VARCHAR(200),
+  change_part VARCHAR(200),
+  capsule_size VARCHAR(200),
+  shipper_size VARCHAR(200),
+  qty_per_shipper VARCHAR(200),
+  no_of_shipper VARCHAR(200),
+  flavour VARCHAR(200),
+  fragrance VARCHAR(200),
+  quantity VARCHAR(200),
+  foc_qty VARCHAR(20),
+  mrp VARCHAR(200),
+  billing_rate VARCHAR(200),
+  costing VARCHAR(200),
+  inventory_charges VARCHAR(200),
+  cylinder_charge VARCHAR(200),
+  plate_charges VARCHAR(200),
+  domino VARCHAR(200),
+  stereo VARCHAR(200),
+  shipper_drawing_ref_code VARCHAR(200),
   ctn_outer_drawing_ref_no VARCHAR(200),
   ctn_inner_drawing_ref_no VARCHAR(200),
   foil_drawing_ref_no VARCHAR(200),
@@ -87,37 +74,49 @@ CREATE TABLE IF NOT EXISTS sales_order_approval (
   drug_approval_under VARCHAR(200)
 );
 
-
-CREATE TABLE IF NOT EXISTS sales_order_approval_chat (
+CREATE TABLE IF NOT EXISTS sales_order_stages (
   id SERIAL PRIMARY KEY,
-  sales_order_approval_id INTEGER,
+  sales_order_id INTEGER,
+  stage_name VARCHAR(200),
+  is_approved INTEGER DEFAULT 0,
+  created_by INTEGER,
+  created_at TIMESTAMP NULL,
+  updated_by INTEGER,
+  updated_at TIMESTAMP NULL,
+  is_deleted INTEGER DEFAULT 0
+);
+
+
+CREATE TABLE IF NOT EXISTS sales_order_chat (
+  id SERIAL PRIMARY KEY,
+  sales_order_id INTEGER,
   comment TEXT,
   created_by INTEGER,
-  created_time TIMESTAMP NULL,
-  CONSTRAINT fk_sales_order_approval
-    FOREIGN KEY (sales_order_approval_id) 
-    REFERENCES sales_order_approval(id)
+  created_at TIMESTAMP NULL,
+  CONSTRAINT fk_sales_order
+    FOREIGN KEY (sales_order_id) 
+    REFERENCES sales_orders(id)
     ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS sales_order_approval_comments (
-  comment_id SERIAL PRIMARY KEY,
-  sales_order_approval_id INTEGER,
+CREATE TABLE IF NOT EXISTS sales_order_comments (
+  id SERIAL PRIMARY KEY,
+  sales_order_id INTEGER,
   created_by INTEGER,
-  created_time TIMESTAMP NULL,
+  created_at TIMESTAMP NULL,
   comments VARCHAR(500),
   status VARCHAR(200),
   type VARCHAR(200),
   is_deleted INTEGER DEFAULT 0,
-  CONSTRAINT fk_sales_order_approval_comments
-    FOREIGN KEY (sales_order_approval_id) 
-    REFERENCES sales_order_approval(id)
+  CONSTRAINT fk_sales_order_comments
+    FOREIGN KEY (sales_order_id) 
+    REFERENCES sales_orders(id)
     ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS sales_order_approval_documents (
-  document_id SERIAL PRIMARY KEY,
-  sales_order_approval_id INTEGER,
+CREATE TABLE IF NOT EXISTS sales_order_documents (
+  id SERIAL PRIMARY KEY,
+  sales_order_id INTEGER,
   tag VARCHAR(200),
   file_name VARCHAR(200),
   file_path VARCHAR(500),
@@ -125,20 +124,20 @@ CREATE TABLE IF NOT EXISTS sales_order_approval_documents (
   metadata TEXT,
   is_deleted INTEGER DEFAULT 0,
   created_by INTEGER,
-  created_time TIMESTAMP NULL,
-  CONSTRAINT fk_sales_order_approval_documents
-    FOREIGN KEY (sales_order_approval_id) 
-    REFERENCES sales_order_approval(id)
+  created_at TIMESTAMP NULL,
+  CONSTRAINT fk_sales_order_documents
+    FOREIGN KEY (sales_order_id) 
+    REFERENCES sales_orders(id)
     ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS sales_order_approval_performa_invoice (
-  performa_invoice_id SERIAL PRIMARY KEY,
-  created_time TIMESTAMP NULL,
+CREATE TABLE IF NOT EXISTS sales_order_performa_invoice (
+  id SERIAL PRIMARY KEY,
+  created_at TIMESTAMP NULL,
   created_by INTEGER,
   is_deleted INTEGER DEFAULT 0,
   exporter_name VARCHAR(200),
-  manufacturer_name VARCHAR(200),
+  organization_name VARCHAR(200),
   consignee_name VARCHAR(400),
   consignee_contact_details VARCHAR(400),
   consignee_address TEXT,
@@ -162,41 +161,30 @@ CREATE TABLE IF NOT EXISTS sales_order_approval_performa_invoice (
   previous_performa_invoice_id INTEGER DEFAULT 0
 );
 
-CREATE TABLE IF NOT EXISTS sales_order_approval_performa_invoice_products (
+CREATE TABLE IF NOT EXISTS sales_order_performa_invoice_items (
   id SERIAL PRIMARY KEY,
   performa_invoice_id INTEGER,
-  sales_order_approval_id INTEGER,
+  sales_order_id INTEGER,
   is_deleted INTEGER DEFAULT 0,
-  product_name VARCHAR(200),
+  item_id INTEGER,
   composition TEXT,
   dosage_name VARCHAR(200),
   product_cast VARCHAR(200),
   p_pack_short TEXT,
   p_quantity FLOAT,
   p_foc_qty FLOAT,
-  p_billing_rate FLOAT,
-  CONSTRAINT fk_performa_invoice
-    FOREIGN KEY (performa_invoice_id)
-    REFERENCES sales_order_approval_performa_invoice(performa_invoice_id)
-    ON DELETE CASCADE,
-  CONSTRAINT fk_sales_order_approval
-    FOREIGN KEY (sales_order_approval_id)
-    REFERENCES sales_order_approval(id)
-    ON DELETE CASCADE
+  p_billing_rate FLOAT
 );
 
-CREATE TABLE IF NOT EXISTS sales_order_approval_quotation (
-  quotation_id SERIAL PRIMARY KEY,
-  created_time TIMESTAMP NULL,
+CREATE TABLE IF NOT EXISTS sales_order_quotation (
+  id SERIAL PRIMARY KEY,
+  created_at TIMESTAMP NULL,
   created_by INTEGER,
   is_deleted INTEGER DEFAULT 0,
-  company_name VARCHAR(200),
+  organization_id INTEGER,
   quotation_number VARCHAR(200),
   quotation_date DATE,
-  customer_name VARCHAR(200),
-  customer_contact_person VARCHAR(200),
-  customer_mobile_number VARCHAR(200),
-  customer_email VARCHAR(200),
+  customer_id INTEGER,
   advance_percentage FLOAT,
   charges TEXT,
   total_amount FLOAT,
@@ -204,12 +192,12 @@ CREATE TABLE IF NOT EXISTS sales_order_approval_quotation (
   prev_copy_quotation_id INTEGER DEFAULT 0
 );
 
-CREATE TABLE IF NOT EXISTS sales_order_approval_quotation_products (
+CREATE TABLE IF NOT EXISTS sales_order_quotation_items (
   id SERIAL PRIMARY KEY,
   quotation_id INTEGER,
-  sales_order_approval_id INTEGER,
+  sales_order_id INTEGER,
   is_deleted INTEGER DEFAULT 0,
-  product_name VARCHAR(200),
+  item_id INTEGER,
   composition TEXT,
   dosage_name VARCHAR(200),
   product_cast VARCHAR(200),
@@ -222,27 +210,15 @@ CREATE TABLE IF NOT EXISTS sales_order_approval_quotation_products (
   comments TEXT,
   tax_percent FLOAT,
   product_extra_charges FLOAT,
-  product_extra_charges_tax_percent FLOAT,
-  CONSTRAINT fk_quotation
-    FOREIGN KEY (quotation_id)
-    REFERENCES sales_order_approval_quotation(quotation_id)
-    ON DELETE CASCADE,
-  CONSTRAINT fk_sales_order_approval
-    FOREIGN KEY (sales_order_approval_id)
-    REFERENCES sales_order_approval(id)
-    ON DELETE CASCADE
+  product_extra_charges_tax_percent FLOAT
 );
 
-CREATE TABLE IF NOT EXISTS sales_order_approval_save_transactions (
-  save_id SERIAL PRIMARY KEY,
-  sales_order_approval_id INTEGER,
+CREATE TABLE IF NOT EXISTS sales_order_save_transactions (
+  id SERIAL PRIMARY KEY,
+  sales_order_id INTEGER,
   created_by INTEGER,
-  created_time TIMESTAMP NULL,
-  diff TEXT,
-  CONSTRAINT fk_sales_order_approval
-    FOREIGN KEY (sales_order_approval_id)
-    REFERENCES sales_order_approval(id)
-    ON DELETE CASCADE
+  created_at TIMESTAMP NULL,
+  diff TEXT
 );
 
 CREATE TABLE IF NOT EXISTS ci_sessions (

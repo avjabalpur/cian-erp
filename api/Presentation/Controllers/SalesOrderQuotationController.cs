@@ -1,16 +1,11 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Xcianify.Core.Domain.Services;
 using Xcianify.Core.DTOs.SalesOrder;
+using Xcianify.Core.Domain.Services;
 
 namespace Xcianify.Presentation.Controllers
 {
-    [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/sales-order-quotation")]
     public class SalesOrderQuotationController : BaseApiController
     {
         private readonly ISalesOrderQuotationService _quotationService;
@@ -27,127 +22,50 @@ namespace Xcianify.Presentation.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            try
-            {
-                var quotations = await _quotationService.GetAllQuotationsAsync();
-                return Ok(quotations);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var quotations = await _quotationService.GetAllQuotationsAsync();
+            return Ok(quotations);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                var quotation = await _quotationService.GetQuotationByIdAsync(id);
-                return Ok(quotation);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
-        }
-
-        [HttpGet("number/{quotationNumber}")]
-        public async Task<IActionResult> GetByQuotationNumber(string quotationNumber)
-        {
-            try
-            {
-                var quotation = await _quotationService.GetQuotationByNumberAsync(quotationNumber);
-                return Ok(quotation);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var quotation = await _quotationService.GetQuotationByIdAsync(id);
+            return Ok(quotation);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateSalesOrderQuotationDto createQuotationDto)
         {
-            try
-            {
-                var createdQuotation = await _quotationService.CreateQuotationAsync(createQuotationDto);
-                return CreatedAtAction(nameof(GetById), new { id = createdQuotation.Id }, createdQuotation);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var createdQuotation = await _quotationService.CreateQuotationAsync(createQuotationDto);
+            return CreatedAtAction(nameof(GetById), new { id = createdQuotation.Id }, createdQuotation);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] CreateSalesOrderQuotationDto updateQuotationDto)
         {
-            try
-            {
-                await _quotationService.UpdateQuotationAsync(id, updateQuotationDto);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            await _quotationService.UpdateQuotationAsync(id, updateQuotationDto);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                await _quotationService.DeleteQuotationAsync(id);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            await _quotationService.DeleteQuotationAsync(id);
+            return NoContent();
         }
 
-        [HttpGet("customer/{customerId}")]
-        public async Task<IActionResult> GetByCustomer(int customerId)
+        [HttpGet("number/{quotationNumber}")]
+        public async Task<IActionResult> GetByQuotationNumber(string quotationNumber)
         {
-            try
-            {
-                var quotations = await _quotationService.GetQuotationsByCustomerAsync(customerId);
-                return Ok(quotations);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var quotation = await _quotationService.GetQuotationByNumberAsync(quotationNumber);
+            return Ok(quotation);
         }
 
-        [HttpGet("organization/{organizationId}")]
-        public async Task<IActionResult> GetByOrganization(int organizationId)
+        [HttpGet("sales-order/{salesOrderId}")]
+        public async Task<IActionResult> GetBySalesOrder(int salesOrderId)
         {
-            try
-            {
-                var quotations = await _quotationService.GetQuotationsByOrganizationAsync(organizationId);
-                return Ok(quotations);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
-        }
-
-        [HttpGet("date-range")]
-        public async Task<IActionResult> GetByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
-        {
-            try
-            {
-                var quotations = await _quotationService.GetQuotationsByDateRangeAsync(startDate, endDate);
-                return Ok(quotations);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var quotations = await _quotationService.GetQuotationByIdAsync(salesOrderId);
+            return Ok(quotations);
         }
 
         // --- Sales Order Quotation Items Endpoints ---
@@ -155,59 +73,31 @@ namespace Xcianify.Presentation.Controllers
         [HttpGet("{quotationId}/items")]
         public async Task<IActionResult> GetItems(int quotationId)
         {
-            try
-            {
-                var items = await _quotationItemService.GetQuotationItemsByQuotationAsync(quotationId);
-                return Ok(items);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var items = await _quotationItemService.GetItemByIdAsync(quotationId);
+            return Ok(items);
         }
 
         [HttpPost("{quotationId}/items")]
         public async Task<IActionResult> CreateItem(int quotationId, [FromBody] CreateSalesOrderQuotationItemDto createItemDto)
         {
-            try
-            {
-                createItemDto.QuotationId = quotationId;
-                var createdItem = await _quotationItemService.CreateQuotationItemAsync(createItemDto);
-                return CreatedAtAction(nameof(GetItems), new { quotationId }, createdItem);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            createItemDto.QuotationId = quotationId;
+            var createdItem = await _quotationItemService.CreateItemAsync(createItemDto);
+            return CreatedAtAction(nameof(GetItems), new { quotationId }, createdItem);
         }
 
         [HttpPut("{quotationId}/items/{itemId}")]
         public async Task<IActionResult> UpdateItem(int quotationId, int itemId, [FromBody] CreateSalesOrderQuotationItemDto updateItemDto)
         {
-            try
-            {
-                updateItemDto.QuotationId = quotationId;
-                await _quotationItemService.UpdateQuotationItemAsync(itemId, updateItemDto);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            updateItemDto.QuotationId = quotationId;
+            await _quotationItemService.UpdateItemAsync(itemId, updateItemDto);
+            return NoContent();
         }
 
         [HttpDelete("{quotationId}/items/{itemId}")]
         public async Task<IActionResult> DeleteItem(int quotationId, int itemId)
         {
-            try
-            {
-                await _quotationItemService.DeleteQuotationItemAsync(itemId);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            await _quotationItemService.DeleteItemAsync(itemId);
+            return NoContent();
         }
     }
 } 

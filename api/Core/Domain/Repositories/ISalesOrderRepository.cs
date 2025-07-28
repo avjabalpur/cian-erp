@@ -16,9 +16,6 @@ namespace Xcianify.Core.Domain.Repositories
         Task DeleteAsync(int id);
         Task<bool> ExistsAsync(int id);
         Task<bool> SoNumberExistsAsync(string soNumber, int? excludeId = null);
-        Task<IEnumerable<SalesOrder>> GetByCustomerIdAsync(int customerId);
-        Task<IEnumerable<SalesOrder>> GetByOrganizationIdAsync(int organizationId);
-        Task<IEnumerable<SalesOrder>> GetByStatusAsync(string status);
         Task<int> GetNextSoNumberAsync();
     }
 } 

@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using Xcianify.Core.Domain.Services;
 using Xcianify.Core.DTOs.SalesOrder;
+using Xcianify.Core.Domain.Services;
 
 namespace Xcianify.Presentation.Controllers
 {
+    [ApiController]
     [Route("api/sales-order")]
     public class SalesOrderController : BaseApiController
     {
@@ -27,363 +28,168 @@ namespace Xcianify.Presentation.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] SalesOrderFilterDto filterDto)
         {
-            try
-            {
-                var (items, totalCount) = await _salesOrderService.GetAllSalesOrdersAsync(filterDto);
-                return Ok(new { Items = items, TotalCount = totalCount });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var (items, totalCount) = await _salesOrderService.GetAllAsync(filterDto);
+            return Ok(new { Items = items, TotalCount = totalCount });
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                var salesOrder = await _salesOrderService.GetSalesOrderByIdAsync(id);
-                return Ok(salesOrder);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var salesOrder = await _salesOrderService.GetByIdAsync(id);
+            return Ok(salesOrder);
         }
 
         [HttpGet("number/{soNumber}")]
         public async Task<IActionResult> GetBySoNumber(string soNumber)
         {
-            try
-            {
-                var salesOrder = await _salesOrderService.GetSalesOrderBySoNumberAsync(soNumber);
-                return Ok(salesOrder);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var salesOrder = await _salesOrderService.GetBySoNumberAsync(soNumber);
+            return Ok(salesOrder);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateSalesOrderDto createSalesOrderDto)
         {
-            try
-            {
-                var createdSalesOrder = await _salesOrderService.CreateSalesOrderAsync(createSalesOrderDto);
-                return CreatedAtAction(nameof(GetById), new { id = createdSalesOrder.Id }, createdSalesOrder);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var createdSalesOrder = await _salesOrderService.CreateAsync(createSalesOrderDto);
+            return CreatedAtAction(nameof(GetById), new { id = createdSalesOrder.Id }, createdSalesOrder);
         }
 
         [HttpPut]
         public async Task<IActionResult> Update([FromBody] UpdateSalesOrderDto updateSalesOrderDto)
         {
-            try
-            {
-                await _salesOrderService.UpdateSalesOrderAsync(updateSalesOrderDto);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            await _salesOrderService.UpdateAsync(updateSalesOrderDto);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                await _salesOrderService.DeleteSalesOrderAsync(id);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            await _salesOrderService.DeleteAsync(id);
+            return NoContent();
         }
 
-        [HttpGet("customer/{customerId}")]
-        public async Task<IActionResult> GetByCustomer(int customerId)
-        {
-            try
-            {
-                var salesOrders = await _salesOrderService.GetSalesOrdersByCustomerAsync(customerId);
-                return Ok(salesOrders);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
-        }
-
-        [HttpGet("organization/{organizationId}")]
-        public async Task<IActionResult> GetByOrganization(int organizationId)
-        {
-            try
-            {
-                var salesOrders = await _salesOrderService.GetSalesOrdersByOrganizationAsync(organizationId);
-                return Ok(salesOrders);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
-        }
-
-        [HttpGet("status/{status}")]
-        public async Task<IActionResult> GetByStatus(string status)
-        {
-            try
-            {
-                var salesOrders = await _salesOrderService.GetSalesOrdersByStatusAsync(status);
-                return Ok(salesOrders);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
-        }
 
         [HttpGet("generate-number")]
         public async Task<IActionResult> GenerateSoNumber()
         {
-            try
-            {
-                var soNumber = await _salesOrderService.GenerateSoNumberAsync();
-                return Ok(new { SoNumber = soNumber });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var nextNumber = await _salesOrderService.GenerateSoNumberAsync();
+            return Ok(new { NextNumber = nextNumber });
         }
 
         [HttpPost("{id}/submit")]
         public async Task<IActionResult> Submit(int id)
         {
-            try
-            {
-                var result = await _salesOrderService.SubmitSalesOrderAsync(id);
-                return Ok(new { Success = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            await _salesOrderService.SubmitAsync(id);
+            return NoContent();
         }
 
         [HttpPost("{id}/approve")]
         public async Task<IActionResult> Approve(int id)
         {
-            try
-            {
-                var result = await _salesOrderService.ApproveSalesOrderAsync(id);
-                return Ok(new { Success = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            await _salesOrderService.ApproveAsync(id);
+            return NoContent();
         }
 
         [HttpPost("{id}/reject")]
         public async Task<IActionResult> Reject(int id)
         {
-            try
-            {
-                var result = await _salesOrderService.RejectSalesOrderAsync(id);
-                return Ok(new { Success = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            await _salesOrderService.RejectAsync(id);
+            return NoContent();
         }
 
         // --- Sales Order Comments Endpoints ---
 
-        [HttpGet("{id}/comments")]
-        public async Task<IActionResult> GetComments(int id)
+        [HttpGet("{salesOrderId}/comments")]
+        public async Task<IActionResult> GetComments(int salesOrderId)
         {
-            try
-            {
-                var comments = await _commentService.GetCommentsBySalesOrderAsync(id);
-                return Ok(comments);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var comments = await _commentService.GetCommentsBySalesOrderAsync(salesOrderId);
+            return Ok(comments);
         }
 
-        [HttpPost("{id}/comments")]
-        public async Task<IActionResult> CreateComment(int id, [FromBody] CreateSalesOrderCommentDto createCommentDto)
+        [HttpPost("{salesOrderId}/comments")]
+        public async Task<IActionResult> CreateComment(int salesOrderId, [FromBody] CreateSalesOrderCommentDto createCommentDto)
         {
-            try
-            {
-                createCommentDto.SalesOrderId = id;
-                var createdComment = await _commentService.CreateCommentAsync(createCommentDto);
-                return CreatedAtAction(nameof(GetComments), new { id }, createdComment);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            createCommentDto.SalesOrderId = salesOrderId;
+            var createdComment = await _commentService.CreateCommentAsync(createCommentDto);
+            return CreatedAtAction(nameof(GetComments), new { salesOrderId }, createdComment);
         }
 
-        [HttpPut("{id}/comments/{commentId}")]
-        public async Task<IActionResult> UpdateComment(int id, int commentId, [FromBody] CreateSalesOrderCommentDto updateCommentDto)
+        [HttpPut("{salesOrderId}/comments/{commentId}")]
+        public async Task<IActionResult> UpdateComment(int salesOrderId, int commentId, [FromBody] CreateSalesOrderCommentDto updateCommentDto)
         {
-            try
-            {
-                updateCommentDto.SalesOrderId = id;
-                await _commentService.UpdateCommentAsync(commentId, updateCommentDto);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            updateCommentDto.SalesOrderId = salesOrderId;
+            await _commentService.UpdateCommentAsync(commentId, updateCommentDto);
+            return NoContent();
         }
 
-        [HttpDelete("{id}/comments/{commentId}")]
-        public async Task<IActionResult> DeleteComment(int id, int commentId)
+        [HttpDelete("{salesOrderId}/comments/{commentId}")]
+        public async Task<IActionResult> DeleteComment(int salesOrderId, int commentId)
         {
-            try
-            {
-                await _commentService.DeleteCommentAsync(commentId);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            await _commentService.DeleteCommentAsync(commentId);
+            return NoContent();
         }
 
         // --- Sales Order Chat Endpoints ---
 
-        [HttpGet("{id}/chat")]
-        public async Task<IActionResult> GetChatMessages(int id)
+        [HttpGet("{salesOrderId}/chat")]
+        public async Task<IActionResult> GetChatMessages(int salesOrderId)
         {
-            try
-            {
-                var chatMessages = await _chatService.GetChatMessagesBySalesOrderAsync(id);
-                return Ok(chatMessages);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var chatMessages = await _chatService.GetChatMessagesBySalesOrderAsync(salesOrderId);
+            return Ok(chatMessages);
         }
 
-        [HttpPost("{id}/chat")]
-        public async Task<IActionResult> CreateChatMessage(int id, [FromBody] CreateSalesOrderChatDto createChatDto)
+        [HttpPost("{salesOrderId}/chat")]
+        public async Task<IActionResult> CreateChatMessage(int salesOrderId, [FromBody] CreateSalesOrderChatDto createChatDto)
         {
-            try
-            {
-                createChatDto.SalesOrderId = id;
-                var createdChatMessage = await _chatService.CreateChatMessageAsync(createChatDto);
-                return CreatedAtAction(nameof(GetChatMessages), new { id }, createdChatMessage);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            createChatDto.SalesOrderId = salesOrderId;
+            var createdChatMessage = await _chatService.CreateChatMessageAsync(createChatDto);
+            return CreatedAtAction(nameof(GetChatMessages), new { salesOrderId }, createdChatMessage);
         }
 
-        [HttpPut("{id}/chat/{chatId}")]
-        public async Task<IActionResult> UpdateChatMessage(int id, int chatId, [FromBody] CreateSalesOrderChatDto updateChatDto)
+        [HttpPut("{salesOrderId}/chat/{chatId}")]
+        public async Task<IActionResult> UpdateChatMessage(int salesOrderId, int chatId, [FromBody] CreateSalesOrderChatDto updateChatDto)
         {
-            try
-            {
-                updateChatDto.SalesOrderId = id;
-                await _chatService.UpdateChatMessageAsync(chatId, updateChatDto);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            updateChatDto.SalesOrderId = salesOrderId;
+            await _chatService.UpdateChatMessageAsync(chatId, updateChatDto);
+            return NoContent();
         }
 
-        [HttpDelete("{id}/chat/{chatId}")]
-        public async Task<IActionResult> DeleteChatMessage(int id, int chatId)
+        [HttpDelete("{salesOrderId}/chat/{chatId}")]
+        public async Task<IActionResult> DeleteChatMessage(int salesOrderId, int chatId)
         {
-            try
-            {
-                await _chatService.DeleteChatMessageAsync(chatId);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            await _chatService.DeleteChatMessageAsync(chatId);
+            return NoContent();
         }
 
         // --- Sales Order Documents Endpoints ---
 
-        [HttpGet("{id}/documents")]
-        public async Task<IActionResult> GetDocuments(int id)
+        [HttpGet("{salesOrderId}/documents")]
+        public async Task<IActionResult> GetDocuments(int salesOrderId)
         {
-            try
-            {
-                var documents = await _documentService.GetDocumentsBySalesOrderAsync(id);
-                return Ok(documents);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            var documents = await _documentService.GetDocumentsBySalesOrderAsync(salesOrderId);
+            return Ok(documents);
         }
 
-        [HttpPost("{id}/documents")]
-        public async Task<IActionResult> CreateDocument(int id, [FromBody] CreateSalesOrderDocumentDto createDocumentDto)
+        [HttpPost("{salesOrderId}/documents")]
+        public async Task<IActionResult> CreateDocument(int salesOrderId, [FromBody] CreateSalesOrderDocumentDto createDocumentDto)
         {
-            try
-            {
-                createDocumentDto.SalesOrderId = id;
-                var createdDocument = await _documentService.CreateDocumentAsync(createDocumentDto);
-                return CreatedAtAction(nameof(GetDocuments), new { id }, createdDocument);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            createDocumentDto.SalesOrderId = salesOrderId;
+            var createdDocument = await _documentService.CreateDocumentAsync(createDocumentDto);
+            return CreatedAtAction(nameof(GetDocuments), new { salesOrderId }, createdDocument);
         }
 
-        [HttpPut("{id}/documents/{documentId}")]
-        public async Task<IActionResult> UpdateDocument(int id, int documentId, [FromBody] CreateSalesOrderDocumentDto updateDocumentDto)
+        [HttpPut("{salesOrderId}/documents/{documentId}")]
+        public async Task<IActionResult> UpdateDocument(int salesOrderId, int documentId, [FromBody] CreateSalesOrderDocumentDto updateDocumentDto)
         {
-            try
-            {
-                updateDocumentDto.SalesOrderId = id;
-                await _documentService.UpdateDocumentAsync(documentId, updateDocumentDto);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            updateDocumentDto.SalesOrderId = salesOrderId;
+            await _documentService.UpdateDocumentAsync(documentId, updateDocumentDto);
+            return NoContent();
         }
 
-        [HttpDelete("{id}/documents/{documentId}")]
-        public async Task<IActionResult> DeleteDocument(int id, int documentId)
+        [HttpDelete("{salesOrderId}/documents/{documentId}")]
+        public async Task<IActionResult> DeleteDocument(int salesOrderId, int documentId)
         {
-            try
-            {
-                await _documentService.DeleteDocumentAsync(documentId);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            await _documentService.DeleteDocumentAsync(documentId);
+            return NoContent();
         }
     }
 } 

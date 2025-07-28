@@ -6,12 +6,12 @@ namespace Xcianify.Core.Domain.Services
 {
     public interface ISalesOrderQuotationItemService
     {
-        Task<IEnumerable<SalesOrderQuotationItemDto>> GetAllQuotationItemsAsync();
-        Task<SalesOrderQuotationItemDto> GetQuotationItemByIdAsync(int id);
-        Task<SalesOrderQuotationItemDto> CreateQuotationItemAsync(CreateSalesOrderQuotationItemDto quotationItemDto);
-        Task UpdateQuotationItemAsync(int id, CreateSalesOrderQuotationItemDto quotationItemDto);
-        Task DeleteQuotationItemAsync(int id);
-        Task<IEnumerable<SalesOrderQuotationItemDto>> GetQuotationItemsByQuotationAsync(int quotationId);
-        Task<IEnumerable<SalesOrderQuotationItemDto>> GetQuotationItemsBySalesOrderAsync(int salesOrderId);
+        Task<IEnumerable<SalesOrderQuotationItemDto>> GetAllItemsAsync();
+        Task<SalesOrderQuotationItemDto> GetItemByIdAsync(int id);
+        Task<SalesOrderQuotationItemDto> CreateItemAsync(CreateSalesOrderQuotationItemDto quotationItemDto);
+        Task UpdateItemAsync(int id, CreateSalesOrderQuotationItemDto quotationItemDto);
+        Task DeleteItemAsync(int id);
+        Task<IEnumerable<SalesOrderQuotationItemDto>> GetItemsByQuotationAsync(int quotationId);
+        Task<IEnumerable<SalesOrderQuotationItemDto>> GetItemsBySalesOrderAsync(int salesOrderId);
     }
 } 

@@ -30,7 +30,7 @@ namespace Xcianify.Repository
                 LEFT JOIN users u1 ON pi.created_by = u1.id
                 LEFT JOIN users u2 ON pi.updated_by = u2.id
                 WHERE pi.is_deleted = 0
-                ORDER BY pi.created_time DESC";
+                ORDER BY pi.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderPerformaInvoice>(query);
         }
@@ -82,7 +82,7 @@ namespace Xcianify.Repository
                     port_of_discharge, place_of_receipt_by_pre_carrier, final_destination,
                     terms_of_delivery, payment_terms, shipment_mode, port_of_loading,
                     additionalcharges, total_amount, previous_performa_invoice_id,
-                    is_deleted, created_by, created_time, updated_by, updated_time
+                    is_deleted, created_by, created_at, updated_by, updated_at
                 ) VALUES (
                     @ExporterName, @OrganizationName, @ConsigneeName, @ConsigneeContactDetails,
                     @ConsigneeAddress, @PerformaInvoiceNumber, @PerformaInvoiceDate,
@@ -115,7 +115,7 @@ namespace Xcianify.Repository
                     shipment_mode = @ShipmentMode, port_of_loading = @PortOfLoading,
                     additionalcharges = @AdditionalCharges, total_amount = @TotalAmount,
                     previous_performa_invoice_id = @PreviousPerformaInvoiceId,
-                    updated_by = @UpdatedBy, updated_time = @UpdatedTime
+                    updated_by = @UpdatedBy, updated_at = @UpdatedTime
                 WHERE id = @Id AND is_deleted = 0
                 RETURNING *";
 
@@ -164,7 +164,7 @@ namespace Xcianify.Repository
                 LEFT JOIN users u1 ON pi.created_by = u1.id
                 LEFT JOIN users u2 ON pi.updated_by = u2.id
                 WHERE pi.is_deleted = 0
-                ORDER BY pi.created_time DESC";
+                ORDER BY pi.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderPerformaInvoice>(query);
         }

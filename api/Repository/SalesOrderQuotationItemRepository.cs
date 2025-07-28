@@ -30,7 +30,7 @@ namespace Xcianify.Repository
                 LEFT JOIN users u1 ON soqi.created_by = u1.id
                 LEFT JOIN users u2 ON soqi.updated_by = u2.id
                 WHERE soqi.is_deleted = 0
-                ORDER BY soqi.created_time DESC";
+                ORDER BY soqi.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderQuotationItem>(query);
         }
@@ -61,8 +61,8 @@ namespace Xcianify.Repository
                     quotation_id, sales_order_id, item_id, composition, dosage_name,
                     product_cast, p_pack_short, so_status, p_quantity, p_foc_qty,
                     p_mrp, p_billing_rate, comments, tax_percent, product_extra_charges,
-                    product_extra_charges_tax_percent, is_deleted, created_by, created_time,
-                    updated_by, updated_time
+                    product_extra_charges_tax_percent, is_deleted, created_by, created_at,
+                    updated_by, updated_at
                 ) VALUES (
                     @QuotationId, @SalesOrderId, @ItemId, @Composition, @DosageName,
                     @ProductCast, @PPackShort, @SoStatus, @PQuantity, @PFocQty,
@@ -86,7 +86,7 @@ namespace Xcianify.Repository
                     p_quantity = @PQuantity, p_foc_qty = @PFocQty, p_mrp = @PMrp,
                     p_billing_rate = @PBillingRate, comments = @Comments, tax_percent = @TaxPercent,
                     product_extra_charges = @ProductExtraCharges, product_extra_charges_tax_percent = @ProductExtraChargesTaxPercent,
-                    updated_by = @UpdatedBy, updated_time = @UpdatedTime
+                    updated_by = @UpdatedBy, updated_at = @UpdatedTime
                 WHERE id = @Id AND is_deleted = 0
                 RETURNING *";
 
@@ -123,7 +123,7 @@ namespace Xcianify.Repository
                 LEFT JOIN users u1 ON soqi.created_by = u1.id
                 LEFT JOIN users u2 ON soqi.updated_by = u2.id
                 WHERE soqi.quotation_id = @QuotationId AND soqi.is_deleted = 0
-                ORDER BY soqi.created_time DESC";
+                ORDER BY soqi.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderQuotationItem>(query, new { QuotationId = quotationId });
         }
@@ -141,7 +141,7 @@ namespace Xcianify.Repository
                 LEFT JOIN users u1 ON soqi.created_by = u1.id
                 LEFT JOIN users u2 ON soqi.updated_by = u2.id
                 WHERE soqi.sales_order_id = @SalesOrderId AND soqi.is_deleted = 0
-                ORDER BY soqi.created_time DESC";
+                ORDER BY soqi.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderQuotationItem>(query, new { SalesOrderId = salesOrderId });
         }
