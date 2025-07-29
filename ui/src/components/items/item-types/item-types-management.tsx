@@ -113,24 +113,9 @@ export default function ItemTypesManagement() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center">
-        <Button 
-          variant="ghost" 
-          onClick={() => router.push("/items")}
-          className="text-blue-600 hover:text-blue-700"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Item Master
-        </Button>
-      </div>
-
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Item Types</h1>
-          <p className="mt-2 text-gray-600">
-            Manage pharmaceutical item types and categories ({totalCount} total)
-          </p>
         </div>
         <Button onClick={handleCreateItemType}>
           <Plus className="h-4 w-4 mr-2" />

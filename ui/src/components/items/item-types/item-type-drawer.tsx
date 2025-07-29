@@ -43,10 +43,11 @@ export default function ItemTypeDrawer({
     },
   });
 
-  const { control, handleSubmit, reset, formState: { isSubmitting } } = form;
+  const { control, handleSubmit, reset, formState: { isSubmitting, errors } } = form;
 
   useEffect(() => {
     if (itemType) {
+      console.log('Setting form values for edit:', itemType);
       reset({
         code: itemType.code || "",
         name: itemType.name || "",
@@ -55,6 +56,7 @@ export default function ItemTypeDrawer({
         isActive: itemType.isActive ?? true,
       });
     } else {
+      console.log('Setting form values for create');
       reset({
         code: "",
         name: "",
@@ -66,6 +68,9 @@ export default function ItemTypeDrawer({
   }, [itemType, reset]);
 
   const onSubmit = async (data: ItemTypeFormData) => {
+    console.log('Form submitted with data:', data);
+    console.log('Current itemType:', itemType);
+    
     try {
       const payload = {
         code: data.code,
@@ -75,17 +80,23 @@ export default function ItemTypeDrawer({
         isActive: data.isActive,
       };
 
+      console.log('Payload to be sent:', payload);
+
       if (itemType) {
-        await updateItemTypeMutation.mutateAsync({
+        console.log('Updating item type with ID:', itemType.id);
+        const result = await updateItemTypeMutation.mutateAsync({
           id: itemType.id,
           data: payload,
         });
+        console.log('Update result:', result);
         toast({
           title: "Success",
           description: "Item type updated successfully",
         });
       } else {
-        await createItemTypeMutation.mutateAsync(payload);
+        console.log('Creating new item type');
+        const result = await createItemTypeMutation.mutateAsync(payload);
+        console.log('Create result:', result);
         toast({
           title: "Success",
           description: "Item type created successfully",
@@ -96,6 +107,12 @@ export default function ItemTypeDrawer({
       onClose();
     } catch (error: any) {
       console.error('Item type operation failed:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        response: error?.response,
+        status: error?.response?.status,
+        data: error?.response?.data
+      });
       
       // Handle specific error cases
       let errorMessage = itemType 
@@ -127,6 +144,15 @@ export default function ItemTypeDrawer({
 
   const isLoading = createItemTypeMutation.isPending || updateItemTypeMutation.isPending;
 
+  // Debug form state
+  console.log('Form errors:', errors);
+  console.log('Form isSubmitting:', isSubmitting);
+  console.log('Mutation states:', {
+    createPending: createItemTypeMutation.isPending,
+    updatePending: updateItemTypeMutation.isPending,
+    isLoading
+  });
+
   return (
     <RightDrawer
       isOpen={isOpen}
@@ -139,6 +165,7 @@ export default function ItemTypeDrawer({
     >
       <FormProvider {...form}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {JSON.stringify(errors)}
           <FormInput
             control={control}
             name="code"
@@ -167,7 +194,11 @@ export default function ItemTypeDrawer({
             name="parentTypeId"
             label="Parent Item Type ID"
             placeholder="Enter parent item type ID (optional)"
-            inputProps={{ type: "number" }}
+            inputProps={{ 
+              type: "number",
+              min: "1",
+              step: "1"
+            }}
           />
 
           <div className="flex items-center justify-between rounded-lg border p-4">

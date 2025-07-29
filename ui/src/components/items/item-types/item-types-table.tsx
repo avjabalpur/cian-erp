@@ -94,7 +94,7 @@ export default function ItemTypesTable({
         columnMeta={columnMeta}
         isLoading={isLoading}
         groupingEnabled={false}
-        globalFilterEnabled={true}
+        globalFilterEnabled={false}
         dragDropGroupingEnabled={false}
         onRowClick={onEdit}
         actionButtons={actionButtons}
