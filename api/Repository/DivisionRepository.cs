@@ -26,8 +26,8 @@ namespace Xcianify.Repository
                     dept.id as Department_Id,
                     dept.code as Department_Code,
                     dept.name as Department_Name
-                FROM ""divisions"" d
-                LEFT JOIN ""departments"" dept ON d.department_id = dept.id
+                FROM divisions d
+                LEFT JOIN departments dept ON d.department_id = dept.id
                 WHERE d.id = @Id";
 
             using var connection = _dbContext.GetConnection();
@@ -59,8 +59,8 @@ namespace Xcianify.Repository
                     dept.id as Department_Id,
                     dept.code as Department_Code,
                     dept.name as Department_Name
-                FROM ""divisions"" d
-                LEFT JOIN ""departments"" dept ON d.department_id = dept.id
+                FROM divisions d
+                LEFT JOIN departments dept ON d.department_id = dept.id
                 ORDER BY d.name";
 
             using var connection = _dbContext.GetConnection();
@@ -83,8 +83,8 @@ namespace Xcianify.Repository
                     dept.id as Department_Id,
                     dept.code as Department_Code,
                     dept.name as Department_Name
-                FROM ""divisions"" d
-                LEFT JOIN ""departments"" dept ON d.department_id = dept.id
+                FROM divisions d
+                LEFT JOIN departments dept ON d.department_id = dept.id
                 WHERE d.department_id = @DepartmentId
                 ORDER BY d.name";
 
@@ -104,7 +104,7 @@ namespace Xcianify.Repository
         public async Task<int> CreateAsync(Division division)
         {
             const string query = @"
-                INSERT INTO ""divisions""
+                INSERT INTO divisions
                     (code, department_id, name, description, unit, conversion_factor, 
                      is_active, created_by, updated_by, created_at, updated_at)
                 VALUES 
@@ -119,7 +119,7 @@ namespace Xcianify.Repository
         public async Task<bool> UpdateAsync(Division division)
         {
             const string query = @"
-                UPDATE ""divisions""
+                UPDATE divisions
                 SET 
                     code = @Code,
                     department_id = @DepartmentId,
@@ -139,7 +139,7 @@ namespace Xcianify.Repository
 
         public async Task<bool> DeleteAsync(int id)
         {
-            const string query = @"DELETE FROM ""divisions"" WHERE id = @Id";
+            const string query = @"DELETE FROM divisions WHERE id = @Id";
             
             using var connection = _dbContext.GetConnection();
             var affectedRows = await connection.ExecuteAsync(query, new { Id = id });
@@ -148,7 +148,7 @@ namespace Xcianify.Repository
 
         public async Task<bool> CodeExistsAsync(string code, int? excludeId = null)
         {
-            var query = "SELECT COUNT(*) FROM \"divisions\" WHERE code = @Code";
+            var query = "SELECT COUNT(*) FROM divisions WHERE code = @Code";
             
             if (excludeId.HasValue)
             {

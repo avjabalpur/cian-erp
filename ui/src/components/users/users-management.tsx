@@ -23,7 +23,7 @@ export default function UsersManagement() {
   const [columnFilters, setColumnFilters] = useState<any[]>([])
   const [sorting, setSorting] = useState<any[]>([])
 
-  const { data: users, isLoading } = useUsers({
+  const { data: usersData, isLoading } = useUsers({
     search: searchTerm,
     pageNumber: pageIndex + 1,
     pageSize,
@@ -31,8 +31,9 @@ export default function UsersManagement() {
     sorting: sorting,
     globalFilter: globalFilter
   })
-  const totalCount = users?.length || 0
-  const pageCount = users?.length || 0
+  const users = usersData?.items || []
+  const totalCount = usersData?.totalCount || 0
+  const pageCount = usersData?.pageCount || 0
 
   const handleView = (user: User) => {
     router.push(`/users/${user.id}`)

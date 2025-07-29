@@ -4,14 +4,90 @@ export interface SelectOption {
   value: string;
   label: string;
   variant?: "default" | "secondary" | "destructive" | "outline";
+  disabled?: boolean;
+  shortName?: string;
 }
 
 export interface StatusOption extends SelectOption {
   color: string;
-  bgColor: string;
+  bgColor?: string;
 }
 
+// Current Status Options
+export const currentStatusOptions: StatusOption[] = [
+  { 
+    label: "IN-PROGRESS", 
+    value: "IN-PROGRESS", 
+    color: "orange", 
+    shortName: "IN-PROG",
+    variant: "outline"
+  },
+  { 
+    label: "SO-CONFIRMED", 
+    value: "SO-CONFIRMED", 
+    color: "green", 
+    shortName: "SO-CONF",
+    variant: "default"
+  },
+  { 
+    label: "ADDED-TO-PROGEN", 
+    value: "ADDED-TO-PROGEN", 
+    color: "blue", 
+    disabled: true, 
+    shortName: "PROGEN",
+    variant: "secondary"
+  },
+  { 
+    label: "REQUEST-CHANGES", 
+    value: "REQUEST-CHANGES", 
+    color: "purple", 
+    disabled: true, 
+    shortName: "REQ-CHA",
+    variant: "outline"
+  },
+  { 
+    label: "CANCEL", 
+    value: "CANCEL", 
+    color: "grey", 
+    shortName: "CANCEL",
+    variant: "destructive"
+  },
+];
+
 // Sales Order Status Options
+export const soStatusOptions: SelectOption[] = [
+  { label: "NEW", value: "NEW" },
+  { label: "REPEAT", value: "REPEAT" },
+  { label: "REVISED", value: "REVISED" },
+];
+
+// Product Shelf Life Options
+export const pShelfLifeOptions: SelectOption[] = [
+  { label: "NA", value: "NA" },
+  { label: "18", value: "18" },
+  { label: "24", value: "24" },
+  { label: "36", value: "36" },
+];
+
+// Dosage Name Options
+export const dosageNameOptions: SelectOption[] = [
+  { label: "TABLET", value: "TABLET" },
+  { label: "GEL", value: "GEL" },
+  { label: "CAPSULE", value: "CAPSULE" },
+  { label: "LIQUID", value: "LIQUID" },
+  { label: "OINTMENT", value: "OINTMENT" },
+  { label: "POWDER", value: "POWDER" },
+  { label: "CREAM", value: "CREAM" },
+  { label: "SOFTGEL", value: "SOFTGEL" },
+];
+
+// Product Domino Options
+export const pDominoOptions: SelectOption[] = [
+  { label: "DOMINO", value: "DOMINO" },
+  { label: "STEREO", value: "STEREO" },
+];
+
+// Legacy Sales Order Status Options (keeping for backward compatibility)
 export const salesOrderStatusOptions: StatusOption[] = [
   {
     value: "new",
@@ -139,8 +215,8 @@ export const drugApprovalOptions: SelectOption[] = [
   { value: "other", label: "Other" }
 ];
 
-// Current Status Options
-export const currentStatusOptions: StatusOption[] = [
+// Legacy Current Status Options (keeping for backward compatibility)
+export const legacyCurrentStatusOptions: StatusOption[] = [
   {
     value: "pending",
     label: "Pending",
@@ -221,6 +297,31 @@ export const getStatusColor = (status: string): StatusOption => {
 export const getCurrentStatusColor = (status: string): StatusOption => {
   return currentStatusOptions.find(option => option.value === status) || 
          currentStatusOptions[0]; // Default to first option
+};
+
+export const getCurrentStatusOption = (status: string): StatusOption => {
+  return currentStatusOptions.find(option => option.value === status) || 
+         currentStatusOptions[0]; // Default to first option
+};
+
+export const getSoStatusOption = (status: string): SelectOption => {
+  return soStatusOptions.find(option => option.value === status) || 
+         soStatusOptions[0]; // Default to first option
+};
+
+export const getDosageNameOption = (dosage: string): SelectOption => {
+  return dosageNameOptions.find(option => option.value === dosage) || 
+         dosageNameOptions[0]; // Default to first option
+};
+
+export const getPDominoOption = (domino: string): SelectOption => {
+  return pDominoOptions.find(option => option.value === domino) || 
+         pDominoOptions[0]; // Default to first option
+};
+
+export const getPShelfLifeOption = (shelfLife: string): SelectOption => {
+  return pShelfLifeOptions.find(option => option.value === shelfLife) || 
+         pShelfLifeOptions[0]; // Default to first option
 };
 
 export const formatDate = (date: string | Date): string => {

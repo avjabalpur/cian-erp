@@ -1,5 +1,5 @@
-import ItemsManagement from "@/components/items/items-management"
+import ItemsManagement from "@/components/items/items/items-management";
 
-export default function AdminItemsPage() {
-  return <ItemsManagement />
-}
+export default function ItemsPage() {
+  return <ItemsManagement />;
+} 

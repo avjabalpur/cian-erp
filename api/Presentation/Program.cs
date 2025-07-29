@@ -124,6 +124,8 @@ builder.Services.AddAutoMapper(
     typeof(PermissionMapper),
     typeof(OrganizationMapper),
     typeof(ItemMasterMapper),
+    typeof(ItemTypeMapper),
+    typeof(HsnMasterMapper),
     typeof(SalesOrderMapper)
 );
 
@@ -147,8 +149,7 @@ builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IRolePermissionService, RolePermissionService>();
 
-// Register Item Master services and repositories
-builder.Services.AddScoped<IItemMasterRepository, ItemMasterRepository>();
+
 
 // Register Department services and repositories
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
@@ -158,11 +159,14 @@ builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IDivisionRepository, DivisionRepository>();
 builder.Services.AddScoped<IDivisionService, DivisionService>();
 
-// Register ItemSalesDetail services and repositories
+// Register Item Master services and repositories
+builder.Services.AddScoped<IItemMasterRepository, ItemMasterRepository>();
+builder.Services.AddScoped<IItemTypeRepository, ItemTypeRepository>();
+builder.Services.AddScoped<IItemTypeService, ItemTypeService>();
+builder.Services.AddScoped<IHsnMasterRepository, HsnMasterRepository>();
+builder.Services.AddScoped<IHsnMasterService, HsnMasterService>();
 builder.Services.AddScoped<IItemSalesDetailRepository, ItemSalesDetailRepository>();
 builder.Services.AddScoped<IItemSalesDetailService, ItemSalesDetailService>();
-
-// Register ItemStockAnalysis services and repositories
 builder.Services.AddScoped<IItemStockAnalysisRepository, ItemStockAnalysisRepository>();
 builder.Services.AddScoped<IItemStockAnalysisService, ItemStockAnalysisService>();
 builder.Services.AddScoped<IItemSpecificationRepository, ItemSpecificationRepository>();
@@ -225,9 +229,5 @@ app.UseAuthorization();
 
 // Map controllers
 app.MapControllers();
-
-app.UseExceptionHandling();
-
-Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 app.Run();

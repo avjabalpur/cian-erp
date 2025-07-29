@@ -45,6 +45,10 @@ export const useLogin = () => {
         router.push('/dashboard');
       }
     },
+    onError: (error) => {
+      debugger;
+      console.error('Login failed:', error);
+    }
   });
 };
 

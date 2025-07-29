@@ -12,6 +12,6 @@ namespace Xcianify.Core.Domain.Services
         Task<ItemMasterDto> GetItemByCodeAsync(string itemCode);
         Task<ItemMasterDto> CreateItemAsync(CreateItemMasterDto createDto);
         Task<ItemMasterDto> UpdateItemAsync(int id, UpdateItemMasterDto updateDto);
-        Task<bool> DeleteItemAsync(int id);
+        Task DeleteItemAsync(int id);
     }
 }

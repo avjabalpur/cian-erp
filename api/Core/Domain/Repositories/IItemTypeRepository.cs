@@ -2,17 +2,19 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xcianify.Core.DTOs;
 using Xcianify.Core.DTOs.ItemMaster;
+using Xcianify.Core.Model;
 
 namespace Xcianify.Core.Domain.Repositories
 {
     public interface IItemTypeRepository
     {
-        Task<ItemTypeDto> GetByIdAsync(int id);
-        Task<PaginatedResult<ItemTypeDto>> GetAllAsync(ItemTypeFilterDto filter);
-        Task<ItemTypeDto> CreateAsync(CreateItemTypeDto dto, int userId);
-        Task<ItemTypeDto> UpdateAsync(int id, UpdateItemTypeDto dto, int userId);
-        Task<bool> DeleteAsync(int id);
+        // New pattern methods (following UserRepository)
+        Task<(List<ItemType> Items, int TotalCount)> GetAllAsync(ItemTypeFilterDto filterDto);
+        Task<ItemType> GetByIdAsync(int id);
+        Task<ItemType> AddAsync(ItemType itemType);
+        Task UpdateAsync(ItemType itemType);
+        Task DeleteAsync(int id);
         Task<bool> ExistsAsync(string code, int? excludeId = null);
-        Task<IEnumerable<ItemTypeDto>> GetParentTypesAsync();
+        Task<IEnumerable<ItemType>> GetParentTypesAsync();
     }
 }

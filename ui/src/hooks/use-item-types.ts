@@ -5,28 +5,28 @@ import { ItemType, CreateItemTypeData, UpdateItemTypeData } from '../types/item-
 // --- API Functions ---
 
 const getItemTypes = async (): Promise<ItemType[]> => {
-  const { data } = await api.get('/ItemType');
+  const { data } = await api.get('/item-types');
   return data;
 };
 
 const getItemTypeById = async (id: number): Promise<ItemType | null> => {
   if (!id) return null;
-  const { data } = await api.get(`/ItemType/${id}`);
+  const { data } = await api.get(`/item-types/${id}`);
   return data;
 };
 
 const createItemType = async (itemTypeData: CreateItemTypeData): Promise<ItemType> => {
-  const { data } = await api.post('/ItemType', itemTypeData);
+  const { data } = await api.post('/item-types', itemTypeData);
   return data;
 };
 
 const updateItemType = async ({ id, ...itemTypeData }: { id: number; data: UpdateItemTypeData }): Promise<ItemType> => {
-  const { data } = await api.put(`/ItemType/${id}`, itemTypeData.data);
+  const { data } = await api.put(`/item-types/${id}`, itemTypeData.data);
   return data;
 };
 
 const deleteItemType = async (id: number): Promise<void> => {
-  await api.delete(`/ItemType/${id}`);
+  await api.delete(`/item-types/${id}`);
 };
 
 

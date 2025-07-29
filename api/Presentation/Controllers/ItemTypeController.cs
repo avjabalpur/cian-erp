@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Xcianify.Core.DTOs.ItemMaster;
 using Xcianify.Core.Domain.Services;
@@ -46,16 +42,28 @@ namespace Xcianify.Presentation.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateItemTypeDto dto)
         {
+            // Get current user ID from claims
+            var userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
+            if (userId <= 0)
+            {
+                return Unauthorized(new { message = "Invalid user" });
+            }
 
-            var createdItemType = await _itemTypeService.CreateAsync(dto, CurrentUserId);
+            var createdItemType = await _itemTypeService.CreateAsync(dto, userId);
             return CreatedAtAction(nameof(GetById), new { id = createdItemType.Id }, createdItemType);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateItemTypeDto dto)
         {
+            // Get current user ID from claims
+            var userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
+            if (userId <= 0)
+            {
+                return Unauthorized(new { message = "Invalid user" });
+            }
 
-            var updatedItemType = await _itemTypeService.UpdateAsync(id, dto, CurrentUserId);
+            var updatedItemType = await _itemTypeService.UpdateAsync(id, dto, userId);
             return Ok(updatedItemType);
         }
 

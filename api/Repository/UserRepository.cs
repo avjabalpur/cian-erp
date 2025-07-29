@@ -160,8 +160,18 @@ namespace Xcianify.Repository
         public async Task<User> GetByUsernameAsync(string username)
         {
             var query = $@"
-                SELECT * FROM {TableName}
-                WHERE username = @Username";
+                SELECT id as id,
+                    username as username,
+                    email as email,
+                    password_hash as passwordHash,
+                    first_name as firstName,
+                    last_name as lastName,
+                    is_active as isActive,
+                    is_email_verified as isEmailVerified,
+                    is_phone_verified as isPhoneVerified,
+                    last_login as lastLogin 
+               FROM {TableName}
+               WHERE username = @Username";
 
             using var connection = _dbContext.GetConnection();
             return await connection.QueryFirstOrDefaultAsync<User>(query, new { Username = username });
@@ -170,7 +180,17 @@ namespace Xcianify.Repository
         public async Task<User> GetByEmailAsync(string email)
         {
             var query = $@"
-                SELECT * FROM {TableName}
+                SELECT id as id,
+                    username as username,
+                    email as email,
+                    password_hash as passwordHash,
+                    first_name as firstName,
+                    last_name as lastName,
+                    is_active as isActive,
+                    is_email_verified as isEmailVerified,
+                    is_phone_verified as isPhoneVerified,
+                    last_login as lastLogin 
+                FROM {TableName}
                 WHERE email = @Email";
 
             using var connection = _dbContext.GetConnection();

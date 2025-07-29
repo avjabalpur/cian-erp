@@ -1,234 +1,177 @@
 using Dapper;
-using Xcianify.Core.DTOs.ItemMaster;
 using Xcianify.Core.Domain.Repositories;
-using Xcianify.Repository.DbContext;
 using Xcianify.Core.DTOs;
+using Xcianify.Core.DTOs.ItemMaster;
+using Xcianify.Core.Model;
+using Xcianify.Repository.DbContext;
 
 namespace Xcianify.Repository
 {
     public class ItemTypeRepository : IItemTypeRepository
     {
         private readonly DapperDbContext _dbContext;
-        private bool _disposed = false;
+        private const string TableName = "item_type";
 
         public ItemTypeRepository(DapperDbContext dbContext)
         {
-            _dbContext = dbContext;
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public async Task<ItemTypeDto> GetByIdAsync(int id)
+        public async Task<(List<ItemType> Items, int TotalCount)> GetAllAsync(ItemTypeFilterDto filterDto)
         {
-            using (var connection = _dbContext.GetConnection())
-            {
-                var sql = @"
-                    SELECT it.id, it.code, it.name, it.description, it.parent_type_id AS ParentTypeId,
-                           it.is_active AS IsActive, it.created_at AS CreatedAt, it.updated_at AS UpdatedAt,
-                           it.created_by AS CreatedBy, it.updated_by AS UpdatedBy,
-                           parent.name AS ParentTypeName
-                    FROM item_type it
-                    LEFT JOIN item_type parent ON it.parent_type_id = parent.id
-                    WHERE it.id = @Id";
+            var whereConditions = new List<string>();
+            var parameters = new DynamicParameters();
 
-                return await connection.QueryFirstOrDefaultAsync<ItemTypeDto>(sql, new { Id = id });
+            // Add search filter
+            if (!string.IsNullOrWhiteSpace(filterDto.SearchTerm))
+            {
+                whereConditions.Add("(LOWER(code) LIKE @SearchTerm OR LOWER(name) LIKE @SearchTerm OR LOWER(description) LIKE @SearchTerm)");
+                parameters.Add("@SearchTerm", $"%{filterDto.SearchTerm.ToLower()}%");
             }
-        }
 
-        public async Task<PaginatedResult<ItemTypeDto>> GetAllAsync(ItemTypeFilterDto filter)
-        {
-            using (var connection = _dbContext.GetConnection())
+            // Add isActive filter
+            if (filterDto.IsActive.HasValue)
             {
-                var whereClause = "WHERE 1=1";
-                var parameters = new DynamicParameters();
-
-                if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
-                {
-                    whereClause += " AND (it.code ILIKE @SearchTerm OR it.name ILIKE @SearchTerm)";
-                    parameters.Add("@SearchTerm", $"%{filter.SearchTerm}%");
-                }
-
-                if (filter.IsActive.HasValue)
-                {
-                    whereClause += " AND it.is_active = @IsActive";
-                    parameters.Add("@IsActive", filter.IsActive.Value);
-                }
-
-                var countSql = $"SELECT COUNT(*) FROM item_type it {whereClause}";
-                var totalCount = await connection.ExecuteScalarAsync<int>(countSql, parameters);
-
-                var sql = @$"
-                    SELECT it.id, it.code, it.name, it.description, it.parent_type_id AS ParentTypeId,
-                           it.is_active AS IsActive, it.created_at AS CreatedAt, it.updated_at AS UpdatedAt,
-                           it.created_by AS CreatedBy, it.updated_by AS UpdatedBy,
-                           parent.name AS ParentTypeName
-                    FROM item_type it
-                    LEFT JOIN item_type parent ON it.parent_type_id = parent.id
-                    {whereClause}
-                    ORDER BY it.name
-                    LIMIT @PageSize OFFSET @Offset";
-
-                parameters.Add("@PageSize", filter.PageSize);
-                parameters.Add("@Offset", (filter.PageNumber - 1) * filter.PageSize);
-
-                var items = await connection.QueryAsync<ItemTypeDto>(sql, parameters);
-
-                return new PaginatedResult<ItemTypeDto>
-                {
-                    Items = items.ToList(),
-                    TotalCount = totalCount,
-                    PageNumber = filter.PageNumber,
-                    PageSize = filter.PageSize
-                };
+                whereConditions.Add("is_active = @IsActive");
+                parameters.Add("@IsActive", filterDto.IsActive.Value);
             }
-        }
 
-        public async Task<ItemTypeDto> CreateAsync(CreateItemTypeDto dto, int userId)
-        {
-            using (var connection = _dbContext.GetConnection())
-            {
-                var sql = @"
-                    INSERT INTO item_type (code, name, description, parent_type_id, is_active, created_by, updated_by)
-                    VALUES (@Code, @Name, @Description, @ParentTypeId, @IsActive, @CreatedBy, @UpdatedBy)
-                    RETURNING id, code, name, description, parent_type_id AS ParentTypeId, is_active AS IsActive,
-                              created_at AS CreatedAt, updated_at AS UpdatedAt, created_by AS CreatedBy, updated_by AS UpdatedBy";
+            var whereClause = whereConditions.Count > 0 ? $"WHERE {string.Join(" AND ", whereConditions)}" : "";
 
-                var parameters = new
-                {
-                    dto.Code,
-                    dto.Name,
-                    dto.Description,
-                    dto.ParentTypeId,
-                    dto.IsActive,
-                    CreatedBy = userId,
-                    UpdatedBy = userId
-                };
+            // Calculate offset for pagination
+            var offset = (filterDto.PageNumber - 1) * filterDto.PageSize;
 
-                var result = await connection.QueryFirstOrDefaultAsync<ItemTypeDto>(sql, parameters);
+            var query = $@"
+                SELECT 
+                    id as Id,
+                    code as Code,
+                    name as Name,
+                    description as Description,
+                    parent_type_id as ParentTypeId,
+                    is_active as IsActive,
+                    created_at as CreatedAt,
+                    updated_at as UpdatedAt,
+                    created_by as CreatedBy,
+                    updated_by as UpdatedBy
+                FROM {TableName}
+                {whereClause}
+                ORDER BY created_at DESC
+                LIMIT @PageSize OFFSET @Offset;
                 
-                // Get parent type name if exists
-                if (result != null && result.ParentTypeId.HasValue)
-                {
-                    var parentSql = "SELECT name FROM item_type WHERE id = @ParentTypeId";
-                    result.ParentTypeName = await connection.QueryFirstOrDefaultAsync<string>(parentSql, new { ParentTypeId = result.ParentTypeId });
-                }
+                SELECT COUNT(*) FROM {TableName} {whereClause};";
 
-                return result;
-            }
+            parameters.Add("@PageSize", filterDto.PageSize);
+            parameters.Add("@Offset", offset);
+
+            using var connection = _dbContext.GetConnection();
+            using var multi = await connection.QueryMultipleAsync(query, parameters);
+            var items = (await multi.ReadAsync<ItemType>()).AsList();
+            var totalCount = await multi.ReadFirstAsync<int>();
+
+            return (items, totalCount);
         }
 
-        public async Task<ItemTypeDto> UpdateAsync(int id, UpdateItemTypeDto dto, int userId)
+        public async Task<ItemType> GetByIdAsync(int id)
         {
-            using (var connection = _dbContext.GetConnection())
-            {
-                // Get existing item to preserve values not being updated
-                var existing = await GetByIdAsync(id);
-                if (existing == null)
-                    return null;
+            var query = $@"
+                SELECT 
+                    id as Id,
+                    code as Code,
+                    name as Name,
+                    description as Description,
+                    parent_type_id as ParentTypeId,
+                    is_active as IsActive,
+                    created_at as CreatedAt,
+                    updated_at as UpdatedAt,
+                    created_by as CreatedBy,
+                    updated_by as UpdatedBy
+                FROM {TableName}
+                WHERE id = @Id";
 
-                var sql = @"
-                    UPDATE item_type 
-                    SET code = @Code, 
-                        name = @Name, 
-                        description = @Description,
-                        parent_type_id = @ParentTypeId,
-                        is_active = @IsActive,
-                        updated_by = @UpdatedBy,
-                        updated_at = @UpdatedAt
-                    WHERE id = @Id
-                    RETURNING id, code, name, description, parent_type_id AS ParentTypeId, is_active AS IsActive,
-                              created_at AS CreatedAt, updated_at AS UpdatedAt, created_by AS CreatedBy, updated_by AS UpdatedBy";
-
-                var parameters = new
-                {
-                    Id = id,
-                    Code = dto.Code ?? existing.Code,
-                    Name = dto.Name ?? existing.Name,
-                    Description = dto.Description ?? existing.Description,
-                    ParentTypeId = dto.ParentTypeId ?? existing.ParentTypeId,
-                    IsActive = dto.IsActive ?? existing.IsActive,
-                    UpdatedBy = userId,
-                    UpdatedAt = DateTime.UtcNow
-                };
-
-                var result = await connection.QueryFirstOrDefaultAsync<ItemTypeDto>(sql, parameters);
-                
-                // Get parent type name if exists
-                if (result != null && result.ParentTypeId.HasValue)
-                {
-                    var parentSql = "SELECT name FROM item_type WHERE id = @ParentTypeId";
-                    result.ParentTypeName = await connection.QueryFirstOrDefaultAsync<string>(parentSql, new { ParentTypeId = result.ParentTypeId });
-                }
-
-                return result;
-            }
+            using var connection = _dbContext.GetConnection();
+            return await connection.QueryFirstOrDefaultAsync<ItemType>(query, new { Id = id });
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<ItemType> AddAsync(ItemType itemType)
         {
-            using (var connection = _dbContext.GetConnection())
-            {
-                // Check if any items reference this type
-                var checkSql = "SELECT COUNT(1) FROM item_type WHERE parent_type_id = @Id";
-                var childCount = await connection.ExecuteScalarAsync<int>(checkSql, new { Id = id });
-                
-                if (childCount > 0)
-                {
-                    throw new InvalidOperationException("Cannot delete item type that has child types. Please reassign or delete the child types first.");
-                }
+            var query = $@"
+                INSERT INTO {TableName} (
+                    code, name, description, parent_type_id, is_active, 
+                    created_at, updated_at, created_by, updated_by
+                ) VALUES (
+                    @Code, @Name, @Description, @ParentTypeId, @IsActive,
+                    @CreatedAt, @UpdatedAt, @CreatedBy, @UpdatedBy
+                )
+                RETURNING *";
 
-                var sql = "DELETE FROM item_type WHERE id = @Id";
-                var affectedRows = await connection.ExecuteAsync(sql, new { Id = id });
-                return affectedRows > 0;
-            }
+            using var connection = _dbContext.GetConnection();
+            return await connection.QueryFirstAsync<ItemType>(query, itemType);
+        }
+
+        public async Task UpdateAsync(ItemType itemType)
+        {
+            var query = $@"
+                UPDATE {TableName} 
+                SET code = @Code,
+                    name = @Name,
+                    description = @Description,
+                    parent_type_id = @ParentTypeId,
+                    is_active = @IsActive,
+                    updated_at = @UpdatedAt,
+                    updated_by = @UpdatedBy
+                WHERE id = @Id";
+
+            itemType.UpdatedAt = DateTime.UtcNow;
+
+            using var connection = _dbContext.GetConnection();
+            await connection.ExecuteAsync(query, itemType);
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var query = $"DELETE FROM {TableName} WHERE id = @Id";
+            using var connection = _dbContext.GetConnection();
+            await connection.ExecuteAsync(query, new { Id = id });
         }
 
         public async Task<bool> ExistsAsync(string code, int? excludeId = null)
         {
-            using (var connection = _dbContext.GetConnection())
+            var sql = $"SELECT COUNT(*) FROM {TableName} WHERE code = @Code";
+            var parameters = new DynamicParameters();
+            parameters.Add("Code", code);
+
+            if (excludeId.HasValue)
             {
-                var sql = "SELECT COUNT(1) FROM item_type WHERE code = @Code";
-                var parameters = new { Code = code };
-
-                if (excludeId.HasValue)
-                {
-                    sql += " AND id != @ExcludeId";
-                   // parameters = new { Code = code, ExcludeId = excludeId.Value };
-                }
-
-                var count = await connection.ExecuteScalarAsync<int>(sql, parameters);
-                return count > 0;
+                sql += " AND id != @ExcludeId";
+                parameters.Add("ExcludeId", excludeId.Value);
             }
+
+            using var connection = _dbContext.GetConnection();
+            var count = await connection.ExecuteScalarAsync<int>(sql, parameters);
+            return count > 0;
         }
 
-        public async Task<IEnumerable<ItemTypeDto>> GetParentTypesAsync()
+        public async Task<IEnumerable<ItemType>> GetParentTypesAsync()
         {
-            using (var connection = _dbContext.GetConnection())
-            {
-                var sql = @"
-                    SELECT id, code, name, description, parent_type_id AS ParentTypeId, is_active AS IsActive
-                    FROM item_type 
-                    WHERE is_active = true
-                    ORDER BY name";
+            var query = $@"
+                SELECT 
+                    id as Id,
+                    code as Code,
+                    name as Name,
+                    description as Description,
+                    parent_type_id as ParentTypeId,
+                    is_active as IsActive,
+                    created_at as CreatedAt,
+                    updated_at as UpdatedAt,
+                    created_by as CreatedBy,
+                    updated_by as UpdatedBy
+                FROM {TableName} 
+                WHERE is_active = true
+                ORDER BY name";
 
-                return await connection.QueryAsync<ItemTypeDto>(sql);
-            }
+            using var connection = _dbContext.GetConnection();
+            return await connection.QueryAsync<ItemType>(query);
         }
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                    _dbContext?.Dispose();
-                }
-                _disposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
     }
 }

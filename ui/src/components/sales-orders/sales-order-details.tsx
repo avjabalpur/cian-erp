@@ -11,6 +11,7 @@ import { SalesOrderInfo } from "./sales-order-info";
 import { SalesOrderApprovalStages } from "./sales-order-approval-stages";
 import { SalesOrderDocuments } from "./sales-order-documents-table";
 import { SalesOrderComments } from "./sales-order-comments-table";
+import { SalesOrderChat } from "./sales-order-chat";
 import { formatDate } from "@/lib/date-utils";
 
 interface SalesOrderDetailsProps {
@@ -110,6 +111,8 @@ export function SalesOrderDetails({ salesOrderId }: SalesOrderDetailsProps) {
           <SalesOrderComments salesOrderId={salesOrderId} />
 
           <SalesOrderDocuments salesOrderId={salesOrderId} />
+
+          <SalesOrderChat salesOrderId={salesOrderId} />
         </div>
 
         {/* Right Column - Approval Stages */}

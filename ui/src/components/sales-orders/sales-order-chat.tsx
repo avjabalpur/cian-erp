@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, User } from "lucide-react";
+import { Send, User, MessageSquare } from "lucide-react";
 import { useChatMessagesBySalesOrder, useCreateSalesOrderChatMessage } from "@/hooks/sales-order/use-sales-order-chat";
 import type { SalesOrderChat, CreateSalesOrderChatData } from "@/types/sales-order-extended";
 import { format } from "date-fns";
@@ -63,11 +63,14 @@ export function SalesOrderChat({ salesOrderId }: SalesOrderChatProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Chat Messages</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <MessageSquare className="h-5 w-5" />
+          Chat Messages
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Chat Messages */}
-        <ScrollArea className="h-96 border rounded-md p-4">
+        <ScrollArea className="h-64 border rounded-md p-4">
           {chatMessages.length === 0 ? (
             <div className="text-center text-muted-foreground py-8">
               No messages yet. Start the conversation!

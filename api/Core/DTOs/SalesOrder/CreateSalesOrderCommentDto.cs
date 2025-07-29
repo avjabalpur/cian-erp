@@ -11,7 +11,7 @@ namespace Xcianify.Core.DTOs.SalesOrder
         [MinLength(1, ErrorMessage = "Comment cannot be empty")]
         public string Comments { get; set; }
         
-        public string Status { get; set; }
-        public string Type { get; set; }
+        public string? Status { get; set; }
+        public string? Type { get; set; }
     }
 } 

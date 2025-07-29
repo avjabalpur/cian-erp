@@ -58,10 +58,10 @@ namespace Xcianify.Repository
             
             var query = @"
                 INSERT INTO sales_order_comments (
-                    sales_order_id, comments, status, type, is_deleted, 
+                    sales_order_id, comments, status, type, 
                     created_by, created_at, updated_by, updated_at
                 ) VALUES (
-                    @SalesOrderId, @Comments, @Status, @Type, @IsDeleted,
+                    @SalesOrderId, @Comments, @Status, @Type,
                     @CreatedBy, @CreatedAt, @UpdatedBy, @UpdatedAt
                 ) RETURNING *";
 

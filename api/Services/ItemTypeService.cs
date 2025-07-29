@@ -3,13 +3,13 @@ using Xcianify.Core.Domain.Repositories;
 using Xcianify.Core.Domain.Services;
 using Xcianify.Core.Exceptions;
 using Xcianify.Core.DTOs;
+using Xcianify.Core.Model;
 
 namespace Xcianify.Services
 {
     public class ItemTypeService : IItemTypeService
     {
         private readonly IItemTypeRepository _itemTypeRepository;
-        private bool _disposed = false;
 
         public ItemTypeService(IItemTypeRepository itemTypeRepository)
         {
@@ -23,13 +23,22 @@ namespace Xcianify.Services
             {
                 throw new NotFoundException("Item type not found");
             }
-            return itemType;
+            return MapToDto(itemType);
         }
 
         public async Task<PaginatedResult<ItemTypeDto>> GetAllAsync(ItemTypeFilterDto filter)
         {
             ValidateFilter(filter);
-            return await _itemTypeRepository.GetAllAsync(filter);
+            var (items, totalCount) = await _itemTypeRepository.GetAllAsync(filter);
+            var dtos = items.Select(MapToDto).ToList();
+            
+            return new PaginatedResult<ItemTypeDto>
+            {
+                Items = dtos,
+                TotalCount = totalCount,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
 
         public async Task<ItemTypeDto> CreateAsync(CreateItemTypeDto dto, int userId)
@@ -52,77 +61,79 @@ namespace Xcianify.Services
                 }
             }
 
-            return await _itemTypeRepository.CreateAsync(dto, userId);
+            var itemType = new ItemType
+            {
+                Code = dto.Code,
+                Name = dto.Name,
+                Description = dto.Description,
+                ParentTypeId = dto.ParentTypeId,
+                IsActive = dto.IsActive,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                CreatedBy = userId,
+                UpdatedBy = userId
+            };
+
+            var created = await _itemTypeRepository.AddAsync(itemType);
+            return MapToDto(created);
         }
 
         public async Task<ItemTypeDto> UpdateAsync(int id, UpdateItemTypeDto dto, int userId)
         {
-            // Check if item type exists
-            var existingItemType = await _itemTypeRepository.GetByIdAsync(id);
-            if (existingItemType == null)
+            ValidateUpdateDto(dto);
+            
+            var itemType = await _itemTypeRepository.GetByIdAsync(id);
+            if (itemType == null)
             {
                 throw new NotFoundException("Item type not found");
             }
 
-            ValidateUpdateDto(dto);
-
-            // Check if new code is already taken by another record
-            if (dto.Code != null && dto.Code != existingItemType.Code)
+            // Check if item type code already exists (excluding current record)
+            if (await _itemTypeRepository.ExistsAsync(dto.Code, id))
             {
-                if (await _itemTypeRepository.ExistsAsync(dto.Code, id))
-                {
-                    throw new ValidationException("Item type code already exists");
-                }
+                throw new ValidationException("Item type code already exists");
             }
 
-            // If parent type is being updated, verify it exists and doesn't create a circular reference
-            if (dto.ParentTypeId.HasValue && dto.ParentTypeId != existingItemType.ParentTypeId)
+            // If parent type is specified, verify it exists
+            if (dto.ParentTypeId.HasValue)
             {
-                // Check if the new parent exists
                 var parentType = await _itemTypeRepository.GetByIdAsync(dto.ParentTypeId.Value);
                 if (parentType == null)
                 {
                     throw new ValidationException("Parent item type not found");
                 }
-
             }
 
-            return await _itemTypeRepository.UpdateAsync(id, dto, userId);
+            itemType.Code = dto.Code;
+            itemType.Name = dto.Name;
+            itemType.Description = dto.Description;
+            itemType.ParentTypeId = dto.ParentTypeId;
+            if (dto.IsActive.HasValue)
+            {
+                itemType.IsActive = dto.IsActive.Value;
+            }
+            itemType.UpdatedBy = userId;
+
+            await _itemTypeRepository.UpdateAsync(itemType);
+            return MapToDto(itemType);
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            // Check if item type exists
-            var existingItemType = await _itemTypeRepository.GetByIdAsync(id);
-            if (existingItemType == null)
+            var itemType = await _itemTypeRepository.GetByIdAsync(id);
+            if (itemType == null)
             {
                 throw new NotFoundException("Item type not found");
             }
 
-            // Check if there are any child item types
-            var filter = new ItemTypeFilterDto 
-            { 
-                PageNumber = 1, 
-                PageSize = 1,
-                SearchTerm = "",
-                IsActive = null
-            };
-            
-            var childItems = await _itemTypeRepository.GetAllAsync(filter);
-            if (childItems.TotalCount > 0)
-            {
-                throw new ValidationException("Cannot delete item type that has child types. Please delete or reassign the child types first.");
-            }
-
-            // Add any additional business rules for deletion here
-            // For example, check if the item type is being used by any items
-
-            return await _itemTypeRepository.DeleteAsync(id);
+            await _itemTypeRepository.DeleteAsync(id);
+            return true;
         }
 
         public async Task<IEnumerable<ItemTypeDto>> GetParentTypesAsync()
         {
-            return await _itemTypeRepository.GetParentTypesAsync();
+            var parentTypes = await _itemTypeRepository.GetParentTypesAsync();
+            return parentTypes.Select(MapToDto);
         }
 
         private void ValidateFilter(ItemTypeFilterDto filter)
@@ -147,7 +158,7 @@ namespace Xcianify.Services
         {
             if (dto == null)
             {
-                throw new ValidationException("Item type data is required");
+                throw new ValidationException("Item type data cannot be null");
             }
 
             if (string.IsNullOrWhiteSpace(dto.Code))
@@ -155,19 +166,9 @@ namespace Xcianify.Services
                 throw new ValidationException("Item type code is required");
             }
 
-            if (dto.Code.Length > 10)
-            {
-                throw new ValidationException("Item type code cannot exceed 10 characters");
-            }
-
             if (string.IsNullOrWhiteSpace(dto.Name))
             {
                 throw new ValidationException("Item type name is required");
-            }
-
-            if (dto.Name.Length > 100)
-            {
-                throw new ValidationException("Item type name cannot exceed 100 characters");
             }
         }
 
@@ -175,28 +176,37 @@ namespace Xcianify.Services
         {
             if (dto == null)
             {
-                throw new ValidationException("Item type data is required");
+                throw new ValidationException("Item type data cannot be null");
             }
 
-            if (dto.Code != null && string.IsNullOrWhiteSpace(dto.Code))
+            if (string.IsNullOrWhiteSpace(dto.Code))
             {
-                throw new ValidationException("Item type code cannot be empty");
+                throw new ValidationException("Item type code is required");
             }
 
-            if (dto.Code != null && dto.Code.Length > 10)
+            if (string.IsNullOrWhiteSpace(dto.Name))
             {
-                throw new ValidationException("Item type code cannot exceed 10 characters");
+                throw new ValidationException("Item type name is required");
             }
+        }
 
-            if (dto.Name != null && string.IsNullOrWhiteSpace(dto.Name))
+        private ItemTypeDto MapToDto(ItemType itemType)
+        {
+            if (itemType == null) return null;
+            
+            return new ItemTypeDto
             {
-                throw new ValidationException("Item type name cannot be empty");
-            }
-
-            if (dto.Name != null && dto.Name.Length > 100)
-            {
-                throw new ValidationException("Item type name cannot exceed 100 characters");
-            }
+                Id = itemType.Id,
+                Code = itemType.Code,
+                Name = itemType.Name,
+                Description = itemType.Description,
+                ParentTypeId = itemType.ParentTypeId,
+                IsActive = itemType.IsActive,
+                CreatedAt = itemType.CreatedAt,
+                UpdatedAt = itemType.UpdatedAt,
+                CreatedBy = itemType.CreatedBy,
+                UpdatedBy = itemType.UpdatedBy
+            };
         }
     }
 }
