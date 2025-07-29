@@ -1,25 +1,65 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useItemTypes } from "@/hooks/items/use-item-types";
+import { useItemTypes, useDeleteItemType} from "@/hooks/items/use-item-types";
+import { itemTypeParsers } from "@/lib/utils/item-master-utils";
 import ItemTypesTable from "./item-types-table";
-import ItemTypeFilter from "./item-type-filter";
 import ItemTypeDrawer from "./item-type-drawer";
+import { ItemTypeFilter } from "@/types/item";
+import { ItemTypeFilter as ItemTypeFilterComponent } from "./item-type-filter";
 
 export default function ItemTypesManagement() {
   const router = useRouter();
   const { toast } = useToast();
-  const { data: itemTypes = [], isLoading, refetch } = useItemTypes();
+  
+  // nuqs query state hooks
+  const [page, setPage] = useQueryState("page", itemTypeParsers.page);
+  const [pageSize, setPageSize] = useQueryState("pageSize", itemTypeParsers.pageSize);
+  const [searchTerm, setSearchTerm] = useQueryState("searchTerm", itemTypeParsers.searchTerm);
+  const [isActive, setIsActive] = useQueryState("isActive", itemTypeParsers.isActive);
+
+  // Convert nuqs state to API filter
+  const filter: ItemTypeFilter = {
+    pageNumber: page,
+    pageSize: pageSize,
+    searchTerm: searchTerm || undefined,
+    isActive: isActive ?? undefined,
+  };
+
+  // Query with pagination
+  const { 
+    data: paginatedData, 
+    isLoading, 
+    error,
+    refetch 
+  } = useItemTypes(filter);
+
+  // Extract data from paginated response
+  const itemTypes = paginatedData?.items || [];
+  const totalCount = paginatedData?.totalCount || 0;
+  const totalPages = paginatedData?.totalPages || 0;
   
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedItemType, setSelectedItemType] = useState<any>(null);
-  const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+
+  // Delete mutation
+  const deleteItemTypeMutation = useDeleteItemType();
+
+  // Handle errors
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load item types. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [error, toast]);
 
   const handleCreateItemType = () => {
     setSelectedItemType(null);
@@ -35,7 +75,7 @@ export default function ItemTypesManagement() {
     if (!confirm("Are you sure you want to delete this item type?")) return;
 
     try {
-      // TODO: Implement delete functionality
+      await deleteItemTypeMutation.mutateAsync(itemType.id);
       toast({
         title: "Success",
         description: "Item type deleted successfully",
@@ -51,17 +91,30 @@ export default function ItemTypesManagement() {
   };
 
   const handlePaginationChange = (newPageIndex: number, newPageSize: number) => {
-    setPageIndex(newPageIndex);
+    // Update nuqs state (API uses 1-based pagination)
+    setPage(newPageIndex + 1);
     setPageSize(newPageSize);
   };
 
-  const pageCount = Math.ceil(itemTypes.length / pageSize);
-  const paginatedItemTypes = itemTypes.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
+  const handleFilterChange = (filters: any) => {
+    // This will be handled by nuqs automatically through the filter component
+    // The component will re-render with new filter values
+  };
+
+  const handleGlobalFilterChange = (value: string) => {
+    setSearchTerm(value || null);
+    setPage(1); // Reset to first page when searching
+  };
+
+  const handleSuccess = () => {
+    setDrawerOpen(false);
+    refetch();
+  };
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center">
         <Button 
           variant="ghost" 
           onClick={() => router.push("/items")}
@@ -74,8 +127,10 @@ export default function ItemTypesManagement() {
 
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Item Types</h1>
-          <p className="mt-2 text-gray-600">Manage pharmaceutical item types and categories</p>
+          <h1 className="text-xl font-bold text-gray-900">Item Types</h1>
+          <p className="mt-2 text-gray-600">
+            Manage pharmaceutical item types and categories ({totalCount} total)
+          </p>
         </div>
         <Button onClick={handleCreateItemType}>
           <Plus className="h-4 w-4 mr-2" />
@@ -83,49 +138,29 @@ export default function ItemTypesManagement() {
         </Button>
       </div>
 
-      {/* Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Filters</CardTitle>
-          <CardDescription>Filter item types by various criteria</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ItemTypeFilter />
-        </CardContent>
-      </Card>
+      {/* Filter Component */}
+      {/* <ItemTypeFilterComponent onFilterChange={handleFilterChange} /> */}
 
       {/* Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Item Types ({itemTypes.length})</CardTitle>
-          <CardDescription>
-            List of all pharmaceutical item types and categories
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ItemTypesTable
-            itemTypes={paginatedItemTypes}
-            onEdit={handleEditItemType}
-            onDelete={handleDeleteItemType}
-            isLoading={isLoading}
-            pageCount={pageCount}
-            pageSize={pageSize}
-            pageIndex={pageIndex}
-            totalCount={itemTypes.length}
-            onPaginationChange={handlePaginationChange}
-          />
-        </CardContent>
-      </Card>
+      <ItemTypesTable
+        itemTypes={itemTypes}
+        onEdit={handleEditItemType}
+        onDelete={handleDeleteItemType}
+        isLoading={isLoading}
+        pageCount={totalPages}
+        pageSize={pageSize}
+        pageIndex={(page || 1) - 1} // Convert 1-based to 0-based for table
+        totalCount={totalCount}
+        onPaginationChange={handlePaginationChange}
+        onGlobalFilterChange={handleGlobalFilterChange}
+      />
 
       {/* Drawer */}
       <ItemTypeDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         itemType={selectedItemType}
-        onSuccess={() => {
-          setDrawerOpen(false);
-          refetch();
-        }}
+        onSuccess={handleSuccess}
       />
     </div>
   );

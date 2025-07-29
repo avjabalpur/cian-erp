@@ -54,8 +54,7 @@ namespace Xcianify.Core.DTOs.ItemMaster
 
     public class HsnMasterFilterDto : BaseFilterDto
     {
-        public string SearchTerm { get; set; }
         public bool? IsActive { get; set; }
-        public string HsnType { get; set; }
+        public string? HsnType { get; set; }
     }
 }

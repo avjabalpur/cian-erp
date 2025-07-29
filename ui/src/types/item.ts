@@ -1,3 +1,39 @@
+export interface ItemType {
+  id: number;
+  code: string;
+  name: string;
+  description?: string;
+  parentTypeId?: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+  createdBy?: number;
+  updatedBy?: number;
+}
+
+export interface CreateItemTypeData {
+  code: string;
+  name: string;
+  description?: string;
+  parentTypeId?: number;
+  isActive?: boolean;
+}
+
+export interface UpdateItemTypeData {
+  code: string;
+  name: string;
+  description?: string;
+  parentTypeId?: number;
+  isActive?: boolean;
+}
+
+export interface ItemTypeFilter {
+  searchTerm?: string;
+  isActive?: boolean;
+  pageNumber?: number;
+  pageSize?: number;
+}
+
 export interface Item {
   id: number;
   itemCode: string;

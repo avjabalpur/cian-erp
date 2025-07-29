@@ -5,7 +5,7 @@ import { Edit, Trash2 } from "lucide-react";
 import { Column } from "@/types/common";
 import { formatDate } from "@/lib/date-utils";
 import AdvancedTable from "../../shared/advanced-table";
-import { ItemType } from "@/hooks/items/use-item-types";
+import { ItemType } from "@/types/item";
 
 interface ItemTypesTableProps {
   itemTypes: ItemType[];
@@ -40,18 +40,19 @@ export default function ItemTypesTable({
 }: ItemTypesTableProps) {
 
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'itemType', data_type: 'string', description: 'Item Type' },
+    { name: 'code', data_type: 'string', description: 'Code' },
+    { name: 'name', data_type: 'string', description: 'Name' },
     { name: 'description', data_type: 'string', description: 'Description' },
-    { name: 'parentItemTypeId', data_type: 'number', description: 'Parent Type' },
+    { name: 'parentTypeId', data_type: 'number', description: 'Parent Type ID' },
     { name: 'isActive', data_type: 'boolean', description: 'Active' },
-    { name: 'createdByName', data_type: 'string', description: 'Created By' },
     { name: 'createdAt', data_type: 'date', description: 'Created At' },
   ], []);
   
   const defaultColumns = [
-    'itemType',
+    'code',
+    'name',
     'description',
-    'parentItemTypeId',
+    'parentTypeId',
     'isActive',
   ];
 
@@ -62,6 +63,7 @@ export default function ItemTypesTable({
       createdAt: itemType.createdAt ? formatDate(itemType.createdAt) : '',
       updatedAt: itemType.updatedAt ? formatDate(itemType.updatedAt) : '',
       isActive: itemType.isActive ? 'Yes' : 'No',
+      parentTypeId: itemType.parentTypeId || 'N/A',
     }));
   }, [itemTypes]);
 

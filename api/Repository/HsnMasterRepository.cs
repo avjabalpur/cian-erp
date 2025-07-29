@@ -23,10 +23,10 @@ namespace Xcianify.Repository
             var parameters = new DynamicParameters();
 
             // Add search filter
-            if (!string.IsNullOrWhiteSpace(filterDto.SearchTerm))
+            if (!string.IsNullOrWhiteSpace(filterDto.Search))
             {
                 whereConditions.Add("(LOWER(code) LIKE @SearchTerm OR LOWER(name) LIKE @SearchTerm OR LOWER(description) LIKE @SearchTerm)");
-                parameters.Add("@SearchTerm", $"%{filterDto.SearchTerm.ToLower()}%");
+                parameters.Add("@SearchTerm", $"%{filterDto.Search.ToLower()}%");
             }
 
             // Add isActive filter

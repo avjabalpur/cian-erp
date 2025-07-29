@@ -43,14 +43,8 @@ namespace Xcianify.Presentation.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateHsnMasterDto dto)
         {
-            // Get current user ID from claims
-            var userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
-            if (userId <= 0)
-            {
-                return Unauthorized(new { message = "Invalid user" });
-            }
 
-            var createdHsn = await _hsnMasterService.CreateAsync(dto, userId);
+            var createdHsn = await _hsnMasterService.CreateAsync(dto, CurrentUserId);
             return CreatedAtAction(nameof(GetById), new { id = createdHsn.Id }, createdHsn);
         }
 
@@ -58,14 +52,7 @@ namespace Xcianify.Presentation.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] UpdateHsnMasterDto dto)
         {
 
-            // Get current user ID from claims
-            var userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
-            if (userId <= 0)
-            {
-                return Unauthorized(new { message = "Invalid user" });
-            }
-
-            var updatedHsn = await _hsnMasterService.UpdateAsync(id, dto, userId);
+            var updatedHsn = await _hsnMasterService.UpdateAsync(id, dto, CurrentUserId);
             return Ok(updatedHsn);
         }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -12,20 +12,13 @@ import { FormInput } from "@/components/shared/forms/form-input";
 import { FormSelect } from "@/components/shared/forms/form-select";
 import { FormTextarea } from "@/components/shared/forms/form-textarea";
 import { RightDrawer } from "@/components/shared/right-drawer";
-
-const itemTypeSchema = z.object({
-  itemType: z.string().min(1, "Item Type is required"),
-  description: z.string().optional(),
-  parentItemTypeId: z.number().optional(),
-  isActive: z.boolean().default(true),
-});
-
-type ItemTypeFormData = z.infer<typeof itemTypeSchema>;
+import { ItemTypeFormData, itemTypeSchema } from "@/validations/item-master";
+import { ItemType } from "@/types/item";
 
 interface ItemTypeDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  itemType?: any;
+  itemType?: ItemType | null;
   onSuccess: () => void;
 }
 
@@ -42,59 +35,94 @@ export default function ItemTypeDrawer({
   const form = useForm<ItemTypeFormData>({
     resolver: zodResolver(itemTypeSchema),
     defaultValues: {
-      itemType: "",
+      code: "",
+      name: "",
       description: "",
-      parentItemTypeId: undefined,
+      parentTypeId: undefined,
       isActive: true,
     },
   });
 
+  const { control, handleSubmit, reset, formState: { isSubmitting } } = form;
+
   useEffect(() => {
     if (itemType) {
-      form.reset({
-        itemType: itemType.itemType || "",
+      reset({
+        code: itemType.code || "",
+        name: itemType.name || "",
         description: itemType.description || "",
-        parentItemTypeId: itemType.parentItemTypeId || undefined,
+        parentTypeId: itemType.parentTypeId || undefined,
         isActive: itemType.isActive ?? true,
       });
     } else {
-      form.reset({
-        itemType: "",
+      reset({
+        code: "",
+        name: "",
         description: "",
-        parentItemTypeId: undefined,
+        parentTypeId: undefined,
         isActive: true,
       });
     }
-  }, [itemType, form]);
+  }, [itemType, reset]);
 
   const onSubmit = async (data: ItemTypeFormData) => {
     try {
+      const payload = {
+        code: data.code,
+        name: data.name,
+        description: data.description,
+        parentTypeId: data.parentTypeId,
+        isActive: data.isActive,
+      };
+
       if (itemType) {
         await updateItemTypeMutation.mutateAsync({
           id: itemType.id,
-          data,
+          data: payload,
         });
         toast({
           title: "Success",
           description: "Item type updated successfully",
         });
       } else {
-        await createItemTypeMutation.mutateAsync(data);
+        await createItemTypeMutation.mutateAsync(payload);
         toast({
           title: "Success",
           description: "Item type created successfully",
         });
       }
+      reset();
       onSuccess();
-    } catch (error) {
+      onClose();
+    } catch (error: any) {
+      console.error('Item type operation failed:', error);
+      
+      // Handle specific error cases
+      let errorMessage = itemType 
+        ? "Failed to update item type" 
+        : "Failed to create item type";
+      
+      if (error?.response?.status === 401) {
+        errorMessage = "Authentication failed. Please log in again.";
+      } else if (error?.response?.status === 403) {
+        errorMessage = "You don't have permission to perform this action.";
+      } else if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Error",
-        description: itemType 
-          ? "Failed to update item type" 
-          : "Failed to create item type",
+        description: errorMessage,
         variant: "destructive",
       });
     }
+  };
+
+  const handleClose = () => {
+    reset();
+    onClose();
   };
 
   const isLoading = createItemTypeMutation.isPending || updateItemTypeMutation.isPending;
@@ -102,33 +130,41 @@ export default function ItemTypeDrawer({
   return (
     <RightDrawer
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       title={itemType ? "Edit Item Type" : "Create New Item Type"}
       description={itemType 
         ? "Update the item type information below." 
         : "Fill in the information below to create a new item type."
       }
     >
-      <div className="mx-auto w-full max-w-2xl">
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <FormProvider {...form}>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <FormInput
-            control={form.control}
-            name="itemType"
-            label="Item Type"
+            control={control}
+            name="code"
+            label="Code"
+            placeholder="Enter item type code"
+            required
+          />
+
+          <FormInput
+            control={control}
+            name="name"
+            label="Name"
             placeholder="Enter item type name"
             required
           />
 
           <FormTextarea
-            control={form.control}
+            control={control}
             name="description"
             label="Description"
             placeholder="Enter item type description"
           />
 
           <FormInput
-            control={form.control}
-            name="parentItemTypeId"
+            control={control}
+            name="parentTypeId"
             label="Parent Item Type ID"
             placeholder="Enter parent item type ID (optional)"
             inputProps={{ type: "number" }}
@@ -147,16 +183,24 @@ export default function ItemTypeDrawer({
             />
           </div>
 
-          <div className="flex justify-end gap-2">
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Saving..." : itemType ? "Update Item Type" : "Create Item Type"}
-            </Button>
-            <Button type="button" variant="outline" onClick={onClose}>
+          <div className="flex justify-end gap-4 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isSubmitting || isLoading}
+            >
               Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting || isLoading}
+            >
+              {isLoading ? "Saving..." : itemType ? "Update Item Type" : "Create Item Type"}
             </Button>
           </div>
         </form>
-      </div>
+      </FormProvider>
     </RightDrawer>
   );
 } 

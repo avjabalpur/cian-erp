@@ -115,7 +115,7 @@ export function UserDrawer({ isOpen, onClose, user }: UserDrawerProps) {
       <FormProvider {...form}>
         <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-6">
           <UserInformationForm control={control as any} />
-          <div className="flex justify-end gap-4 pt-4">
+          <div className="flex justify-end gap-4">
             <Button
               type="button"
               variant="outline"

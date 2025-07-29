@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import { ArrowLeft, Edit, Package, AlertTriangle, TrendingUp, TrendingDown, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { useItems, type Item } from "@/hooks/use-items"
+import { useItems } from "@/hooks/items/use-items"
 
 interface ItemDetailPageProps {
   itemId: number

@@ -1,50 +1,24 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
+import { ItemType, CreateItemTypeData, UpdateItemTypeData, ItemTypeFilter } from '@/types/item';
 
-// Types
-export interface ItemType {
-  id: number;
-  name: string;
-  description?: string;
-  parentType?: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt?: string;
-  createdBy?: number;
-  createdByName?: string;
-  updatedBy?: number;
-  updatedByName?: string;
-}
-
-export interface CreateItemTypeData {
-  name: string;
-  description?: string;
-  parentType?: string;
-  isActive?: boolean;
-}
-
-export interface UpdateItemTypeData {
-  name: string;
-  description?: string;
-  parentType?: string;
-  isActive?: boolean;
-}
-
-export interface ItemTypeFilter {
-  search?: string;
-  parentType?: string;
-  isActive?: boolean;
-  page?: number;
-  pageSize?: number;
+// New paginated response structure
+export interface PaginatedResponse<T> {
+  items: T[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
 }
 
 // API Functions
-const getItemTypes = async (filter?: ItemTypeFilter): Promise<ItemType[]> => {
+const getItemTypes = async (filter?: ItemTypeFilter): Promise<PaginatedResponse<ItemType>> => {
   const params = new URLSearchParams();
-  if (filter?.search) params.append('search', filter.search);
-  if (filter?.parentType) params.append('parentType', filter.parentType);
+  if (filter?.searchTerm) params.append('searchTerm', filter.searchTerm);
   if (filter?.isActive !== undefined) params.append('isActive', filter.isActive.toString());
-  if (filter?.page) params.append('page', filter.page.toString());
+  if (filter?.pageNumber) params.append('pageNumber', filter.pageNumber.toString());
   if (filter?.pageSize) params.append('pageSize', filter.pageSize.toString());
 
   const { data } = await api.get(`/item-types?${params.toString()}`);
@@ -56,7 +30,7 @@ const getItemTypeById = async (id: number): Promise<ItemType> => {
   return data;
 };
 
-const getParentTypes = async (): Promise<string[]> => {
+const getParentTypes = async (): Promise<ItemType[]> => {
   const { data } = await api.get('/item-types/parent-types');
   return data;
 };
@@ -77,7 +51,7 @@ const deleteItemType = async (id: number): Promise<void> => {
 
 // React Query Hooks
 export const useItemTypes = (filter?: ItemTypeFilter) => {
-  return useQuery<ItemType[], Error>({
+  return useQuery<PaginatedResponse<ItemType>, Error>({
     queryKey: ['item-types', filter],
     queryFn: () => getItemTypes(filter),
   });
@@ -92,7 +66,7 @@ export const useItemTypeById = (id: number) => {
 };
 
 export const useParentTypes = () => {
-  return useQuery<string[], Error>({
+  return useQuery<ItemType[], Error>({
     queryKey: ['parent-types'],
     queryFn: getParentTypes,
   });

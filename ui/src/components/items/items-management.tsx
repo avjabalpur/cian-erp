@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { useItems, type Item, type ItemFilters } from "@/hooks/use-items"
+import { useItems, type Item} from "@/hooks/items/use-items"
 import ItemFilter from "./item-filter"
 import ItemTable from "./item-table"
 

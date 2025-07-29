@@ -37,7 +37,6 @@ namespace Xcianify.Core.DTOs.ItemMaster
 
     public class ItemTypeFilterDto : BaseFilterDto
     {
-        public string SearchTerm { get; set; }
         public bool? IsActive { get; set; }
     }
 }

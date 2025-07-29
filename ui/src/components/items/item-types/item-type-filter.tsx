@@ -2,61 +2,48 @@
 
 import { useState } from "react";
 import { useQueryState } from "nuqs";
-import { parseAsString, parseAsBoolean } from "nuqs";
 import { Search } from "lucide-react";
-import { FilterWrapper } from "@/components/shared/filter/filter-wrapper";
-import { NuqsFormInput } from "@/components/shared/filter/nuqs-form-input";
-import { NuqsFormSelect } from "@/components/shared/filter/nuqs-form-select";
+import {
+  NuqsFormInput,
+  NuqsFormSelect,
+  FilterWrapper,
+} from "@/components/shared/filter";
+import {
+  statusOptions,
+  sortOptions,
+  sortOrderOptions,
+  pageSizeOptions,
+  itemTypeParsers
+} from "@/lib/utils/item-master-utils";
 
-export default function ItemTypeFilter() {
+interface ItemTypeFilterProps {
+  onFilterChange: (filters: any) => void;
+}
+
+export function ItemTypeFilter({ onFilterChange }: ItemTypeFilterProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // nuqs query state hooks
-  const [search, setSearch] = useQueryState("search", parseAsString.withDefault(""));
-  const [isActive, setIsActive] = useQueryState("isActive", parseAsString.withDefault(""));
-  const [page, setPage] = useQueryState("page", parseAsString.withDefault("1"));
-  const [pageSize, setPageSize] = useQueryState("pageSize", parseAsString.withDefault("10"));
-  const [sortBy, setSortBy] = useQueryState("sortBy", parseAsString.withDefault("createdAt"));
-  const [sortOrder, setSortOrder] = useQueryState("sortOrder", parseAsString.withDefault("desc"));
-
-  const statusOptions = [
-    { label: "All Statuses", value: "" },
-    { label: "Active", value: "active" },
-    { label: "Inactive", value: "inactive" },
-  ];
-
-  const sortOptions = [
-    { label: "Created Date", value: "createdAt" },
-    { label: "Updated Date", value: "updatedAt" },
-    { label: "Item Type", value: "itemType" },
-    { label: "Description", value: "description" },
-  ];
-
-  const sortOrderOptions = [
-    { label: "Descending", value: "desc" },
-    { label: "Ascending", value: "asc" },
-  ];
-
-  const pageSizeOptions = [
-    { label: "10 per page", value: "10" },
-    { label: "25 per page", value: "25" },
-    { label: "50 per page", value: "50" },
-    { label: "100 per page", value: "100" },
-  ];
+  // nuqs query state hooks with default values
+  const [page, setPage] = useQueryState("page", itemTypeParsers.page);
+  const [pageSize, setPageSize] = useQueryState("pageSize", itemTypeParsers.pageSize);
+  const [sortBy, setSortBy] = useQueryState("sortBy", itemTypeParsers.sortBy);
+  const [sortOrder, setSortOrder] = useQueryState("sortOrder", itemTypeParsers.sortOrder);
+  const [searchTerm, setSearchTerm] = useQueryState("searchTerm", itemTypeParsers.searchTerm);
+  const [isActive, setIsActive] = useQueryState("isActive", itemTypeParsers.isActive);
 
   const clearFilters = () => {
-    setSearch(null);
+    setSearchTerm(null);
     setIsActive(null);
-    setPage("1");
-    setPageSize("10");
-    setSortBy("createdAt");
+    setPage(1);
+    setPageSize(10);
+    setSortBy("created_at");
     setSortOrder("desc");
   };
 
   const getActiveFilterCount = () => {
     let count = 0;
-    if (search) count++;
-    if (isActive) count++;
+    if (searchTerm) count++;
+    if (isActive !== null) count++;
     return count;
   };
 
@@ -72,16 +59,16 @@ export default function ItemTypeFilter() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
         <NuqsFormInput
           label="Search"
-          value={search}
-          onChange={setSearch}
-          placeholder="Search item type name or description..."
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder="Search by code, name, or description..."
           icon={<Search />}
         />
         
         <NuqsFormSelect
           label="Status"
-          value={isActive}
-          onChange={setIsActive}
+          value={isActive?.toString() || ""}
+          onChange={(value) => setIsActive(value === 'true' ? true : value === 'false' ? false : null)}
           options={statusOptions}
         />
         
@@ -99,15 +86,15 @@ export default function ItemTypeFilter() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <NuqsFormSelect
               label="Sort Order"
-              value={sortOrder}
+              value={sortOrder as any}
               onChange={setSortOrder}
               options={sortOrderOptions}
             />
             
             <NuqsFormSelect
               label="Page Size"
-              value={pageSize}
-              onChange={setPageSize}
+              value={pageSize?.toString() || "20"}
+              onChange={(value) => setPageSize(value ? parseInt(value) : 20)}
               options={pageSizeOptions}
             />
           </div>
