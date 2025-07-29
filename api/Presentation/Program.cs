@@ -172,6 +172,12 @@ builder.Services.AddScoped<IItemStockAnalysisService, ItemStockAnalysisService>(
 builder.Services.AddScoped<IItemSpecificationRepository, ItemSpecificationRepository>();
 builder.Services.AddScoped<IItemMasterService, ItemMasterService>();
 
+// Register Config List services and repositories
+builder.Services.AddScoped<IConfigListRepository, ConfigListRepository>();
+builder.Services.AddScoped<IConfigListService, ConfigListService>();
+builder.Services.AddScoped<IConfigListValueRepository, ConfigListValueRepository>();
+builder.Services.AddScoped<IConfigListValueService, ConfigListValueService>();
+
 // Register security services
 builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 

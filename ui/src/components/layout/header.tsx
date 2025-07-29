@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Menu, Bell, LogOut, User, Settings, ChevronLeft, ChevronRight } from "lucide-react"
+import { ConfigurationMenu } from "@/components/shared/configuration-menu"
 
 interface UserData {
   username: string
@@ -55,6 +56,9 @@ export const Header = ({ user, onLogout, onToggleSidebar, isCollapsed, setSideba
           <Button variant="ghost" className="p-1 rounded-full text-gray-400 hover:text-gray-500">
             <Bell className="h-6 w-6" />
           </Button>
+
+          {/* Configuration Menu */}
+          <ConfigurationMenu />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

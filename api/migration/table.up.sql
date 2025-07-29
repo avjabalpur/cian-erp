@@ -1,4 +1,31 @@
 
+CREATE TABLE IF NOT EXISTS config_lists (
+    id SERIAL PRIMARY KEY,
+    list_code VARCHAR(50) UNIQUE NOT NULL,  -- 'hsn_type', 'gs_id', etc.
+    list_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by INTEGER,
+    updated_by INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS config_list_values (
+    id SERIAL PRIMARY KEY,
+    list_id INTEGER NOT NULL,
+    value_code VARCHAR(50) NOT NULL,
+    value_name VARCHAR(100) NOT NULL,
+    display_order INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE,
+    extra_data JSONB,  -- For additional attributes if needed (using JSONB for better performance)
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by INTEGER,
+    updated_by INTEGER,
+    CONSTRAINT fk_config_list_values_list_id FOREIGN KEY (list_id) REFERENCES config_lists(id) ON DELETE CASCADE,
+    CONSTRAINT unique_list_value UNIQUE (list_id, value_code)
+);
 
 CREATE TABLE IF NOT EXISTS users (
   srno SERIAL PRIMARY KEY,

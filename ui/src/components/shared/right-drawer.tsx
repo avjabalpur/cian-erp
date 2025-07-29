@@ -51,7 +51,7 @@ export function RightDrawer({
                 )}>
                 <ScrollArea className="h-full rounded-md border">
                     {(title || description) && (
-                        <SheetHeader className="px-6 py-4 border-b bg-muted/30">
+                        <SheetHeader className="p-2 border-b bg-muted/30">
                             {title && <SheetTitle className="text-lg font-semibold">{title}</SheetTitle>}
                             {description && (
                                 <SheetDescription className="text-sm text-muted-foreground">
@@ -61,7 +61,7 @@ export function RightDrawer({
                         </SheetHeader>
                     )}
 
-                    <div className="flex-1 overflow-y-auto p-6">
+                    <div className="flex-1 overflow-y-auto p-2">
                         {children}
                     </div>
                 </ScrollArea>
