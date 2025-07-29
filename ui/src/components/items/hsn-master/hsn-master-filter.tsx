@@ -1,135 +1,69 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useQueryState } from "nuqs";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Search, X } from "lucide-react";
+  NuqsFormInput,
+  NuqsFormSelect,
+  FilterWrapper,
+} from "@/components/shared/filter";
+import { hsnMasterParsers } from "@/lib/utils/hsn-master-utils";
 
-interface HsnMasterFilters {
-  search: string;
-  hsnType: string;
-  isActive: boolean | undefined;
-}
+export default function HsnMasterFilter() {
+  // URL state management with nuqs
+  const [search, setSearch] = useQueryState("search", hsnMasterParsers.search);
+  const [isActive, setIsActive] = useQueryState("isActive", hsnMasterParsers.isActive);
+  const [page, setPage] = useQueryState("page", hsnMasterParsers.page);
+  const [pageSize, setPageSize] = useQueryState("pageSize", hsnMasterParsers.pageSize);
 
-interface HsnMasterFilterProps {
-  filters: HsnMasterFilters;
-  onFiltersChange: (filters: HsnMasterFilters) => void;
-  onClearFilters: () => void;
-}
-
-export default function HsnMasterFilter({
-  filters,
-  onFiltersChange,
-  onClearFilters,
-}: HsnMasterFilterProps) {
-  const updateFilter = (key: keyof HsnMasterFilters, value: any) => {
-    onFiltersChange({
-      ...filters,
-      [key]: value,
-    });
+  const clearFilters = () => {
+    setSearch(null);
+    setIsActive(null);
+    setPage(1);
+    setPageSize(20);
   };
 
   const getActiveFilterCount = () => {
     let count = 0;
-    if (filters.search) count++;
-    if (filters.hsnType) count++;
-    if (filters.isActive !== undefined) count++;
+    if (search) count++;
+    if (isActive !== null) count++;
     return count;
   };
 
+  const activeFilterCount = getActiveFilterCount();
+
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Search */}
-        <div className="space-y-2">
-          <Label htmlFor="search">Search</Label>
-          <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              id="search"
-              placeholder="Search by HSN code, description, or type..."
-              value={filters.search}
-              onChange={(e) => updateFilter("search", e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </div>
+    <FilterWrapper
+      title="HSN Master Filters"
+      activeFilterCount={activeFilterCount}
+      onClearFilters={clearFilters}
+      showExpandCollapse={false}
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <NuqsFormInput
+          label="Search"
+          value={search}
+          onChange={(value) => {
+            setSearch(value);
+            setPage(1); // Reset to first page when searching
+          }}
+          placeholder="Search by code, description..."
+        />
 
-        {/* HSN Type */}
-        <div className="space-y-2">
-          <Label htmlFor="hsnType">HSN Type</Label>
-          <Select
-            value={filters.hsnType}
-            onValueChange={(value) => updateFilter("hsnType", value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="All HSN types" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">All HSN types</SelectItem>
-              <SelectItem value="pharmaceutical">Pharmaceutical</SelectItem>
-              <SelectItem value="medical_device">Medical Device</SelectItem>
-              <SelectItem value="cosmetic">Cosmetic</SelectItem>
-              <SelectItem value="supplement">Supplement</SelectItem>
-              <SelectItem value="chemical">Chemical</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Status */}
-        <div className="space-y-2">
-          <Label htmlFor="status">Status</Label>
-          <Select
-            value={filters.isActive === undefined ? "" : filters.isActive.toString()}
-            onValueChange={(value) => {
-              if (value === "") {
-                updateFilter("isActive", undefined);
-              } else {
-                updateFilter("isActive", value === "true");
-              }
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="All statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">All statuses</SelectItem>
-              <SelectItem value="true">Active</SelectItem>
-              <SelectItem value="false">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <NuqsFormSelect
+          label="Status"
+          value={isActive?.toString() || null}
+          onChange={(value) => {
+            setIsActive(value === "true" ? true : value === "false" ? false : null);
+            setPage(1);
+          }}
+          options={[
+            { value: "true", label: "Active" },
+            { value: "false", label: "Inactive" },
+          ]}
+          placeholder="Select status"
+        />
+       
       </div>
-
-      {/* Filter Actions */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {getActiveFilterCount() > 0 && (
-            <span className="text-sm text-muted-foreground">
-              {getActiveFilterCount()} filter{getActiveFilterCount() !== 1 ? "s" : ""} active
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          {getActiveFilterCount() > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onClearFilters}
-            >
-              <X className="h-4 w-4 mr-2" />
-              Clear Filters
-            </Button>
-          )}
-        </div>
-      </div>
-    </div>
+    </FilterWrapper>
   );
 } 

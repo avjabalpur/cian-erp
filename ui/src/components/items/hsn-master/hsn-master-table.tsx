@@ -1,181 +1,136 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useMemo } from "react";
 import { Edit, Trash2 } from "lucide-react";
-import { formatDate } from "@/lib/utils/sales-order-utils";
-
-interface HsnCode {
-  id: number;
-  hsnCode: string;
-  description?: string;
-  hsnType?: string;
-  taxRate?: number;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt?: string;
-  createdBy?: number;
-  createdByName?: string;
-  updatedBy?: number;
-  updatedByName?: string;
-}
+import { Column } from "@/types/common";
+import { formatDate } from "@/lib/date-utils";
+import AdvancedTable from "../../shared/advanced-table";
+import { HsnMaster } from "@/types/hsn-master";
 
 interface HsnMasterTableProps {
-  hsnCodes: HsnCode[];
-  isLoading: boolean;
-  onEdit: (hsnCode: HsnCode) => void;
-  onDelete: (id: number) => void;
+  hsnCodes: HsnMaster[];
+  onEdit: (hsnCode: HsnMaster) => void;
+  onDelete: (hsnCode: HsnMaster) => void;
+  isLoading?: boolean;
+  // Server-side operations
+  onGlobalFilterChange?: (filter: string) => void;
+  onColumnFiltersChange?: (filters: any[]) => void;
+  onSortingChange?: (sorting: any[]) => void;
+  // Pagination
+  pageCount?: number;
+  pageSize?: number;
+  pageIndex?: number;
+  totalCount?: number;
+  onPaginationChange?: (pageIndex: number, pageSize: number) => void;
 }
 
 export default function HsnMasterTable({
   hsnCodes,
-  isLoading,
   onEdit,
   onDelete,
+  isLoading,
+  onGlobalFilterChange,
+  onColumnFiltersChange,
+  onSortingChange,
+  pageCount,
+  pageSize,
+  pageIndex,
+  totalCount,
+  onPaginationChange,
 }: HsnMasterTableProps) {
-  const [sortField, setSortField] = useState<keyof HsnCode>("createdAt");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
-  const handleSort = (field: keyof HsnCode) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
+  const columnMeta: Column[] = useMemo(() => [
+    { name: 'code', data_type: 'string', description: 'Code' },
+    { name: 'name', data_type: 'string', description: 'Name' },
+    { name: 'description', data_type: 'string', description: 'Description' },
+    { name: 'hsnType', data_type: 'string', description: 'HSN Type' },
+    { name: 'uqc', data_type: 'string', description: 'UQC' },
+    { name: 'igstRate', data_type: 'number', description: 'IGST Rate (%)' },
+    { name: 'cgstRate', data_type: 'number', description: 'CGST Rate (%)' },
+    { name: 'sgstRate', data_type: 'number', description: 'SGST Rate (%)' },
+    { name: 'cessRate', data_type: 'number', description: 'CESS Rate (%)' },
+    { name: 'isReverseCharges', data_type: 'boolean', description: 'Reverse Charges' },
+    { name: 'isActive', data_type: 'boolean', description: 'Active' },
+    { name: 'createdAt', data_type: 'date', description: 'Created At' },
+  ], []);
+  
+  const defaultColumns = [
+    'code',
+    'name',
+    'description',
+    'hsnType',
+    'uqc',
+    'igstRate',
+    'cgstRate',
+    'sgstRate',
+    'cessRate',
+    'isReverseCharges',
+    'isActive',
+  ];
+
+  // Transform data for better display
+  const transformedData = useMemo(() => {
+    return hsnCodes.map(hsnCode => ({
+      ...hsnCode,
+      createdAt: hsnCode.createdAt ? formatDate(hsnCode.createdAt) : '',
+      updatedAt: hsnCode.updatedAt ? formatDate(hsnCode.updatedAt) : '',
+      isActive: hsnCode.isActive ? 'Yes' : 'No',
+      isReverseCharges: hsnCode.isReverseCharges ? 'Yes' : 'No',
+      igstRate: hsnCode.igstRate !== undefined ? `${hsnCode.igstRate}%` : 'N/A',
+      cgstRate: hsnCode.cgstRate !== undefined ? `${hsnCode.cgstRate}%` : 'N/A',
+      sgstRate: hsnCode.sgstRate !== undefined ? `${hsnCode.sgstRate}%` : 'N/A',
+      cessRate: hsnCode.cessRate !== undefined ? `${hsnCode.cessRate}%` : 'N/A',
+      hsnType: hsnCode.hsnType || 'N/A',
+      uqc: hsnCode.uqc || 'N/A',
+    }));
+  }, [hsnCodes]);
+
+  const actionButtons = {
+    onEdit: onEdit,
+    onDelete: onDelete,
+    customActions: [
+      {
+        label: 'Edit',
+        icon: Edit,
+        onClick: onEdit,
+        variant: 'outline' as const,
+      },
+      {
+        label: 'Delete',
+        icon: Trash2,
+        onClick: onDelete,
+        variant: 'destructive' as const,
+      },
+    ]
   };
 
-  const sortedHsnCodes = [...hsnCodes].sort((a, b) => {
-    const aValue = a[sortField];
-    const bValue = b[sortField];
-
-    if (aValue === null || aValue === undefined) return 1;
-    if (bValue === null || bValue === undefined) return -1;
-
-    if (typeof aValue === "string" && typeof bValue === "string") {
-      return sortDirection === "asc" 
-        ? aValue.localeCompare(bValue)
-        : bValue.localeCompare(aValue);
-    }
-
-    if (typeof aValue === "number" && typeof bValue === "number") {
-      return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
-    }
-
-    if (typeof aValue === "boolean" && typeof bValue === "boolean") {
-      return sortDirection === "asc" 
-        ? (aValue === bValue ? 0 : aValue ? -1 : 1)
-        : (aValue === bValue ? 0 : aValue ? 1 : -1);
-    }
-
-    return 0;
-  });
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-32">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  if (hsnCodes.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">No HSN codes found</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead 
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => handleSort("hsnCode")}
-            >
-              HSN Code
-            </TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead 
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => handleSort("hsnType")}
-            >
-              HSN Type
-            </TableHead>
-            <TableHead 
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => handleSort("taxRate")}
-            >
-              Tax Rate (%)
-            </TableHead>
-            <TableHead 
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => handleSort("isActive")}
-            >
-              Status
-            </TableHead>
-            <TableHead>Created By</TableHead>
-            <TableHead 
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => handleSort("createdAt")}
-            >
-              Created Date
-            </TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortedHsnCodes.map((hsnCode) => (
-            <TableRow key={hsnCode.id}>
-              <TableCell className="font-medium font-mono">{hsnCode.hsnCode}</TableCell>
-              <TableCell className="max-w-xs truncate">
-                {hsnCode.description || "-"}
-              </TableCell>
-              <TableCell>{hsnCode.hsnType || "-"}</TableCell>
-              <TableCell>
-                {hsnCode.taxRate !== undefined ? `${hsnCode.taxRate}%` : "-"}
-              </TableCell>
-              <TableCell>
-                <Badge variant={hsnCode.isActive ? "default" : "secondary"}>
-                  {hsnCode.isActive ? "Active" : "Inactive"}
-                </Badge>
-              </TableCell>
-              <TableCell>{hsnCode.createdByName || "-"}</TableCell>
-              <TableCell>{formatDate(hsnCode.createdAt)}</TableCell>
-              <TableCell className="text-right">
-                <div className="flex items-center justify-end gap-2">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => onEdit(hsnCode)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => onDelete(hsnCode.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <div className="w-full">
+      <AdvancedTable
+        data={transformedData}
+        columns={defaultColumns}
+        columnMeta={columnMeta}
+        isLoading={isLoading}
+        groupingEnabled={false}
+        globalFilterEnabled={false}
+        dragDropGroupingEnabled={false}
+        onRowClick={onEdit}
+        actionButtons={actionButtons}
+        className="w-full"
+        // Server-side pagination
+        manualPagination={!!onPaginationChange}
+        pageCount={pageCount}
+        pageSize={pageSize}
+        pageIndex={pageIndex}
+        totalCount={totalCount}
+        onPaginationChange={onPaginationChange}
+        // Server-side filtering and sorting
+        manualFiltering={false}
+        manualSorting={true}
+        onGlobalFilterChange={onGlobalFilterChange}
+        onColumnFiltersChange={onColumnFiltersChange}
+        onSortingChange={onSortingChange}
+      />
     </div>
   );
 } 

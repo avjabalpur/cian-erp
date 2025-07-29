@@ -6,58 +6,66 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useHsnMaster } from "@/hooks/items/use-hsn-master";
+import { useHsnMaster, useDeleteHsnMaster } from "@/hooks/items/use-hsn-master";
+import { useQueryState } from "nuqs";
+import { hsnMasterParsers } from "@/lib/utils/hsn-master-utils";
 import HsnMasterTable from "./hsn-master-table";
 import HsnMasterFilter from "./hsn-master-filter";
 import HsnMasterDrawer from "./hsn-master-drawer";
+import { HsnMasterFilter as HsnMasterFilterType } from "@/types/hsn-master";
 
 export default function HsnMasterManagement() {
   const router = useRouter();
   const { toast } = useToast();
-  const { data: hsnCodes = [], isLoading, refetch } = useHsnMaster();
-  
+  const deleteHsnMasterMutation = useDeleteHsnMaster();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedHsnCode, setSelectedHsnCode] = useState<any>(null);
-  const [filters, setFilters] = useState({
-    search: "",
-    hsnType: "",
-    isActive: undefined as boolean | undefined
-  });
+  const [selectedHsnMaster, setSelectedHsnMaster] = useState<any>(null);
 
-  const filteredHsnCodes = hsnCodes.filter((hsnCode) => {
-    const matchesSearch = !filters.search || 
-      hsnCode.hsnCode.toLowerCase().includes(filters.search.toLowerCase()) ||
-      hsnCode.description?.toLowerCase().includes(filters.search.toLowerCase()) ||
-      hsnCode.hsnType?.toLowerCase().includes(filters.search.toLowerCase());
+  // URL state management with nuqs
+  const [page, setPage] = useQueryState("page", hsnMasterParsers.page);
+  const [pageSize, setPageSize] = useQueryState("pageSize", hsnMasterParsers.pageSize);
+  const [searchTerm, setSearchTerm] = useQueryState("search", hsnMasterParsers.search);
+  const [isActive, setIsActive] = useQueryState("isActive", hsnMasterParsers.isActive);
 
-    const matchesType = !filters.hsnType || hsnCode.hsnType === filters.hsnType;
-    
-    const matchesActive = filters.isActive === undefined || hsnCode.isActive === filters.isActive;
+  // Construct filter object for API
+  const filter: HsnMasterFilterType = {
+    pageNumber: page || 1,
+    pageSize: pageSize || 20,
+    search: searchTerm || undefined,
+    isActive: isActive || undefined,
+  };
 
-    return matchesSearch && matchesType && matchesActive;
-  });
+  const { data: hsnMasterData, isLoading, refetch } = useHsnMaster(filter);
+  const hsnCodes = hsnMasterData?.items || [];
+  const totalCount = hsnMasterData?.totalCount || 0;
+
+  const handlePaginationChange = (pageIndex: number, newPageSize: number) => {
+    setPage(pageIndex + 1); // Convert to 1-based indexing
+    setPageSize(newPageSize);
+  };
 
   const handleCreateHsnCode = () => {
-    setSelectedHsnCode(null);
+    setSelectedHsnMaster(null);
     setDrawerOpen(true);
   };
 
   const handleEditHsnCode = (hsnCode: any) => {
-    setSelectedHsnCode(hsnCode);
+    setSelectedHsnMaster(hsnCode);
     setDrawerOpen(true);
   };
 
-  const handleDeleteHsnCode = async (id: number) => {
+  const handleDeleteHsnCode = async (hsnCode: any) => {
     if (!confirm("Are you sure you want to delete this HSN code?")) return;
 
     try {
-      // TODO: Implement delete functionality
+      await deleteHsnMasterMutation.mutateAsync(hsnCode.id);
       toast({
         title: "Success",
         description: "HSN code deleted successfully",
       });
       refetch();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Delete HSN master failed:', error);
       toast({
         title: "Error",
         description: "Failed to delete HSN code",
@@ -66,32 +74,12 @@ export default function HsnMasterManagement() {
     }
   };
 
-  const clearFilters = () => {
-    setFilters({
-      search: "",
-      hsnType: "",
-      isActive: undefined
-    });
-  };
-
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button 
-          variant="ghost" 
-          onClick={() => router.push("/items")}
-          className="text-blue-600 hover:text-blue-700"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Item Master
-        </Button>
-      </div>
 
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">HSN Master</h1>
-          <p className="mt-2 text-gray-600">Manage HSN codes and tax classifications</p>
+          <h1 className="text-xl font-bold text-gray-900">HSN Master</h1>
         </div>
         <Button onClick={handleCreateHsnCode}>
           <Plus className="h-4 w-4 mr-2" />
@@ -99,44 +87,27 @@ export default function HsnMasterManagement() {
         </Button>
       </div>
 
-      {/* Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Filters</CardTitle>
-          <CardDescription>Filter HSN codes by various criteria</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <HsnMasterFilter 
-            filters={filters} 
-            onFiltersChange={setFilters} 
-            onClearFilters={clearFilters}
-          />
-        </CardContent>
-      </Card>
+      <HsnMasterFilter />
 
-      {/* Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>HSN Codes ({filteredHsnCodes.length})</CardTitle>
-          <CardDescription>
-            List of all HSN codes and their tax classifications
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      
           <HsnMasterTable
-            hsnCodes={filteredHsnCodes}
+            hsnCodes={hsnCodes}
             isLoading={isLoading}
             onEdit={handleEditHsnCode}
             onDelete={handleDeleteHsnCode}
+            pageCount={Math.ceil(totalCount / (pageSize || 20))}
+            pageSize={pageSize || 20}
+            pageIndex={(page || 1) - 1} 
+            totalCount={totalCount}
+            onPaginationChange={handlePaginationChange}
           />
-        </CardContent>
-      </Card>
+        
 
       {/* Drawer */}
       <HsnMasterDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        hsnCode={selectedHsnCode}
+        hsnMaster={selectedHsnMaster}
         onSuccess={() => {
           setDrawerOpen(false);
           refetch();

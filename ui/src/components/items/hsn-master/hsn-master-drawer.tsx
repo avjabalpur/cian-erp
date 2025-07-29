@@ -1,64 +1,30 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useCreateHsnMaster, useUpdateHsnMaster } from "@/hooks/items/use-hsn-master";
+import { FormInput } from "@/components/shared/forms/form-input";
+import { FormTextarea } from "@/components/shared/forms/form-textarea";
+import { FormSelect } from "@/components/shared/forms/form-select";
 import { RightDrawer } from "@/components/shared/right-drawer";
-
-const hsnMasterSchema = z.object({
-  hsnCode: z.string().min(1, "HSN Code is required"),
-  description: z.string().optional(),
-  hsnType: z.string().optional(),
-  taxRate: z.number().min(0).max(100).optional(),
-  isActive: z.boolean().default(true),
-});
-
-type HsnMasterFormData = z.infer<typeof hsnMasterSchema>;
+import { HsnMasterFormData, hsnMasterSchema } from "@/validations/item-master";
+import { HsnMaster } from "@/types/hsn-master";
 
 interface HsnMasterDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  hsnCode?: any;
+  hsnMaster?: HsnMaster | null;
   onSuccess: () => void;
 }
 
 export default function HsnMasterDrawer({
   isOpen,
   onClose,
-  hsnCode,
+  hsnMaster,
   onSuccess,
 }: HsnMasterDrawerProps) {
   const { toast } = useToast();
@@ -68,196 +34,309 @@ export default function HsnMasterDrawer({
   const form = useForm<HsnMasterFormData>({
     resolver: zodResolver(hsnMasterSchema),
     defaultValues: {
-      hsnCode: "",
+      code: "",
+      name: "",
       description: "",
       hsnType: "",
-      taxRate: undefined,
+      uqc: "",
+      igstRate: undefined,
+      cgstRate: undefined,
+      sgstRate: undefined,
+      cessRate: undefined,
+      isReverseCharges: false,
       isActive: true,
     },
   });
 
+  const { control, handleSubmit, reset, formState: { isSubmitting, errors } } = form;
+
   useEffect(() => {
-    if (hsnCode) {
-      form.reset({
-        hsnCode: hsnCode.hsnCode || "",
-        description: hsnCode.description || "",
-        hsnType: hsnCode.hsnType || "",
-        taxRate: hsnCode.taxRate || undefined,
-        isActive: hsnCode.isActive ?? true,
+    if (hsnMaster) {
+      console.log('Setting form values for edit:', hsnMaster);
+      reset({
+        code: hsnMaster.code || "",
+        name: hsnMaster.name || "",
+        description: hsnMaster.description || "",
+        hsnType: hsnMaster.hsnType || "",
+        uqc: hsnMaster.uqc || "",
+        igstRate: hsnMaster.igstRate || undefined,
+        cgstRate: hsnMaster.cgstRate || undefined,
+        sgstRate: hsnMaster.sgstRate || undefined,
+        cessRate: hsnMaster.cessRate || undefined,
+        isReverseCharges: hsnMaster.isReverseCharges ?? false,
+        isActive: hsnMaster.isActive ?? true,
       });
     } else {
-      form.reset({
-        hsnCode: "",
+      console.log('Setting form values for create');
+      reset({
+        code: "",
+        name: "",
         description: "",
         hsnType: "",
-        taxRate: undefined,
+        uqc: "",
+        igstRate: undefined,
+        cgstRate: undefined,
+        sgstRate: undefined,
+        cessRate: undefined,
+        isReverseCharges: false,
         isActive: true,
       });
     }
-  }, [hsnCode, form]);
+  }, [hsnMaster, reset]);
 
   const onSubmit = async (data: HsnMasterFormData) => {
+    console.log('Form submitted with data:', data);
+    console.log('Current hsnMaster:', hsnMaster);
+    
     try {
-      if (hsnCode) {
-        await updateHsnMasterMutation.mutateAsync({
-          id: hsnCode.id,
-          data,
+      const payload = {
+        code: data.code,
+        name: data.name,
+        description: data.description,
+        hsnType: data.hsnType,
+        uqc: data.uqc,
+        igstRate: data.igstRate,
+        cgstRate: data.cgstRate,
+        sgstRate: data.sgstRate,
+        cessRate: data.cessRate,
+        isReverseCharges: data.isReverseCharges,
+        isActive: data.isActive,
+      };
+
+      console.log('Payload to be sent:', payload);
+
+      if (hsnMaster) {
+        console.log('Updating HSN master with ID:', hsnMaster.id);
+        const result = await updateHsnMasterMutation.mutateAsync({
+          id: hsnMaster.id,
+          data: payload,
         });
+        console.log('Update result:', result);
         toast({
           title: "Success",
-          description: "HSN code updated successfully",
+          description: "HSN master updated successfully",
         });
       } else {
-        await createHsnMasterMutation.mutateAsync(data);
+        console.log('Creating new HSN master');
+        const result = await createHsnMasterMutation.mutateAsync(payload);
+        console.log('Create result:', result);
         toast({
           title: "Success",
-          description: "HSN code created successfully",
+          description: "HSN master created successfully",
         });
       }
+      reset();
       onSuccess();
-    } catch (error) {
+      onClose();
+    } catch (error: any) {
+      console.error('HSN master operation failed:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        response: error?.response,
+        status: error?.response?.status,
+        data: error?.response?.data
+      });
+      
+      // Handle specific error cases
+      let errorMessage = hsnMaster 
+        ? "Failed to update HSN master" 
+        : "Failed to create HSN master";
+      
+      if (error?.response?.status === 401) {
+        errorMessage = "Authentication failed. Please log in again.";
+      } else if (error?.response?.status === 403) {
+        errorMessage = "You don't have permission to perform this action.";
+      } else if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Error",
-        description: hsnCode 
-          ? "Failed to update HSN code" 
-          : "Failed to create HSN code",
+        description: errorMessage,
         variant: "destructive",
       });
     }
   };
 
+  const handleClose = () => {
+    reset();
+    onClose();
+  };
+
   const isLoading = createHsnMasterMutation.isPending || updateHsnMasterMutation.isPending;
 
+  // Debug form state
+  console.log('Form errors:', errors);
+  console.log('Form isSubmitting:', isSubmitting);
+  console.log('Mutation states:', {
+    createPending: createHsnMasterMutation.isPending,
+    updatePending: updateHsnMasterMutation.isPending,
+    isLoading
+  });
+
+  const hsnTypeOptions = [
+    { value: "H", label: "H" },
+    { value: "S", label: "S" },
+  ];
+
   return (
-    <RightDrawer isOpen={isOpen} onClose={onClose}
-    title= {hsnCode ? "Edit HSN Code" : "Create New HSN Code"}
-    description= {hsnCode 
-      ? "Update the HSN code information below." 
-      : "Fill in the information below to create a new HSN code."
-    }
+    <RightDrawer
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={hsnMaster ? "Edit HSN Master" : "Create New HSN Master"}
+      size="xl"
+      description={hsnMaster 
+        ? "Update the HSN master information below." 
+        : "Fill in the information below to create a new HSN master."
+      }
     >
-    <div className="mx-auto w-full max-w-2xl">
-      
+      <FormProvider {...form}>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormInput
+              control={control}
+              name="code"
+              label="Code"
+              placeholder="Enter HSN code (e.g., 3004)"
+              required
+            />
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-6">
-              <FormField
-                control={form.control}
-                name="hsnCode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>HSN Code *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter HSN code (e.g., 3004)" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      Enter the HSN (Harmonized System of Nomenclature) code
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormInput
+              control={control}
+              name="name"
+              label="Name"
+              placeholder="Enter HSN name"
+              required
+            />
+          </div>
 
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Enter description (optional)" 
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <FormTextarea
+            control={control}
+            name="description"
+            label="Description"
+            placeholder="Enter description"
+            required
+          />
 
-              <FormField
-                control={form.control}
-                name="hsnType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>HSN Type</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select HSN type (optional)" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="">No type specified</SelectItem>
-                        <SelectItem value="pharmaceutical">Pharmaceutical</SelectItem>
-                        <SelectItem value="medical_device">Medical Device</SelectItem>
-                        <SelectItem value="cosmetic">Cosmetic</SelectItem>
-                        <SelectItem value="supplement">Supplement</SelectItem>
-                        <SelectItem value="chemical">Chemical</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormSelect
+              control={control}
+              name="hsnType"
+              label="HSN Type"
+              placeholder="Select HSN type (optional)"
+              options={hsnTypeOptions}
+            />
 
-              <FormField
-                control={form.control}
-                name="taxRate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tax Rate (%)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="Enter tax rate (0-100)"
-                        {...field}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          field.onChange(value === "" ? undefined : parseFloat(value));
-                        }}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Enter the applicable tax rate as a percentage
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormInput
+              control={control}
+              name="uqc"
+              label="UQC"
+              placeholder="Enter UQC"
+            />
+          </div>
 
-              <FormField
-                control={form.control}
-                name="isActive"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">Active Status</FormLabel>
-                      <FormDescription>
-                        Enable or disable this HSN code
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormInput
+              control={control}
+              name="igstRate"
+              label="IGST Rate (%)"
+              placeholder="Enter IGST rate"
+              inputProps={{ 
+                type: "number",
+                min: "0",
+                max: "100",
+                step: "0.01"
+              }}
+            />
 
-              <DrawerFooter>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Saving..." : hsnCode ? "Update HSN Code" : "Create HSN Code"}
-                </Button>
-                <DrawerClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DrawerClose>
-              </DrawerFooter>
-            </form>
-          </Form>
-        </div>
+            <FormInput
+              control={control}
+              name="cgstRate"
+              label="CGST Rate (%)"
+              placeholder="Enter CGST rate"
+              inputProps={{ 
+                type: "number",
+                min: "0",
+                max: "100",
+                step: "0.01"
+              }}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormInput
+              control={control}
+              name="sgstRate"
+              label="SGST Rate (%)"
+              placeholder="Enter SGST rate"
+              inputProps={{ 
+                type: "number",
+                min: "0",
+                max: "100",
+                step: "0.01"
+              }}
+            />
+
+            <FormInput
+              control={control}
+              name="cessRate"
+              label="CESS Rate (%)"
+              placeholder="Enter CESS rate"
+              inputProps={{ 
+                type: "number",
+                min: "0",
+                max: "100",
+                step: "0.01"
+              }}
+            />
+          </div>
+
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <label className="text-base font-medium">Reverse Charges</label>
+              <p className="text-sm text-muted-foreground">
+                Enable reverse charges for this HSN code
+              </p>
+            </div>
+            <Switch
+              checked={form.watch("isReverseCharges")}
+              onCheckedChange={(checked) => form.setValue("isReverseCharges", checked)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <label className="text-base font-medium">Active Status</label>
+              <p className="text-sm text-muted-foreground">
+                Enable or disable this HSN master
+              </p>
+            </div>
+            <Switch
+              checked={form.watch("isActive")}
+              onCheckedChange={(checked) => form.setValue("isActive", checked)}
+            />
+          </div>
+
+          <div className="flex justify-end gap-4 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isSubmitting || isLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting || isLoading}
+            >
+              {isLoading ? "Saving..." : hsnMaster ? "Update HSN Master" : "Create HSN Master"}
+            </Button>
+          </div>
+        </form>
+      </FormProvider>
     </RightDrawer>
   );
 } 

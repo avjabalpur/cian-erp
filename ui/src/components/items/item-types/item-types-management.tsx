@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Plus, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useItemTypes, useDeleteItemType} from "@/hooks/items/use-item-types";
-import { itemTypeParsers } from "@/lib/utils/item-master-utils";
 import ItemTypesTable from "./item-types-table";
 import ItemTypeDrawer from "./item-type-drawer";
 import { ItemTypeFilter } from "@/types/item";
@@ -18,17 +17,17 @@ export default function ItemTypesManagement() {
   const { toast } = useToast();
   
   // nuqs query state hooks
-  const [page, setPage] = useQueryState("page", itemTypeParsers.page);
-  const [pageSize, setPageSize] = useQueryState("pageSize", itemTypeParsers.pageSize);
-  const [searchTerm, setSearchTerm] = useQueryState("searchTerm", itemTypeParsers.searchTerm);
-  const [isActive, setIsActive] = useQueryState("isActive", itemTypeParsers.isActive);
+  const [page, setPage] = useQueryState("page");
+  const [pageSize, setPageSize] = useQueryState("pageSize");
+  const [searchTerm, setSearchTerm] = useQueryState("searchTerm");
+  const [isActive, setIsActive] = useQueryState("isActive");
 
   // Convert nuqs state to API filter
   const filter: ItemTypeFilter = {
-    pageNumber: page,
-    pageSize: pageSize,
+    pageNumber: page ? parseInt(page) : undefined,
+    pageSize: pageSize ? parseInt(pageSize) : undefined,
     searchTerm: searchTerm || undefined,
-    isActive: isActive ?? undefined,
+    isActive: isActive ? isActive === 'true' : undefined,
   };
 
   // Query with pagination
@@ -91,19 +90,14 @@ export default function ItemTypesManagement() {
   };
 
   const handlePaginationChange = (newPageIndex: number, newPageSize: number) => {
-    // Update nuqs state (API uses 1-based pagination)
-    setPage(newPageIndex + 1);
-    setPageSize(newPageSize);
+    setPage(newPageIndex.toString());
+    setPageSize(newPageSize.toString());
   };
 
-  const handleFilterChange = (filters: any) => {
-    // This will be handled by nuqs automatically through the filter component
-    // The component will re-render with new filter values
-  };
 
   const handleGlobalFilterChange = (value: string) => {
     setSearchTerm(value || null);
-    setPage(1); // Reset to first page when searching
+    setPage("1");
   };
 
   const handleSuccess = () => {
@@ -133,8 +127,8 @@ export default function ItemTypesManagement() {
         onDelete={handleDeleteItemType}
         isLoading={isLoading}
         pageCount={totalPages}
-        pageSize={pageSize}
-        pageIndex={(page || 1) - 1} // Convert 1-based to 0-based for table
+        pageSize={pageSize ? parseInt(pageSize) : undefined}
+        pageIndex={page ? parseInt(page) - 1 : 0} // Convert 1-based to 0-based for table
         totalCount={totalCount}
         onPaginationChange={handlePaginationChange}
         onGlobalFilterChange={handleGlobalFilterChange}

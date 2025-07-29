@@ -11,21 +11,9 @@ export interface ItemType {
   updatedBy?: number;
 }
 
-export interface CreateItemTypeData {
-  code: string;
-  name: string;
-  description?: string;
-  parentTypeId?: number;
-  isActive?: boolean;
-}
+export type CreateItemTypeData = Omit<ItemType, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'>;
 
-export interface UpdateItemTypeData {
-  code: string;
-  name: string;
-  description?: string;
-  parentTypeId?: number;
-  isActive?: boolean;
-}
+export type UpdateItemTypeData = Partial<CreateItemTypeData>;
 
 export interface ItemTypeFilter {
   searchTerm?: string;

@@ -1,3 +1,4 @@
+using AutoMapper;
 using Xcianify.Core.DTOs.ItemMaster;
 using Xcianify.Core.Domain.Repositories;
 using Xcianify.Core.Domain.Services;
@@ -10,10 +11,14 @@ namespace Xcianify.Services
     public class HsnMasterService : IHsnMasterService
     {
         private readonly IHsnMasterRepository _hsnMasterRepository;
+        private readonly IMapper _mapper;
 
-        public HsnMasterService(IHsnMasterRepository hsnMasterRepository)
+        public HsnMasterService(
+            IHsnMasterRepository hsnMasterRepository,
+            IMapper mapper)
         {
             _hsnMasterRepository = hsnMasterRepository ?? throw new ArgumentNullException(nameof(hsnMasterRepository));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public async Task<HsnMasterDto> GetByIdAsync(int id)
@@ -23,14 +28,13 @@ namespace Xcianify.Services
             {
                 throw new NotFoundException("HSN code not found");
             }
-            return MapToDto(hsn);
+            return _mapper.Map<HsnMasterDto>(hsn);
         }
 
         public async Task<PaginatedResult<HsnMasterDto>> GetAllAsync(HsnMasterFilterDto filter)
         {
-            ValidateFilter(filter);
             var (items, totalCount) = await _hsnMasterRepository.GetAllAsync(filter);
-            var dtos = items.Select(MapToDto).ToList();
+            var dtos = _mapper.Map<IEnumerable<HsnMasterDto>>(items).ToList();
             
             return new PaginatedResult<HsnMasterDto>
             {
@@ -43,40 +47,24 @@ namespace Xcianify.Services
 
         public async Task<HsnMasterDto> CreateAsync(CreateHsnMasterDto dto, int userId)
         {
-            ValidateCreateDto(dto);
             
             // Check if HSN code already exists
             if (await _hsnMasterRepository.ExistsAsync(dto.Code))
             {
                 throw new ValidationException("HSN code already exists");
             }
-
-            var hsnMaster = new HsnMaster
-            {
-                Code = dto.Code,
-                Name = dto.Name,
-                Description = dto.Description,
-                HsnType = dto.HsnType,
-                Uqc = dto.Uqc,
-                IgstRate = dto.IgstRate ?? 0,
-                CgstRate = dto.CgstRate ?? 0,
-                SgstRate = dto.SgstRate ?? 0,
-                CessRate = dto.CessRate ?? 0,
-                IsReverseCharges = dto.IsReverseCharges ?? false,
-                IsActive = dto.IsActive,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                CreatedBy = userId,
-                UpdatedBy = userId
-            };
+            var hsnMaster = _mapper.Map<HsnMaster>(dto);
+            hsnMaster.CreatedAt = DateTime.UtcNow;
+            hsnMaster.UpdatedAt = DateTime.UtcNow;
+            hsnMaster.CreatedBy = userId;
+            hsnMaster.UpdatedBy = userId;
 
             var created = await _hsnMasterRepository.AddAsync(hsnMaster);
-            return MapToDto(created);
+            return _mapper.Map<HsnMasterDto>(created);
         }
 
         public async Task<HsnMasterDto> UpdateAsync(int id, UpdateHsnMasterDto dto, int userId)
         {
-            ValidateUpdateDto(dto);
             
             var hsnMaster = await _hsnMasterRepository.GetByIdAsync(id);
             if (hsnMaster == null)
@@ -90,21 +78,12 @@ namespace Xcianify.Services
                 throw new ValidationException("HSN code already exists");
             }
 
-            hsnMaster.Code = dto.Code;
-            hsnMaster.Name = dto.Name;
-            hsnMaster.Description = dto.Description;
-            hsnMaster.HsnType = dto.HsnType;
-            hsnMaster.Uqc = dto.Uqc;
-            if (dto.IgstRate.HasValue) hsnMaster.IgstRate = dto.IgstRate.Value;
-            if (dto.CgstRate.HasValue) hsnMaster.CgstRate = dto.CgstRate.Value;
-            if (dto.SgstRate.HasValue) hsnMaster.SgstRate = dto.SgstRate.Value;
-            if (dto.CessRate.HasValue) hsnMaster.CessRate = dto.CessRate.Value;
-            if (dto.IsReverseCharges.HasValue) hsnMaster.IsReverseCharges = dto.IsReverseCharges.Value;
-            if (dto.IsActive.HasValue) hsnMaster.IsActive = dto.IsActive.Value;
+            _mapper.Map(dto, hsnMaster);
             hsnMaster.UpdatedBy = userId;
+            hsnMaster.UpdatedAt = DateTime.UtcNow;
 
             await _hsnMasterRepository.UpdateAsync(hsnMaster);
-            return MapToDto(hsnMaster);
+            return _mapper.Map<HsnMasterDto>(hsnMaster);
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -122,126 +101,9 @@ namespace Xcianify.Services
         public async Task<IEnumerable<HsnMasterDto>> GetHsnTypesAsync()
         {
             var hsnTypes = await _hsnMasterRepository.GetHsnTypesAsync();
-            return hsnTypes.Select(MapToDto);
+            return _mapper.Map<IEnumerable<HsnMasterDto>>(hsnTypes);
         }
 
-        private void ValidateFilter(HsnMasterFilterDto filter)
-        {
-            if (filter == null)
-            {
-                throw new ValidationException("Filter cannot be null");
-            }
 
-            if (filter.PageNumber < 1)
-            {
-                throw new ValidationException("Page number must be greater than 0");
-            }
-
-            if (filter.PageSize < 1 || filter.PageSize > 100)
-            {
-                throw new ValidationException("Page size must be between 1 and 100");
-            }
-        }
-
-        private void ValidateCreateDto(CreateHsnMasterDto dto)
-        {
-            if (dto == null)
-            {
-                throw new ValidationException("HSN data cannot be null");
-            }
-
-            if (string.IsNullOrWhiteSpace(dto.Code))
-            {
-                throw new ValidationException("HSN code is required");
-            }
-
-            if (string.IsNullOrWhiteSpace(dto.Name))
-            {
-                throw new ValidationException("HSN name is required");
-            }
-
-            if (dto.IgstRate < 0 || dto.IgstRate > 100)
-            {
-                throw new ValidationException("IGST rate must be between 0 and 100");
-            }
-
-            if (dto.CgstRate < 0 || dto.CgstRate > 100)
-            {
-                throw new ValidationException("CGST rate must be between 0 and 100");
-            }
-
-            if (dto.SgstRate < 0 || dto.SgstRate > 100)
-            {
-                throw new ValidationException("SGST rate must be between 0 and 100");
-            }
-
-            if (dto.CessRate < 0 || dto.CessRate > 100)
-            {
-                throw new ValidationException("Cess rate must be between 0 and 100");
-            }
-        }
-
-        private void ValidateUpdateDto(UpdateHsnMasterDto dto)
-        {
-            if (dto == null)
-            {
-                throw new ValidationException("HSN data cannot be null");
-            }
-
-            if (string.IsNullOrWhiteSpace(dto.Code))
-            {
-                throw new ValidationException("HSN code is required");
-            }
-
-            if (string.IsNullOrWhiteSpace(dto.Name))
-            {
-                throw new ValidationException("HSN name is required");
-            }
-
-            if (dto.IgstRate.HasValue && (dto.IgstRate < 0 || dto.IgstRate > 100))
-            {
-                throw new ValidationException("IGST rate must be between 0 and 100");
-            }
-
-            if (dto.CgstRate.HasValue && (dto.CgstRate < 0 || dto.CgstRate > 100))
-            {
-                throw new ValidationException("CGST rate must be between 0 and 100");
-            }
-
-            if (dto.SgstRate.HasValue && (dto.SgstRate < 0 || dto.SgstRate > 100))
-            {
-                throw new ValidationException("SGST rate must be between 0 and 100");
-            }
-
-            if (dto.CessRate.HasValue && (dto.CessRate < 0 || dto.CessRate > 100))
-            {
-                throw new ValidationException("Cess rate must be between 0 and 100");
-            }
-        }
-
-        private HsnMasterDto MapToDto(HsnMaster hsnMaster)
-        {
-            if (hsnMaster == null) return null;
-            
-            return new HsnMasterDto
-            {
-                Id = hsnMaster.Id,
-                Code = hsnMaster.Code,
-                Name = hsnMaster.Name,
-                Description = hsnMaster.Description,
-                HsnType = hsnMaster.HsnType,
-                Uqc = hsnMaster.Uqc,
-                IgstRate = hsnMaster.IgstRate,
-                CgstRate = hsnMaster.CgstRate,
-                SgstRate = hsnMaster.SgstRate,
-                CessRate = hsnMaster.CessRate,
-                IsReverseCharges = hsnMaster.IsReverseCharges,
-                IsActive = hsnMaster.IsActive,
-                CreatedAt = hsnMaster.CreatedAt,
-                UpdatedAt = hsnMaster.UpdatedAt,
-                CreatedBy = hsnMaster.CreatedBy,
-                UpdatedBy = hsnMaster.UpdatedBy
-            };
-        }
     }
 }
