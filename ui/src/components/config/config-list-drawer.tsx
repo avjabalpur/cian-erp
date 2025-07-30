@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +13,7 @@ import { useCreateConfigList, useUpdateConfigList } from "@/hooks/config/use-con
 import { useConfigListValuesByListId, useCreateConfigListValue, useUpdateConfigListValue, useDeleteConfigListValue } from "@/hooks/config/use-config-list-values";
 import { FormInput } from "@/components/shared/forms/form-input";
 import { FormTextarea } from "@/components/shared/forms/form-textarea";
+import { FormCheckbox } from "@/components/shared/forms/form-checkbox";
 import { RightDrawer } from "@/components/shared/right-drawer";
 import { ConfigListFormData, configListSchema, ConfigListValueFormData } from "@/validations/config-list";
 import { ConfigList, ConfigListValue } from "@/types/config-list";
@@ -215,7 +215,7 @@ export default function ConfigListDrawer({
               await updateConfigListValueMutation.mutateAsync({
                 id: value.id,
                 data: {
-                  listId: value.id,
+                  listId: createdConfigListId,
                   valueCode: value.valueCode,
                   valueName: value.valueName,
                   displayOrder: value.displayOrder,
@@ -263,16 +263,6 @@ export default function ConfigListDrawer({
       let errorMessage = configList 
         ? "Failed to update config list" 
         : "Failed to create config list";
-      
-      if (error?.response?.status === 401) {
-        errorMessage = "Authentication failed. Please log in again.";
-      } else if (error?.response?.status === 403) {
-        errorMessage = "You don't have permission to perform this action.";
-      } else if (error?.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error?.message) {
-        errorMessage = error.message;
-      }
       
       toast({
         title: "Error",
@@ -334,18 +324,12 @@ export default function ConfigListDrawer({
                 placeholder="Enter description"
               />
 
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <label className="text-base font-medium">Active Status</label>
-                  <p className="text-sm text-muted-foreground">
-                    Enable or disable this config list
-                  </p>
-                </div>
-                <Switch
-                  checked={form.watch("isActive")}
-                  onCheckedChange={(checked) => form.setValue("isActive", checked)}
+              <FormCheckbox
+                  control={control}
+                  name="isActive"
+                  label="Active Status"
+                  inline={true}
                 />
-              </div>
             </CardContent>
           </Card>
 
