@@ -14,7 +14,6 @@ export default function ItemsFilter() {
   const [qcRequired, setQcRequired] = useQueryState("qcRequired", parseAsString.withDefault(""));
 
   const itemTypeOptions = [
-    { label: "All Types", value: "" },
     { label: "Tablet", value: "tablet" },
     { label: "Capsule", value: "capsule" },
     { label: "Syrup", value: "syrup" },
@@ -24,13 +23,11 @@ export default function ItemsFilter() {
   ];
 
   const statusOptions = [
-    { label: "All Statuses", value: "" },
     { label: "Active", value: "active" },
     { label: "Inactive", value: "inactive" },
   ];
 
   const yesNoOptions = [
-    { label: "All", value: "" },
     { label: "Yes", value: "yes" },
     { label: "No", value: "no" },
   ];

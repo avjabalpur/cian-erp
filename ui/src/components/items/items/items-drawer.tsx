@@ -129,7 +129,7 @@ export default function ItemsDrawer({
   const isLoading = createItemMutation.isPending || updateItemMutation.isPending;
 
   const itemTypeOptions = [
-    { label: "Select item type", value: "" },
+    { label: "Select item type", value: "-1" },
     { label: "Tablet", value: "tablet" },
     { label: "Capsule", value: "capsule" },
     { label: "Syrup", value: "syrup" },

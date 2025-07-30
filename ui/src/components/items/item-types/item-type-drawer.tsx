@@ -128,7 +128,7 @@ export default function ItemTypeDrawer({
       }
     >
       <FormProvider {...form}>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {JSON.stringify(errors)}
           <FormInput
             control={control}

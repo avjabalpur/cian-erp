@@ -60,21 +60,10 @@ export default function ItemsManagement() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button 
-          variant="ghost" 
-          onClick={() => router.push("/items")}
-          className="text-blue-600 hover:text-blue-700"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Item Master
-        </Button>
-      </div>
 
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Items</h1>
+          <h1 className="text-xl font-bold text-gray-900">Items</h1>
           <p className="mt-2 text-gray-600">Manage pharmaceutical items and products</p>
         </div>
         <Button onClick={handleCreateItem}>
@@ -84,26 +73,10 @@ export default function ItemsManagement() {
       </div>
 
       {/* Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Filters</CardTitle>
-          <CardDescription>Filter items by various criteria</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ItemsFilter />
-        </CardContent>
-      </Card>
+      <ItemsFilter />
 
       {/* Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Items ({items.length})</CardTitle>
-          <CardDescription>
-            List of all pharmaceutical items and products
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ItemsTable
+      <ItemsTable
             items={paginatedItems}
             onEdit={handleEditItem}
             onDelete={handleDeleteItem}
@@ -114,9 +87,6 @@ export default function ItemsManagement() {
             totalCount={items.length}
             onPaginationChange={handlePaginationChange}
           />
-        </CardContent>
-      </Card>
-
       {/* Drawer */}
       <ItemsDrawer
         isOpen={drawerOpen}
