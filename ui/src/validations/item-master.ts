@@ -5,13 +5,13 @@ export const itemTypeSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
   parentTypeId: z.string()
-    .optional()
-    .transform((val) => {
-      if (!val || val === "") return undefined;
-      const num = parseInt(val, 10);
-      return isNaN(num) ? undefined : num;
-    }),
-  isActive: z.boolean().default(true),
+  .optional()
+  .transform((val) => {
+    if (!val || val === "") return undefined;
+    const num = parseFloat(val);
+    return isNaN(num) ? undefined : num;
+  }),
+  isActive: z.coerce.boolean().default(true),
 });
 
 export const hsnMasterSchema = z.object({
@@ -48,8 +48,8 @@ export const hsnMasterSchema = z.object({
       const num = parseFloat(val);
       return isNaN(num) ? undefined : num;
     }),
-  isReverseCharges: z.boolean().default(false),
-  isActive: z.boolean().default(true),
+  isReverseCharges: z.coerce.boolean().default(false),
+  isActive: z.coerce.boolean().default(true),
 });
 
 export type ItemTypeFormData = z.infer<typeof itemTypeSchema>;

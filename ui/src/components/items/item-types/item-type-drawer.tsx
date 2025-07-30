@@ -5,15 +5,14 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useCreateItemType, useUpdateItemType } from "@/hooks/items/use-item-types";
 import { FormInput } from "@/components/shared/forms/form-input";
-import { FormSelect } from "@/components/shared/forms/form-select";
 import { FormTextarea } from "@/components/shared/forms/form-textarea";
 import { RightDrawer } from "@/components/shared/right-drawer";
 import { ItemTypeFormData, itemTypeSchema } from "@/validations/item-master";
 import { ItemType } from "@/types/item";
+import { FormCheckbox } from "@/components/shared/forms/form-checkbox";
 
 interface ItemTypeDrawerProps {
   isOpen: boolean;
@@ -47,7 +46,6 @@ export default function ItemTypeDrawer({
 
   useEffect(() => {
     if (itemType) {
-      console.log('Setting form values for edit:', itemType);
       reset({
         code: itemType.code || "",
         name: itemType.name || "",
@@ -56,7 +54,6 @@ export default function ItemTypeDrawer({
         isActive: itemType.isActive ?? true,
       });
     } else {
-      console.log('Setting form values for create');
       reset({
         code: "",
         name: "",
@@ -68,8 +65,6 @@ export default function ItemTypeDrawer({
   }, [itemType, reset]);
 
   const onSubmit = async (data: ItemTypeFormData) => {
-    console.log('Form submitted with data:', data);
-    console.log('Current itemType:', itemType);
     
     try {
       const payload = {
@@ -80,23 +75,18 @@ export default function ItemTypeDrawer({
         isActive: data.isActive,
       };
 
-      console.log('Payload to be sent:', payload);
 
       if (itemType) {
-        console.log('Updating item type with ID:', itemType.id);
         const result = await updateItemTypeMutation.mutateAsync({
           id: itemType.id,
           data: payload,
         });
-        console.log('Update result:', result);
         toast({
           title: "Success",
           description: "Item type updated successfully",
         });
       } else {
-        console.log('Creating new item type');
         const result = await createItemTypeMutation.mutateAsync(payload);
-        console.log('Create result:', result);
         toast({
           title: "Success",
           description: "Item type created successfully",
@@ -106,28 +96,12 @@ export default function ItemTypeDrawer({
       onSuccess();
       onClose();
     } catch (error: any) {
-      console.error('Item type operation failed:', error);
-      console.error('Error details:', {
-        message: error?.message,
-        response: error?.response,
-        status: error?.response?.status,
-        data: error?.response?.data
-      });
+
       
       // Handle specific error cases
       let errorMessage = itemType 
         ? "Failed to update item type" 
         : "Failed to create item type";
-      
-      if (error?.response?.status === 401) {
-        errorMessage = "Authentication failed. Please log in again.";
-      } else if (error?.response?.status === 403) {
-        errorMessage = "You don't have permission to perform this action.";
-      } else if (error?.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error?.message) {
-        errorMessage = error.message;
-      }
       
       toast({
         title: "Error",
@@ -143,16 +117,6 @@ export default function ItemTypeDrawer({
   };
 
   const isLoading = createItemTypeMutation.isPending || updateItemTypeMutation.isPending;
-
-  // Debug form state
-  console.log('Form errors:', errors);
-  console.log('Form isSubmitting:', isSubmitting);
-  console.log('Mutation states:', {
-    createPending: createItemTypeMutation.isPending,
-    updatePending: updateItemTypeMutation.isPending,
-    isLoading
-  });
-
   return (
     <RightDrawer
       isOpen={isOpen}
@@ -201,18 +165,12 @@ export default function ItemTypeDrawer({
             }}
           />
 
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <label className="text-base font-medium">Active Status</label>
-              <p className="text-sm text-muted-foreground">
-                Enable or disable this item type
-              </p>
-            </div>
-            <Switch
-              checked={form.watch("isActive")}
-              onCheckedChange={(checked) => form.setValue("isActive", checked)}
-            />
-          </div>
+          <FormCheckbox
+                  control={control}
+                  name="isActive"
+                  label="Active Status"
+                  inline={true}
+                />
 
           <div className="flex justify-end gap-4 pt-4">
             <Button
