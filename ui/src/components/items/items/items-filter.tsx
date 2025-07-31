@@ -5,6 +5,7 @@ import { parseAsString, parseAsBoolean } from "nuqs";
 import { FilterWrapper } from "@/components/shared/filter/filter-wrapper";
 import { NuqsFormInput } from "@/components/shared/filter/nuqs-form-input";
 import { NuqsFormSelect } from "@/components/shared/filter/nuqs-form-select";
+import { useState } from "react";
 
 export default function ItemsFilter() {
   const [search, setSearch] = useQueryState("search", parseAsString.withDefault(""));
@@ -12,6 +13,7 @@ export default function ItemsFilter() {
   const [status, setStatus] = useQueryState("status", parseAsString.withDefault(""));
   const [manufactured, setManufactured] = useQueryState("manufactured", parseAsString.withDefault(""));
   const [qcRequired, setQcRequired] = useQueryState("qcRequired", parseAsString.withDefault(""));
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const itemTypeOptions = [
     { label: "Tablet", value: "tablet" },
@@ -54,6 +56,8 @@ export default function ItemsFilter() {
     <FilterWrapper
       activeFilterCount={getActiveFilterCount()}
       onClearFilters={clearFilters}
+      isExpanded={isExpanded}
+      onToggleExpand={setIsExpanded}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <NuqsFormInput

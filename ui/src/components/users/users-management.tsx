@@ -33,7 +33,7 @@ export default function UsersManagement() {
   })
   const users = usersData?.items || []
   const totalCount = usersData?.totalCount || 0
-  const pageCount = usersData?.pageCount || 0
+  const pageCount = 10 // TODO: get from API
 
   const handleView = (user: User) => {
     router.push(`/users/${user.id}`)

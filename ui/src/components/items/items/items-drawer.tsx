@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -147,8 +147,10 @@ export default function ItemsDrawer({
         ? "Update the item information below." 
         : "Fill in the information below to create a new item."
       }
+      size="4xl"
     >
-      <div className="mx-auto w-full max-w-4xl">
+      <div className="mx-auto w-full">
+      <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <Tabs defaultValue="basic" className="w-full">
             <TabsList className="grid w-full grid-cols-5">
@@ -283,6 +285,7 @@ export default function ItemsDrawer({
             </Button>
           </div>
         </form>
+        </FormProvider>
       </div>
     </RightDrawer>
   );

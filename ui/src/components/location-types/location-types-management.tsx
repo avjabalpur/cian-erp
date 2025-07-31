@@ -23,11 +23,10 @@ export default function LocationTypesManagement() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Location Type Management</h1>
-          <p className="mt-2 text-gray-600">Manage system location types</p>
+          <h1 className="text-xl font-bold text-gray-900">Location Type Management</h1>
         </div>
         <Button onClick={() => { setSelectedLocationType(null); setDrawerOpen(true); }}>
           <Plus className="w-4 h-4 mr-2" />

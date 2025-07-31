@@ -19,7 +19,7 @@ interface RightDrawerProps {
     title?: string
     description?: string
     className?: string
-    size?: "sm" | "md" | "lg" | "xl" | "full" | "2xl"
+    size?: "sm" | "md" | "lg" | "xl" | "full" | "2xl" | "3xl" | "4xl"
 }
 
 export function RightDrawer({
@@ -38,6 +38,8 @@ export function RightDrawer({
         xl: "sm:max-w-xl",
         full: "sm:max-w-full",
         "2xl": "sm:max-w-2xl",
+        "3xl": "sm:max-w-3xl",
+        "4xl": "sm:max-w-4xl",
     }
 
     return (

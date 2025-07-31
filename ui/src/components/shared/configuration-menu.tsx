@@ -45,8 +45,16 @@ export function ConfigurationMenu() {
           Config Lists
         </DropdownMenuItem>
         
-        <DropdownMenuSeparator />
         <DropdownMenuItem 
+          onClick={() => handleNavigate("/config/config-settings")}
+          className="cursor-pointer hover:bg-gray-50"
+        >
+          <Settings className="mr-2 h-4 w-4 text-blue-600" />
+          Config Settings
+        </DropdownMenuItem>
+
+        {/*<DropdownMenuSeparator />
+         <DropdownMenuItem 
           onClick={() => handleNavigate("/settings")}
           className="cursor-pointer hover:bg-gray-50"
         >
@@ -59,7 +67,7 @@ export function ConfigurationMenu() {
         >
           <Cog className="mr-2 h-4 w-4 text-orange-600" />
           Advanced Config
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
       </DropdownMenuContent>
     </DropdownMenu>
   );
