@@ -3,32 +3,35 @@ import { FormInput } from "@/components/shared/forms/form-input"
 import { FormSelect } from "@/components/shared/forms/form-select"
 import { FormTextarea } from "@/components/shared/forms/form-textarea"
 import { FormSwitch } from "@/components/shared/forms/form-switch"
+import { ConfigListSelect } from "@/components/shared/config-list-select"
+import { useItemTypes, useParentTypes } from "@/hooks/items/use-item-types"
+import { useController } from "react-hook-form"
 
 interface ItemBasicInfoFormProps {
   control: any;
 }
 
 export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
+  // Fetch item types and parent types
+  const { data: itemTypes = { items: [] } } = useItemTypes();
+  const { data: parentTypes = [] } = useParentTypes();
+
+  // Create options for item types
   const itemTypeOptions = [
     { label: "Select item type", value: "-1" },
-    { label: "FG - Finished Goods", value: "FG" },
-    { label: "RM - Raw Material", value: "RM" },
-    { label: "PM - Packing Material", value: "PM" },
-    { label: "SP - Semi Processed", value: "SP" },
+    ...itemTypes.items.map((itemType) => ({
+      label: `${itemType.code} - ${itemType.name}`,
+      value: itemType.id.toString(),
+    })),
   ];
 
+  // Create options for sub types (parent types)
   const subTypeOptions = [
     { label: "Select sub type", value: "-1" },
-    { label: "FG-CAPSULE", value: "FG-CAPSULE" },
-    { label: "FG-TABLET", value: "FG-TABLET" },
-    { label: "FG-SYRUP", value: "FG-SYRUP" },
-    { label: "FG-INJECTION", value: "FG-INJECTION" },
-  ];
-
-  const gsIndOptions = [
-    { label: "Select GS Ind.", value: "-1" },
-    { label: "G - Goods", value: "G" },
-    { label: "S - Services", value: "S" },
+    ...parentTypes.map((parentType) => ({
+      label: `${parentType.code} - ${parentType.name}`,
+      value: parentType.id.toString(),
+    })),
   ];
 
   const uqcOptions = [
@@ -61,12 +64,17 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
               label="Sub Type"
               options={subTypeOptions}
             />
-            <FormSelect
-              control={control}
-              name="gsInd"
-              label="GS Ind."
-              options={gsIndOptions}
-            />
+            <div className="space-y-2">
+              <label className="text-sm font-medium">GS Ind.</label>
+              <ConfigListSelect
+                listCode="GS_IND"
+                value={control._formValues?.gsInd}
+                onChange={(value) => {
+                  control.setValue("gsInd", value);
+                }}
+                placeholder="Select GS Ind."
+              />
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
