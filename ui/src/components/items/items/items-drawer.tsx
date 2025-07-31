@@ -118,7 +118,7 @@ export default function ItemsDrawer({
                 <ItemBasicInfoForm control={form.control} />
               </TabsContent>
 
-              {/* <TabsContent value="manufacturing" className="space-y-3">
+              <TabsContent value="manufacturing" className="space-y-3">
                 <ItemManufacturingForm control={form.control} />
               </TabsContent>
 
@@ -144,7 +144,7 @@ export default function ItemsDrawer({
 
               <TabsContent value="other" className="space-y-3">
                 <ItemOtherDetailsForm control={form.control} />
-              </TabsContent> */}
+              </TabsContent>
             </Tabs>
 
             <div className="flex justify-end gap-2 pt-4 border-t">

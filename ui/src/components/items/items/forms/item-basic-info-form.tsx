@@ -10,6 +10,7 @@ interface ItemBasicInfoFormProps {
 
 export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
   const itemTypeOptions = [
+    { label: "Select item type", value: "-1" },
     { label: "FG - Finished Goods", value: "FG" },
     { label: "RM - Raw Material", value: "RM" },
     { label: "PM - Packing Material", value: "PM" },
@@ -17,6 +18,7 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
   ];
 
   const subTypeOptions = [
+    { label: "Select sub type", value: "-1" },
     { label: "FG-CAPSULE", value: "FG-CAPSULE" },
     { label: "FG-TABLET", value: "FG-TABLET" },
     { label: "FG-SYRUP", value: "FG-SYRUP" },
@@ -24,11 +26,13 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
   ];
 
   const gsIndOptions = [
+    { label: "Select GS Ind.", value: "-1" },
     { label: "G - Goods", value: "G" },
     { label: "S - Services", value: "S" },
   ];
 
   const uqcOptions = [
+    { label: "Select UQC", value: "-1" },
     { label: "KGS - Kilograms", value: "KGS" },
     { label: "NOS - Numbers", value: "NOS" },
     { label: "LTR - Liters", value: "LTR" },
@@ -42,7 +46,7 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Item Identification</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-2">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <FormSelect
               control={control}
@@ -104,7 +108,7 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">HSN & UQC Details</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-2">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <FormInput
               control={control}
@@ -149,8 +153,8 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Item Properties</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <CardContent className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <FormSwitch
               control={control}
               name="goods"
@@ -161,9 +165,7 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
               name="boughtOut"
               label="Bought-Out"
             />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+         
             <FormSwitch
               control={control}
               name="jobWork"
@@ -174,9 +176,7 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
               name="imported"
               label="Imported"
             />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        
             <FormSwitch
               control={control}
               name="manufactured"
@@ -196,8 +196,8 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Additional Details</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <CardContent className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <FormInput
               control={control}
               name="currentBuyer"
@@ -211,9 +211,7 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
               placeholder="0"
               inputProps={{ type: "number" }}
             />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          
             <FormInput
               control={control}
               name="desiredPackSize"
@@ -227,9 +225,6 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
               placeholder="100.00 %"
               inputProps={{ type: "number", step: "0.01" }}
             />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <FormInput
               control={control}
               name="drawingRef"

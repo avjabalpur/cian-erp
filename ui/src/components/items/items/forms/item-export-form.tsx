@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FormInput } from "@/components/shared/forms/form-input"
 import { FormSelect } from "@/components/shared/forms/form-select"
 import { FormTextarea } from "@/components/shared/forms/form-textarea"
-import { FormRadioGroup } from "@/components/shared/forms/form-radio-group"
+import { FormRadioGroup } from "@/components/shared/forms/form-radio-group";
 
 interface ItemExportFormProps {
   control: any;
@@ -10,7 +10,7 @@ interface ItemExportFormProps {
 
 export function ItemExportForm({ control }: ItemExportFormProps) {
   const exportProductGroupOptions = [
-    { label: "Select group", value: "" },
+    { label: "Select group", value: "-1" },
     { label: "GENERAL", value: "01" },
     { label: "SPECIAL", value: "02" },
   ];
@@ -28,7 +28,6 @@ export function ItemExportForm({ control }: ItemExportFormProps) {
             name="itemDescriptionForExports"
             label="Description"
             placeholder="Enter detailed description for exports"
-            rows={4}
           />
         </CardContent>
       </Card>
@@ -51,7 +50,6 @@ export function ItemExportForm({ control }: ItemExportFormProps) {
               name="exportProductGroupName"
               label="Group Name"
               placeholder="GENERAL"
-              readOnly
             />
           </div>
         </CardContent>
@@ -92,7 +90,6 @@ export function ItemExportForm({ control }: ItemExportFormProps) {
               name="depbRemarks"
               label="Remarks"
               placeholder="Enter DEPB remarks"
-              rows={3}
             />
           </div>
         </CardContent>
@@ -153,7 +150,6 @@ export function ItemExportForm({ control }: ItemExportFormProps) {
               name="dutyDrawbackRemarks"
               label="Remarks"
               placeholder="Enter duty drawback remarks"
-              rows={3}
             />
           </div>
         </CardContent>

@@ -9,7 +9,7 @@ interface ItemSalesFormProps {
 
 export function ItemSalesForm({ control }: ItemSalesFormProps) {
   const productTypeOptions = [
-    { label: "Select product type", value: "" },
+    { label: "Select product type", value: "-1" },
     { label: "Sale Pack", value: "Sale Pack" },
     { label: "Bulk", value: "Bulk" },
     { label: "Sample", value: "Sample" },

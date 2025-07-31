@@ -9,7 +9,7 @@ interface ItemOtherDetailsFormProps {
 
 export function ItemOtherDetailsForm({ control }: ItemOtherDetailsFormProps) {
   const colorOptions = [
-    { label: "Select color", value: "" },
+    { label: "Select color", value: "-1" },
     { label: "DRUG", value: "DRUG" },
     { label: "FOOD", value: "FOOD" },
     { label: "FOOD (NT)", value: "FOOD (NT)" },

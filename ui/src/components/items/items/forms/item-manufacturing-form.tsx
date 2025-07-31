@@ -14,7 +14,7 @@ export function ItemManufacturingForm({ control }: ItemManufacturingFormProps) {
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Quality & Standards</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <FormInput
               control={control}
@@ -73,7 +73,7 @@ export function ItemManufacturingForm({ control }: ItemManufacturingFormProps) {
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Manufacturing Details</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <FormInput
               control={control}
@@ -105,7 +105,7 @@ export function ItemManufacturingForm({ control }: ItemManufacturingFormProps) {
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Quality Control</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <FormSwitch
               control={control}
@@ -165,7 +165,7 @@ export function ItemManufacturingForm({ control }: ItemManufacturingFormProps) {
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Other Flags</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <FormSwitch
               control={control}
