@@ -390,7 +390,7 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
   return (
     <Card className={`${className} border-gray-200 shadow-sm`}>
       <CardHeader className="bg-white border-b border-gray-200 rounded-t-lg">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <CardTitle className="flex items-center gap-2 text-gray-800">
             <Filter className="h-5 w-5 text-gray-600" />
             Results
@@ -516,7 +516,7 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
                   {headerGroup.headers.map(header => (
                     <TableHead 
                       key={header.id} 
-                      className="relative px-4 py-3 text-left font-semibold text-gray-900 border-r border-gray-200 last:border-r-0 bg-gray-50 hover:bg-gray-100 transition-colors"
+                      className="relative px-3 py-2 text-left font-semibold text-gray-900 border-r border-gray-200 last:border-r-0 bg-gray-50 hover:bg-gray-100 transition-colors"
                     >
                       <div
                         className="flex items-center gap-2 cursor-pointer select-none"
@@ -651,7 +651,7 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
                 <TableRow>
                   <TableCell
                     colSpan={table.getAllColumns().length}
-                    className="h-24 text-center text-gray-500"
+                    className="h-16 text-center text-gray-500"
                   >
                     {isLoading ? (
                       <div className="flex items-center justify-center gap-2">
@@ -736,7 +736,7 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
                       {row.getVisibleCells().map((cell, index) => (
                         <TableCell 
                           key={cell.id}
-                          className="px-4 py-2 border-r border-gray-100 last:border-r-0 text-sm text-gray-900"
+                          className="px-3 py-1 border-r border-gray-100 last:border-r-0 text-sm text-gray-900"
                           style={
                             index === 0 && row.depth > 0 
                               ? { paddingLeft: `${(row.depth * 16) + 16}px` } 

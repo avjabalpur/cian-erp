@@ -21,7 +21,7 @@ namespace Xcianify.Repository
         public async Task<LocationType> GetByIdAsync(int id)
         {
             var query = $@"
-                SELECT * FROM {TableName}
+                SELECT id, code, name, is_active as isActive, created_at as createdAt, updated_at as updatedAt, created_by as createdBy, updated_by as updatedBy FROM {TableName}
                 WHERE id = @Id";
 
             using var connection = _dbContext.GetConnection();
@@ -31,7 +31,7 @@ namespace Xcianify.Repository
         public async Task<IEnumerable<LocationType>> GetAllAsync()
         {
             var query = $@"
-                SELECT * FROM {TableName}
+                SELECT id, code, name, is_active as isActive, created_at as createdAt, updated_at as updatedAt, created_by as createdBy, updated_by as updatedBy FROM {TableName}
                 ORDER BY name";
 
             using var connection = _dbContext.GetConnection();

@@ -6,12 +6,13 @@ import { Plus } from "lucide-react"
 import { useOrganizations } from "@/hooks/use-organizations"
 import { OrganizationDrawer } from "./organization-drawer"
 import OrganizationTable from "./organization-table"
+import { Organization } from "@/types/organization"
 
 export default function OrganizationsManagement() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedOrganization, setSelectedOrganization] = useState<any | null>(null)
 
-  const { data: organizations = [], isLoading } = useOrganizations()
+  const { data: organizations = { items: [], totalCount: 0, pageCount: 0 }, isLoading } = useOrganizations()
 
   const handleEdit = (organization: any) => {
     setSelectedOrganization(organization)
@@ -35,7 +36,7 @@ export default function OrganizationsManagement() {
         </Button>
       </div>
       <OrganizationTable
-        organizations={organizations}
+        organizations={organizations.items}
         onEdit={handleEdit}
         isLoading={isLoading}
       />

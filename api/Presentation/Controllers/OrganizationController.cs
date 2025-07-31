@@ -55,7 +55,6 @@ namespace Xcianify.Presentation.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<OrganizationDto>> Create([FromBody] CreateOrganizationDto dto)
         {
             var createdOrganization = await _organizationService.CreateOrganizationAsync(dto);
@@ -63,7 +62,6 @@ namespace Xcianify.Presentation.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateOrganizationDto dto)
         {
             if (id != dto.Id)
@@ -76,7 +74,6 @@ namespace Xcianify.Presentation.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             await _organizationService.DeleteOrganizationAsync(id);

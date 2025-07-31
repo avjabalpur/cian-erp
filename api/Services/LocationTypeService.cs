@@ -56,7 +56,7 @@ namespace Xcianify.Services
 
         public async Task UpdateLocationTypeAsync(UpdateLocationTypeDto dto)
         {
-            var existingLocationType = await _locationTypeRepository.GetByIdAsync(dto.Id);
+            var existingLocationType = await _locationTypeRepository.GetByIdAsync(dto.Id.Value);
             if (existingLocationType == null)
             {
                 throw new KeyNotFoundException($"Location type with ID {dto.Id} not found.");

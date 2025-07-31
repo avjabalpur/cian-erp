@@ -28,15 +28,14 @@ namespace Xcianify.Services
 
         public async Task<PaginatedOrganizationResultDto> GetOrganizationsAsync(OrganizationFilterDto filter)
         {
-            var organizations = await _organizationRepository.GetAllAsync(filter);
-            var totalCount = await _organizationRepository.GetCountAsync(filter);
+            var (items, totalCount) = await _organizationRepository.GetAllAsync(filter);
 
             return new PaginatedOrganizationResultDto
             {
-                Items = _mapper.Map<List<OrganizationDto>>(organizations),
+                Items = _mapper.Map<List<OrganizationDto>>(items),
                 TotalCount = totalCount,
                 PageNumber = filter.PageNumber,
-                PageSize = filter.PageSize
+                PageSize = filter.PageSize,
             };
         }
 
@@ -76,8 +75,6 @@ namespace Xcianify.Services
             }
 
             var organization = _mapper.Map<Organization>(dto);
-            organization.CreatedAt = DateTime.UtcNow;
-            organization.UpdatedAt = DateTime.UtcNow;
             
             var createdOrganization = await _organizationRepository.CreateAsync(organization);
             return _mapper.Map<OrganizationDto>(createdOrganization);
@@ -108,7 +105,6 @@ namespace Xcianify.Services
             }
 
             var organization = _mapper.Map<Organization>(dto);
-            organization.UpdatedAt = DateTime.UtcNow;
             
             await _organizationRepository.UpdateAsync(organization);
         }

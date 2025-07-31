@@ -2,12 +2,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FormInput } from "@/components/shared/forms/form-input"
 import { FormSelect } from "@/components/shared/forms/form-select"
 import { FormSwitch } from "@/components/shared/forms/form-switch"
+import { useLocationTypes } from "@/hooks/use-location-types"
 
 interface OrganizationInformationFormProps {
   control: any;
 }
 
 export function OrganizationInformationForm({ control }: OrganizationInformationFormProps) {
+  const { data: locationTypes = [], isLoading: locationTypesLoading } = useLocationTypes()
+
+  // Transform location types for the select options
+  const locationTypeOptions = locationTypes.map(lt => ({
+    value: lt.id.toString(),
+    label: lt.name
+  }))
+
   return (
     <div className="space-y-6">
       {/* Basic Information */}
@@ -22,7 +31,7 @@ export function OrganizationInformationForm({ control }: OrganizationInformation
               name="code"
               label="Organization Code"
               placeholder="Enter organization code"
-              inputProps={{ type: "text", autoComplete: "off", maxLength: 20 }}
+              inputProps={{ type: "text", autoComplete: "off", maxLength: 10 }}
               required
             />
             <FormInput
@@ -37,13 +46,9 @@ export function OrganizationInformationForm({ control }: OrganizationInformation
               control={control}
               name="locationTypeId"
               label="Location Type"
-              options={[
-                { value: "1", label: 'Head Office' },
-                { value: "2", label: 'Branch Office' },
-                { value: "3", label: 'Warehouse' },
-                { value: "4", label: 'Factory' },
-              ]}
-              placeholder="Select location type"
+              options={locationTypeOptions}
+              placeholder={locationTypesLoading ? "Loading..." : "Select location type"}
+              disabled={locationTypesLoading}
             />
             <FormInput
               control={control}
@@ -68,21 +73,21 @@ export function OrganizationInformationForm({ control }: OrganizationInformation
               name="email"
               label="Email"
               placeholder="Enter email address"
-              inputProps={{ type: "email", autoComplete: "email" }}
+              inputProps={{ type: "email", autoComplete: "email", maxLength: 100 }}
             />
             <FormInput
               control={control}
               name="phone"
               label="Phone"
               placeholder="Enter phone number"
-              inputProps={{ type: "tel", autoComplete: "tel" }}
+              inputProps={{ type: "tel", autoComplete: "tel", maxLength: 15 }}
             />
             <FormInput
               control={control}
               name="website"
               label="Website"
               placeholder="Enter website URL"
-              inputProps={{ type: "url", autoComplete: "url" }}
+              inputProps={{ type: "url", autoComplete: "url", maxLength: 100 }}
             />
           </div>
         </CardContent>
@@ -100,14 +105,14 @@ export function OrganizationInformationForm({ control }: OrganizationInformation
               name="address1"
               label="Address Line 1"
               placeholder="Enter address line 1"
-              inputProps={{ type: "text", autoComplete: "address-line1" }}
+              inputProps={{ type: "text", autoComplete: "address-line1", maxLength: 100 }}
             />
             <FormInput
               control={control}
               name="address2"
               label="Address Line 2"
               placeholder="Enter address line 2"
-              inputProps={{ type: "text", autoComplete: "address-line2" }}
+              inputProps={{ type: "text", autoComplete: "address-line2", maxLength: 100 }}
             />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormInput
@@ -115,21 +120,21 @@ export function OrganizationInformationForm({ control }: OrganizationInformation
                 name="city"
                 label="City"
                 placeholder="Enter city"
-                inputProps={{ type: "text", autoComplete: "address-level2" }}
+                inputProps={{ type: "text", autoComplete: "address-level2", maxLength: 50 }}
               />
               <FormInput
                 control={control}
                 name="state"
                 label="State"
                 placeholder="Enter state"
-                inputProps={{ type: "text", autoComplete: "address-level1" }}
+                inputProps={{ type: "text", autoComplete: "address-level1", maxLength: 50 }}
               />
               <FormInput
                 control={control}
                 name="zip"
                 label="ZIP Code"
                 placeholder="Enter ZIP code"
-                inputProps={{ type: "text", autoComplete: "postal-code" }}
+                inputProps={{ type: "text", autoComplete: "postal-code", maxLength: 10 }}
               />
             </div>
             <FormInput
@@ -137,7 +142,7 @@ export function OrganizationInformationForm({ control }: OrganizationInformation
               name="country"
               label="Country"
               placeholder="Enter country"
-              inputProps={{ type: "text", autoComplete: "country-name" }}
+              inputProps={{ type: "text", autoComplete: "country-name", maxLength: 50 }}
             />
           </div>
         </CardContent>
@@ -155,7 +160,7 @@ export function OrganizationInformationForm({ control }: OrganizationInformation
               name="gstinNumber"
               label="GSTIN Number"
               placeholder="Enter GSTIN number"
-              inputProps={{ type: "text", autoComplete: "off", maxLength: 15 }}
+              inputProps={{ type: "text", autoComplete: "off", maxLength: 50 }}
             />
             <FormInput
               control={control}
@@ -163,6 +168,59 @@ export function OrganizationInformationForm({ control }: OrganizationInformation
               label="PAN Number"
               placeholder="Enter PAN number"
               inputProps={{ type: "text", autoComplete: "off", maxLength: 10 }}
+            />
+            <FormInput
+              control={control}
+              name="tdsCycle"
+              label="TDS Cycle"
+              placeholder="Enter TDS cycle"
+              inputProps={{ type: "text", autoComplete: "off", maxLength: 50 }}
+            />
+            <FormInput
+              control={control}
+              name="vatTinNumber"
+              label="VAT/TIN Number"
+              placeholder="Enter VAT/TIN number"
+              inputProps={{ type: "text", autoComplete: "off", maxLength: 50 }}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Additional Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Additional Information</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormInput
+              control={control}
+              name="employmentStatusCode"
+              label="Employment Status Code"
+              placeholder="Enter employment status code"
+              inputProps={{ type: "text", autoComplete: "off", maxLength: 50 }}
+            />
+            <FormInput
+              control={control}
+              name="esiOfficeCode"
+              label="ESI Office Code"
+              placeholder="Enter ESI office code"
+              inputProps={{ type: "text", autoComplete: "off", maxLength: 50 }}
+            />
+            <FormInput
+              control={control}
+              name="cinNumber"
+              label="CIN Number"
+              placeholder="Enter CIN number"
+              inputProps={{ type: "text", autoComplete: "off", maxLength: 50 }}
+            />
+            <FormInput
+              control={control}
+              name="licenseNumber"
+              label="License Number"
+              placeholder="Enter license number"
+              inputProps={{ type: "text", autoComplete: "off", maxLength: 50 }}
             />
           </div>
         </CardContent>

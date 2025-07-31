@@ -32,7 +32,6 @@ namespace Xcianify.Presentation.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<LocationTypeDto>> Create([FromBody] CreateLocationTypeDto dto)
         {
             var createdLocationType = await _locationTypeService.CreateLocationTypeAsync(dto);
@@ -40,20 +39,14 @@ namespace Xcianify.Presentation.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateLocationTypeDto dto)
         {
-            if (id != dto.Id)
-            {
-                return BadRequest("ID in the URL does not match the ID in the request body.");
-            }
-
+            dto.Id = id;
             await _locationTypeService.UpdateLocationTypeAsync(dto);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             await _locationTypeService.DeleteLocationTypeAsync(id);

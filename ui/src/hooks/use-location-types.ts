@@ -5,30 +5,29 @@ import { LocationType, CreateLocationTypeData, UpdateLocationTypeData } from '..
 // --- API Functions ---
 
 const getLocationTypes = async (): Promise<LocationType[]> => {
-  const { data } = await api.get('/LocationType');
+  const { data } = await api.get('/location-types');
   return data;
 };
 
 const getLocationTypeById = async (id: number): Promise<LocationType | null> => {
   if (!id) return null;
-  const { data } = await api.get(`/LocationType/${id}`);
+  const { data } = await api.get(`/location-types/${id}`);
   return data;
 };
 
 const createLocationType = async (locationTypeData: CreateLocationTypeData): Promise<LocationType> => {
-  const { data } = await api.post('/LocationType', locationTypeData);
+  const { data } = await api.post('/location-types', locationTypeData);
   return data;
 };
 
-const updateLocationType = async ({ id, ...locationTypeData }: { id: number; data: UpdateLocationTypeData }): Promise<LocationType> => {
-  const { data } = await api.put(`/LocationType/${id}`, locationTypeData.data);
+const updateLocationType = async ({ id, data: locationTypeData }: { id: number; data: UpdateLocationTypeData }): Promise<LocationType> => {
+  const { data } = await api.put(`/location-types/${id}`, locationTypeData);
   return data;
 };
 
 const deleteLocationType = async (id: number): Promise<void> => {
-  await api.delete(`/LocationType/${id}`);
+  await api.delete(`/location-types/${id}`);
 };
-
 
 // --- Custom Hooks ---
 
