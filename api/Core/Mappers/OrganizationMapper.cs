@@ -1,4 +1,6 @@
 using AutoMapper;
+using Core.DTOs.Organization;
+using Core.Model;
 using Xcianify.Core.DTOs.Organization;
 using Xcianify.Core.Model;
 

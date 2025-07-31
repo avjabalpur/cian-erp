@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { Edit, Trash2 } from "lucide-react";
-import { Column } from "@/types/common";
+import { Column } from "@/components/shared/advanced-table/types";
 import { formatDate } from "@/lib/date-utils";
 import AdvancedTable from "../../shared/advanced-table";
 import { ItemType } from "@/types/item";
@@ -40,12 +40,12 @@ export default function ItemTypesTable({
 }: ItemTypesTableProps) {
 
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'code', data_type: 'string', description: 'Code' },
-    { name: 'name', data_type: 'string', description: 'Name' },
-    { name: 'description', data_type: 'string', description: 'Description' },
-    { name: 'parentTypeId', data_type: 'number', description: 'Parent Type ID' },
-    { name: 'isActive', data_type: 'boolean', description: 'Active' },
-    { name: 'createdAt', data_type: 'date', description: 'Created At' },
+    { name: 'code', data_type: 'string', displayName: 'Code' },
+    { name: 'name', data_type: 'string', displayName: 'Name' },
+    { name: 'description', data_type: 'string', displayName: 'Description' },
+    { name: 'parentTypeId', data_type: 'number', displayName: 'Parent Type ID' },
+    { name: 'isActive', data_type: 'boolean', displayName: 'Active' },
+    { name: 'createdAt', data_type: 'date', displayName: 'Created At' },
   ], []);
   
   const defaultColumns = [

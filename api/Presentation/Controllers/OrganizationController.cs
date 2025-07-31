@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Xcianify.Core.DTOs.Organization;
 using Xcianify.Core.Domain.Services;
+using Core.DTOs.Organization;
 
 namespace Xcianify.Presentation.Controllers
 {
@@ -20,7 +21,7 @@ namespace Xcianify.Presentation.Controllers
         public async Task<ActionResult<PaginatedOrganizationResultDto>> GetAll(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
-            [FromQuery] string searchTerm = null,
+            [FromQuery] string search = null,
             [FromQuery] bool? isActive = null,
             [FromQuery] int? locationTypeId = null,
             [FromQuery] string sortBy = null,
@@ -30,7 +31,7 @@ namespace Xcianify.Presentation.Controllers
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                SearchTerm = searchTerm,
+                Search = search,
                 IsActive = isActive,
                 LocationTypeId = locationTypeId
             };

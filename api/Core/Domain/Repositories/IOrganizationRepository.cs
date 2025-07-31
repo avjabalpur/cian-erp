@@ -1,3 +1,5 @@
+using Core.DTOs.Organization;
+using Core.Model;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xcianify.Core.DTOs.Organization;

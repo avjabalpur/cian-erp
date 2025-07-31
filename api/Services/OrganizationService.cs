@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using AutoMapper;
+using Core.DTOs.Organization;
+using Core.Model;
 using Xcianify.Core.Domain.Repositories;
 using Xcianify.Core.Domain.Services;
 using Xcianify.Core.DTOs.Organization;

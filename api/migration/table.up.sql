@@ -27,6 +27,75 @@ CREATE TABLE IF NOT EXISTS config_list_values (
     CONSTRAINT unique_list_value UNIQUE (list_id, value_code)
 );
 
+CREATE TABLE IF NOT EXISTS config_settings (
+    id SERIAL PRIMARY KEY,
+    setting_key VARCHAR(100) UNIQUE NOT NULL,
+    setting_name VARCHAR(150) NOT NULL,
+    description TEXT,
+    string_value TEXT,
+    integer_value BIGINT,
+    boolean_value BOOLEAN,
+    decimal_value NUMERIC(15,4),
+    default_value TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by INTEGER,
+    updated_by INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS location_type (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(10) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by INTEGER,
+    updated_by INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS organizations (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(10) UNIQUE NOT NULL,
+    location_type_id INTEGER NOT NULL REFERENCES location_type(id),
+    name VARCHAR(100) NOT NULL,
+    contact_person VARCHAR(100),
+    address1 VARCHAR(100),
+    address2 VARCHAR(100),
+    city VARCHAR(50),
+    state VARCHAR(50),
+    country VARCHAR(50),
+    zip VARCHAR(10),
+    phone VARCHAR(15),
+    email VARCHAR(100),
+    website VARCHAR(100),
+    gstin_number VARCHAR(50),
+    tds_cycle VARCHAR(50),
+    employment_status_code Varchar(50),
+    esi_office_code VARCHAR(50),
+    exc_regin_code VARCHAR(50),
+    st_regn_code VARCHAR(50),
+    cin_number VARCHAR(50),
+    interface_code VARCHAR(50),  
+    license_number VARCHAR(50),
+    ecc_number VARCHAR(50),
+    range VARCHAR(50),
+    division VARCHAR(50),
+    collectorate VARCHAR(50),
+    drug_license_number1 VARCHAR(50),
+    drug_license_number2 VARCHAR(50),
+    food_license_number VARCHAR(50),
+    cst_regn_number VARCHAR(50),
+    vat_tin_number VARCHAR(50),
+    pan_number VARCHAR(10),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by INTEGER,
+    updated_by INTEGER
+);
+
 CREATE TABLE IF NOT EXISTS users (
   srno SERIAL PRIMARY KEY,
   username varchar(50) ,
@@ -36,7 +105,7 @@ CREATE TABLE IF NOT EXISTS users (
   depthead varchar(30) ,
   dept varchar(45),
   loccd varchar(45)
-) ;
+);
 
 CREATE TABLE IF NOT EXISTS sales_orders (
   id SERIAL PRIMARY KEY,
@@ -164,7 +233,7 @@ CREATE TABLE IF NOT EXISTS sales_order_performa_invoice (
   created_by INTEGER,
   is_deleted INTEGER DEFAULT 0,
   exporter_name VARCHAR(200),
-  organization_name VARCHAR(200),
+  organization_id INTEGER,
   consignee_name VARCHAR(400),
   consignee_contact_details VARCHAR(400),
   consignee_address TEXT,

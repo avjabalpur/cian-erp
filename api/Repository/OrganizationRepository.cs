@@ -1,6 +1,7 @@
+using Core.DTOs.Organization;
+using Core.Model;
 using Dapper;
 using Xcianify.Core.Domain.Repositories;
-using Xcianify.Core.DTOs.Organization;
 using Xcianify.Core.Model;
 using Xcianify.Repository.DbContext;
 
@@ -88,7 +89,7 @@ namespace Xcianify.Repository
                 },
                 new 
                 { 
-                    SearchTerm = $"%{filter.SearchTerm}%",
+                    SearchTerm = $"%{filter.Search}%",
                     IsActive = filter.IsActive,
                     LocationTypeId = filter.LocationTypeId,
                     PageSize = filter.PageSize,
@@ -109,7 +110,7 @@ namespace Xcianify.Repository
             using var connection = _dbContext.GetConnection();
             return await connection.ExecuteScalarAsync<int>(query, new 
             { 
-                SearchTerm = $"%{filter.SearchTerm}%",
+                SearchTerm = $"%{filter.Search}%",
                 IsActive = filter.IsActive,
                 LocationTypeId = filter.LocationTypeId
             });
@@ -185,7 +186,7 @@ namespace Xcianify.Repository
         {
             var conditions = new List<string>();
             
-            if (!string.IsNullOrEmpty(filter.SearchTerm))
+            if (!string.IsNullOrEmpty(filter.Search))
             {
                 conditions.Add("(o.name ILIKE @SearchTerm OR o.code ILIKE @SearchTerm OR o.contact_person ILIKE @SearchTerm OR o.email ILIKE @SearchTerm)");
             }

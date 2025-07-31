@@ -11,17 +11,18 @@ import {
 } from '@tanstack/react-table';
 import { exportToCSV } from './export-utils';
 import { getColumnTypeFromDataType, guessColumnTypeFromValue, FilterType } from './column-utils';
-import { Column as ColumnMeta } from './types';
+import { Column as ColumnMeta, CellRenderer } from './types';
 import { DragDropGrouping } from './drag-drop-grouping';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { DebouncedInput } from '@/components/shared/debounced-input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ChevronUp, ChevronDown, ChevronRight, Download, Search, Filter, Layers, Columns, Maximize2, Minimize2 } from 'lucide-react';
-import { DebouncedInput } from '../debounced-input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ChevronUp, ChevronDown, ChevronRight, Download, Search, Filter, Layers, Columns, Maximize2, Minimize2, Trash2, Mail } from 'lucide-react';
 
 interface TanstackTableWrapperProps {
   data: any[];
@@ -37,6 +38,16 @@ interface TanstackTableWrapperProps {
     onEdit?: (row: any) => void;
     onDelete?: (row: any) => void;
     onView?: (row: any) => void;
+  };
+  // Multiple selection props
+  enableRowSelection?: boolean;
+  selectedRows?: string[];
+  onSelectionChange?: (selectedIds: string[]) => void;
+  rowIdField?: string;
+  // Bulk actions
+  bulkActions?: {
+    onBulkEmail?: (selectedRows: any[]) => void;
+    onBulkDelete?: (selectedIds: string[]) => void;
   };
   // Server-side pagination props
   pageCount?: number;
@@ -64,6 +75,13 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
   className = '',
   onRowClick,
   actionButtons,
+  // Multiple selection props
+  enableRowSelection = false,
+  selectedRows: externalSelectedRows,
+  onSelectionChange,
+  rowIdField = 'id',
+  // Bulk actions
+  bulkActions,
   // Server-side pagination props
   pageCount,
   pageSize: externalPageSize,
@@ -87,6 +105,7 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
     pageIndex: externalPageIndex ?? 0,
     pageSize: externalPageSize ?? 20,
   });
+  const [selected, setSelected] = useState<string[]>([]);
 
   // Update internal pagination when external props change
   useEffect(() => {
@@ -98,34 +117,102 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
     }
   }, [externalPageIndex, externalPageSize, manualPagination]);
 
+  // Update internal selection when external props change
+  useEffect(() => {
+    if (externalSelectedRows !== undefined) {
+      setSelected(externalSelectedRows);
+    }
+  }, [externalSelectedRows]);
+
   // Determine column types using metadata or data
   const tableColumns = useMemo(() => {
     if (!data || data.length === 0) return [];
     const keys = columns || Object.keys(data[0]);
-    const dataColumns = keys.map((key) => {
+    
+    // Add selection column if enabled
+    const allColumns = enableRowSelection ? ['selection', ...keys] : keys;
+    
+    const dataColumns = allColumns.map((key) => {
+      // Handle selection column
+      if (key === 'selection') {
+        return {
+          accessorKey: 'selection',
+          header: () => (
+            <Checkbox
+              className="w-4 h-4 pr-1.5"
+              checked={selected.length > 0 && selected.length === data.length}
+              onCheckedChange={(checked) => {
+                const allIds = data.map(row => row[rowIdField]);
+                setSelected(checked ? allIds : []);
+                if (onSelectionChange) {
+                  onSelectionChange(checked ? allIds : []);
+                }
+              }}
+              disabled={isLoading}
+            />
+          ),
+          description: 'Row selection',
+          meta: { type: 'unknown' as FilterType },
+          enableSorting: false,
+          enableColumnFilter: false,
+          enableGrouping: false,
+          cell: (info: any) => {
+            const row = info.row.original;
+            return (
+              <Checkbox
+                checked={selected.includes(row[rowIdField])}
+                onCheckedChange={(checked) => {
+                  const newSelected = checked
+                    ? [...selected, row[rowIdField]]
+                    : selected.filter(id => id !== row[rowIdField]);
+                  setSelected(newSelected);
+                  if (onSelectionChange) {
+                    onSelectionChange(newSelected);
+                  }
+                }}
+                disabled={isLoading}
+              />
+            );
+          },
+        };
+      }
+
       let type: FilterType = 'string';
       let description = '';
+      let customRenderer: CellRenderer | undefined;
+      let displayName: string | undefined;
+      
       if (columnMeta) {
         const meta = columnMeta.find((c) => c.name === key);
         if (meta) {
           type = getColumnTypeFromDataType(meta.data_type);
           description = meta.description || '';
+          customRenderer = meta.render;
+          displayName = meta.displayName;
         }
       } else {
         // Guess type from first value
         type = guessColumnTypeFromValue(data[0][key]);
       }
+      
       return {
         accessorKey: key,
-        header: key,
-        description,
-        meta: { type: type as FilterType },
-        enableSorting: true,
-        enableColumnFilter: true,
-        enableGrouping: groupingEnabled,
+        header: displayName || key,
+         description,
+         meta: { type: type as FilterType },
+         enableSorting: true,
+         enableColumnFilter: true,
+         enableGrouping: groupingEnabled,
         cell: (info: any) => {
-          // Advanced cell rendering: render booleans as check, dates as readable, etc.
           const value = info.getValue();
+          const row = info.row.original;
+          
+          // Use custom renderer if available
+          if (customRenderer) {
+            return customRenderer(value, row);
+          }
+          
+          // Default rendering based on type
           if (type === 'boolean') return value ? '✔️' : '';
           if (type === 'date') return value ? new Date(value).toLocaleString() : '';
           if (typeof value === 'object' && value !== null) return JSON.stringify(value);
@@ -154,8 +241,8 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
       };
     });
 
-    // Add action buttons column if provided
-    if (actionButtons && (actionButtons.onEdit || actionButtons.onDelete || actionButtons.onView)) {
+    // Add action buttons column if provided (but exclude delete for individual rows when bulk delete is enabled)
+    if (actionButtons && (actionButtons.onEdit || actionButtons.onView || actionButtons.onDelete)) {
       dataColumns.push({
         accessorKey: 'actions',
         header: 'Actions',
@@ -209,7 +296,7 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
     }
 
     return dataColumns;
-  }, [data, columns, columnMeta, groupingEnabled, actionButtons]);
+  }, [data, columns, columnMeta, groupingEnabled, actionButtons, enableRowSelection, selected, onSelectionChange, rowIdField, isLoading]);
 
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({});
 
@@ -217,18 +304,20 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
   useEffect(() => {
     if (data && data.length > 0) {
       const keys = columns || Object.keys(data[0]);
-      const initialVisibility = Object.fromEntries(keys.map(k => [k, true]));
+      // Add selection column to visibility if row selection is enabled
+      const allKeys = enableRowSelection ? ['selection', ...keys] : keys;
+      const initialVisibility = Object.fromEntries(allKeys.map(k => [k, true]));
       setColumnVisibility(prev => {
         // Only update if the keys have actually changed
         const prevKeys = Object.keys(prev);
-        const newKeys = keys;
+        const newKeys = allKeys;
         if (prevKeys.length !== newKeys.length || !prevKeys.every(key => newKeys.includes(key))) {
           return initialVisibility;
         }
         return prev;
       });
     }
-  }, [data, columns]);
+  }, [data, columns, enableRowSelection]);
 
   // Prepare columns for drag and drop component
   const dragDropColumns = useMemo(() => {
@@ -304,13 +393,46 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <CardTitle className="flex items-center gap-2 text-gray-800">
             <Filter className="h-5 w-5 text-gray-600" />
-            Query Results
+            Results
             <Badge variant="secondary" className="bg-gray-100 text-gray-600">
               {table.getFilteredRowModel().rows.length} rows
             </Badge>
           </CardTitle>
 
           <div className="flex flex-wrap items-center gap-2">
+            {/* Bulk Action Buttons */}
+            {bulkActions && selected.length > 0 && (
+              <div className="flex items-center gap-2 mr-4">
+                {bulkActions.onBulkEmail && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const selectedData = data.filter(row => selected.includes(row[rowIdField]))
+                      bulkActions.onBulkEmail!(selectedData)
+                    }}
+                    disabled={isLoading}
+                    className="bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700"
+                  >
+                    <Mail className="h-4 w-4 mr-2" />
+                    Email ({selected.length})
+                  </Button>
+                )}
+                {bulkActions.onBulkDelete && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => bulkActions.onBulkDelete!(selected)}
+                    disabled={isLoading}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete ({selected.length})
+                  </Button>
+                )}
+              </div>
+            )}
+
             {globalFilterEnabled && (
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -376,7 +498,7 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
 
       {/* Drag and Drop Grouping */}
       {dragDropGroupingEnabled && groupingEnabled && (
-        <CardContent className="pt-4">
+        <CardContent className="pt-0">
           <DragDropGrouping
             availableColumns={dragDropColumns}
             groupedColumns={grouping}
@@ -406,7 +528,7 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
                         {header.column.getIsSorted() === 'asc' && <ChevronUp className="h-4 w-4 text-blue-600" />}
                         {header.column.getIsSorted() === 'desc' && <ChevronDown className="h-4 w-4 text-blue-600" />}
                       </div>
-                      {header.column.getCanFilter() && (() => {
+                      {/* {header.column.getCanFilter() && (() => {
                         const type: FilterType = (header.column.columnDef.meta && (header.column.columnDef.meta as { type?: FilterType }).type) || 'string';
                         const filterVal = header.column.getFilterValue();
 
@@ -517,7 +639,7 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
                             delay={500}
                           />
                         );
-                      })()}
+                      })()} */}
 
                     </TableHead>
                   ))}

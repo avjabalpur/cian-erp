@@ -96,6 +96,20 @@ const allMenuItems: MenuItem[] = [
         icon: Building2,
         roles: ["SUPER_ADMIN", "ADMIN"],
       },
+      {
+        id: "locations",
+        label: "Locations",
+        href: "/locations",
+        icon: Building2,
+        roles: ["SUPER_ADMIN", "ADMIN"],
+      },
+      {
+        id: "organizations",
+        label: "Organizations",
+        href: "/organizations",
+        icon: Building2,
+        roles: ["SUPER_ADMIN", "ADMIN"],
+      },
     ],
   },
   {

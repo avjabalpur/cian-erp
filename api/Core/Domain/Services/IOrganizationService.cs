@@ -1,3 +1,4 @@
+using Core.DTOs.Organization;
 using System.Threading.Tasks;
 using Xcianify.Core.DTOs.Organization;
 

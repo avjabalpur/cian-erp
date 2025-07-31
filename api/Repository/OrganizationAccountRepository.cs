@@ -1,3 +1,4 @@
+using Core.Model;
 using Dapper;
 using Xcianify.Core.Domain.Repositories;
 using Xcianify.Core.Model;
