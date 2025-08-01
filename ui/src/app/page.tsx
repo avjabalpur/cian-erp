@@ -9,29 +9,30 @@ export default function HomePage() {
   useEffect(() => {
     if (isLoading) return;
     if (user) {
-      const primaryRole = user.roles[0]
-      switch (primaryRole) {
-        case "SUPER_ADMIN":
-        case "ADMIN":
-          redirect("/auth/admin")
-        case "SALES_MANAGER":
-        case "SALES_EXECUTIVE":
-          redirect("/auth/sales")
-        case "PURCHASE_MANAGER":
-        case "PURCHASE_EXECUTIVE":
-          redirect("/auth/purchase")
-        case "INVENTORY_MANAGER":
-        case "INVENTORY_EXECUTIVE":
-          redirect("/auth/inventory")
-        case "QUALITY_MANAGER":
-        case "QUALITY_EXECUTIVE":
-          redirect("/auth/quality")
-        case "ACCOUNTS_MANAGER":
-        case "ACCOUNTS_EXECUTIVE":
-          redirect("/auth/accounts")
-        default:
-          redirect("/auth/dashboard")
-      }
+      const primaryRole = user?.roles?.[0] || "SUPER_ADMIN"
+      // switch (primaryRole) {
+      //   case "SUPER_ADMIN":
+      //   case "ADMIN":
+      //     redirect("/dashboard")
+      //   case "SALES_MANAGER":
+      //   case "SALES_EXECUTIVE":
+      //     redirect("/dashboard")
+      //   case "PURCHASE_MANAGER":
+      //   case "PURCHASE_EXECUTIVE":
+      //     redirect("/dashboard")
+      //   case "INVENTORY_MANAGER":
+      //   case "INVENTORY_EXECUTIVE":
+      //     redirect("/dashboard")
+      //   case "QUALITY_MANAGER":
+      //   case "QUALITY_EXECUTIVE":
+      //     redirect("/dashboard")
+      //   case "ACCOUNTS_MANAGER":
+      //   case "ACCOUNTS_EXECUTIVE":
+      //     redirect("/dashboard")
+      //   default:
+      //     redirect("/dashboard")
+      // }
+      redirect("/dashboard")
     } else if (!isLoading) {
       redirect("/login")
     }

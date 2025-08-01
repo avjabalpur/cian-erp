@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 import api from '../lib/api';
+import { getLocalStorage, setLocalStorage, removeLocalStorage } from '../lib/storage';
 import { AuthResponse, LoginRequest, RegisterRequest, User } from '../types/auth';
 
 // --- API Functions ---
@@ -22,8 +23,8 @@ const getMe = async (): Promise<User> => {
 };
 
 const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('refershToken'); // Note: using 'refershToken' as per API response
+    removeLocalStorage('token');
+    removeLocalStorage('refershToken'); // Note: using 'refershToken' as per API response
 }
 
 // --- Custom Hooks ---
@@ -36,9 +37,9 @@ export const useLogin = () => {
     mutationFn: login,
     onSuccess: (data) => {
       if (data && data.token && data.refreshToken) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('refreshToken', data.refreshToken);
-        localStorage.setItem('user', JSON.stringify(data));
+        setLocalStorage('token', data.token);
+        setLocalStorage('refreshToken', data.refreshToken);
+        setLocalStorage('user', JSON.stringify(data));
 
         queryClient.invalidateQueries({ queryKey: ['me'] });
         
@@ -62,7 +63,7 @@ export const useMe = () => {
   return useQuery<User, Error>({
     queryKey: ['me'],
     queryFn: getMe,
-    enabled: !!localStorage.getItem('token'),
+    enabled: !!getLocalStorage('token'),
     retry: 1,
     staleTime: Infinity,
   });

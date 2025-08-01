@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { BASE_URL } from '../config';
+import { getLocalStorage, removeLocalStorage } from './storage';
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -8,7 +9,7 @@ const api = axios.create({
 // Add a request interceptor to include the token in headers
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = getLocalStorage('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -24,8 +25,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
+      removeLocalStorage('token');
+      removeLocalStorage('refreshToken');
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
       }

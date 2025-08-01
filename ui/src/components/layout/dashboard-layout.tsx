@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useLogout } from "@/hooks/use-auth"
 import { useMenu } from "@/hooks/use-menu"
+import { getLocalStorage } from "@/lib/storage"
 import { Sidebar } from "./sidebar"
 import { Header } from "./header"
 import { MobileSidebar } from "./mobile-sidebar"
@@ -24,7 +25,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
   const navigation = useMenu(user)
 
   useEffect(() => {
-    const userData = localStorage.getItem("user")
+    const userData = getLocalStorage("user")
     if (userData) {
       try {
         setUser(JSON.parse(userData))

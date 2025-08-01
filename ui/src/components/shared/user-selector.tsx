@@ -15,7 +15,7 @@ export function UserSelector({
   error,
 }: UserSelectorProps) {
   const { data: users, isLoading } = useUsers()
-  const usersData = users || []
+  const usersData = users?.items || []
   const options = usersData.map((user) => ({
     label: `${user.firstName} ${user.lastName}`,
     value: user.id.toString(),
