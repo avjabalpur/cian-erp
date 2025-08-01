@@ -9,6 +9,12 @@ const getPermissions = async (): Promise<Permission[]> => {
   return data;
 };
 
+const getPermissionById = async (id: number): Promise<Permission | null> => {
+  if (!id) return null;
+  const { data } = await api.get(`/permissions/${id}`);
+  return data;
+};
+
 const createPermission = async (permissionData: any): Promise<Permission> => {
   const { data } = await api.post('/permissions', permissionData);
   return data;
@@ -30,6 +36,14 @@ export const usePermissions = () => {
   return useQuery<Permission[], Error>({
     queryKey: ['permissions'],
     queryFn: getPermissions,
+  });
+};
+
+export const usePermissionById = (id: number) => {
+  return useQuery<Permission | null, Error>({
+    queryKey: ['permission', id],
+    queryFn: () => getPermissionById(id),
+    enabled: !!id,
   });
 };
 

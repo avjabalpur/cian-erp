@@ -40,13 +40,13 @@ export function PermissionTable({
 }: PermissionTableProps) {
   // Define column metadata for proper filtering and display
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'name', data_type: 'string', description: 'Role name' },
-    { name: 'moduleName', data_type: 'string', description: 'Module' },
-    { name: 'description', data_type: 'string', description: 'description' },
-    { name: 'actionType', data_type: 'string', description: 'Module' },
-    { name: 'isActive', data_type: 'boolean', description: 'Active status' },
-    { name: 'createdAt', data_type: 'date', description: 'Created date' },
-    { name: 'updatedAt', data_type: 'date', description: 'Updated date' },
+    { name: 'name', data_type: 'string', displayName: 'Permission name' },
+    { name: 'moduleName', data_type: 'string', displayName: 'Module' },
+    { name: 'description', data_type: 'string', displayName: 'description' },
+    { name: 'actionType', data_type: 'string', displayName: 'Module' },
+    { name: 'isActive', data_type: 'boolean', displayName: 'Active status' },
+    { name: 'createdAt', data_type: 'date', displayName: 'Created date' },
+    { name: 'updatedAt', data_type: 'date', displayName: 'Updated date' },
   ], [])
 
   // Define which columns to show by default
@@ -83,9 +83,9 @@ export function PermissionTable({
         columns={defaultColumns}
         columnMeta={columnMeta}
         isLoading={isLoading}
-        groupingEnabled={true}
-        globalFilterEnabled={true}
-        dragDropGroupingEnabled={true}
+        groupingEnabled={false}
+        globalFilterEnabled={false}
+        dragDropGroupingEnabled={false}
         onRowClick={onView}
         actionButtons={actionButtons}
         className="w-full"

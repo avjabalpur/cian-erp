@@ -39,8 +39,7 @@ export function UserDetailsDrawer({ isOpen, onClose, userId }: UserDrawerProps) 
     <RightDrawer
       isOpen={isOpen}
       onClose={onClose}
-      title={`User Details`}
-      description={`User Details`}
+      title={`${user.firstName} ${user.lastName}`}
       size="3xl"
     >
      <div className="lg:col-span-2 space-y-6">

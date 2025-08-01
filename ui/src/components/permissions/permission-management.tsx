@@ -7,11 +7,14 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { PermissionTable } from "./permission-table"
 import { PermissionDrawer } from "./permission-drawer"
+import { PermissionDetailsDrawer } from "./permission-details-drawer"
 import { toast } from "@/hooks/use-toast"
 
 export default function PermissionManagement() {
   const [openDrawer, setOpenDrawer] = useState(false)
+  const [openDetailsDrawer, setOpenDetailsDrawer] = useState(false)
   const [selectedPermission, setSelectedPermission] = useState<Permission | null>(null)
+  const [selectedPermissionId, setSelectedPermissionId] = useState<number | null>(null)
   const [pageIndex, setPageIndex] = useState(0)
   const [pageSize, setPageSize] = useState(10)
   const [globalFilter, setGlobalFilter] = useState('')
@@ -24,8 +27,8 @@ export default function PermissionManagement() {
   const { mutate: deletePermissionMution, isPending: isDeleting } = useDeletePermission();
 
   const handleView = (permission: Permission) => {
-    setSelectedPermission(permission)
-    setOpenDrawer(true)
+    setSelectedPermissionId(permission.id)
+    setOpenDetailsDrawer(true)
   }
 
   const handleEdit = (permission: Permission) => {
@@ -96,6 +99,11 @@ export default function PermissionManagement() {
         isOpen={openDrawer}
         onClose={() => { setOpenDrawer(false); setSelectedPermission(null); }}
         permission={selectedPermission}
+      />
+      <PermissionDetailsDrawer
+        isOpen={openDetailsDrawer}
+        onClose={() => { setOpenDetailsDrawer(false); setSelectedPermissionId(null); }}
+        permissionId={selectedPermissionId}
       />
     </div>
   )

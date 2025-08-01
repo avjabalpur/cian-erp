@@ -26,15 +26,11 @@ export function UserInfo({ user }: UserInfoProps) {
                 <h1 className="text-2xl font-bold">
                   {user.firstName} {user.lastName}
                 </h1>
-                <Badge variant={getStatusColor(user.status || '')}>{user.status}</Badge>
+                <Badge variant={getStatusColor(user.isActive)}>{user.isActive ? "Active" : "Inactive"}</Badge>
               </div>
               {user.username && <p className="text-muted-foreground">@{user.username}</p>}
             </div>
           </div>
-          <Button variant="outline" size="sm">
-            <Edit className="h-4 w-4 mr-2" />
-            Edit User
-          </Button>
         </div>
       </CardHeader>
       <CardContent>

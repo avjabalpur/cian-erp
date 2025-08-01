@@ -112,9 +112,9 @@ export function UserRoles({ userId }: UserRolesProps) {
               {assignedRoles.length > 0 ? (
                 assignedRoles.map((role: any) => (
                   <TableRow key={role.name}>
-                    <TableCell>{role.name}</TableCell>
-                    <TableCell>{role.description}</TableCell>
-                    <TableCell>
+                    <TableCell className="p-2">{role.name}</TableCell>
+                    <TableCell className="p-1">{role.description}</TableCell>
+                    <TableCell className="p-1">
                       <Button
                         variant="destructive"
                         size="sm"

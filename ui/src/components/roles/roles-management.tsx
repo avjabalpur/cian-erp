@@ -6,13 +6,16 @@ import { Role } from "@/types/role"
 import { useDeleteRole, useRoles } from "@/hooks/use-roles"
 import RolesTable from "./roles-table"
 import { RoleDrawer } from "./role-drawer"
+import { RoleDetailsDrawer } from "./role-details-drawer"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 
 export default function RolesManagement() {
   const [openRoleDrawer, setOpenRoleDrawer] = useState(false)
+  const [openRoleDetailsDrawer, setOpenRoleDetailsDrawer] = useState(false)
   const [role, setRole] = useState<Role | null>(null)
+  const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null)
   const { mutate: deleteRole, isPending: isDeleting } = useDeleteRole();
 
   const router = useRouter()
@@ -30,7 +33,8 @@ export default function RolesManagement() {
   const pageCount = roles?.length || 0
 
   const handleView = (role: Role) => {
-    router.push(`/roles/${role.id}`)
+    setSelectedRoleId(role.id)
+    setOpenRoleDetailsDrawer(true)
   }
 
   const handleEdit = (role: Role) => {
@@ -106,6 +110,11 @@ export default function RolesManagement() {
             onSortingChange={handleSortingChange}
           />
           <RoleDrawer isOpen={openRoleDrawer} onClose={() => { setOpenRoleDrawer(false); setRole(null); }} role={role} />
+          <RoleDetailsDrawer 
+            isOpen={openRoleDetailsDrawer} 
+            onClose={() => { setOpenRoleDetailsDrawer(false); setSelectedRoleId(null); }} 
+            roleId={selectedRoleId} 
+          />
     </div>
   )
 }

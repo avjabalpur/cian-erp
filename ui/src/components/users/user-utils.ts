@@ -1,15 +1,8 @@
-
-export const getStatusColor = (status: string) => {
-  switch (status.toLowerCase()) {
-    case "active":
+export const getStatusColor = (status: boolean) => {
+  switch (status) {
+    case true:
       return "default"
-    case "inactive":
-      return "secondary"
-    case "suspended":
-      return "destructive"
-    case "pending":
-      return "outline"
-    default:
+    case false:
       return "secondary"
   }
 }
