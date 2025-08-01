@@ -53,7 +53,7 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <FormSelect
               control={control}
-              name="itemType"
+              name="itemTypeId"
               label="Item Type"
               options={itemTypeOptions}
               required
@@ -103,109 +103,105 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
             />
             <FormInput
               control={control}
-              name="pharmacopeiaName"
-              label="Pharmacopeia Name"
-              placeholder="Enter pharmacopeia name"
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* HSN & UQC Details */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">HSN & UQC Details</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <FormInput
-              control={control}
-              name="hsn"
-              label="HSN"
-              placeholder="Enter HSN code"
-            />
-            <FormSelect
-              control={control}
-              name="uqc"
-              label="UQC"
-              options={uqcOptions}
-            />
-            <FormInput
-              control={control}
-              name="unitOfMeasure"
-              label="Unit of Measure"
-              placeholder="Enter unit"
+              name="revNo"
+              label="Revision No"
+              placeholder="Enter revision number"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <FormInput
               control={control}
-              name="issuingUnit"
-              label="Issuing Unit"
-              placeholder="Enter issuing unit"
+              name="pharmacopoeiaName"
+              label="Pharmacopoeia Name"
+              placeholder="Enter pharmacopoeia name"
             />
             <FormInput
               control={control}
-              name="convFactorUomIss"
-              label="Conv. Factor (UOM/Iss.UOM)"
-              placeholder="1.00000"
-              inputProps={{ type: "number", step: "0.00001" }}
+              name="drawingRef"
+              label="Drawing Reference"
+              placeholder="Enter drawing reference"
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* Item Properties */}
+      {/* Unit of Measure */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Item Properties</CardTitle>
+          <CardTitle className="text-lg">Unit of Measure</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <FormSwitch
+            <FormSelect
               control={control}
-              name="goods"
-              label="Goods"
+              name="unitOfMeasure"
+              label="Unit of Measure"
+              options={uqcOptions}
+            />
+            <FormSelect
+              control={control}
+              name="issuingUnit"
+              label="Issuing Unit"
+              options={uqcOptions}
             />
             <FormSwitch
               control={control}
-              name="boughtOut"
-              label="Bought-Out"
+              name="goodsType"
+              label="Goods Type"
             />
-         
-            <FormSwitch
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <FormInput
               control={control}
-              name="jobWork"
-              label="Job Work"
+              name="uomIssConvFactor"
+              label="UOM ISS Conversion Factor"
+              placeholder="Enter conversion factor"
+              inputProps={{ type: "number", step: "0.01" }}
             />
-            <FormSwitch
+            <FormInput
               control={control}
-              name="imported"
-              label="Imported"
-            />
-        
-            <FormSwitch
-              control={control}
-              name="manufactured"
-              label="Manufactured"
-            />
-            <FormSwitch
-              control={control}
-              name="taxCreditApplicable"
-              label="Tax Credit Applicable"
+              name="uomUqcConvFactor"
+              label="UOM UQC Conversion Factor"
+              placeholder="Enter conversion factor"
+              inputProps={{ type: "number", step: "0.01" }}
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* Additional Details */}
+      {/* Planning Information */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Additional Details</CardTitle>
+          <CardTitle className="text-lg">Planning Information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <FormInput
+              control={control}
+              name="leadTimeDays"
+              label="Lead Time (Days)"
+              placeholder="Enter lead time"
+              inputProps={{ type: "number" }}
+            />
+            <FormInput
+              control={control}
+              name="economicOrderQty"
+              label="Economic Order Qty"
+              placeholder="Enter economic order quantity"
+              inputProps={{ type: "number" }}
+            />
+            <FormInput
+              control={control}
+              name="desiredPackSize"
+              label="Desired Pack Size"
+              placeholder="Enter desired pack size"
+              inputProps={{ type: "number" }}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <FormInput
               control={control}
               name="currentBuyer"
@@ -214,41 +210,13 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
             />
             <FormInput
               control={control}
-              name="economicOrdQty"
-              label="Economic Ord. Qty."
-              placeholder="0"
-              inputProps={{ type: "number" }}
-            />
-          
-            <FormInput
-              control={control}
-              name="desiredPackSize"
-              label="Desired Pack Size"
-              placeholder="Enter pack size"
-            />
-            <FormInput
-              control={control}
               name="freightOn"
-              label="Freight on"
-              placeholder="100.00 %"
-              inputProps={{ type: "number", step: "0.01" }}
-            />
-            <FormInput
-              control={control}
-              name="drawingRef"
-              label="Drawing/Ref."
-              placeholder="Enter drawing reference"
-            />
-            <FormInput
-              control={control}
-              name="leadTime"
-              label="Lead Time (in Days)"
-              placeholder="Enter lead time"
-              inputProps={{ type: "number" }}
+              label="Freight On"
+              placeholder="Enter freight on"
             />
           </div>
         </CardContent>
       </Card>
     </div>
-  );
+  )
 } 

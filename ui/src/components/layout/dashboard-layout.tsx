@@ -63,9 +63,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
           setSidebarOpen={setSidebarOpen}
         />
         <main className="flex-1 relative overflow-y-auto focus:outline-none">
-          <div className="py-6">
-            <div className="mx-auto px-4 sm:px-6 lg:px-8">{children}</div>
-          </div>
+            <div className="mx-auto px-2 sm:px-4 lg:px-6 py-4">{children}</div>
         </main>
       </div>
     </div>

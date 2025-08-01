@@ -16,14 +16,14 @@ import { ItemStockAnalysisForm } from "./forms/item-stock-analysis-form";
 import { ItemExportForm } from "./forms/item-export-form";
 import { ItemSpecificationsForm } from "./forms/item-specifications-form";
 import { ItemOtherDetailsForm } from "./forms/item-other-details-form";
-import { CreateItemMasterData, UpdateItemMasterData } from "@/types/item-master";
+import { CreateItemMasterData, UpdateItemMasterData, ItemMaster } from "@/types/item-master";
 import { ItemMasterFormData, itemMasterSchema } from "@/validations/item-master";
 import { getItemMasterDefaultValues, mapItemToFormData, transformFormDataToApi } from "@/lib/utils/item-master-utils";
 
 interface ItemsDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  item?: any;
+  item?: ItemMaster | null;
   onSuccess: () => void;
 }
 
@@ -43,16 +43,24 @@ export default function ItemsDrawer({
   });
 
   useEffect(() => {
-    if (item) {
-      form.reset(mapItemToFormData(item));
-    } else {
-      form.reset(getItemMasterDefaultValues());
+    if (isOpen) {
+      if (item) {
+        console.log('Loading item data:', item);
+        const formData = mapItemToFormData(item);
+        console.log('Mapped form data:', formData);
+        form.reset(formData);
+      } else {
+        console.log('Resetting to default values');
+        form.reset(getItemMasterDefaultValues());
+      }
     }
-  }, [item, form]);
+  }, [item, form, isOpen]);
 
   const onSubmit = async (data: ItemMasterFormData) => {
     try {
+      console.log('Form data before transformation:', data);
       const transformedData = transformFormDataToApi(data);
+      console.log('Transformed data:', transformedData);
 
       if (item) {
         const result = await updateItemMutation.mutateAsync({
@@ -86,12 +94,17 @@ export default function ItemsDrawer({
     }
   };
 
+  const handleClose = () => {
+    form.reset(getItemMasterDefaultValues());
+    onClose();
+  };
+
   const isLoading = createItemMutation.isPending || updateItemMutation.isPending;
 
   return (
     <RightDrawer 
       isOpen={isOpen} 
-      onClose={onClose}
+      onClose={handleClose}
       title={item ? "Edit Item" : "Create New Item"}
       description={item 
         ? "Update the item information below." 
@@ -151,7 +164,7 @@ export default function ItemsDrawer({
               <Button type="submit" disabled={isLoading}>
                 {isLoading ? "Saving..." : item ? "Update Item" : "Create Item"}
               </Button>
-              <Button type="button" variant="outline" onClick={onClose}>
+              <Button type="button" variant="outline" onClick={handleClose}>
                 Cancel
               </Button>
             </div>

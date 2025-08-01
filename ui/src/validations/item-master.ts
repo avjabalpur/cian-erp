@@ -57,7 +57,13 @@ export const itemMasterSchema = z.object({
   // Basic Info
   itemCode: z.string().min(1, "Item Code is required"),
   revNo: z.string().optional(),
-  itemTypeId: z.number().min(1, "Item Type is required"),
+  itemTypeId: z.string()
+    .min(1, "Item Type is required")
+    .transform((val) => {
+      if (!val || val === "-1") return 0;
+      const num = parseInt(val);
+      return isNaN(num) ? 0 : num;
+    }),
   subType: z.string().optional(),
   gsInd: z.string().optional(),
   goodsType: z.boolean().default(false),
@@ -66,24 +72,96 @@ export const itemMasterSchema = z.object({
   pharmacopoeiaName: z.string().optional(),
   unitOfMeasure: z.string().optional(),
   issuingUnit: z.string().optional(),
-  uomIssConvFactor: z.number().optional(),
-  uomUqcConvFactor: z.number().optional(),
+  uomIssConvFactor: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  uomUqcConvFactor: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
   drawingRef: z.string().optional(),
-  leadTimeDays: z.number().optional(),
+  leadTimeDays: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseInt(val);
+      return isNaN(num) ? undefined : num;
+    }),
   currentBuyer: z.string().optional(),
-  economicOrderQty: z.number().optional(),
-  desiredPackSize: z.number().optional(),
+  economicOrderQty: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseInt(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  desiredPackSize: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseInt(val);
+      return isNaN(num) ? undefined : num;
+    }),
   freightOn: z.string().optional(),
 
   // Manufacturing
   stdAssayStrength: z.string().optional(),
-  shelfLifeMonths: z.number().optional(),
-  shelfLifeDays: z.number().optional(),
-  stdRate: z.number().optional(),
-  stdLossOnDry: z.number().optional(),
-  safetyStock: z.number().optional(),
-  allowedAllergenPercent: z.number().optional(),
-  stdMfgFeesPerUnit: z.number().optional(),
+  shelfLifeMonths: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseInt(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  shelfLifeDays: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseInt(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  stdRate: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  stdLossOnDry: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  safetyStock: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseInt(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  allowedAllergenPercent: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  stdMfgFeesPerUnit: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
   mainProdCentre: z.string().optional(),
 
   // Sales
@@ -93,7 +171,13 @@ export const itemMasterSchema = z.object({
   productType: z.string().optional(),
   salesDivision: z.string().optional(),
   productGroup: z.string().optional(),
-  conversionFactor: z.number().optional(),
+  conversionFactor: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
   vendorPartNo: z.string().optional(),
 
   // Boolean flags
@@ -117,15 +201,69 @@ export const itemMasterSchema = z.object({
 
   // Bought Out Details
   purchaseBasedOn: z.string().optional(),
-  excessPlanningPercent: z.number().optional(),
-  reorderLevel: z.number().optional(),
-  minStockLevel: z.number().optional(),
-  maxStockLevel: z.number().optional(),
-  minBalanceShelfLifeDays: z.number().optional(),
-  customDutyPercent: z.number().optional(),
-  igstPercent: z.number().optional(),
-  swsPercent: z.number().optional(),
-  maxPurchaseRate: z.number().optional(),
+  excessPlanningPercent: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  reorderLevel: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  minStockLevel: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  maxStockLevel: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  minBalanceShelfLifeDays: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseInt(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  customDutyPercent: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  igstPercent: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  swsPercent: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  maxPurchaseRate: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
   stopProcurement: z.boolean().default(false),
 
   // Stock Analysis
@@ -139,14 +277,44 @@ export const itemMasterSchema = z.object({
   exportProductGroupCode: z.string().optional(),
   exportProductGroupName: z.string().optional(),
   depbRateListSrlNo: z.string().optional(),
-  depbRate: z.number().optional(),
-  depbValueCap: z.number().optional(),
+  depbRate: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  depbValueCap: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
   depbRemarks: z.string().optional(),
   dutyDrawbackSrlNo: z.string().optional(),
   dutyDrawbackRateType: z.string().optional(),
-  dutyDrawbackRatePercent: z.number().optional(),
-  dutyDrawbackRateFixed: z.number().optional(),
-  dutyDrawbackValueCap: z.number().optional(),
+  dutyDrawbackRatePercent: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  dutyDrawbackRateFixed: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  dutyDrawbackValueCap: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
   dutyDrawbackRemarks: z.string().optional(),
 
   // Specifications
@@ -155,13 +323,49 @@ export const itemMasterSchema = z.object({
   customTariffNo: z.string().optional(),
   exciseTariffNo: z.string().optional(),
   vatCommCode: z.string().optional(),
-  convFactor: z.number().optional(),
+  convFactor: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
   oldCode: z.string().optional(),
-  standardWeight: z.number().optional(),
-  standardConversionCostFactor: z.number().optional(),
-  standardPackingCostFactor: z.number().optional(),
-  costFactorPercent: z.number().optional(),
-  packingCostRs: z.number().optional(),
+  standardWeight: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  standardConversionCostFactor: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  standardPackingCostFactor: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  costFactorPercent: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  packingCostRs: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
 
   // Other Details
   packShort: z.string().optional(),
@@ -182,22 +386,58 @@ export const itemMasterSchema = z.object({
   withMeasuringCap: z.boolean().default(false),
   withSpoon: z.boolean().default(false),
   packingNp: z.string().optional(),
-  packingNpQty: z.number().optional(),
+  packingNpQty: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseInt(val);
+      return isNaN(num) ? undefined : num;
+    }),
   packingStylePtd: z.string().optional(),
-  packingStylePtdQty: z.number().optional(),
+  packingStylePtdQty: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseInt(val);
+      return isNaN(num) ? undefined : num;
+    }),
   notePerStrip: z.string().optional(),
   packShortPtdSpec: z.string().optional(),
   packShortPtdSize: z.string().optional(),
-  packShortPtdQty: z.number().optional(),
+  packShortPtdQty: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseInt(val);
+      return isNaN(num) ? undefined : num;
+    }),
   packingStyleNpSize: z.string().optional(),
-  packingStyleNpQty: z.number().optional(),
+  packingStyleNpQty: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseInt(val);
+      return isNaN(num) ? undefined : num;
+    }),
   noteForCtn: z.string().optional(),
   outerSize: z.string().optional(),
-  outerQty: z.number().optional(),
+  outerQty: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseInt(val);
+      return isNaN(num) ? undefined : num;
+    }),
   shrink: z.string().optional(),
   shrinkPacking: z.string().optional(),
   shipperSize: z.string().optional(),
-  qtyPerShipper: z.number().optional(),
+  qtyPerShipper: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseInt(val);
+      return isNaN(num) ? undefined : num;
+    }),
   shipperNote: z.string().optional(),
 });
 
