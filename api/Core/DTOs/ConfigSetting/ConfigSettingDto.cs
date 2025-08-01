@@ -49,7 +49,7 @@ namespace Xcianify.Core.DTOs.ConfigSetting
 
     public class ConfigSettingFilterDto : BaseFilterDto
     {
-        public string? SearchTerm { get; set; }
+        public string? search { get; set; }
         public bool? IsActive { get; set; }
     }
 

@@ -526,11 +526,16 @@ CREATE TABLE IF NOT EXISTS mst_country (
   status VARCHAR(255)  -- 0=>Inactive, 1=>Active, 2=>Blocked
 );
 
-CREATE TABLE IF NOT EXISTS mst_dosage (
-  d_id SERIAL PRIMARY KEY,
-  dosage_name VARCHAR(255),
+CREATE TABLE IF NOT EXISTS dosage (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255),
   register_date VARCHAR(255),
-  status VARCHAR(255)  -- 0=>Inactive, 1=>Active, 2=>Blocked
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  created_by INTEGER,
+  updated_by INTEGER,
+  is_deleted BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS mst_email_template_macros (

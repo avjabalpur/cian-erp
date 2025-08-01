@@ -30,6 +30,6 @@ namespace Xcianify.Core.DTOs.ItemMaster
 
     public class UnitOfMeasureFilterDto : BaseFilterDto
     {
-        public string SearchTerm { get; set; }
+        public string search { get; set; }
     }
 }

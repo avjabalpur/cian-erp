@@ -25,8 +25,8 @@ namespace Xcianify.Repository
             // Add search filter
             if (!string.IsNullOrWhiteSpace(filterDto.Search))
             {
-                whereConditions.Add("(LOWER(code) LIKE @SearchTerm OR LOWER(name) LIKE @SearchTerm OR LOWER(description) LIKE @SearchTerm)");
-                parameters.Add("@SearchTerm", $"%{filterDto.Search.ToLower()}%");
+                whereConditions.Add("(LOWER(code) LIKE @search OR LOWER(name) LIKE @search OR LOWER(description) LIKE @search)");
+                parameters.Add("@search", $"%{filterDto.Search.ToLower()}%");
             }
 
             // Add isActive filter

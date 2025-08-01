@@ -43,10 +43,10 @@ namespace Xcianify.Repository
                 var whereClause = "WHERE 1=1";
                 var parameters = new DynamicParameters();
 
-                if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
+                if (!string.IsNullOrWhiteSpace(filter.search))
                 {
-                    whereClause += " AND (uom_code ILIKE @SearchTerm OR uom_name ILIKE @SearchTerm)";
-                    parameters.Add("@SearchTerm", $"%{filter.SearchTerm}%");
+                    whereClause += " AND (uom_code ILIKE @search OR uom_name ILIKE @search)";
+                    parameters.Add("@search", $"%{filter.search}%");
                 }
 
                 var countSql = $"SELECT COUNT(*) FROM unit_of_measures {whereClause}";

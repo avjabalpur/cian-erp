@@ -19,14 +19,14 @@ export default function ItemTypesManagement() {
   // nuqs query state hooks
   const [page, setPage] = useQueryState("page");
   const [pageSize, setPageSize] = useQueryState("pageSize");
-  const [searchTerm, setSearchTerm] = useQueryState("searchTerm");
+  const [search, setsearch] = useQueryState("search");
   const [isActive, setIsActive] = useQueryState("isActive");
 
   // Convert nuqs state to API filter
   const filter: ItemTypeFilter = {
     pageNumber: page ? parseInt(page) : undefined,
     pageSize: pageSize ? parseInt(pageSize) : undefined,
-    searchTerm: searchTerm || undefined,
+    search: search || undefined,
     isActive: isActive ? isActive === 'true' : undefined,
   };
 
@@ -96,7 +96,7 @@ export default function ItemTypesManagement() {
 
 
   const handleGlobalFilterChange = (value: string) => {
-    setSearchTerm(value || null);
+    setsearch(value || null);
     setPage("1");
   };
 

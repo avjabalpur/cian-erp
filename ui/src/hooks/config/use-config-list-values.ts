@@ -6,7 +6,7 @@ import { ConfigListValue, CreateConfigListValueData, UpdateConfigListValueData, 
 const getConfigListValues = async (filter?: ConfigListValueFilter): Promise<PaginatedResponse<ConfigListValue>> => {
   const params = new URLSearchParams();
   if (filter?.listId) params.append('listId', filter.listId.toString());
-  if (filter?.search) params.append('searchTerm', filter.search);
+  if (filter?.search) params.append('search', filter.search);
   if (filter?.isActive !== undefined) params.append('isActive', filter.isActive.toString());
   if (filter?.pageNumber) params.append('pageNumber', filter.pageNumber.toString());
   if (filter?.pageSize) params.append('pageSize', filter.pageSize.toString());

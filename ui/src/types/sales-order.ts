@@ -123,7 +123,7 @@ export interface SalesOrderDocument {
 }
 
 export interface SalesOrderFilter {
-  searchTerm?: string;
+  search?: string;
   soNumber?: string;
   soStatus?: string;
   customerId?: number;

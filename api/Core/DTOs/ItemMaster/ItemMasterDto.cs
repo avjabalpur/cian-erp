@@ -9,7 +9,7 @@ namespace Xcianify.Core.DTOs.ItemMaster
         
         [Required]
         [StringLength(50)]
-        public string ItemId { get; set; }
+        public string ItemCode { get; set; }
         
         [StringLength(10)]
         public string RevNo { get; set; }
@@ -17,8 +17,7 @@ namespace Xcianify.Core.DTOs.ItemMaster
         [Required]
         public int ItemTypeId { get; set; }
         
-        [StringLength(50)]
-        public string SubType { get; set; }
+        public int? SubType { get; set; }
         
         [StringLength(10)]
         public string GsInd { get; set; }
@@ -48,15 +47,14 @@ namespace Xcianify.Core.DTOs.ItemMaster
         [StringLength(50)]
         public string DrawingRef { get; set; }
         
-        [StringLength(100)]
-        public string StdAssayStrength { get; set; }
+        public decimal? StdAssayStrength { get; set; }
         
         public int? ShelfLifeMonths { get; set; }
         public int? ShelfLifeDays { get; set; }
         public decimal? StdRate { get; set; }
         public int? LeadTimeDays { get; set; }
         public decimal? StdLossOnDry { get; set; }
-        public decimal? SafetyStock { get; set; }
+        public int? SafetyStock { get; set; }
         public bool BoughtOut { get; set; }
         public bool JobWork { get; set; }
         public bool Imported { get; set; }
@@ -64,8 +62,8 @@ namespace Xcianify.Core.DTOs.ItemMaster
         [StringLength(100)]
         public string CurrentBuyer { get; set; }
         
-        public decimal? EconomicOrderQty { get; set; }
-        public decimal? DesiredPackSize { get; set; }
+        public int? EconomicOrderQty { get; set; }
+        public int? DesiredPackSize { get; set; }
         public bool TaxCreditApplicable { get; set; }
         
         [StringLength(10)]
@@ -99,28 +97,26 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public bool BatchNotApplicable { get; set; }
         public bool QcRequired { get; set; }
         
-        [StringLength(100)]
-        public string Allergen { get; set; }
+        public bool Allergen { get; set; }
         
         public bool MfgDateApplicable { get; set; }
         public bool ExpiryDateApplicable { get; set; }
         public bool TrackSerialNos { get; set; }
         
-        [StringLength(10)]
-        public string PackingFreightInsuranceServices { get; set; }
+        public bool PackingFreightInsuranceServices { get; set; }
         
-        [StringLength(100)]
-        public string ActiveIngredient { get; set; }
+        public bool ActiveIngredient { get; set; }
         
         public bool MfgLocNameRequired { get; set; }
         public bool MfgMmYyyyApplicable { get; set; }
         public bool ExpiryMmYyyyApplicable { get; set; }
         public bool PrincipalForStatutoryReporting { get; set; }
         
-        public DateTime CreatedOn { get; set; }
-        public int CreatedBy { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public int? CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public int? UpdatedBy { get; set; }
+        public bool IsDeleted { get; set; }
         
         public virtual ItemSpecificationDto Specification { get; set; }
     }

@@ -241,9 +241,17 @@ CREATE TABLE divisions (
     updated_by INTEGER
 );
 
--- need to add back dosage_form master table
-
--- We need a way where admin can create any masters at run time
+CREATE TABLE IF NOT EXISTS dosage (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255),
+  register_date VARCHAR(255),
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  created_by INTEGER,
+  updated_by INTEGER,
+  is_deleted BOOLEAN DEFAULT FALSE
+);
 
 
 CREATE TABLE item_master (
@@ -301,25 +309,24 @@ CREATE TABLE item_master (
     mfg_mm_yyyy_applicable BOOLEAN,
     expiry_mm_yyyy_applicable BOOLEAN,
     principal_for_statutory_reporting BOOLEAN,
-    created_on DATE
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by INTEGER,
+    updated_by INTEGER,
+    is_deleted BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE item_specifications (
     id SERIAL PRIMARY KEY,
     item_code VARCHAR(50), -- FK to item_master(item_code)
-
     specification TEXT,
-
     substitute_for_item_code VARCHAR(50),
-
     custom_tariff_no VARCHAR(50),
     excise_tariff_no VARCHAR(50),
     vat_comm_code VARCHAR(50),
-
     conversion_factor NUMERIC(10, 5),
     old_code VARCHAR(50),
     standard_weight NUMERIC(10, 4), -- in Kgs
-
     standard_conversion_cost_factor NUMERIC(10, 5),
     standard_packing_cost_factor NUMERIC(10, 5),
     markup_percentage NUMERIC(5, 2),
@@ -330,23 +337,16 @@ CREATE TABLE item_specifications (
 CREATE TABLE item_bought_out_details (
     id SERIAL PRIMARY KEY,
     item_code VARCHAR(50), -- FK to item_master(item_code)
-
     purchase_based_on VARCHAR(20) CHECK (purchase_based_on IN ('Re-order Level', 'M.R.P. Plan', 'Indents')),
     excess_planning_percent NUMERIC(6, 2),
-
-    -- Inventory Norms
     reorder_level NUMERIC(12, 4),
     min_stock_level NUMERIC(12, 4),
     max_stock_level NUMERIC(12, 4),
     min_balance_shelf_life_days INTEGER,
-
-    -- Import Duties (% on assessable value)
     custom_duty_percent NUMERIC(6, 2),
     igst_percent NUMERIC(6, 2),
     sws_percent NUMERIC(6, 2),
-
     max_purchase_rate NUMERIC(12, 5),
-
     stop_procurement BOOLEAN DEFAULT FALSE
 );
 

@@ -530,7 +530,7 @@
           ],
           "parameters": [
             {
-              "name": "SearchTerm",
+              "name": "search",
               "in": "query",
               "style": "form",
               "schema": {
@@ -794,7 +794,7 @@
           ],
           "parameters": [
             {
-              "name": "SearchTerm",
+              "name": "search",
               "in": "query",
               "style": "form",
               "schema": {
@@ -2269,7 +2269,7 @@
           ],
           "parameters": [
             {
-              "name": "SearchTerm",
+              "name": "search",
               "in": "query",
               "style": "form",
               "schema": {
@@ -2582,7 +2582,7 @@
               }
             },
             {
-              "name": "searchTerm",
+              "name": "search",
               "in": "query",
               "style": "form",
               "schema": {
@@ -3564,7 +3564,7 @@
           ],
           "parameters": [
             {
-              "name": "SearchTerm",
+              "name": "search",
               "in": "query",
               "style": "form",
               "schema": {

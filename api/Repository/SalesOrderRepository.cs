@@ -27,10 +27,10 @@ namespace Xcianify.Repository
             var whereClause = "WHERE so.is_deleted = 0";
             var parameters = new DynamicParameters();
 
-            if (!string.IsNullOrEmpty(filterDto.SearchTerm))
+            if (!string.IsNullOrEmpty(filterDto.search))
             {
-                whereClause += " AND (so.so_number ILIKE @SearchTerm OR so.so_status ILIKE @SearchTerm OR c.customer_name ILIKE @SearchTerm)";
-                parameters.Add("@SearchTerm", $"%{filterDto.SearchTerm}%");
+                whereClause += " AND (so.so_number ILIKE @search OR so.so_status ILIKE @search OR c.customer_name ILIKE @search)";
+                parameters.Add("@search", $"%{filterDto.search}%");
             }
 
             if (!string.IsNullOrEmpty(filterDto.SoNumber))

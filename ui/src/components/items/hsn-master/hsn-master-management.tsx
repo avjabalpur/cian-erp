@@ -24,14 +24,14 @@ export default function HsnMasterManagement() {
   // URL state management with nuqs
   const [page, setPage] = useQueryState("page", hsnMasterParsers.page);
   const [pageSize, setPageSize] = useQueryState("pageSize", hsnMasterParsers.pageSize);
-  const [searchTerm, setSearchTerm] = useQueryState("search", hsnMasterParsers.search);
+  const [search, setsearch] = useQueryState("search", hsnMasterParsers.search);
   const [isActive, setIsActive] = useQueryState("isActive", hsnMasterParsers.isActive);
 
   // Construct filter object for API
   const filter: HsnMasterFilterType = {
     pageNumber: page || 1,
     pageSize: pageSize || 20,
-    search: searchTerm || undefined,
+    search: search || undefined,
     isActive: isActive || undefined,
   };
 

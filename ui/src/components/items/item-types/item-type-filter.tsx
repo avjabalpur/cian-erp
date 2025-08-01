@@ -28,11 +28,11 @@ export function ItemTypeFilter({ onFilterChange }: ItemTypeFilterProps) {
   const [pageSize, setPageSize] = useQueryState("pageSize", itemTypeParsers.pageSize);
   const [sortBy, setSortBy] = useQueryState("sortBy", itemTypeParsers.sortBy);
   const [sortOrder, setSortOrder] = useQueryState("sortOrder", itemTypeParsers.sortOrder);
-  const [searchTerm, setSearchTerm] = useQueryState("searchTerm", itemTypeParsers.searchTerm);
+  const [search, setsearch] = useQueryState("search", itemTypeParsers.search);
   const [isActive, setIsActive] = useQueryState("isActive", itemTypeParsers.isActive);
 
   const clearFilters = () => {
-    setSearchTerm(null);
+    setsearch(null);
     setIsActive(null);
     setPage(1);
     setPageSize(10);
@@ -42,7 +42,7 @@ export function ItemTypeFilter({ onFilterChange }: ItemTypeFilterProps) {
 
   const getActiveFilterCount = () => {
     let count = 0;
-    if (searchTerm) count++;
+    if (search) count++;
     if (isActive !== null) count++;
     return count;
   };
@@ -59,8 +59,8 @@ export function ItemTypeFilter({ onFilterChange }: ItemTypeFilterProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
         <NuqsFormInput
           label="Search"
-          value={searchTerm}
-          onChange={setSearchTerm}
+          value={search}
+          onChange={setsearch}
           placeholder="Search by code, name, or description..."
           icon={<Search />}
         />

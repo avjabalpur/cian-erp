@@ -22,10 +22,10 @@ namespace Xcianify.Repository
             var parameters = new DynamicParameters();
 
             // Add search filter
-            if (!string.IsNullOrWhiteSpace(filterDto.SearchTerm))
+            if (!string.IsNullOrWhiteSpace(filterDto.Search))
             {
-                whereConditions.Add("(LOWER(item_code) LIKE @SearchTerm OR LOWER(item_name) LIKE @SearchTerm OR LOWER(short_name) LIKE @SearchTerm)");
-                parameters.Add("@SearchTerm", $"%{filterDto.SearchTerm.ToLower()}%");
+                whereConditions.Add("(LOWER(item_code) LIKE @search OR LOWER(item_name) LIKE @search OR LOWER(short_name) LIKE @search)");
+                parameters.Add("@search", $"%{filterDto.Search.ToLower()}%");
             }
 
             // Add itemTypeId filter
@@ -34,6 +34,9 @@ namespace Xcianify.Repository
                 whereConditions.Add("item_type_id = @ItemTypeId");
                 parameters.Add("@ItemTypeId", filterDto.ItemTypeId.Value);
             }
+
+            // Always filter out deleted items
+            whereConditions.Add("(is_deleted = false or is_deleted is null)");
 
             var whereClause = whereConditions.Count > 0 ? $"WHERE {string.Join(" AND ", whereConditions)}" : "";
 
@@ -99,7 +102,8 @@ namespace Xcianify.Repository
                     created_at as CreatedAt,
                     updated_at as UpdatedAt,
                     created_by as CreatedBy,
-                    updated_by as UpdatedBy
+                    updated_by as UpdatedBy,
+                    is_deleted as IsDeleted
                 FROM {TableName}
                 {whereClause}
                 ORDER BY created_at DESC
@@ -179,9 +183,10 @@ namespace Xcianify.Repository
                     created_at as CreatedAt,
                     updated_at as UpdatedAt,
                     created_by as CreatedBy,
-                    updated_by as UpdatedBy
+                    updated_by as UpdatedBy,
+                    is_deleted as IsDeleted
                 FROM {TableName}
-                WHERE id = @Id";
+                WHERE id = @Id AND is_deleted = false";
 
             using var connection = _dbContext.GetConnection();
             return await connection.QueryFirstOrDefaultAsync<ItemMaster>(query, new { Id = id });
@@ -248,9 +253,10 @@ namespace Xcianify.Repository
                     created_at as CreatedAt,
                     updated_at as UpdatedAt,
                     created_by as CreatedBy,
-                    updated_by as UpdatedBy
+                    updated_by as UpdatedBy,
+                    is_deleted as IsDeleted
                 FROM {TableName}
-                WHERE item_code = @ItemCode";
+                WHERE item_code = @ItemCode AND is_deleted = false";
 
             using var connection = _dbContext.GetConnection();
             return await connection.QueryFirstOrDefaultAsync<ItemMaster>(query, new { ItemCode = itemCode });
@@ -270,7 +276,7 @@ namespace Xcianify.Repository
                     qc_required, allergen, mfg_date_applicable, expiry_date_applicable, track_serial_nos,
                     packing_freight_insurance_services, active_ingredient, mfg_loc_name_required,
                     mfg_mm_yyyy_applicable, expiry_mm_yyyy_applicable, principal_for_statutory_reporting,
-                    created_at, updated_at, created_by, updated_by
+                    created_at, updated_at, created_by, updated_by, is_deleted
                 ) VALUES (
                     @ItemCode, @RevNo, @ItemTypeId, @SubType, @GsInd, @GoodsType, @ItemName, @ShortName,
                     @PharmacopoeiaName, @UnitOfMeasure, @IssuingUnit, @UomIssConvFactor, @UomUqcConvFactor,
@@ -282,7 +288,7 @@ namespace Xcianify.Repository
                     @QcRequired, @Allergen, @MfgDateApplicable, @ExpiryDateApplicable, @TrackSerialNos,
                     @PackingFreightInsuranceServices, @ActiveIngredient, @MfgLocNameRequired,
                     @MfgMmYyyyApplicable, @ExpiryMmYyyyApplicable, @PrincipalForStatutoryReporting,
-                    @CreatedAt, @UpdatedAt, @CreatedBy, @UpdatedBy
+                    @CreatedAt, @UpdatedAt, @CreatedBy, @UpdatedBy, @IsDeleted
                 )
                 RETURNING *";
 
@@ -348,7 +354,8 @@ namespace Xcianify.Repository
                     expiry_mm_yyyy_applicable = @ExpiryMmYyyyApplicable,
                     principal_for_statutory_reporting = @PrincipalForStatutoryReporting,
                     updated_at = @UpdatedAt,
-                    updated_by = @UpdatedBy
+                    updated_by = @UpdatedBy,
+                    is_deleted = @IsDeleted
                 WHERE id = @Id";
 
             item.UpdatedAt = DateTime.UtcNow;
@@ -359,14 +366,14 @@ namespace Xcianify.Repository
 
         public async Task DeleteAsync(int id)
         {
-            var query = $"DELETE FROM {TableName} WHERE id = @Id";
+            var query = $"UPDATE {TableName} SET is_deleted = true, updated_at = @UpdatedAt WHERE id = @Id";
             using var connection = _dbContext.GetConnection();
-            await connection.ExecuteAsync(query, new { Id = id });
+            await connection.ExecuteAsync(query, new { Id = id, UpdatedAt = DateTime.UtcNow });
         }
 
         public async Task<bool> ItemCodeExistsAsync(string itemCode)
         {
-            var query = $"SELECT COUNT(*) FROM {TableName} WHERE item_code = @ItemCode";
+            var query = $"SELECT COUNT(*) FROM {TableName} WHERE item_code = @ItemCode AND is_deleted = false";
             using var connection = _dbContext.GetConnection();
             var count = await connection.ExecuteScalarAsync<int>(query, new { ItemCode = itemCode });
             return count > 0;

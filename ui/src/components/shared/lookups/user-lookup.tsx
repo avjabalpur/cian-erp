@@ -41,11 +41,11 @@ export function UserLookup({
   onSelect,
   title = "Select User"
 }: UserLookupProps) {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [search, setsearch] = useState("");
 
   // Fetch users with search
   const { data: usersData, isLoading } = useUsers({
-    search: searchTerm,
+    search: search,
     pageNumber: 1,
     pageSize: 50 // Show more users for better selection
   });
@@ -55,12 +55,12 @@ export function UserLookup({
   const handleUserSelect = (userId: number) => {
     onSelect(userId);
     onClose();
-    setSearchTerm("");
+    setsearch("");
   };
 
   const handleClose = () => {
     onClose();
-    setSearchTerm("");
+    setsearch("");
   };
 
   return (
@@ -79,8 +79,8 @@ export function UserLookup({
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search by name, username, or ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={search}
+              onChange={(e) => setsearch(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -106,7 +106,7 @@ export function UserLookup({
                 ) : users.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                      {searchTerm ? "No users found" : "No users available"}
+                      {search ? "No users found" : "No users available"}
                     </TableCell>
                   </TableRow>
                 ) : (

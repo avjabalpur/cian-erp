@@ -28,11 +28,11 @@ export default function SalesOrderSaveTransactionsTable({
   onDelete,
   onCreate,
 }: SalesOrderSaveTransactionsTableProps) {
-  const [searchTerm, setSearchTerm] = useState("")
+  const [search, setsearch] = useState("")
 
   const filteredSaveTransactions = saveTransactions.filter((saveTransaction) =>
-    saveTransaction.diff?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    saveTransaction.createdByName?.toLowerCase().includes(searchTerm.toLowerCase())
+    saveTransaction.diff?.toLowerCase().includes(search.toLowerCase()) ||
+    saveTransaction.createdByName?.toLowerCase().includes(search.toLowerCase())
   )
 
   return (
@@ -63,8 +63,8 @@ export default function SalesOrderSaveTransactionsTable({
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search transactions..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={search}
+                onChange={(e) => setsearch(e.target.value)}
                 className="pl-8"
               />
             </div>
@@ -73,7 +73,7 @@ export default function SalesOrderSaveTransactionsTable({
           {filteredSaveTransactions.length === 0 ? (
             <div className="flex items-center justify-center h-32">
               <p className="text-muted-foreground">
-                {searchTerm ? "No transactions found matching your search" : "No transactions found"}
+                {search ? "No transactions found matching your search" : "No transactions found"}
               </p>
             </div>
           ) : (

@@ -10,7 +10,7 @@ import { Plus } from "lucide-react"
 import { UserDrawer } from "./user-drawer"
 
 export default function UsersManagement() {
-  const [searchTerm, setSearchTerm] = useState("")
+  const [search, setsearch] = useState("")
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
@@ -24,7 +24,7 @@ export default function UsersManagement() {
   const [sorting, setSorting] = useState<any[]>([])
 
   const { data: usersData, isLoading } = useUsers({
-    search: searchTerm,
+    search: search,
     pageNumber: pageIndex + 1,
     pageSize,
     columnFilters: columnFilters,

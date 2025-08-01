@@ -46,7 +46,7 @@ export const itemTypeParsers = {
   pageSize: parseAsInteger.withDefault(10),
   sortBy: parseAsString.withDefault("created_at"),
   sortOrder: parseAsString.withDefault("desc") as any,
-  searchTerm: parseAsString.withDefault(""),
+  search: parseAsString.withDefault(""),
   isActive: parseAsBoolean,
 };
 
@@ -56,12 +56,12 @@ export const defaultItemTypeFilter = {
   pageSize: 10,
   sortBy: "created_at",
   sortOrder: "desc" as "asc" | "desc",
-  searchTerm: "",
+  search: "",
   isActive: undefined as boolean | undefined,
 };
 
 export const itemMasterFilterParsers = {
-  searchTerm: parseAsString.withDefault(''),
+  search: parseAsString.withDefault(''),
   itemCode: parseAsString.withDefault(''),
   itemName: parseAsString.withDefault(''),
   shortName: parseAsString.withDefault(''),
@@ -407,7 +407,7 @@ export const transformFormDataToApi = (data: ItemMasterFormData) => {
 
 export const clearItemMasterFilters = () => {
   return {
-    searchTerm: '',
+    search: '',
     itemCode: '',
     itemName: '',
     shortName: '',
@@ -487,7 +487,7 @@ export const clearItemMasterFilters = () => {
 
 export const buildItemMasterFilter = (params: any): ItemMasterFilter => {
   return {
-    searchTerm: params.searchTerm || undefined,
+    search: params.search || undefined,
     itemCode: params.itemCode || undefined,
     itemName: params.itemName || undefined,
     shortName: params.shortName || undefined,

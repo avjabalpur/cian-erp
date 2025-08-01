@@ -16,7 +16,7 @@ export interface PaginatedResponse<T> {
 // API Functions
 const getItemTypes = async (filter?: ItemTypeFilter): Promise<PaginatedResponse<ItemType>> => {
   const params = new URLSearchParams();
-  if (filter?.searchTerm) params.append('searchTerm', filter.searchTerm);
+  if (filter?.search) params.append('search', filter.search);
   if (filter?.isActive !== undefined) params.append('isActive', filter.isActive.toString());
   if (filter?.pageNumber) params.append('pageNumber', filter.pageNumber.toString());
   if (filter?.pageSize) params.append('pageSize', filter.pageSize.toString());

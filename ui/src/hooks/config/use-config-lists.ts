@@ -5,7 +5,7 @@ import { ConfigList, CreateConfigListData, UpdateConfigListData, ConfigListFilte
 // API Functions
 const getConfigLists = async (filter?: ConfigListFilter): Promise<PaginatedResponse<ConfigList>> => {
   const params = new URLSearchParams();
-  if (filter?.search) params.append('searchTerm', filter.search);
+  if (filter?.search) params.append('search', filter.search);
   if (filter?.isActive !== undefined) params.append('isActive', filter.isActive.toString());
   if (filter?.pageNumber) params.append('pageNumber', filter.pageNumber.toString());
   if (filter?.pageSize) params.append('pageSize', filter.pageSize.toString());

@@ -28,13 +28,13 @@ export default function SalesOrderQuotationsTable({
   onDelete,
   onCreate,
 }: SalesOrderQuotationsTableProps) {
-  const [searchTerm, setSearchTerm] = useState("")
+  const [search, setsearch] = useState("")
 
   const filteredQuotations = quotations.filter((quotation) =>
-    quotation.quotationNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    quotation.organizationName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    quotation.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    quotation.createdByName?.toLowerCase().includes(searchTerm.toLowerCase())
+    quotation.quotationNumber.toLowerCase().includes(search.toLowerCase()) ||
+    quotation.organizationName?.toLowerCase().includes(search.toLowerCase()) ||
+    quotation.customerName?.toLowerCase().includes(search.toLowerCase()) ||
+    quotation.createdByName?.toLowerCase().includes(search.toLowerCase())
   )
 
   return (
@@ -65,8 +65,8 @@ export default function SalesOrderQuotationsTable({
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search quotations..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={search}
+                onChange={(e) => setsearch(e.target.value)}
                 className="pl-8"
               />
             </div>
@@ -75,7 +75,7 @@ export default function SalesOrderQuotationsTable({
           {filteredQuotations.length === 0 ? (
             <div className="flex items-center justify-center h-32">
               <p className="text-muted-foreground">
-                {searchTerm ? "No quotations found matching your search" : "No quotations found"}
+                {search ? "No quotations found matching your search" : "No quotations found"}
               </p>
             </div>
           ) : (

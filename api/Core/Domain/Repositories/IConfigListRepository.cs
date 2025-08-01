@@ -5,7 +5,7 @@ namespace Xcianify.Core.Domain.Repositories
     public interface IConfigListRepository
     {
         Task<(List<ConfigList> Items, int TotalCount)> GetAllAsync(
-            string? searchTerm = null,
+            string? search = null,
             bool? isActive = null,
             int pageNumber = 1,
             int pageSize = 20,

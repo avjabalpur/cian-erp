@@ -5,9 +5,6 @@ namespace Xcianify.Core.DTOs.ItemMaster
 {
     public class UpdateItemMasterDto
     {
-
-        public string ItemId { get; set; }
-
         [Required(ErrorMessage = "Item code is required")]
         [StringLength(50, ErrorMessage = "Item code cannot be longer than 50 characters")]
         public string ItemCode { get; set; }
@@ -18,8 +15,7 @@ namespace Xcianify.Core.DTOs.ItemMaster
         [Required(ErrorMessage = "Item type ID is required")]
         public int ItemTypeId { get; set; }
 
-        [StringLength(50, ErrorMessage = "Sub-type cannot be longer than 50 characters")]
-        public string SubType { get; set; }
+        public int? SubType { get; set; }
 
         [StringLength(10, ErrorMessage = "GS indicator cannot be longer than 10 characters")]
         public string GsInd { get; set; }
@@ -52,8 +48,8 @@ namespace Xcianify.Core.DTOs.ItemMaster
         [StringLength(50, ErrorMessage = "Drawing reference cannot be longer than 50 characters")]
         public string DrawingRef { get; set; }
 
-        [StringLength(100, ErrorMessage = "Standard assay strength cannot be longer than 100 characters")]
-        public string StdAssayStrength { get; set; }
+        [Range(0, double.MaxValue, ErrorMessage = "Standard assay strength must be a positive number")]
+        public decimal? StdAssayStrength { get; set; }
 
         [Range(0, int.MaxValue, ErrorMessage = "Shelf life months must be a positive number")]
         public int? ShelfLifeMonths { get; set; }
@@ -70,8 +66,8 @@ namespace Xcianify.Core.DTOs.ItemMaster
         [Range(0, double.MaxValue, ErrorMessage = "Standard loss on dry must be a positive number")]
         public decimal? StdLossOnDry { get; set; }
 
-        [Range(0, double.MaxValue, ErrorMessage = "Safety stock must be a positive number")]
-        public decimal? SafetyStock { get; set; }
+        [Range(0, int.MaxValue, ErrorMessage = "Safety stock must be a positive number")]
+        public int? SafetyStock { get; set; }
 
         public bool BoughtOut { get; set; }
         public bool JobWork { get; set; }
@@ -80,11 +76,11 @@ namespace Xcianify.Core.DTOs.ItemMaster
         [StringLength(100, ErrorMessage = "Current buyer cannot be longer than 100 characters")]
         public string CurrentBuyer { get; set; }
 
-        [Range(0, double.MaxValue, ErrorMessage = "Economic order quantity must be a positive number")]
-        public decimal? EconomicOrderQty { get; set; }
+        [Range(0, int.MaxValue, ErrorMessage = "Economic order quantity must be a positive number")]
+        public int? EconomicOrderQty { get; set; }
 
-        [Range(0, double.MaxValue, ErrorMessage = "Desired pack size must be a positive number")]
-        public decimal? DesiredPackSize { get; set; }
+        [Range(0, int.MaxValue, ErrorMessage = "Desired pack size must be a positive number")]
+        public int? DesiredPackSize { get; set; }
 
         public bool TaxCreditApplicable { get; set; }
 
@@ -124,18 +120,15 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public bool BatchNotApplicable { get; set; }
         public bool QcRequired { get; set; }
 
-        [StringLength(100, ErrorMessage = "Allergen cannot be longer than 100 characters")]
-        public string Allergen { get; set; }
+        public bool Allergen { get; set; }
 
         public bool MfgDateApplicable { get; set; }
         public bool ExpiryDateApplicable { get; set; }
         public bool TrackSerialNos { get; set; }
 
-        [StringLength(10, ErrorMessage = "Packing freight insurance services cannot be longer than 10 characters")]
-        public string PackingFreightInsuranceServices { get; set; }
+        public bool PackingFreightInsuranceServices { get; set; }
 
-        [StringLength(100, ErrorMessage = "Active ingredient cannot be longer than 100 characters")]
-        public string ActiveIngredient { get; set; }
+        public bool ActiveIngredient { get; set; }
 
         public bool MfgLocNameRequired { get; set; }
         public bool MfgMmYyyyApplicable { get; set; }

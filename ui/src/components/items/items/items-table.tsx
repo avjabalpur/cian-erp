@@ -2,15 +2,14 @@
 
 import { useMemo } from "react";
 import { FileText, Edit, Trash2 } from "lucide-react";
-import { Column } from "@/types/common";
 import { formatDate } from "@/lib/date-utils";
-import AdvancedTable from "../../shared/advanced-table";
-import { Item } from "@/hooks/items/use-items";
+import AdvancedTable, { Column } from "../../shared/advanced-table";
+import { ItemMaster } from "@/types/item-master";
 
 interface ItemsTableProps {
-  items: Item[];
-  onEdit: (item: Item) => void;
-  onDelete: (item: Item) => void;
+  items: ItemMaster[];
+  onEdit: (item: ItemMaster) => void;
+  onDelete: (item: ItemMaster) => void;
   isLoading?: boolean;
   // Server-side operations
   onGlobalFilterChange?: (filter: string) => void;
@@ -43,13 +42,13 @@ export default function ItemsTable({
     { name: 'itemCode', data_type: 'string', description: 'Item Code' },
     { name: 'itemName', data_type: 'string', description: 'Item Name' },
     { name: 'shortName', data_type: 'string', description: 'Short Name' },
-    { name: 'itemType', data_type: 'string', description: 'Item Type' },
-    { name: 'composition', data_type: 'string', description: 'Composition' },
-    { name: 'dosageName', data_type: 'string', description: 'Dosage' },
+    { name: 'revNo', data_type: 'string', description: 'Revision No' },
+    { name: 'itemTypeId', data_type: 'number', description: 'Item Type' },
+    { name: 'unitOfMeasure', data_type: 'string', description: 'Unit of Measure' },
     { name: 'manufactured', data_type: 'boolean', description: 'Manufactured' },
     { name: 'qcRequired', data_type: 'boolean', description: 'QC Required' },
-    { name: 'isActive', data_type: 'boolean', description: 'Active' },
-    { name: 'createdByName', data_type: 'string', description: 'Created By' },
+    { name: 'boughtOut', data_type: 'boolean', description: 'Bought Out' },
+    { name: 'sold', data_type: 'boolean', description: 'Sold' },
     { name: 'createdAt', data_type: 'date', description: 'Created At' },
   ], []);
   
@@ -57,12 +56,13 @@ export default function ItemsTable({
     'itemCode',
     'itemName',
     'shortName',
-    'itemType',
-    'composition',
-    'dosageName',
+    'revNo',
+    'itemTypeId',
+    'unitOfMeasure',
     'manufactured',
     'qcRequired',
-    'isActive',
+    'boughtOut',
+    'sold',
   ];
 
   // Transform items data for better display
@@ -73,7 +73,12 @@ export default function ItemsTable({
       updatedAt: item.updatedAt ? formatDate(item.updatedAt) : '',
       manufactured: item.manufactured ? 'Yes' : 'No',
       qcRequired: item.qcRequired ? 'Yes' : 'No',
-      isActive: item.isActive ? 'Yes' : 'No',
+      boughtOut: item.boughtOut ? 'Yes' : 'No',
+      sold: item.sold ? 'Yes' : 'No',
+      itemTypeId: item.itemTypeId || 'N/A',
+      unitOfMeasure: item.unitOfMeasure || 'N/A',
+      shortName: item.shortName || 'N/A',
+      revNo: item.revNo || 'N/A',
     }));
   }, [items]);
 
@@ -110,7 +115,7 @@ export default function ItemsTable({
         columnMeta={columnMeta}
         isLoading={isLoading}
         groupingEnabled={false}
-        globalFilterEnabled={true}
+        globalFilterEnabled={false}
         dragDropGroupingEnabled={false}
         onRowClick={onEdit}
         actionButtons={actionButtons}

@@ -26,10 +26,10 @@ namespace Xcianify.Repository
             var parameters = new DynamicParameters();
 
             // Add search filter
-            if (!string.IsNullOrWhiteSpace(filterDto.SearchTerm))
+            if (!string.IsNullOrWhiteSpace(filterDto.search))
             {
                 whereConditions.Add("(LOWER(setting_key) LIKE @Search OR LOWER(setting_name) LIKE @Search OR LOWER(description) LIKE @Search OR CAST(id AS TEXT) LIKE @Search)");
-                parameters.Add("@Search", $"%{filterDto.SearchTerm.ToLower()}%");
+                parameters.Add("@Search", $"%{filterDto.search.ToLower()}%");
             }
 
             // Add isActive filter

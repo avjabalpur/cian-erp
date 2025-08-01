@@ -44,7 +44,7 @@ export type CreateOrganizationData = Omit<Organization, 'id' | 'createdAt' | 'up
 export type UpdateOrganizationData = Partial<CreateOrganizationData> & { id: number };
 
 export interface OrganizationFilter {
-  searchTerm?: string;
+  search?: string;
   isActive?: boolean;
   locationTypeId?: number;
   pageNumber?: number;

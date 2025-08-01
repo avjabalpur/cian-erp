@@ -40,13 +40,13 @@ namespace Xcianify.Infrastructure.Data.Repositories
                 .Include(i => i.Specification)
                 .AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
+            if (!string.IsNullOrWhiteSpace(filter.search))
             {
-                var searchTerm = filter.SearchTerm.ToLower();
+                var search = filter.search.ToLower();
                 query = query.Where(i =>
-                    i.ItemCode.ToLower().Contains(searchTerm) ||
-                    i.ItemName.ToLower().Contains(searchTerm) ||
-                    i.ShortName.ToLower().Contains(searchTerm));
+                    i.ItemCode.ToLower().Contains(search) ||
+                    i.ItemName.ToLower().Contains(search) ||
+                    i.ShortName.ToLower().Contains(search));
             }
 
             if (filter.ItemTypeId.HasValue)

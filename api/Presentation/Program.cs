@@ -126,7 +126,8 @@ builder.Services.AddAutoMapper(
     typeof(ItemMasterMapper),
     typeof(ItemTypeMapper),
     typeof(HsnMasterMapper),
-    typeof(SalesOrderMapper)
+    typeof(SalesOrderMapper),
+    typeof(DosageMapper)
 );
 
 // Register repositories
@@ -208,6 +209,10 @@ builder.Services.AddScoped<ISalesOrderQuotationService, SalesOrderQuotationServi
 builder.Services.AddScoped<ISalesOrderQuotationItemService, SalesOrderQuotationItemService>();
 builder.Services.AddScoped<ISalesOrderSaveTransactionService, SalesOrderSaveTransactionService>();
 builder.Services.AddScoped<ISalesOrderStageService, SalesOrderStageService>();
+
+// Register Dosage services and repositories
+builder.Services.AddScoped<IDosageRepository, DosageRepository>();
+builder.Services.AddScoped<IDosageService, DosageService>();
 
 // Add Controllers
 builder.Services.AddControllers();

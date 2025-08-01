@@ -4,7 +4,7 @@ namespace Xcianify.Core.DTOs.SalesOrder
 {
     public class SalesOrderFilterDto
     {
-        public string? SearchTerm { get; set; }
+        public string? search { get; set; }
         public string? SoNumber { get; set; }
         public string? SoStatus { get; set; }
         public int? CustomerId { get; set; }

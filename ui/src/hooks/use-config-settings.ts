@@ -7,7 +7,7 @@ import { ConfigSetting, CreateConfigSettingData, UpdateConfigSettingData, Config
 const getConfigSettings = async (params?: { 
   pageNumber?: number; 
   pageSize?: number; 
-  searchTerm?: string; 
+  search?: string; 
   isActive?: boolean; 
   columnFilters?: any[];
   sorting?: any[];
@@ -48,15 +48,15 @@ const deleteConfigSetting = async (id: number): Promise<void> => {
 export const useConfigSettings = ({ 
   pageNumber = 1, 
   pageSize = 10, 
-  searchTerm, 
+  search, 
   isActive, 
   columnFilters, 
   sorting, 
   globalFilter 
 }: any = {}) => {
   return useQuery<{ items: ConfigSetting[]; totalCount: number; pageCount: number }, Error>({
-    queryKey: ['configSettings', { pageNumber, pageSize, searchTerm, isActive, columnFilters, sorting, globalFilter }],
-    queryFn: () => getConfigSettings({ pageNumber, pageSize, searchTerm, isActive, columnFilters, sorting, globalFilter }),
+    queryKey: ['configSettings', { pageNumber, pageSize, search, isActive, columnFilters, sorting, globalFilter }],
+    queryFn: () => getConfigSettings({ pageNumber, pageSize, search, isActive, columnFilters, sorting, globalFilter }),
   });
 };
 

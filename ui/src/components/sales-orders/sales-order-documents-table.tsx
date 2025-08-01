@@ -18,7 +18,7 @@ interface SalesOrderDocumentsProps {
 }
 
 export function SalesOrderDocuments({ salesOrderId }: SalesOrderDocumentsProps) {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [search, setsearch] = useState("");
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [uploadData, setUploadData] = useState({
     fileName: "",
@@ -33,9 +33,9 @@ export function SalesOrderDocuments({ salesOrderId }: SalesOrderDocumentsProps) 
   const createDocumentMutation = useCreateSalesOrderDocument();
 
   const filteredDocuments = documents.filter((doc: SalesOrderDocument) =>
-    doc.fileName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    doc.tag?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    doc.fileType?.toLowerCase().includes(searchTerm.toLowerCase())
+    doc.fileName.toLowerCase().includes(search.toLowerCase()) ||
+    doc.tag?.toLowerCase().includes(search.toLowerCase()) ||
+    doc.fileType?.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleDeleteDocument = async (documentId: number) => {
@@ -215,8 +215,8 @@ export function SalesOrderDocuments({ salesOrderId }: SalesOrderDocumentsProps) 
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search documents..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={search}
+              onChange={(e) => setsearch(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -225,7 +225,7 @@ export function SalesOrderDocuments({ salesOrderId }: SalesOrderDocumentsProps) 
           <ScrollArea className="border rounded-md p-4">
             {filteredDocuments.length === 0 ? (
               <div className="text-center text-muted-foreground py-8">
-                {searchTerm ? "No documents found matching your search." : "No documents uploaded yet."}
+                {search ? "No documents found matching your search." : "No documents uploaded yet."}
               </div>
             ) : (
               <div className="space-y-3">

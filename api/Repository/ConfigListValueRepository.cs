@@ -16,7 +16,7 @@ namespace Xcianify.Repository
 
         public async Task<(List<ConfigListValue> Items, int TotalCount)> GetAllAsync(
             int? listId = null,
-            string? searchTerm = null,
+            string? search = null,
             bool? isActive = null,
             int pageNumber = 1,
             int pageSize = 20,
@@ -35,10 +35,10 @@ namespace Xcianify.Repository
                 parameters.Add("@ListId", listId.Value);
             }
 
-            if (!string.IsNullOrWhiteSpace(searchTerm))
+            if (!string.IsNullOrWhiteSpace(search))
             {
-                whereConditions.Add("(clv.value_code LIKE @SearchTerm OR clv.value_name LIKE @SearchTerm)");
-                parameters.Add("@SearchTerm", $"%{searchTerm}%");
+                whereConditions.Add("(clv.value_code LIKE @search OR clv.value_name LIKE @search)");
+                parameters.Add("@search", $"%{search}%");
             }
 
             if (isActive.HasValue)

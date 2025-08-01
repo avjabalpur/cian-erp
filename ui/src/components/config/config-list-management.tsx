@@ -21,14 +21,14 @@ export default function ConfigListManagement() {
   // URL state management with nuqs
   const [page, setPage] = useQueryState("page", configListParsers.page);
   const [pageSize, setPageSize] = useQueryState("pageSize", configListParsers.pageSize);
-  const [searchTerm, setSearchTerm] = useQueryState("search", configListParsers.search);
+  const [search, setsearch] = useQueryState("search", configListParsers.search);
   const [isActive, setIsActive] = useQueryState("isActive", configListParsers.isActive);
 
   // Construct filter object for API
   const filter: ConfigListFilterType = {
     pageNumber: page || 1,
     pageSize: pageSize || 20,
-    search: searchTerm || undefined,
+    search: search || undefined,
     isActive: isActive || undefined,
   };
 

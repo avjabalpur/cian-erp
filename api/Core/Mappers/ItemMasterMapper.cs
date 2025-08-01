@@ -15,14 +15,12 @@ namespace Xcianify.Core.Mappers
             CreateMap<ItemSpecificationDto, ItemSpecification>();
             CreateMap<ItemSpecification, ItemSpecificationDto>();
 
-            // For updates, we need to handle the ID mapping explicitly
-            CreateMap<ItemMaster, ItemMaster>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedOn, opt => opt.Ignore());
+            //CreateMap<ItemMaster, ItemMaster>()
+            //    .ForMember(dest => dest.Id, opt => opt.Ignore());
 
-            CreateMap<ItemSpecification, ItemSpecification>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.ItemCode, opt => opt.Ignore());
+            //CreateMap<ItemSpecification, ItemSpecification>()
+            //    .ForMember(dest => dest.Id, opt => opt.Ignore())
+            //    .ForMember(dest => dest.ItemCode, opt => opt.Ignore());
         }
     }
 }

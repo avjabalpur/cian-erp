@@ -16,7 +16,7 @@ export type CreateItemTypeData = Omit<ItemType, 'id' | 'createdAt' | 'updatedAt'
 export type UpdateItemTypeData = Partial<CreateItemTypeData>;
 
 export interface ItemTypeFilter {
-  searchTerm?: string;
+  search?: string;
   isActive?: boolean;
   pageNumber?: number;
   pageSize?: number;

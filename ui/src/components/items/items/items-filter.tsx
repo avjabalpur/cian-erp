@@ -59,7 +59,7 @@ export default function ItemsFilter() {
       isExpanded={isExpanded}
       onToggleExpand={setIsExpanded}
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
         <NuqsFormInput
           label="Search"
           placeholder="Search by item code, name, or short name..."

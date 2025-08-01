@@ -5,7 +5,7 @@ import { ItemMaster, CreateItemMasterData, UpdateItemMasterData, ItemMasterFilte
 // API Functions
 const getItemMasters = async (filter?: ItemMasterFilter): Promise<PaginatedResponse<ItemMaster>> => {
   const params = new URLSearchParams();
-  if (filter?.searchTerm) params.append('searchTerm', filter.searchTerm);
+  if (filter?.search) params.append('search', filter.search);
   if (filter?.itemCode) params.append('itemCode', filter.itemCode);
   if (filter?.itemName) params.append('itemName', filter.itemName);
   if (filter?.shortName) params.append('shortName', filter.shortName);

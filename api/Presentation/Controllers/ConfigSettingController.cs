@@ -20,7 +20,7 @@ namespace Xcianify.Presentation.Controllers
         public async Task<ActionResult<PaginatedConfigSettingResultDto>> GetAll(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
-            [FromQuery] string searchTerm = null,
+            [FromQuery] string search = null,
             [FromQuery] bool? isActive = null,
             [FromQuery] string sortBy = null,
             [FromQuery] bool sortDescending = false)
@@ -29,7 +29,7 @@ namespace Xcianify.Presentation.Controllers
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
-                SearchTerm = searchTerm,
+                search = search,
                 IsActive = isActive
             };
 

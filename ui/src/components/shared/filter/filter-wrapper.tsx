@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Filter, X } from "lucide-react";
+import { Filter, X, ChevronUp, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FilterWrapperProps {
@@ -43,11 +43,11 @@ export function FilterWrapper({
   const hasActiveFilters = activeFilterCount > 0;
 
   return (
-    <Card className={cn("mb-6", className)}>
-      <CardHeader className="pb-3">
+    <Card className={cn("mb-4", className)}>
+      <CardHeader className="pb-1 pt-1">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
+            <Filter className="h-4 w-4" />
             {title}
             {hasActiveFilters && (
               <Badge variant="secondary" className="ml-2">
@@ -62,7 +62,11 @@ export function FilterWrapper({
                 size="sm"
                 onClick={handleToggleExpand}
               >
-                {isExpanded ? "Collapse" : "Expand"}
+                {isExpanded ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
               </Button>
             )}
             {showClearButton && hasActiveFilters && onClearFilters && (
@@ -80,9 +84,11 @@ export function FilterWrapper({
         </div>
       </CardHeader>
       
-      <CardContent>
-        {children}
-      </CardContent>
+      {isExpanded && (
+        <CardContent>
+          {children}
+        </CardContent>
+      )}
     </Card>
   );
 } 

@@ -5,7 +5,7 @@ import { HsnMaster, CreateHsnMasterData, UpdateHsnMasterData, HsnMasterFilter, P
 // API Functions
 const getHsnMaster = async (filter?: HsnMasterFilter): Promise<PaginatedResponse<HsnMaster>> => {
   const params = new URLSearchParams();
-  if (filter?.search) params.append('searchTerm', filter.search);
+  if (filter?.search) params.append('search', filter.search);
   if (filter?.hsnType) params.append('hsnType', filter.hsnType);
   if (filter?.isActive !== undefined) params.append('isActive', filter.isActive.toString());
   if (filter?.pageNumber) params.append('pageNumber', filter.pageNumber.toString());

@@ -28,7 +28,7 @@ export default function SalesOrderPerformaInvoiceTable({
   onDelete,
   onCreate,
 }: SalesOrderPerformaInvoiceTableProps) {
-  const [searchTerm, setSearchTerm] = useState("")
+  const [search, setsearch] = useState("")
 
   const {
     data: performaInvoices = [],
@@ -44,9 +44,9 @@ export default function SalesOrderPerformaInvoiceTable({
   })
 
   const filteredPerformaInvoices = performaInvoices.filter((performaInvoice) =>
-    performaInvoice.performaInvoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    performaInvoice.exporterName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    performaInvoice.consigneeName.toLowerCase().includes(searchTerm.toLowerCase())
+    performaInvoice.performaInvoiceNumber.toLowerCase().includes(search.toLowerCase()) ||
+    performaInvoice.exporterName.toLowerCase().includes(search.toLowerCase()) ||
+    performaInvoice.consigneeName.toLowerCase().includes(search.toLowerCase())
   )
 
   if (isLoading) {
@@ -109,8 +109,8 @@ export default function SalesOrderPerformaInvoiceTable({
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search invoices..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={search}
+                onChange={(e) => setsearch(e.target.value)}
                 className="pl-8"
               />
             </div>
@@ -119,7 +119,7 @@ export default function SalesOrderPerformaInvoiceTable({
           {filteredPerformaInvoices.length === 0 ? (
             <div className="flex items-center justify-center h-32">
               <p className="text-muted-foreground">
-                {searchTerm ? "No invoices found matching your search" : "No performa invoices found"}
+                {search ? "No invoices found matching your search" : "No performa invoices found"}
               </p>
             </div>
           ) : (
