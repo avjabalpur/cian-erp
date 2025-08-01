@@ -78,11 +78,10 @@ export default function RolesManagement() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Role Management</h1>
-          <p className="mt-2 text-gray-600">Manage system roles and their permissions</p>
+          <h1 className="text-xl font-bold text-gray-900">Roles</h1>
         </div>
         <Button onClick={() => { setRole(null); setOpenRoleDrawer(true); }}>
             <Plus className="w-4 h-4 mr-2" />

@@ -132,31 +132,31 @@ export default function ItemsDrawer({
               </TabsContent>
 
               <TabsContent value="manufacturing" className="space-y-3">
-                <ItemManufacturingForm control={form.control} />
+                <ItemManufacturingForm control={form.control} itemId={item?.id} />
               </TabsContent>
 
               <TabsContent value="sales" className="space-y-3">
-                <ItemSalesForm control={form.control} />
+                <ItemSalesForm control={form.control} itemId={item?.id} />
               </TabsContent>
 
               <TabsContent value="bought-out" className="space-y-3">
-                <ItemBoughtOutForm control={form.control} />
+                <ItemBoughtOutForm control={form.control} itemId={item?.id} />
               </TabsContent>
 
               <TabsContent value="stock" className="space-y-3">
-                <ItemStockAnalysisForm control={form.control} />
+                <ItemStockAnalysisForm control={form.control} itemId={item?.id} />
               </TabsContent>
 
               <TabsContent value="export" className="space-y-3">
-                <ItemExportForm control={form.control} />
+                <ItemExportForm control={form.control} itemId={item?.id} />
               </TabsContent>
 
               <TabsContent value="specifications" className="space-y-3">
-                <ItemSpecificationsForm control={form.control} />
+                <ItemSpecificationsForm control={form.control} itemId={item?.id} />
               </TabsContent>
 
               <TabsContent value="other" className="space-y-3">
-                <ItemOtherDetailsForm control={form.control} />
+                <ItemOtherDetailsForm control={form.control} itemId={item?.id} />
               </TabsContent>
             </Tabs>
 

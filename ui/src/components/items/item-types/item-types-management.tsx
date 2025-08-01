@@ -106,7 +106,7 @@ export default function ItemTypesManagement() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Item Types</h1>

@@ -75,7 +75,7 @@ export default function HsnMasterManagement() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2">
 
       <div className="flex justify-between items-center">
         <div>

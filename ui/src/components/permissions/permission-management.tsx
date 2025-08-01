@@ -67,11 +67,10 @@ export default function PermissionManagement() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Permission Management</h1>
-          <p className="mt-2 text-gray-600">Manage system permissions</p>
+          <h1 className="text-xl font-bold text-gray-900">Permissions</h1>
         </div>
         <Button onClick={() => { setSelectedPermission(null); setOpenDrawer(true); }}>
           <Plus className="w-4 h-4 mr-2" />

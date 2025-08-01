@@ -27,7 +27,7 @@ export default function OrganizationsManagement() {
     <div className="space-y-2">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Organization Management</h1>
+          <h1 className="text-xl font-bold text-gray-900">Organizations</h1>
         </div>
         <Button onClick={() => { setSelectedOrganization(null); setDrawerOpen(true); }}>
           <Plus className="w-4 h-4 mr-2" />

@@ -2,9 +2,8 @@
 
 import { useMemo, useState } from "react"
 
-import { Column } from "@/types/common"
 import { formatDate } from "@/lib/date-utils"
-import AdvancedTable from "../shared/advanced-table"
+import AdvancedTable, { Column } from "../shared/advanced-table"
 import { User } from "@/types/user"
 
 
@@ -44,16 +43,16 @@ export default function UsersTable({
 }: UsersTableProps) {
 
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'username', data_type: 'string', description: 'Username' },
-    { name: 'email', data_type: 'string', description: 'Email address' },
-    { name: 'firstName', data_type: 'string', description: 'First Name' },
-    { name: 'lastName', data_type: 'string', description: 'Last Name' },
-    { name: 'employeeId', data_type: 'string', description: 'Employee ID' },
-    { name: 'department', data_type: 'string', description: 'Department' },
-    { name: 'designation', data_type: 'string', description: 'Designation' },
-    { name: 'roles', data_type: 'string', description: 'Roles' },
-    { name: 'isActive', data_type: 'boolean', description: 'Active status' },
-    { name: 'lastLogin', data_type: 'date', description: 'Last Login' },
+    { name: 'username', data_type: 'string', displayName: 'Username' },
+    { name: 'email', data_type: 'string', displayName: 'Email address' },
+    { name: 'firstName', data_type: 'string', displayName: 'First Name' },
+    { name: 'lastName', data_type: 'string', displayName: 'Last Name' },
+    { name: 'employeeId', data_type: 'string', displayName: 'Employee ID' },
+    { name: 'department', data_type: 'string', displayName: 'Department' },
+    { name: 'designation', data_type: 'string', displayName: 'Designation' },
+    { name: 'roles', data_type: 'string', displayName: 'Roles' },
+    { name: 'isActive', data_type: 'boolean', displayName: 'Active status' },
+    { name: 'lastLogin', data_type: 'date', displayName: 'Last Login' },
   ], [])
   
   const defaultColumns = [
@@ -90,9 +89,9 @@ export default function UsersTable({
       columns={defaultColumns}
       columnMeta={columnMeta}
       isLoading={isLoading}
-      groupingEnabled={true}
-      globalFilterEnabled={true}
-      dragDropGroupingEnabled={true}
+      groupingEnabled={false}
+      globalFilterEnabled={false}
+      dragDropGroupingEnabled={false}
       onRowClick={onView}
       actionButtons={actionButtons}
       className="w-full"

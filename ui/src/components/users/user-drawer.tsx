@@ -6,7 +6,7 @@ import { useCreateUser, useUpdateUser } from "@/hooks/use-users"
 import { toast } from "@/hooks/use-toast"
 import { userFormSchema, UserFormValues } from "@/validations/user"
 import { useEffect } from "react"
-import { UserInformationForm } from "./forms/user-information-form"
+import { UserInformationForm } from "./user-information-form"
 
 interface UserDrawerProps {
   isOpen: boolean

@@ -8,10 +8,13 @@ import { User } from "@/types/user"
 import { useUsers } from "@/hooks/use-users"
 import { Plus } from "lucide-react"
 import { UserDrawer } from "./user-drawer"
+import { UserDetailsDrawer } from "./user-details-drawer"
 
 export default function UsersManagement() {
   const [search, setsearch] = useState("")
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [detailsDrawerOpen, setDetailsDrawerOpen] = useState(false)
+
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
   const router = useRouter()
@@ -36,7 +39,8 @@ export default function UsersManagement() {
   const pageCount = 10 // TODO: get from API
 
   const handleView = (user: User) => {
-    router.push(`/users/${user.id}`)
+    setSelectedUser(user)
+    setDetailsDrawerOpen(true)
   }
 
   const handleEdit = (user: User) => {
@@ -72,11 +76,10 @@ export default function UsersManagement() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-          <p className="mt-2 text-gray-600">Manage system users and their permissions</p>
+          <h1 className="text-xl font-bold text-gray-900">User Management</h1>
         </div>
         <Button onClick={() => { setSelectedUser(null); setDrawerOpen(true); }}>
           <Plus className="w-4 h-4 mr-2" />
@@ -103,6 +106,12 @@ export default function UsersManagement() {
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         user={selectedUser}
+      />
+      
+      <UserDetailsDrawer
+        isOpen={detailsDrawerOpen}
+        onClose={() => setDetailsDrawerOpen(false)}
+        userId={selectedUser?.id || null}
       />
     </div>
   )

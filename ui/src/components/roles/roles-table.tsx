@@ -1,9 +1,8 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Column } from "@/types/common"
 import { formatDate } from "@/lib/date-utils"
-import AdvancedTable from "../shared/advanced-table"
+import AdvancedTable, { Column } from "../shared/advanced-table"
 import { Role } from "@/types/role"
 
 
@@ -43,10 +42,10 @@ export default function RolesTable({
 }: RolesTableProps) {
 
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'name', data_type: 'string', description: 'Role name' },
-    { name: 'description', data_type: 'string', description: 'Role description' },
-    { name: 'isActive', data_type: 'boolean', description: 'Active status' },
-    { name: 'createdAt', data_type: 'date', description: 'Created date' },
+    { name: 'name', data_type: 'string', displayName: 'Role name' },
+    { name: 'description', data_type: 'string', displayName: 'Role description' },
+    { name: 'isActive', data_type: 'boolean', displayName: 'Active status' },
+    { name: 'createdAt', data_type: 'date', displayName: 'Created date' },
   ], [])
 
   // Define which columns to show by default

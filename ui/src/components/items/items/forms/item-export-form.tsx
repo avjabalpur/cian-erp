@@ -1,33 +1,126 @@
+import { useEffect } from "react";
+import { useController } from "react-hook-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FormInput } from "@/components/shared/forms/form-input"
-import { FormSelect } from "@/components/shared/forms/form-select"
 import { FormTextarea } from "@/components/shared/forms/form-textarea"
-import { FormRadioGroup } from "@/components/shared/forms/form-radio-group";
+import { FormSelect } from "@/components/shared/forms/form-select"
+import { useItemExportDetails } from "@/hooks/items/use-item-export-details"
 
 interface ItemExportFormProps {
   control: any;
+  itemId?: number;
 }
 
-export function ItemExportForm({ control }: ItemExportFormProps) {
-  const exportProductGroupOptions = [
-    { label: "Select group", value: "-1" },
-    { label: "GENERAL", value: "01" },
-    { label: "SPECIAL", value: "02" },
-  ];
+export function ItemExportForm({ control, itemId }: ItemExportFormProps) {
+  // Fetch item export details data
+  const { data: exportData, isLoading } = useItemExportDetails(itemId || 0);
+  
+  // Use controller to programmatically set form values
+  const { field: itemDescriptionField } = useController({
+    name: "itemDescriptionForExports",
+    control,
+  });
+
+  const { field: exportProductGroupCodeField } = useController({
+    name: "exportProductGroupCode",
+    control,
+  });
+
+  const { field: exportProductGroupNameField } = useController({
+    name: "exportProductGroupName",
+    control,
+  });
+
+  const { field: depbRateListSrlNoField } = useController({
+    name: "depbRateListSrlNo",
+    control,
+  });
+
+  const { field: depbRateField } = useController({
+    name: "depbRate",
+    control,
+  });
+
+  const { field: depbValueCapField } = useController({
+    name: "depbValueCap",
+    control,
+  });
+
+  const { field: depbRemarksField } = useController({
+    name: "depbRemarks",
+    control,
+  });
+
+  const { field: dutyDrawbackSrlNoField } = useController({
+    name: "dutyDrawbackSrlNo",
+    control,
+  });
+
+  const { field: dutyDrawbackRateTypeField } = useController({
+    name: "dutyDrawbackRateType",
+    control,
+  });
+
+  const { field: dutyDrawbackRatePercentField } = useController({
+    name: "dutyDrawbackRatePercent",
+    control,
+  });
+
+  const { field: dutyDrawbackRateFixedField } = useController({
+    name: "dutyDrawbackRateFixed",
+    control,
+  });
+
+  const { field: dutyDrawbackValueCapField } = useController({
+    name: "dutyDrawbackValueCap",
+    control,
+  });
+
+  const { field: dutyDrawbackRemarksField } = useController({
+    name: "dutyDrawbackRemarks",
+    control,
+  });
+
+  // Populate form when export data is loaded
+  useEffect(() => {
+    if (exportData && itemId) {
+      itemDescriptionField.onChange(exportData.itemDescriptionForExports || "");
+      exportProductGroupCodeField.onChange(exportData.exportProductGroupCode || "");
+      exportProductGroupNameField.onChange(exportData.exportProductGroupName || "");
+      depbRateListSrlNoField.onChange(exportData.depbRateListSrlNo || "");
+      depbRateField.onChange(exportData.depbRate?.toString() || "");
+      depbValueCapField.onChange(exportData.depbValueCap?.toString() || "");
+      depbRemarksField.onChange(exportData.depbRemarks || "");
+      dutyDrawbackSrlNoField.onChange(exportData.dutyDrawbackSrlNo || "");
+      dutyDrawbackRateTypeField.onChange(exportData.dutyDrawbackRateType || "");
+      dutyDrawbackRatePercentField.onChange(exportData.dutyDrawbackRatePercent?.toString() || "");
+      dutyDrawbackRateFixedField.onChange(exportData.dutyDrawbackRateFixed?.toString() || "");
+      dutyDrawbackValueCapField.onChange(exportData.dutyDrawbackValueCap?.toString() || "");
+      dutyDrawbackRemarksField.onChange(exportData.dutyDrawbackRemarks || "");
+    }
+  }, [exportData, itemId, itemDescriptionField, exportProductGroupCodeField, exportProductGroupNameField, depbRateListSrlNoField, depbRateField, depbValueCapField, depbRemarksField, dutyDrawbackSrlNoField, dutyDrawbackRateTypeField, dutyDrawbackRatePercentField, dutyDrawbackRateFixedField, dutyDrawbackValueCapField, dutyDrawbackRemarksField]);
+
+  if (isLoading && itemId) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-sm text-gray-500">Loading export details...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
-      {/* Item's Description */}
+      {/* Item Description for Exports */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Item's Description (for Exports)</CardTitle>
+          <CardTitle className="text-lg">Item Description for Exports</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <FormTextarea
             control={control}
             name="itemDescriptionForExports"
             label="Description"
-            placeholder="Enter detailed description for exports"
+            placeholder="Enter item description for exports..."
           />
         </CardContent>
       </Card>
@@ -39,59 +132,56 @@ export function ItemExportForm({ control }: ItemExportFormProps) {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <FormSelect
+            <FormInput
               control={control}
               name="exportProductGroupCode"
-              label="Group Code"
-              options={exportProductGroupOptions}
+              label="Product Group Code"
+              placeholder="Enter product group code"
             />
             <FormInput
               control={control}
               name="exportProductGroupName"
-              label="Group Name"
-              placeholder="GENERAL"
+              label="Product Group Name"
+              placeholder="Enter product group name"
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* D.E.P.B. Details */}
+      {/* DEPB Rate Details */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">D.E.P.B. Details</CardTitle>
+          <CardTitle className="text-lg">DEPB Rate Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <FormInput
               control={control}
               name="depbRateListSrlNo"
-              label="Rate List Srl. No."
+              label="Rate List Serial No."
               placeholder="Enter serial number"
             />
             <FormInput
               control={control}
               name="depbRate"
-              label="Rate"
-              placeholder="0.0000 %"
-              inputProps={{ type: "number", step: "0.0001" }}
+              label="DEPB Rate"
+              placeholder="0.00"
+              inputProps={{ type: "number", step: "0.01" }}
             />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <FormInput
               control={control}
               name="depbValueCap"
               label="Value Cap"
-              placeholder="0.00 Per Unit"
+              placeholder="0.00"
               inputProps={{ type: "number", step: "0.01" }}
             />
-            <FormTextarea
-              control={control}
-              name="depbRemarks"
-              label="Remarks"
-              placeholder="Enter DEPB remarks"
-            />
           </div>
+          <FormTextarea
+            control={control}
+            name="depbRemarks"
+            label="DEPB Remarks"
+            placeholder="Enter DEPB remarks..."
+          />
         </CardContent>
       </Card>
 
@@ -101,59 +191,51 @@ export function ItemExportForm({ control }: ItemExportFormProps) {
           <CardTitle className="text-lg">Duty Drawback Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <FormInput
-            control={control}
-            name="dutyDrawbackSrlNo"
-            label="Srl. No."
-            placeholder="Enter serial number"
-          />
-
-          <div className="space-y-3">
-            <FormRadioGroup
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <FormInput
+              control={control}
+              name="dutyDrawbackSrlNo"
+              label="Serial No."
+              placeholder="Enter serial number"
+            />
+            <FormInput
               control={control}
               name="dutyDrawbackRateType"
-              label="Rate"
-              options={[
-                { value: "percent", label: "% of F.O.B. Value" },
-                { value: "fixed", label: "Fixed Amount Per Unit" },
-              ]}
+              label="Rate Type"
+              placeholder="Enter rate type"
             />
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <FormInput
-                control={control}
-                name="dutyDrawbackRatePercent"
-                label="Rate %"
-                placeholder="0.0000 %"
-                inputProps={{ type: "number", step: "0.0001" }}
-              />
-              <FormInput
-                control={control}
-                name="dutyDrawbackRateFixed"
-                label="Fixed Amount"
-                placeholder="0.00"
-                inputProps={{ type: "number", step: "0.01" }}
-              />
-            </div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <FormInput
+              control={control}
+              name="dutyDrawbackRatePercent"
+              label="Rate Percent"
+              placeholder="0.00"
+              inputProps={{ type: "number", step: "0.01" }}
+            />
+            <FormInput
+              control={control}
+              name="dutyDrawbackRateFixed"
+              label="Rate Fixed"
+              placeholder="0.00"
+              inputProps={{ type: "number", step: "0.01" }}
+            />
             <FormInput
               control={control}
               name="dutyDrawbackValueCap"
               label="Value Cap"
-              placeholder="0.00 Per Unit"
+              placeholder="0.00"
               inputProps={{ type: "number", step: "0.01" }}
             />
-            <FormTextarea
-              control={control}
-              name="dutyDrawbackRemarks"
-              label="Remarks"
-              placeholder="Enter duty drawback remarks"
-            />
           </div>
+          <FormTextarea
+            control={control}
+            name="dutyDrawbackRemarks"
+            label="Duty Drawback Remarks"
+            placeholder="Enter duty drawback remarks..."
+          />
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
