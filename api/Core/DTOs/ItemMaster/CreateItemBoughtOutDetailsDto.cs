@@ -1,25 +1,40 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
-namespace Xcianify.Core.Model
+namespace Xcianify.Core.DTOs.ItemMaster
 {
-    public class ItemBoughtOutDetails : BaseModel
+    public class CreateItemBoughtOutDetailsDto
     {
-        public int Id { get; set; }
         public int ItemId { get; set; }
-        
-        [ForeignKey("ItemId")]
-        public virtual ItemMaster Item { get; set; }
+
+        [StringLength(20)]
         public string PurchaseBasedOn { get; set; }
+
+        [Range(0, 9999.99)]
         public decimal? ExcessPlanningPercent { get; set; }
+
+        [Range(0, 99999999.9999)]
         public decimal? ReorderLevel { get; set; }
+
+        [Range(0, 99999999.9999)]
         public decimal? MinStockLevel { get; set; }
+
+        [Range(0, 99999999.9999)]
         public decimal? MaxStockLevel { get; set; }
+
         public int? MinBalanceShelfLifeDays { get; set; }
+
+        [Range(0, 9999.99)]
         public decimal? CustomDutyPercent { get; set; }
+
+        [Range(0, 9999.99)]
         public decimal? IgstPercent { get; set; }
+
+        [Range(0, 9999.99)]
         public decimal? SwsPercent { get; set; }
+
+        [Range(0, 9999999.99999)]
         public decimal? MaxPurchaseRate { get; set; }
-        public bool StopProcurement { get; set; } = false;
+
+        public bool StopProcurement { get; set; }
     }
-}
+} 

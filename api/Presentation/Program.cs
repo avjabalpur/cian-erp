@@ -171,7 +171,14 @@ builder.Services.AddScoped<IItemSalesDetailService, ItemSalesDetailService>();
 builder.Services.AddScoped<IItemStockAnalysisRepository, ItemStockAnalysisRepository>();
 builder.Services.AddScoped<IItemStockAnalysisService, ItemStockAnalysisService>();
 builder.Services.AddScoped<IItemSpecificationRepository, ItemSpecificationRepository>();
+builder.Services.AddScoped<IItemSpecificationService, ItemSpecificationService>();
+builder.Services.AddScoped<IItemBoughtOutDetailsRepository, ItemBoughtOutDetailsRepository>();
+builder.Services.AddScoped<IItemBoughtOutDetailsService, ItemBoughtOutDetailsService>();
 builder.Services.AddScoped<IItemMasterService, ItemMasterService>();
+
+// Register Item Master mappers
+builder.Services.AddScoped<ItemSpecificationMapper>();
+builder.Services.AddScoped<ItemBoughtOutDetailsMapper>();
 
 // Register Config List services and repositories
 builder.Services.AddScoped<IConfigListRepository, ConfigListRepository>();

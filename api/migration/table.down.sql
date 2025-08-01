@@ -12,3 +12,14 @@ DROP TABLE IF EXISTS sales_order_documents CASCADE;
 DROP TABLE IF EXISTS sales_order_stages CASCADE;
 DROP TABLE IF EXISTS sales_orders CASCADE;
 
+DROP TABLE IF EXISTS item_media CASCADE;
+DROP TABLE IF EXISTS item_other_details CASCADE;
+DROP TABLE IF EXISTS item_export_details CASCADE;
+DROP TABLE IF EXISTS item_stock_analysis CASCADE;
+DROP TABLE IF EXISTS item_sales_details CASCADE;
+DROP TABLE IF EXISTS item_bought_out_details CASCADE;
+DROP TABLE IF EXISTS item_specifications CASCADE;
+DROP TABLE IF EXISTS item_master CASCADE;
+
+
+

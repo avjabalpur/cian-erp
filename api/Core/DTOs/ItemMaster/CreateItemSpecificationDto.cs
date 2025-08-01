@@ -12,5 +12,6 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public string Specification8 { get; set; }
         public string Specification9 { get; set; }
         public string Specification10 { get; set; }
+        public int ItemId { get; set; }
     }
 }

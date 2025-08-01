@@ -14,12 +14,12 @@ namespace Xcianify.Repository
             _dbContext = dbContext;
         }
 
-        public async Task<ItemBoughtOutDetails> GetByItemCodeAsync(string itemCode)
+        public async Task<ItemBoughtOutDetails> GetByItemIdAsync(int itemId)
         {
             using (var connection = _dbContext.GetConnection())
             {
-                var sql = "SELECT * FROM item_bought_out_details WHERE item_code = @ItemCode";
-                return await connection.QueryFirstOrDefaultAsync<ItemBoughtOutDetails>(sql, new { ItemCode = itemCode });
+                var sql = "SELECT * FROM item_bought_out_details WHERE item_id = @ItemId";
+                return await connection.QueryFirstOrDefaultAsync<ItemBoughtOutDetails>(sql, new { ItemId = itemId });
             }
         }
 
@@ -47,11 +47,11 @@ namespace Xcianify.Repository
             {
                 var sql = @"
                     INSERT INTO item_bought_out_details 
-                    (item_code, purchase_based_on, excess_planning_percent, reorder_level, 
+                    (item_id, purchase_based_on, excess_planning_percent, reorder_level, 
                      min_stock_level, max_stock_level, min_balance_shelf_life_days, 
                      custom_duty_percent, igst_percent, sws_percent, max_purchase_rate, stop_procurement)
                     VALUES 
-                    (@ItemCode, @PurchaseBasedOn, @ExcessPlanningPercent, @ReorderLevel, 
+                    (@ItemId, @PurchaseBasedOn, @ExcessPlanningPercent, @ReorderLevel, 
                      @MinStockLevel, @MaxStockLevel, @MinBalanceShelfLifeDays, 
                      @CustomDutyPercent, @IgstPercent, @SwsPercent, @MaxPurchaseRate, @StopProcurement)
                     RETURNING *";
@@ -66,7 +66,7 @@ namespace Xcianify.Repository
             {
                 var sql = @"
                     UPDATE item_bought_out_details 
-                    SET item_code = @ItemCode,
+                    SET item_id = @ItemId,
                         purchase_based_on = @PurchaseBasedOn,
                         excess_planning_percent = @ExcessPlanningPercent,
                         reorder_level = @ReorderLevel,

@@ -254,7 +254,7 @@ CREATE TABLE IF NOT EXISTS dosage (
 );
 
 
-CREATE TABLE item_master (
+CREATE TABLE IF NOT EXISTS  item_master (
     id SERIAL PRIMARY KEY,
     item_code VARCHAR(50),
     rev_no VARCHAR(20),
@@ -284,7 +284,7 @@ CREATE TABLE item_master (
     economic_order_qty INTEGER,
     desired_pack_size INTEGER,
     tax_credit_applicable BOOLEAN,
-    freight_on VARCHAR(10), -- 'Weight' or 'Volume'
+    freight_on VARCHAR(10),
     manufactured BOOLEAN,
     allowed_allergen_percent NUMERIC(5, 2),
     std_mfg_fees_per_unit NUMERIC(10, 4),
@@ -313,12 +313,13 @@ CREATE TABLE item_master (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     created_by INTEGER,
     updated_by INTEGER,
+    is_active BOOLEAN DEFAULT TRUE,
     is_deleted BOOLEAN DEFAULT FALSE
 );
 
-CREATE TABLE item_specifications (
+CREATE TABLE IF NOT EXISTS  item_specifications (
     id SERIAL PRIMARY KEY,
-    item_code VARCHAR(50), -- FK to item_master(item_code)
+    item_id INTEGER NOT NULL REFERENCES item_master(id),
     specification TEXT,
     substitute_for_item_code VARCHAR(50),
     custom_tariff_no VARCHAR(50),
@@ -333,10 +334,9 @@ CREATE TABLE item_specifications (
     markup_amount NUMERIC(10, 4)
 );
 
-
-CREATE TABLE item_bought_out_details (
+CREATE TABLE IF NOT EXISTS  item_bought_out_details (
     id SERIAL PRIMARY KEY,
-    item_code VARCHAR(50), -- FK to item_master(item_code)
+    item_id INTEGER NOT NULL REFERENCES item_master(id),
     purchase_based_on VARCHAR(20) CHECK (purchase_based_on IN ('Re-order Level', 'M.R.P. Plan', 'Indents')),
     excess_planning_percent NUMERIC(6, 2),
     reorder_level NUMERIC(12, 4),
@@ -350,72 +350,55 @@ CREATE TABLE item_bought_out_details (
     stop_procurement BOOLEAN DEFAULT FALSE
 );
 
-CREATE TABLE item_sales_details (
+CREATE TABLE IF NOT EXISTS  item_sales_details (
     id SERIAL PRIMARY KEY,
-    item_code VARCHAR(50), -- FK to item_master(item_code)
-    
+    item_id INTEGER NOT NULL REFERENCES item_master(id),
     pack_size_applicable BOOLEAN,
     default_pack_size VARCHAR(100),
-
     saleable_unit_contains INTEGER,
-
     qty_per_box INTEGER,
     boxes_per_case INTEGER,
     case_packing_type VARCHAR(100),
-
     packing_rate NUMERIC(12, 4),
     qty_per_case NUMERIC(12, 4),
     net_weight_case NUMERIC(12, 4),
     tare_weight_case NUMERIC(12, 4),
     gross_weight_case NUMERIC(12, 4),
     gross_weight_unit NUMERIC(12, 4),
-
     case_dimensions_inches VARCHAR(100),
     case_volume_cft NUMERIC(12, 4),
     case_dimensions_cm VARCHAR(100),
     case_volume_cbm NUMERIC(12, 4),
-
     min_sale_rate NUMERIC(12, 4),
     min_so_qty NUMERIC(12, 4),
-
     tertiary_gtin VARCHAR(50),
     secondary_gtin VARCHAR(50),
     primary_gtin VARCHAR(50),
-
     min_batch_qty_autoloading NUMERIC(12, 4),
     consider_as_new_product_till DATE,
-
     interface_code VARCHAR(50),
     specs VARCHAR(100)
 );
 
-
-CREATE TABLE item_stock_analysis (
+CREATE TABLE IF NOT EXISTS  item_stock_analysis (
     id SERIAL PRIMARY KEY,
-    item_code VARCHAR(50), -- FK to item_master(item_code)
-
+    item_id INTEGER NOT NULL REFERENCES item_master(id),
     abc_consumption_value CHAR(1) CHECK (abc_consumption_value IN ('A', 'B', 'C', 'N')),
     xyz_stock_value CHAR(1) CHECK (xyz_stock_value IN ('X', 'Y', 'Z', 'N')),
     fsn_movement CHAR(1) CHECK (fsn_movement IN ('F', 'S', 'N', 'N')),
     ved_analysis CHAR(1) CHECK (ved_analysis IN ('V', 'E', 'D', 'N'))
 );
 
-
-CREATE TABLE item_export_details (
+CREATE TABLE IF NOT EXISTS  item_export_details (
     id SERIAL PRIMARY KEY,
-    item_code VARCHAR(50), -- FK to item_master(item_code)
-
+    item_id INTEGER NOT NULL REFERENCES item_master(id),
     export_description TEXT,
     export_product_group_code VARCHAR(10),
     export_product_group_name VARCHAR(100),
-
-    -- DEPB (Duty Entitlement Passbook Scheme) Details
     depb_rate_list_srl_no VARCHAR(20),
     depb_rate NUMERIC(10, 4),
     depb_value_cap NUMERIC(12, 4),
     depb_remarks TEXT,
-
-    -- Duty Drawback Details
     drawback_srl_no VARCHAR(20),
     drawback_rate NUMERIC(10, 4),
     drawback_rate_type VARCHAR(30), -- '% of F.O.B. Value' or 'Fixed Amount Per Unit'
@@ -423,12 +406,11 @@ CREATE TABLE item_export_details (
     drawback_remarks TEXT
 );
 
-CREATE TABLE item_other_details (
+CREATE TABLE IF NOT EXISTS item_other_details (
     id SERIAL PRIMARY KEY,
-    item_code VARCHAR(50), -- FK to item_master(item_code)
-
+    item_id INTEGER NOT NULL REFERENCES item_master(id),
     pack_short VARCHAR(50),
-    product_cast VARCHAR(50), -- e.g. DRUG, FOOD
+    product_cast VARCHAR(50), 
     pvc_color VARCHAR(50),
     color VARCHAR(50),
     flavour VARCHAR(50),
@@ -437,7 +419,6 @@ CREATE TABLE item_other_details (
     packaging_style VARCHAR(100),
     change_part VARCHAR(100),
     size VARCHAR(50),
-
     with_leaflet BOOLEAN,
     with_applicator BOOLEAN,
     with_wad BOOLEAN,
@@ -445,19 +426,16 @@ CREATE TABLE item_other_details (
     with_cotton BOOLEAN,
     with_measuring_cap BOOLEAN,
     with_spoon BOOLEAN,
-
     packing_np VARCHAR(100),
     packing_np_qty INTEGER,
     packing_style_ptd VARCHAR(100),
     packing_style_ptd_qty INTEGER,
     note_per_strip TEXT,
-
     pack_short_ptd_spec VARCHAR(100),
     pack_short_ptd_size VARCHAR(100),
     pack_short_ptd_qty INTEGER,
     packing_style_np_size VARCHAR(100),
     packing_style_np_qty INTEGER,
-
     note_for_ctn TEXT,
     outer_size VARCHAR(50),
     outer_qty INTEGER,
@@ -468,23 +446,19 @@ CREATE TABLE item_other_details (
     shipper_note TEXT
 );
 
-CREATE TABLE item_media (
+CREATE TABLE IF NOT EXISTS item_media (
     id SERIAL PRIMARY KEY,
-    item_code VARCHAR(50), -- FK to item_master(item_code)
-
+    item_id INTEGER NOT NULL REFERENCES item_master(id),
     media_type VARCHAR(20) CHECK (media_type IN ('image', 'icon', 'document', 'video', 'other')),
     file_name VARCHAR(255),
     file_extension VARCHAR(10),
     file_size_bytes INTEGER,
     mime_type VARCHAR(100),
-
     media_url TEXT, -- path or URL to media storage (e.g., local path, S3, etc.)
     description TEXT,
-
     uploaded_by VARCHAR(100),
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 
 
 -- ============================================

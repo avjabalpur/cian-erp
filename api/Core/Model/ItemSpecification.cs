@@ -7,7 +7,10 @@ namespace Xcianify.Core.Model
     {
         public int Id { get; set; }
 
-        public string ItemCode { get; set; }
+        public int ItemId { get; set; }
+        
+        [ForeignKey("ItemId")]
+        public virtual ItemMaster Item { get; set; }
 
         public string Specification { get; set; }
 

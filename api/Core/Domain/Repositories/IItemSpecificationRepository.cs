@@ -5,9 +5,9 @@ namespace Xcianify.Core.Domain.Repositories
 {
     public interface IItemSpecificationRepository
     {
-        Task<ItemSpecification> GetByItemCodeAsync(string itemCode);
+        Task<ItemSpecification> GetByItemIdAsync(int itemId);
         Task CreateAsync(ItemSpecification specification);
         Task UpdateAsync(ItemSpecification specification);
-        Task DeleteAsync(string itemCode);
+        Task DeleteAsync(int itemId);
     }
 }

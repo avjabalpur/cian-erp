@@ -66,7 +66,7 @@ namespace Xcianify.Services
                 if (createDto.Specification != null)
                 {
                     var specification = _mapper.Map<ItemSpecification>(createDto.Specification);
-                    specification.ItemCode = createDto.ItemCode;
+                    specification.Id = createdItem.Id;
                     specification.CreatedBy = 1; // TODO: Get from current user context
                     specification.UpdatedBy = 1;
                     specification.CreatedAt = DateTime.UtcNow;
@@ -115,7 +115,7 @@ namespace Xcianify.Services
                 if (updateDto.Specification != null)
                 {
                     var specification = _mapper.Map<ItemSpecification>(updateDto.Specification);
-                    specification.ItemCode = updateDto.ItemCode;
+                    specification.Id = item.Id;
                     specification.UpdatedBy = 1; // TODO: Get from current user context
                     specification.UpdatedAt = DateTime.UtcNow;
                     

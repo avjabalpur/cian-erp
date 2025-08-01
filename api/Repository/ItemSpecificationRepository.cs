@@ -15,12 +15,12 @@ namespace Xcianify.Repository
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public async Task<ItemSpecification> GetByItemCodeAsync(string itemCode)
+        public async Task<ItemSpecification> GetByItemIdAsync(int itemId)
         {
             const string query = @"
                 SELECT 
                     id as Id,
-                    item_code as ItemCode,
+                    item_id as ItemId,
                     specification as Specification,
                     substitute_for_item_code as SubstituteForItemCode,
                     custom_tariff_no as CustomTariffNo,
@@ -38,23 +38,23 @@ namespace Xcianify.Repository
                     created_at as CreatedAt,
                     updated_at as UpdatedAt
                 FROM item_specifications
-                WHERE item_code = @ItemCode";
+                WHERE item_id = @ItemId";
 
             using var connection = _dbContext.GetConnection();
-            return await connection.QueryFirstOrDefaultAsync<ItemSpecification>(query, new { ItemCode = itemCode });
+            return await connection.QueryFirstOrDefaultAsync<ItemSpecification>(query, new { ItemId = itemId });
         }
 
         public async Task CreateAsync(ItemSpecification specification)
         {
             const string query = @"
                 INSERT INTO item_specifications (
-                    item_code, specification, substitute_for_item_code, 
+                    item_id, specification, substitute_for_item_code, 
                     custom_tariff_no, excise_tariff_no, vat_comm_code, 
                     conversion_factor, old_code, standard_weight, 
                     standard_conversion_cost_factor, standard_packing_cost_factor, 
                     markup_percentage, markup_amount, created_by, updated_by
                 ) VALUES (
-                    @ItemCode, @Specification, @SubstituteForItemCode, 
+                    @ItemId, @Specification, @SubstituteForItemCode, 
                     @CustomTariffNo, @ExciseTariffNo, @VatCommCode, 
                     @ConversionFactor, @OldCode, @StandardWeight, 
                     @StandardConversionCostFactor, @StandardPackingCostFactor, 
@@ -83,18 +83,18 @@ namespace Xcianify.Repository
                     markup_amount = @MarkupAmount,
                     updated_by = @UpdatedBy,
                     updated_at = @UpdatedAt
-                WHERE item_code = @ItemCode";
+                WHERE item_id = @ItemId";
 
             using var connection = _dbContext.GetConnection();
             await connection.ExecuteAsync(query, specification);
         }
 
-        public async Task DeleteAsync(string itemCode)
+        public async Task DeleteAsync(int itemId)
         {
-            const string query = "DELETE FROM item_specifications WHERE item_code = @ItemCode";
+            const string query = "DELETE FROM item_specifications WHERE item_id = @ItemId";
 
             using var connection = _dbContext.GetConnection();
-            await connection.ExecuteAsync(query, new { ItemCode = itemCode });
+            await connection.ExecuteAsync(query, new { ItemId = itemId });
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Xcianify.Core.Domain.Repositories
 {
     public interface IItemBoughtOutDetailsRepository
     {
-        Task<ItemBoughtOutDetails> GetByItemCodeAsync(string itemCode);
+        Task<ItemBoughtOutDetails> GetByItemIdAsync(int itemId);
         Task<ItemBoughtOutDetails> GetByIdAsync(int id);
         Task<IEnumerable<ItemBoughtOutDetails>> GetAllAsync();
         Task<ItemBoughtOutDetails> CreateAsync(ItemBoughtOutDetails details);

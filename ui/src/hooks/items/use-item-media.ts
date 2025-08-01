@@ -59,32 +59,32 @@ const getItemMedia = async (filter?: ItemMediaFilter): Promise<ItemMedia[]> => {
   if (filter?.page) params.append('page', filter.page.toString());
   if (filter?.pageSize) params.append('pageSize', filter.pageSize.toString());
 
-  const { data } = await api.get(`/item-media?${params.toString()}`);
+  const { data } = await api.get(`/items/media?${params.toString()}`);
   return data;
 };
 
-const getItemMediaById = async (id: number): Promise<ItemMedia> => {
-  const { data } = await api.get(`/item-media/${id}`);
+const getItemMediaById = async (itemId: number, id: number): Promise<ItemMedia> => {
+  const { data } = await api.get(`/items/${itemId}/media/${id}`);
   return data;
 };
 
 const getItemMediaByItemId = async (itemId: number): Promise<ItemMedia[]> => {
-  const { data } = await api.get(`/item-media/item/${itemId}`);
+  const { data } = await api.get(`/items/${itemId}/media`);
   return data;
 };
 
-const createItemMedia = async (mediaData: CreateItemMediaData): Promise<ItemMedia> => {
-  const { data } = await api.post('/item-media', mediaData);
+const createItemMedia = async (itemId: number, mediaData: CreateItemMediaData): Promise<ItemMedia> => {
+  const { data } = await api.post(`/items/${itemId}/media`, mediaData);
   return data;
 };
 
-const updateItemMedia = async (id: number, mediaData: UpdateItemMediaData): Promise<ItemMedia> => {
-  const { data } = await api.put(`/item-media/${id}`, mediaData);
+const updateItemMedia = async (itemId: number, id: number, mediaData: UpdateItemMediaData): Promise<ItemMedia> => {
+  const { data } = await api.put(`/items/${itemId}/media/${id}`, mediaData);
   return data;
 };
 
-const deleteItemMedia = async (id: number): Promise<void> => {
-  await api.delete(`/item-media/${id}`);
+const deleteItemMedia = async (itemId: number, id: number): Promise<void> => {
+  await api.delete(`/items/${itemId}/media/${id}`);
 };
 
 // React Query Hooks
@@ -95,11 +95,11 @@ export const useItemMedia = (filter?: ItemMediaFilter) => {
   });
 };
 
-export const useItemMediaById = (id: number) => {
+export const useItemMediaById = (itemId: number, id: number) => {
   return useQuery<ItemMedia, Error>({
-    queryKey: ['item-media', id],
-    queryFn: () => getItemMediaById(id),
-    enabled: !!id,
+    queryKey: ['item-media', itemId, id],
+    queryFn: () => getItemMediaById(itemId, id),
+    enabled: !!itemId && !!id,
   });
 };
 
@@ -113,31 +113,34 @@ export const useItemMediaByItemId = (itemId: number) => {
 
 export const useCreateItemMedia = () => {
   const queryClient = useQueryClient();
-  return useMutation<ItemMedia, Error, CreateItemMediaData>({
-    mutationFn: createItemMedia,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['item-media'] });
+  return useMutation<ItemMedia, Error, { itemId: number; data: CreateItemMediaData }>({
+    mutationFn: ({ itemId, data }) => createItemMedia(itemId, data),
+    onSuccess: (data, { itemId }) => {
+      queryClient.invalidateQueries({ queryKey: ['item-media', itemId] });
+      queryClient.invalidateQueries({ queryKey: ['item-master', itemId] });
     },
   });
 };
 
 export const useUpdateItemMedia = () => {
   const queryClient = useQueryClient();
-  return useMutation<ItemMedia, Error, { id: number; data: UpdateItemMediaData }>({
-    mutationFn: ({ id, data }) => updateItemMedia(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['item-media'] });
-      queryClient.invalidateQueries({ queryKey: ['item-media', id] });
+  return useMutation<ItemMedia, Error, { itemId: number; id: number; data: UpdateItemMediaData }>({
+    mutationFn: ({ itemId, id, data }) => updateItemMedia(itemId, id, data),
+    onSuccess: (data, { itemId, id }) => {
+      queryClient.invalidateQueries({ queryKey: ['item-media', itemId] });
+      queryClient.invalidateQueries({ queryKey: ['item-media', itemId, id] });
+      queryClient.invalidateQueries({ queryKey: ['item-master', itemId] });
     },
   });
 };
 
 export const useDeleteItemMedia = () => {
   const queryClient = useQueryClient();
-  return useMutation<void, Error, number>({
-    mutationFn: deleteItemMedia,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['item-media'] });
+  return useMutation<void, Error, { itemId: number; id: number }>({
+    mutationFn: ({ itemId, id }) => deleteItemMedia(itemId, id),
+    onSuccess: (_, { itemId }) => {
+      queryClient.invalidateQueries({ queryKey: ['item-media', itemId] });
+      queryClient.invalidateQueries({ queryKey: ['item-master', itemId] });
     },
   });
 }; 

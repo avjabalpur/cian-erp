@@ -5,7 +5,7 @@ namespace Xcianify.Core.DTOs.ItemExportDetails
     public class ItemExportDetailsDto
     {
         public int Id { get; set; }
-        public string ItemCode { get; set; }
+        public int ItemId { get; set; }
         public string ExportDescription { get; set; }
         public string ExportProductGroupCode { get; set; }
         public string ExportProductGroupName { get; set; }

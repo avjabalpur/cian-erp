@@ -8,8 +8,7 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public int Id { get; set; }
         
         [Required]
-        [StringLength(50)]
-        public string ItemId { get; set; }
+        public int ItemId { get; set; }
         
         [StringLength(1000)]
         public string Specification1 { get; set; }
