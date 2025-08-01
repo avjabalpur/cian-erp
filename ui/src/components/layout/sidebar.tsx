@@ -23,14 +23,14 @@ export const Sidebar = ({ navigation, title, isCollapsed }: SidebarProps) => {
     <div
       className={cn(
         "hidden md:flex md:flex-col transition-all duration-300 border-r bg-white",
-        isCollapsed ? "md:w-20" : "md:w-64",
+        isCollapsed ? "md:w-16" : "md:w-48",
       )}
     >
-      <div className="flex items-center flex-shrink-0 px-4 h-16">
+      <div className="flex items-center flex-shrink-0 px-3 h-16">
         <Building2 className="h-8 w-8 text-blue-600" />
         {!isCollapsed && <span className="ml-2 text-xl font-semibold text-gray-900 whitespace-nowrap">{title}</span>}
       </div>
-      <ScrollArea className="flex-1 px-2 mt-5">
+      <ScrollArea className="flex-1 px-2 mt-3">
         <nav className="space-y-1">
           {navigation.map((item) => (
             <NavItem key={item.label} item={item} isCollapsed={isCollapsed} />

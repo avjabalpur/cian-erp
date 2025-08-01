@@ -40,34 +40,20 @@ export default function HsnMasterTable({
 }: HsnMasterTableProps) {
 
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'code', data_type: 'string', description: 'Code' },
-    { name: 'name', data_type: 'string', description: 'Name' },
-    { name: 'description', data_type: 'string', description: 'Description' },
-    { name: 'hsnType', data_type: 'string', description: 'HSN Type' },
-    { name: 'uqc', data_type: 'string', description: 'UQC' },
-    { name: 'igstRate', data_type: 'number', description: 'IGST Rate (%)' },
-    { name: 'cgstRate', data_type: 'number', description: 'CGST Rate (%)' },
-    { name: 'sgstRate', data_type: 'number', description: 'SGST Rate (%)' },
-    { name: 'cessRate', data_type: 'number', description: 'CESS Rate (%)' },
-    { name: 'isReverseCharges', data_type: 'boolean', description: 'Reverse Charges' },
-    { name: 'isActive', data_type: 'boolean', description: 'Active' },
-    { name: 'createdAt', data_type: 'date', description: 'Created At' },
+    { name: 'code', data_type: 'string', description: 'Code', isDefault: true },
+    { name: 'name', data_type: 'string', description: 'Name', isDefault: true },
+    { name: 'description', data_type: 'string', description: 'Description', isDefault: false },
+    { name: 'hsnType', data_type: 'string', description: 'HSN Type', isDefault: true },
+    { name: 'uqc', data_type: 'string', description: 'UQC', isDefault: false },
+    { name: 'igstRate', data_type: 'number', description: 'IGST Rate (%)', isDefault: true },
+    { name: 'cgstRate', data_type: 'number', description: 'CGST Rate (%)', isDefault: false },
+    { name: 'sgstRate', data_type: 'number', description: 'SGST Rate (%)', isDefault: false },
+    { name: 'cessRate', data_type: 'number', description: 'CESS Rate (%)', isDefault: false },
+    { name: 'isReverseCharges', data_type: 'boolean', description: 'Reverse Charges', isDefault: false },
+    { name: 'isActive', data_type: 'boolean', description: 'Active', isDefault: true },
+    { name: 'createdAt', data_type: 'date', description: 'Created At', isDefault: false },
   ], []);
   
-  const defaultColumns = [
-    'code',
-    'name',
-    'description',
-    'hsnType',
-    'uqc',
-    'igstRate',
-    'cgstRate',
-    'sgstRate',
-    'cessRate',
-    'isReverseCharges',
-    'isActive',
-  ];
-
   // Transform data for better display
   const transformedData = useMemo(() => {
     return hsnCodes.map(hsnCode => ({
@@ -108,7 +94,6 @@ export default function HsnMasterTable({
     <div className="w-full">
       <AdvancedTable
         data={transformedData}
-        columns={defaultColumns}
         columnMeta={columnMeta}
         isLoading={isLoading}
         groupingEnabled={false}

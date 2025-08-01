@@ -40,19 +40,12 @@ export default function LocationTypeTable({
 }: LocationTypeTableProps) {
 
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'code', data_type: 'string', displayName: 'Code' },
-    { name: 'name', data_type: 'string', displayName: 'Name' },
-    { name: 'isActive', data_type: 'boolean', displayName: 'Status' },
-    { name: 'createdAt', data_type: 'date', displayName: 'Created At' },
+    { name: 'code', data_type: 'string', displayName: 'Code', isDefault: true },
+    { name: 'name', data_type: 'string', displayName: 'Name', isDefault: true },
+    { name: 'isActive', data_type: 'boolean', displayName: 'Status', isDefault: true },
+    { name: 'createdAt', data_type: 'date', displayName: 'Created At', isDefault: false },
   ], []);
   
-  const defaultColumns = [
-    'code',
-    'name',
-    'isActive',
-    'createdAt',
-  ];
-
   // Transform data for better display
   const transformedData = useMemo(() => {
     return locationTypes.map(locationType => ({
@@ -85,7 +78,6 @@ export default function LocationTypeTable({
     <div className="w-full">
       <AdvancedTable
         data={transformedData}
-        columns={defaultColumns}
         columnMeta={columnMeta}
         isLoading={isLoading}
         groupingEnabled={false}

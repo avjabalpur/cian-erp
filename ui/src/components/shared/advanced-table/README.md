@@ -7,7 +7,7 @@ A powerful, feature-rich table component built on TanStack Table with advanced f
 - **Advanced Filtering**: String, number, boolean, and date filters with operators
 - **Grouping**: Drag-and-drop column grouping with multi-level support
 - **Global Search**: Search across all columns simultaneously
-- **Column Management**: Show/hide columns with visibility controls
+- **Column Management**: Show/hide columns with visibility controls using `isDefault` flag
 - **Export**: Export filtered data to CSV
 - **Row Interactions**: Clickable rows and action buttons
 - **Pagination**: Client-side pagination with customizable page sizes
@@ -26,9 +26,27 @@ const MyComponent = () => {
   ]
 
   const columnMeta: Column[] = [
-    { name: 'name', data_type: 'string', description: 'Person name' },
-    { name: 'age', data_type: 'number', description: 'Person age' },
-    { name: 'active', data_type: 'boolean', description: 'Active status' },
+    { 
+      name: 'name', 
+      data_type: 'string', 
+      displayName: 'Person Name',
+      description: 'Person name',
+      isDefault: true 
+    },
+    { 
+      name: 'age', 
+      data_type: 'number', 
+      displayName: 'Age',
+      description: 'Person age',
+      isDefault: true 
+    },
+    { 
+      name: 'active', 
+      data_type: 'boolean', 
+      displayName: 'Active Status',
+      description: 'Active status',
+      isDefault: false 
+    },
   ]
 
   const handleRowClick = (row: any) => {
@@ -43,7 +61,6 @@ const MyComponent = () => {
   return (
     <AdvancedTable
       data={data}
-      columns={['name', 'age', 'active']}
       columnMeta={columnMeta}
       onRowClick={handleRowClick}
       actionButtons={actionButtons}
@@ -60,64 +77,33 @@ const MyComponent = () => {
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `data` | `any[]` | Required | Array of data objects |
-| `columns` | `string[]` | Auto-detected | Column keys to display |
-| `columnMeta` | `Column[]` | `[]` | Metadata for proper filtering |
-| `isLoading` | `boolean` | `false` | Show loading state |
-| `groupingEnabled` | `boolean` | `true` | Enable grouping features |
+| `columnMeta` | `Column[]` | Required | Column metadata with `isDefault` flag |
+| `isLoading` | `boolean` | `false` | Loading state |
+| `groupingEnabled` | `boolean` | `true` | Enable column grouping |
 | `globalFilterEnabled` | `boolean` | `true` | Enable global search |
-| `dragDropGroupingEnabled` | `boolean` | `true` | Enable drag-drop grouping |
+| `dragDropGroupingEnabled` | `boolean` | `true` | Enable drag-and-drop grouping |
 | `onRowClick` | `(row: any) => void` | - | Row click handler |
-| `actionButtons` | `ActionButtons` | - | Action button configuration |
-| `className` | `string` | `''` | Additional CSS classes |
+| `actionButtons` | `object` | - | Action button configuration |
 
-## Column Metadata
+## Column Configuration
 
-Define column metadata for proper filtering and display:
-
-```tsx
-const columnMeta: Column[] = [
-  { name: 'firstName', data_type: 'string', description: 'First name' },
-  { name: 'age', data_type: 'number', description: 'Age in years' },
-  { name: 'isActive', data_type: 'boolean', description: 'Active status' },
-  { name: 'createdAt', data_type: 'date', description: 'Creation date' },
-]
-```
-
-## Action Buttons
-
-Configure action buttons for each row:
+The `columnMeta` prop defines all available columns with their properties:
 
 ```tsx
-const actionButtons = {
-  onView: (row: any) => navigate(`/view/${row.id}`),
-  onEdit: (row: any) => navigate(`/edit/${row.id}`),
-  onDelete: (row: any) => handleDelete(row.id),
+interface Column {
+  name: string                    // Column key in data
+  data_type: string              // Data type: 'string', 'number', 'boolean', 'date'
+  displayName?: string           // Display name for header and dropdown
+  description?: string           // Column description
+  isDefault?: boolean            // Whether to show by default (default: false)
+  render?: CellRenderer          // Custom cell renderer function
 }
 ```
 
-## Files Structure
+### Column Visibility
 
-```
-ui/components/shared/advanced-table/
-├── index.tsx                 # Main exports
-├── advanced-table-wrapper.tsx # Main component
-├── types.ts                  # TypeScript types
-├── utils.ts                  # Utility exports
-├── column-utils.ts           # Column type utilities
-├── export-utils.ts           # CSV export utilities
-└── drag-drop-grouping.tsx    # Drag-drop grouping component
-```
+- **`isDefault: true`**: Column is shown by default when table loads
+- **`isDefault: false`**: Column is hidden by default but available in column dropdown
+- **`isDefault: undefined`**: Treated as `false` (hidden by default)
 
-## Migration from Old DataTable
-
-The AdvancedTable is a drop-in replacement for the old DataTable with enhanced features. Key differences:
-
-1. **Client-side pagination** instead of server-side
-2. **Advanced filtering** with type-aware filters
-3. **Grouping capabilities** with drag-and-drop
-4. **Better performance** with virtual scrolling
-5. **Export functionality** built-in
-
-## Examples
-
-See `ui/components/sales/leads/lead-table-advanced.tsx` for a complete implementation example with Lead data.
+Users can toggle column visibility using the "Columns" dropdown in the table header.

@@ -46,7 +46,7 @@ export function FilterWrapper({
     <Card className={cn("mb-4", className)}>
       <CardHeader className="pb-1 pt-1">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-sm">
             <Filter className="h-4 w-4" />
             {title}
             {hasActiveFilters && (
@@ -58,7 +58,7 @@ export function FilterWrapper({
           <div className="flex items-center gap-2">
             {showExpandCollapse && (
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={handleToggleExpand}
               >

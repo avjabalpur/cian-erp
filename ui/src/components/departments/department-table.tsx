@@ -40,21 +40,38 @@ export default function DepartmentTable({
 }: DepartmentTableProps) {
 
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'code', data_type: 'string', displayName: 'Code' },
-    { name: 'name', data_type: 'string', displayName: 'Name' },
-    { name: 'description', data_type: 'string', displayName: 'Description' },
-    { name: 'uomForMis', data_type: 'string', displayName: 'UOM for MIS' },
-    { name: 'isActive', data_type: 'boolean', displayName: 'Status' },
+    { 
+      name: 'code', 
+      data_type: 'string', 
+      displayName: 'Code',
+      isDefault: true
+    },
+    { 
+      name: 'name', 
+      data_type: 'string', 
+      displayName: 'Name',
+      isDefault: true
+    },
+    { 
+      name: 'description', 
+      data_type: 'string', 
+      displayName: 'Description',
+      isDefault: true
+    },
+    { 
+      name: 'uomForMis', 
+      data_type: 'string', 
+      displayName: 'UOM for MIS',
+      isDefault: true
+    },
+    { 
+      name: 'isActive', 
+      data_type: 'boolean', 
+      displayName: 'Status',
+      isDefault: true
+    },
   ], []);
   
-  const defaultColumns = [
-    'code',
-    'name',
-    'description',
-    'uomForMis',
-    'isActive',
-  ];
-
   // Transform data for better display
   const transformedData = useMemo(() => {
     return departments.map(department => ({
@@ -88,7 +105,6 @@ export default function DepartmentTable({
     <div className="w-full">
       <AdvancedTable
         data={transformedData}
-        columns={defaultColumns}
         columnMeta={columnMeta}
         isLoading={isLoading}
         groupingEnabled={false}

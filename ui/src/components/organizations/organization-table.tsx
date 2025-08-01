@@ -40,27 +40,16 @@ export default function OrganizationTable({
 }: OrganizationTableProps) {
 
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'code', data_type: 'string', displayName: 'Code' },
-    { name: 'name', data_type: 'string', displayName: 'Name' },
-    { name: 'contactPerson', data_type: 'string', displayName: 'Contact Person' },
-    { name: 'email', data_type: 'string', displayName: 'Email' },
-    { name: 'phone', data_type: 'string', displayName: 'Phone' },
-    { name: 'city', data_type: 'string', displayName: 'City' },
-    { name: 'state', data_type: 'string', displayName: 'State' },
-    { name: 'isActive', data_type: 'boolean', displayName: 'Status' },
+    { name: 'code', data_type: 'string', displayName: 'Code', isDefault: true },
+    { name: 'name', data_type: 'string', displayName: 'Name', isDefault: true },
+    { name: 'contactPerson', data_type: 'string', displayName: 'Contact Person', isDefault: true },
+    { name: 'email', data_type: 'string', displayName: 'Email', isDefault: false },
+    { name: 'phone', data_type: 'string', displayName: 'Phone', isDefault: false },
+    { name: 'city', data_type: 'string', displayName: 'City', isDefault: false },
+    { name: 'state', data_type: 'string', displayName: 'State', isDefault: false },
+    { name: 'isActive', data_type: 'boolean', displayName: 'Status', isDefault: true },
   ], []);
   
-  const defaultColumns = [
-    'code',
-    'name',
-    'contactPerson',
-    'email',
-    'phone',
-    'city',
-    'state',
-    'isActive',
-  ];
-
   // Transform data for better display
   const transformedData = useMemo(() => {
     return organizations.map(organization => ({
@@ -97,7 +86,6 @@ export default function OrganizationTable({
     <div className="w-full">
       <AdvancedTable
         data={transformedData}
-        columns={defaultColumns}
         columnMeta={columnMeta}
         isLoading={isLoading}
         groupingEnabled={false}

@@ -42,25 +42,50 @@ export default function DivisionTable({
 }: DivisionTableProps) {
 
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'code', data_type: 'string', displayName: 'Code' },
-    { name: 'name', data_type: 'string', displayName: 'Name' },
-    { name: 'description', data_type: 'string', displayName: 'Description' },
-    { name: 'departmentName', data_type: 'string', displayName: 'Department' },
-    { name: 'unit', data_type: 'string', displayName: 'Unit' },
-    { name: 'conversionFactor', data_type: 'number', displayName: 'Conversion Factor' },
-    { name: 'isActive', data_type: 'boolean', displayName: 'Status' },
+    { 
+      name: 'code', 
+      data_type: 'string', 
+      displayName: 'Code',
+      isDefault: true
+    },
+    { 
+      name: 'name', 
+      data_type: 'string', 
+      displayName: 'Name',
+      isDefault: true
+    },
+    { 
+      name: 'description', 
+      data_type: 'string', 
+      displayName: 'Description',
+      isDefault: true
+    },
+    { 
+      name: 'departmentName', 
+      data_type: 'string', 
+      displayName: 'Department',
+      isDefault: true
+    },
+    { 
+      name: 'unit', 
+      data_type: 'string', 
+      displayName: 'Unit',
+      isDefault: true
+    },
+    { 
+      name: 'conversionFactor', 
+      data_type: 'number', 
+      displayName: 'Conversion Factor',
+      isDefault: false
+    },
+    { 
+      name: 'isActive', 
+      data_type: 'boolean', 
+      displayName: 'Status',
+      isDefault: true
+    },
   ], []);
   
-  const defaultColumns = [
-    'code',
-    'name',
-    'description',
-    'departmentName',
-    'unit',
-    'conversionFactor',
-    'isActive',
-  ];
-
   // Transform data for better display
   const transformedData = useMemo(() => {
     return divisions.map(division => {
@@ -99,7 +124,6 @@ export default function DivisionTable({
     <div className="w-full">
       <AdvancedTable
         data={transformedData}
-        columns={defaultColumns}
         columnMeta={columnMeta}
         isLoading={isLoading}
         groupingEnabled={false}

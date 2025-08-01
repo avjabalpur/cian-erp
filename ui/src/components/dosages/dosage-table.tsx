@@ -40,19 +40,12 @@ export default function DosageTable({
 }: DosageTableProps) {
 
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'name', data_type: 'string', displayName: 'Name' },
-    { name: 'registerDate', data_type: 'string', displayName: 'Register Date' },
-    { name: 'isActive', data_type: 'boolean', displayName: 'Status' },
-    { name: 'createdAt', data_type: 'date', displayName: 'Created At' },
+    { name: 'name', data_type: 'string', displayName: 'Name', isDefault: true },
+    { name: 'registerDate', data_type: 'string', displayName: 'Register Date', isDefault: true },
+    { name: 'isActive', data_type: 'boolean', displayName: 'Status', isDefault: true },
+    { name: 'createdAt', data_type: 'date', displayName: 'Created At', isDefault: false },
   ], []);
   
-  const defaultColumns = [
-    'name',
-    'registerDate',
-    'isActive',
-    'createdAt',
-  ];
-
   // Transform data for better display
   const transformedData = useMemo(() => {
     return dosages.map(dosage => ({
@@ -86,7 +79,6 @@ export default function DosageTable({
     <div className="w-full">
       <AdvancedTable
         data={transformedData}
-        columns={defaultColumns}
         columnMeta={columnMeta}
         isLoading={isLoading}
         groupingEnabled={false}

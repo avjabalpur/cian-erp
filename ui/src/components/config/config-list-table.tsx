@@ -2,9 +2,8 @@
 
 import { useMemo } from "react";
 import { Edit, Trash2 } from "lucide-react";
-import { Column } from "@/types/common";
 import { formatDate } from "@/lib/date-utils";
-import AdvancedTable from "../shared/advanced-table";
+import AdvancedTable, { Column } from "../shared/advanced-table";
 import { ConfigList } from "@/types/config-list";
 
 interface ConfigListTableProps {
@@ -40,19 +39,43 @@ export default function ConfigListTable({
 }: ConfigListTableProps) {
 
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'listCode', data_type: 'string', description: 'List Code' },
-    { name: 'listName', data_type: 'string', description: 'List Name' },
-    { name: 'description', data_type: 'string', description: 'Description' },
-    { name: 'isActive', data_type: 'boolean', description: 'Active' },
-    { name: 'createdAt', data_type: 'date', description: 'Created At' },
+    { 
+      name: 'listCode', 
+      data_type: 'string', 
+      displayName: 'List Code',
+      isDefault: true 
+    },
+    { 
+      name: 'listName', 
+      data_type: 'string', 
+      displayName: 'List Name',
+      isDefault: true 
+    },
+    { 
+      name: 'description', 
+      data_type: 'string', 
+      displayName: 'Description',
+      isDefault: true 
+    },
+    { 
+      name: 'isActive', 
+      data_type: 'boolean', 
+      displayName: 'Active',
+      isDefault: false 
+    },
+    { 
+      name: 'createdAt', 
+      data_type: 'date', 
+      displayName: 'Created At',
+      isDefault: false 
+    },
+    { 
+      name: 'updatedAt', 
+      data_type: 'date', 
+      displayName: 'Updated At',
+      isDefault: false 
+    },
   ], []);
-  
-  const defaultColumns = [
-    'listCode',
-    'listName',
-    'description',
-    'isActive',
-  ];
 
   // Transform data for better display
   const transformedData = useMemo(() => {
@@ -87,7 +110,6 @@ export default function ConfigListTable({
     <div className="w-full">
       <AdvancedTable
         data={transformedData}
-        columns={defaultColumns}
         columnMeta={columnMeta}
         isLoading={isLoading}
         groupingEnabled={false}

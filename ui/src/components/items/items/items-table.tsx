@@ -39,32 +39,19 @@ export default function ItemsTable({
 }: ItemsTableProps) {
 
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'itemCode', data_type: 'string', description: 'Item Code' },
-    { name: 'itemName', data_type: 'string', description: 'Item Name' },
-    { name: 'shortName', data_type: 'string', description: 'Short Name' },
-    { name: 'revNo', data_type: 'string', description: 'Revision No' },
-    { name: 'itemTypeId', data_type: 'number', description: 'Item Type' },
-    { name: 'unitOfMeasure', data_type: 'string', description: 'Unit of Measure' },
-    { name: 'manufactured', data_type: 'boolean', description: 'Manufactured' },
-    { name: 'qcRequired', data_type: 'boolean', description: 'QC Required' },
-    { name: 'boughtOut', data_type: 'boolean', description: 'Bought Out' },
-    { name: 'sold', data_type: 'boolean', description: 'Sold' },
-    { name: 'createdAt', data_type: 'date', description: 'Created At' },
+    { name: 'itemCode', data_type: 'string', description: 'Item Code', isDefault: true },
+    { name: 'itemName', data_type: 'string', description: 'Item Name', isDefault: true },
+    { name: 'shortName', data_type: 'string', description: 'Short Name', isDefault: true },
+    { name: 'revNo', data_type: 'string', description: 'Revision No', isDefault: false },
+    { name: 'itemTypeId', data_type: 'number', description: 'Item Type', isDefault: true },
+    { name: 'unitOfMeasure', data_type: 'string', description: 'Unit of Measure', isDefault: true },
+    { name: 'manufactured', data_type: 'boolean', description: 'Manufactured', isDefault: false },
+    { name: 'qcRequired', data_type: 'boolean', description: 'QC Required', isDefault: false },
+    { name: 'boughtOut', data_type: 'boolean', description: 'Bought Out', isDefault: false },
+    { name: 'sold', data_type: 'boolean', description: 'Sold', isDefault: false },
+    { name: 'createdAt', data_type: 'date', description: 'Created At', isDefault: false },
   ], []);
   
-  const defaultColumns = [
-    'itemCode',
-    'itemName',
-    'shortName',
-    'revNo',
-    'itemTypeId',
-    'unitOfMeasure',
-    'manufactured',
-    'qcRequired',
-    'boughtOut',
-    'sold',
-  ];
-
   // Transform items data for better display
   const transformedItems = useMemo(() => {
     return items.map(item => ({
@@ -111,7 +98,6 @@ export default function ItemsTable({
     <div className="w-full">
       <AdvancedTable
         data={transformedItems}
-        columns={defaultColumns}
         columnMeta={columnMeta}
         isLoading={isLoading}
         groupingEnabled={false}

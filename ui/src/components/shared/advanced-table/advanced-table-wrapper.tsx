@@ -26,8 +26,7 @@ import { ChevronUp, ChevronDown, ChevronRight, Download, Search, Filter, Layers,
 
 interface TanstackTableWrapperProps {
   data: any[];
-  columns?: string[]; // If not provided, use keys from first data row
-  columnMeta?: ColumnMeta[]; // Optional metadata for columns
+  columnMeta: ColumnMeta[]; // Required metadata for columns with isDefault flag
   isLoading?: boolean;
   groupingEnabled?: boolean;
   globalFilterEnabled?: boolean;
@@ -66,7 +65,6 @@ interface TanstackTableWrapperProps {
 
 const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
   data,
-  columns,
   columnMeta,
   isLoading = false,
   groupingEnabled = true,
@@ -82,7 +80,6 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
   rowIdField = 'id',
   // Bulk actions
   bulkActions,
-  // Server-side pagination props
   pageCount,
   pageSize: externalPageSize,
   pageIndex: externalPageIndex,
@@ -127,123 +124,91 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
   // Determine column types using metadata or data
   const tableColumns = useMemo(() => {
     if (!data || data.length === 0) return [];
-    const keys = columns || Object.keys(data[0]);
     
+    // Include ALL columns from columnMeta, not just default ones
+    const allColumns = columnMeta.map(col => ({
+      accessorKey: col.name,
+      header: col.displayName || col.name,
+      description: col.description || '',
+      meta: { type: getColumnTypeFromDataType(col.data_type) },
+      enableSorting: true,
+      enableColumnFilter: true,
+      enableGrouping: groupingEnabled,
+      cell: (info: any) => {
+        const value = info.getValue();
+        const row = info.row.original;
+        
+        // Use custom renderer if available
+        if (col.render) {
+          return col.render(value, row);
+        }
+        
+        // Default rendering based on type
+        if (col.data_type === 'boolean') return value ? '✔️' : '';
+        if (col.data_type === 'date') return value ? new Date(value).toLocaleString() : '';
+        if (typeof value === 'object' && value !== null) return JSON.stringify(value);
+        return String(value ?? '');
+      },
+      filterFn: (row: any, columnId: string, filterValue: any) => {
+        const val = row.getValue(columnId);
+        if (col.data_type === 'number') {
+          if (filterValue.op === '=') return Number(val) === Number(filterValue.value);
+          if (filterValue.op === '>') return Number(val) > Number(filterValue.value);
+          if (filterValue.op === '<') return Number(val) < Number(filterValue.value);
+          if (filterValue.op === '>=') return Number(val) >= Number(filterValue.value);
+          if (filterValue.op === '<=') return Number(val) <= Number(filterValue.value);
+          return true;
+        }
+        if (col.data_type === 'boolean') {
+          return String(val) === String(filterValue.value);
+        }
+        if (col.data_type === 'date') {
+          // Simple string match or date equality
+          return new Date(val).toLocaleDateString().includes(filterValue.value);
+        }
+        // Default: string includes
+        return String(val ?? '').toLowerCase().includes(String(filterValue.value ?? '').toLowerCase());
+      },
+    }));
+
     // Add selection column if enabled
-    const allColumns = enableRowSelection ? ['selection', ...keys] : keys;
-    
-    const dataColumns = allColumns.map((key) => {
-      // Handle selection column
-      if (key === 'selection') {
-        return {
-          accessorKey: 'selection',
-          header: () => (
+    if (enableRowSelection) {
+      allColumns.unshift({
+        accessorKey: 'selection',
+        header: 'Selection',
+        description: 'Row selection',
+        meta: { type: 'unknown' as FilterType },
+        enableSorting: false,
+        enableColumnFilter: false,
+        enableGrouping: false,
+        cell: (info: any) => {
+          const row = info.row.original;
+          return (
             <Checkbox
-              className="w-4 h-4 pr-1.5"
-              checked={selected.length > 0 && selected.length === data.length}
+              checked={selected.includes(row[rowIdField])}
               onCheckedChange={(checked) => {
-                const allIds = data.map(row => row[rowIdField]);
-                setSelected(checked ? allIds : []);
+                const newSelected = checked
+                  ? [...selected, row[rowIdField]]
+                  : selected.filter(id => id !== row[rowIdField]);
+                setSelected(newSelected);
                 if (onSelectionChange) {
-                  onSelectionChange(checked ? allIds : []);
+                  onSelectionChange(newSelected);
                 }
               }}
               disabled={isLoading}
             />
-          ),
-          description: 'Row selection',
-          meta: { type: 'unknown' as FilterType },
-          enableSorting: false,
-          enableColumnFilter: false,
-          enableGrouping: false,
-          cell: (info: any) => {
-            const row = info.row.original;
-            return (
-              <Checkbox
-                checked={selected.includes(row[rowIdField])}
-                onCheckedChange={(checked) => {
-                  const newSelected = checked
-                    ? [...selected, row[rowIdField]]
-                    : selected.filter(id => id !== row[rowIdField]);
-                  setSelected(newSelected);
-                  if (onSelectionChange) {
-                    onSelectionChange(newSelected);
-                  }
-                }}
-                disabled={isLoading}
-              />
-            );
-          },
-        };
-      }
-
-      let type: FilterType = 'string';
-      let description = '';
-      let customRenderer: CellRenderer | undefined;
-      let displayName: string | undefined;
-      
-      if (columnMeta) {
-        const meta = columnMeta.find((c) => c.name === key);
-        if (meta) {
-          type = getColumnTypeFromDataType(meta.data_type);
-          description = meta.description || '';
-          customRenderer = meta.render;
-          displayName = meta.displayName;
-        }
-      } else {
-        // Guess type from first value
-        type = guessColumnTypeFromValue(data[0][key]);
-      }
-      
-      return {
-        accessorKey: key,
-        header: displayName || key,
-         description,
-         meta: { type: type as FilterType },
-         enableSorting: true,
-         enableColumnFilter: true,
-         enableGrouping: groupingEnabled,
-        cell: (info: any) => {
-          const value = info.getValue();
-          const row = info.row.original;
-          
-          // Use custom renderer if available
-          if (customRenderer) {
-            return customRenderer(value, row);
-          }
-          
-          // Default rendering based on type
-          if (type === 'boolean') return value ? '✔️' : '';
-          if (type === 'date') return value ? new Date(value).toLocaleString() : '';
-          if (typeof value === 'object' && value !== null) return JSON.stringify(value);
-          return String(value ?? '');
+          );
         },
         filterFn: (row: any, columnId: string, filterValue: any) => {
-          const val = row.getValue(columnId);
-          if (type === 'number') {
-            if (filterValue.op === '=') return Number(val) === Number(filterValue.value);
-            if (filterValue.op === '>') return Number(val) > Number(filterValue.value);
-            if (filterValue.op === '<') return Number(val) < Number(filterValue.value);
-            if (filterValue.op === '>=') return Number(val) >= Number(filterValue.value);
-            if (filterValue.op === '<=') return Number(val) <= Number(filterValue.value);
-            return true;
-          }
-          if (type === 'boolean') {
-            return String(val) === String(filterValue.value);
-          }
-          if (type === 'date') {
-            // Simple string match or date equality
-            return new Date(val).toLocaleDateString().includes(filterValue.value);
-          }
-          // Default: string includes
-          return String(val ?? '').toLowerCase().includes(String(filterValue.value ?? '').toLowerCase());
+          // Selection column doesn't need filtering
+          return true;
         },
-      };
-    });
+      });
+    }
 
     // Add action buttons column if provided (but exclude delete for individual rows when bulk delete is enabled)
     if (actionButtons && (actionButtons.onEdit || actionButtons.onView || actionButtons.onDelete)) {
-      dataColumns.push({
+      allColumns.push({
         accessorKey: 'actions',
         header: 'Actions',
         description: 'Row actions',
@@ -295,29 +260,41 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
       });
     }
 
-    return dataColumns;
-  }, [data, columns, columnMeta, groupingEnabled, actionButtons, enableRowSelection, selected, onSelectionChange, rowIdField, isLoading]);
+    return allColumns;
+  }, [data, columnMeta, groupingEnabled, actionButtons, enableRowSelection, selected, onSelectionChange, rowIdField, isLoading]);
 
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({});
 
   // Initialize column visibility when data or columns change
   useEffect(() => {
     if (data && data.length > 0) {
-      const keys = columns || Object.keys(data[0]);
-      // Add selection column to visibility if row selection is enabled
-      const allKeys = enableRowSelection ? ['selection', ...keys] : keys;
-      const initialVisibility = Object.fromEntries(allKeys.map(k => [k, true]));
+      // Create initial visibility based on isDefault flag
+      const initialVisibility: Record<string, boolean> = {};
+      
+      // Set visibility for data columns based on isDefault flag
+      columnMeta.forEach(col => {
+        initialVisibility[col.name] = col.isDefault !== false; // true if isDefault is true or undefined
+      });
+      
+      // Set visibility for special columns (selection, actions) to true
+      if (enableRowSelection) {
+        initialVisibility['selection'] = true;
+      }
+      if (actionButtons && (actionButtons.onEdit || actionButtons.onView || actionButtons.onDelete)) {
+        initialVisibility['actions'] = true;
+      }
+      
       setColumnVisibility(prev => {
         // Only update if the keys have actually changed
         const prevKeys = Object.keys(prev);
-        const newKeys = allKeys;
+        const newKeys = Object.keys(initialVisibility);
         if (prevKeys.length !== newKeys.length || !prevKeys.every(key => newKeys.includes(key))) {
           return initialVisibility;
         }
         return prev;
       });
     }
-  }, [data, columns, enableRowSelection]);
+  }, [data, columnMeta, enableRowSelection, actionButtons]);
 
   // Prepare columns for drag and drop component
   const dragDropColumns = useMemo(() => {
@@ -389,10 +366,10 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
 
   return (
     <Card className={`${className} border-gray-200 shadow-sm`}>
-      <CardHeader className="bg-white border-b border-gray-200 rounded-t-lg">
+      <CardHeader className="bg-white border-b border-gray-200 rounded-t-lg py-2">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <CardTitle className="flex items-center gap-2 text-gray-800">
-            <Filter className="h-5 w-5 text-gray-600" />
+          <CardTitle className="flex items-center gap-2 text-gray-800 text-sm font-medium">
+            <Filter className="h-3 w-3 text-gray-600" />
             Results
             <Badge variant="secondary" className="bg-gray-100 text-gray-600">
               {table.getFilteredRowModel().rows.length} rows
@@ -466,16 +443,27 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {table.getAllLeafColumns().map(column => (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(checked) => column.toggleVisibility(checked)}
-                    disabled={isLoading}
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                ))}
+                {table.getAllColumns().map(column => {
+                  // Skip special columns from dropdown
+                  if (column.id === 'selection' || column.id === 'actions') {
+                    return null;
+                  }
+                  
+                  // Find the column metadata to get the display name
+                  const columnInfo = columnMeta.find(col => col.name === column.id);
+                  const displayName = columnInfo?.displayName || column.id;
+                  
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(checked) => column.toggleVisibility(checked)}
+                      disabled={isLoading}
+                    >
+                      {displayName}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -827,7 +815,7 @@ const TanstackTableWrapper: React.FC<TanstackTableWrapperProps> = ({
         )}
 
         {/* Pagination Controls */}
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200 bg-gray-50 px-4 py-3 rounded-b-lg">
+        <div className="flex items-center justify-between pt-4 border-t border-gray-200 bg-gray-50 px-4 py-3 rounded-b-lg">
           <div className="text-sm text-gray-600">
             {manualPagination ? (
               // Server-side pagination display

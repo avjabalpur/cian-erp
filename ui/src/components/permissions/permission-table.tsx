@@ -40,23 +40,49 @@ export function PermissionTable({
 }: PermissionTableProps) {
   // Define column metadata for proper filtering and display
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'name', data_type: 'string', displayName: 'Permission name' },
-    { name: 'moduleName', data_type: 'string', displayName: 'Module' },
-    { name: 'description', data_type: 'string', displayName: 'description' },
-    { name: 'actionType', data_type: 'string', displayName: 'Module' },
-    { name: 'isActive', data_type: 'boolean', displayName: 'Active status' },
-    { name: 'createdAt', data_type: 'date', displayName: 'Created date' },
-    { name: 'updatedAt', data_type: 'date', displayName: 'Updated date' },
+    { 
+      name: 'name', 
+      data_type: 'string', 
+      displayName: 'Permission name',
+      isDefault: true
+    },
+    { 
+      name: 'moduleName', 
+      data_type: 'string', 
+      displayName: 'Module',
+      isDefault: true
+    },
+    { 
+      name: 'description', 
+      data_type: 'string', 
+      displayName: 'description',
+      isDefault: false
+    },
+    { 
+      name: 'actionType', 
+      data_type: 'string', 
+      displayName: 'Module',
+      isDefault: true
+    },
+    { 
+      name: 'isActive', 
+      data_type: 'boolean', 
+      displayName: 'Active status',
+      isDefault: true
+    },
+    { 
+      name: 'createdAt', 
+      data_type: 'date', 
+      displayName: 'Created date',
+      isDefault: false
+    },
+    { 
+      name: 'updatedAt', 
+      data_type: 'date', 
+      displayName: 'Updated date',
+      isDefault: false
+    },
   ], [])
-
-  // Define which columns to show by default
-  const defaultColumns = [
-    'name',
-    'moduleName',
-    'actionType',
-    'isActive',
-    'createdAt'
-  ]
 
   // Transform roles data for better display
   const transformedPermissions = useMemo(() => {
@@ -80,7 +106,6 @@ export function PermissionTable({
     <div className="w-full">
       <AdvancedTable
         data={transformedPermissions}
-        columns={defaultColumns}
         columnMeta={columnMeta}
         isLoading={isLoading}
         groupingEnabled={false}

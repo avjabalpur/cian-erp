@@ -4,6 +4,7 @@ export interface Column {
   data_type: string
   description?: string | null
   displayName?: string // Display name for the column header
+  isDefault?: boolean // Whether this column should be shown by default
   render?: CellRenderer // Custom cell renderer function
 }
 
@@ -15,8 +16,7 @@ export type CellRenderer = (value: any, row: any) => React.ReactNode
 
 export interface AdvancedTableProps {
   data: any[]
-  columns?: string[]
-  columnMeta?: Column[]
+  columnMeta: Column[] // Single source of truth for column configuration
   isLoading?: boolean
   groupingEnabled?: boolean
   globalFilterEnabled?: boolean

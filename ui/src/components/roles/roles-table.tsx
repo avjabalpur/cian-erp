@@ -42,19 +42,32 @@ export default function RolesTable({
 }: RolesTableProps) {
 
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'name', data_type: 'string', displayName: 'Role name' },
-    { name: 'description', data_type: 'string', displayName: 'Role description' },
-    { name: 'isActive', data_type: 'boolean', displayName: 'Active status' },
-    { name: 'createdAt', data_type: 'date', displayName: 'Created date' },
+    { 
+      name: 'name', 
+      data_type: 'string', 
+      displayName: 'Role name',
+      isDefault: true
+    },
+    { 
+      name: 'description', 
+      data_type: 'string', 
+      displayName: 'Role description',
+      isDefault: true
+    },
+    { 
+      name: 'isActive', 
+      data_type: 'boolean', 
+      displayName: 'Active status',
+      isDefault: true
+    },
+    { 
+      name: 'createdAt', 
+      data_type: 'date', 
+      displayName: 'Created date',
+      isDefault: false
+    },
   ], [])
 
-  // Define which columns to show by default
-  const defaultColumns = [
-    'name',
-    'description',
-    'isActive',
-    'createdAt'
-  ]
     // Transform customers data for better display
     const transformedRoles = useMemo(() => {
       return roles.map(role => ({
@@ -75,7 +88,6 @@ export default function RolesTable({
     <div className="w-full">
     <AdvancedTable
       data={transformedRoles}
-      columns={defaultColumns}
       columnMeta={columnMeta}
       isLoading={isLoading}
       groupingEnabled={false}

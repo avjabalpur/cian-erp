@@ -40,22 +40,14 @@ export default function ItemTypesTable({
 }: ItemTypesTableProps) {
 
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'code', data_type: 'string', displayName: 'Code' },
-    { name: 'name', data_type: 'string', displayName: 'Name' },
-    { name: 'description', data_type: 'string', displayName: 'Description' },
-    { name: 'parentTypeId', data_type: 'number', displayName: 'Parent Type ID' },
-    { name: 'isActive', data_type: 'boolean', displayName: 'Active' },
-    { name: 'createdAt', data_type: 'date', displayName: 'Created At' },
+    { name: 'code', data_type: 'string', displayName: 'Code', isDefault: true },
+    { name: 'name', data_type: 'string', displayName: 'Name', isDefault: true },
+    { name: 'description', data_type: 'string', displayName: 'Description', isDefault: true },
+    { name: 'parentTypeId', data_type: 'number', displayName: 'Parent Type ID', isDefault: false },
+    { name: 'isActive', data_type: 'boolean', displayName: 'Active', isDefault: true },
+    { name: 'createdAt', data_type: 'date', displayName: 'Created At', isDefault: false },
   ], []);
   
-  const defaultColumns = [
-    'code',
-    'name',
-    'description',
-    'parentTypeId',
-    'isActive',
-  ];
-
   // Transform data for better display
   const transformedData = useMemo(() => {
     return itemTypes.map(itemType => ({
@@ -90,7 +82,6 @@ export default function ItemTypesTable({
     <div className="w-full">
       <AdvancedTable
         data={transformedData}
-        columns={defaultColumns}
         columnMeta={columnMeta}
         isLoading={isLoading}
         groupingEnabled={false}

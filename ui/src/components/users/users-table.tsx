@@ -43,27 +43,67 @@ export default function UsersTable({
 }: UsersTableProps) {
 
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'username', data_type: 'string', displayName: 'Username' },
-    { name: 'email', data_type: 'string', displayName: 'Email address' },
-    { name: 'firstName', data_type: 'string', displayName: 'First Name' },
-    { name: 'lastName', data_type: 'string', displayName: 'Last Name' },
-    { name: 'employeeId', data_type: 'string', displayName: 'Employee ID' },
-    { name: 'department', data_type: 'string', displayName: 'Department' },
-    { name: 'designation', data_type: 'string', displayName: 'Designation' },
-    { name: 'roles', data_type: 'string', displayName: 'Roles' },
-    { name: 'isActive', data_type: 'boolean', displayName: 'Active status' },
-    { name: 'lastLogin', data_type: 'date', displayName: 'Last Login' },
+    { 
+      name: 'username', 
+      data_type: 'string', 
+      displayName: 'Username',
+      isDefault: true
+    },
+    { 
+      name: 'email', 
+      data_type: 'string', 
+      displayName: 'Email address',
+      isDefault: true
+    },
+    { 
+      name: 'firstName', 
+      data_type: 'string', 
+      displayName: 'First Name',
+      isDefault: true
+    },
+    { 
+      name: 'lastName', 
+      data_type: 'string', 
+      displayName: 'Last Name',
+      isDefault: true
+    },
+    { 
+      name: 'employeeId', 
+      data_type: 'string', 
+      displayName: 'Employee ID',
+      isDefault: true
+    },
+    { 
+      name: 'department', 
+      data_type: 'string', 
+      displayName: 'Department',
+      isDefault: true
+    },
+    { 
+      name: 'designation', 
+      data_type: 'string', 
+      displayName: 'Designation',
+      isDefault: true
+    },
+    { 
+      name: 'roles', 
+      data_type: 'string', 
+      displayName: 'Roles',
+      isDefault: false
+    },
+    { 
+      name: 'isActive', 
+      data_type: 'boolean', 
+      displayName: 'Active status',
+      isDefault: false
+    },
+    { 
+      name: 'lastLogin', 
+      data_type: 'date', 
+      displayName: 'Last Login',
+      isDefault: false
+    },
   ], [])
-  
-  const defaultColumns = [
-    'username',
-    'email',
-    'firstName',
-    'lastName',
-    'employeeId',
-    'department',
-    'designation',
-  ]
 
     // Transform customers data for better display
     const transformedUsers = useMemo(() => {
@@ -86,7 +126,6 @@ export default function UsersTable({
     <div className="w-full">
     <AdvancedTable
       data={transformedUsers}
-      columns={defaultColumns}
       columnMeta={columnMeta}
       isLoading={isLoading}
       groupingEnabled={false}

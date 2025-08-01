@@ -49,18 +49,18 @@ export default function SalesOrdersTable({
 }: SalesOrdersTableProps) {
 
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'soNumber', data_type: 'string', description: 'Sales Order Number' },
-    { name: 'soDate', data_type: 'date', description: 'Sales Order Date' },
-    { name: 'soStatus', data_type: 'string', description: 'Status' },
-    { name: 'customerName', data_type: 'string', description: 'Customer Name' },
-    { name: 'itemName', data_type: 'string', description: 'Item Name' },
-    { name: 'divisionName', data_type: 'string', description: 'Division' },
-    { name: 'quantity', data_type: 'string', description: 'Quantity' },
-    { name: 'billingRate', data_type: 'string', description: 'Billing Rate' },
-    { name: 'assignedDesignerName', data_type: 'string', description: 'Assigned Designer' },
-    { name: 'isSubmitted', data_type: 'boolean', description: 'Submitted' },
-    { name: 'createdByName', data_type: 'string', description: 'Created By' },
-    { name: 'createdAt', data_type: 'date', description: 'Created At' },
+    { name: 'soNumber', data_type: 'string', description: 'Sales Order Number', isDefault: true },
+    { name: 'soDate', data_type: 'date', description: 'Sales Order Date', isDefault: true },
+    { name: 'soStatus', data_type: 'string', description: 'Status', isDefault: true },
+    { name: 'customerName', data_type: 'string', description: 'Customer Name', isDefault: true },
+    { name: 'itemName', data_type: 'string', description: 'Item Name', isDefault: false },
+    { name: 'divisionName', data_type: 'string', description: 'Division', isDefault: false },
+    { name: 'quantity', data_type: 'string', description: 'Quantity', isDefault: false },
+    { name: 'billingRate', data_type: 'string', description: 'Billing Rate', isDefault: false },
+    { name: 'assignedDesignerName', data_type: 'string', description: 'Assigned Designer', isDefault: false },
+    { name: 'isSubmitted', data_type: 'boolean', description: 'Submitted', isDefault: false },
+    { name: 'createdByName', data_type: 'string', description: 'Created By', isDefault: false },
+    { name: 'createdAt', data_type: 'date', description: 'Created At', isDefault: false },
   ], [])
   
   const defaultColumns = [
@@ -124,7 +124,6 @@ export default function SalesOrdersTable({
     <div className="w-full">
       <AdvancedTable
         data={transformedSalesOrders}
-        columns={defaultColumns}
         columnMeta={columnMeta}
         isLoading={isLoading}
         groupingEnabled={false}

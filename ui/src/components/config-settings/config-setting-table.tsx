@@ -40,27 +40,68 @@ export default function ConfigSettingTable({
 }: ConfigSettingTableProps) {
 
   const columnMeta: Column[] = useMemo(() => [
-    { name: 'settingKey', data_type: 'string', displayName: 'Setting Key' },
-    { name: 'settingName', data_type: 'string', displayName: 'Setting Name' },
-    { name: 'description', data_type: 'string', displayName: 'Description' },
-    { name: 'stringValue', data_type: 'string', displayName: 'String Value' },
-    { name: 'integerValue', data_type: 'number', displayName: 'Integer Value' },
-    { name: 'booleanValue', data_type: 'boolean', displayName: 'Boolean Value' },
-    { name: 'decimalValue', data_type: 'number', displayName: 'Decimal Value' },
-    { name: 'defaultValue', data_type: 'string', displayName: 'Default Value' },
-    { name: 'isActive', data_type: 'boolean', displayName: 'Status' },
-    { name: 'createdAt', data_type: 'date', displayName: 'Created At' },
+    { 
+      name: 'settingKey', 
+      data_type: 'string', 
+      displayName: 'Setting Key',
+      isDefault: true
+    },
+    { 
+      name: 'settingName', 
+      data_type: 'string', 
+      displayName: 'Setting Name',
+      isDefault: true
+    },
+    { 
+      name: 'description', 
+      data_type: 'string', 
+      displayName: 'Description',
+      isDefault: true
+    },
+    { 
+      name: 'stringValue', 
+      data_type: 'string', 
+      displayName: 'String Value',
+      isDefault: true
+    },
+    { 
+      name: 'integerValue', 
+      data_type: 'number', 
+      displayName: 'Integer Value',
+      isDefault: false
+    },
+    { 
+      name: 'booleanValue', 
+      data_type: 'boolean', 
+      displayName: 'Boolean Value',
+      isDefault: false
+    },
+    { 
+      name: 'decimalValue', 
+      data_type: 'number', 
+      displayName: 'Decimal Value',
+      isDefault: false
+    },
+    { 
+      name: 'defaultValue', 
+      data_type: 'string', 
+      displayName: 'Default Value',
+      isDefault: false
+    },
+    { 
+      name: 'isActive', 
+      data_type: 'boolean', 
+      displayName: 'Status',
+      isDefault: true
+    },
+    { 
+      name: 'createdAt', 
+      data_type: 'date', 
+      displayName: 'Created At',
+      isDefault: false
+    },
   ], []);
   
-  const defaultColumns = [
-    'settingKey',
-    'settingName',
-    'description',
-    'stringValue',
-    'isActive',
-    'createdAt',
-  ];
-
   // Transform data for better display
   const transformedData = useMemo(() => {
     return configSettings.map(configSetting => ({
@@ -99,7 +140,6 @@ export default function ConfigSettingTable({
     <div className="w-full">
       <AdvancedTable
         data={transformedData}
-        columns={defaultColumns}
         columnMeta={columnMeta}
         isLoading={isLoading}
         groupingEnabled={false}
