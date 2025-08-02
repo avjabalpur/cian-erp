@@ -127,7 +127,10 @@ builder.Services.AddAutoMapper(
     typeof(ItemTypeMapper),
     typeof(HsnMasterMapper),
     typeof(SalesOrderMapper),
-    typeof(DosageMapper)
+    typeof(DosageMapper),
+    typeof(ItemExportDetailsMapper),
+    typeof(ItemMediaMapper),
+    typeof(ItemOtherDetailsMapper)
 );
 
 builder.Services.AddScoped<ILocationTypeRepository, LocationTypeRepository>();
@@ -167,8 +170,15 @@ builder.Services.AddScoped<IItemMediaRepository, ItemMediaRepository>();
 builder.Services.AddScoped<IItemMediaService, ItemMediaService>();
 builder.Services.AddScoped<IItemOtherDetailsRepository, ItemOtherDetailsRepository>();
 builder.Services.AddScoped<IItemOtherDetailsService, ItemOtherDetailsService>();
+builder.Services.AddScoped<IItemExportDetailsRepository, ItemExportDetailsRepository>();
+builder.Services.AddScoped<IItemExportDetailsService, ItemExportDetailsService>();
+
+// Register custom mappers
 builder.Services.AddScoped<ItemSpecificationMapper>();
 builder.Services.AddScoped<ItemBoughtOutDetailsMapper>();
+
+
+
 
 builder.Services.AddScoped<IConfigListRepository, ConfigListRepository>();
 builder.Services.AddScoped<IConfigListService, ConfigListService>();

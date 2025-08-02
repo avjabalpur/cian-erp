@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { ConfigListValue } from "@/types/config-list";
+import { useConfigListValuesByListCode } from "@/hooks/config/use-config-lists";
 
 interface ConfigListSelectProps {
   listCode: string;
@@ -43,45 +44,6 @@ interface ConfigListValueOption {
   isActive: boolean;
 }
 
-// Custom hook for fetching config list values with extended caching
-const useConfigListValues = (listCode: string) => {
-  const { toast } = useToast();
-
-  return useQuery({
-    queryKey: ["config-list-values", listCode],
-    queryFn: async (): Promise<ConfigListValueOption[]> => {
-      try {
-        const response = await fetch(`/api/config-lists/${listCode}/values`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch config values for ${listCode}`);
-        }
-        const data = await response.json();
-        
-        return data.items?.map((item: ConfigListValue) => ({
-          value: item.valueCode,
-          label: item.valueName,
-          code: item.valueCode,
-          order: item.displayOrder,
-          isActive: item.isActive,
-        })) || [];
-      } catch (error) {
-        console.error("Error fetching config list values:", error);
-        toast({
-          title: "Error",
-          description: `Failed to load values for ${listCode}`,
-          variant: "destructive",
-        });
-        return [];
-      }
-    },
-    enabled: !!listCode,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
-    retry: 2,
-    retryDelay: 1000,
-  });
-};
-
 export function ConfigListSelect({
   listCode,
   value,
@@ -94,7 +56,16 @@ export function ConfigListSelect({
   allowClear = false,
 }: ConfigListSelectProps) {
   const [open, setOpen] = useState(false);
-  const { data: options = [], isLoading, error } = useConfigListValues(listCode);
+  const { data: configValues = [], isLoading, error } = useConfigListValuesByListCode(listCode);
+
+  // Transform config values to options format
+  const options: ConfigListValueOption[] = configValues.map(value => ({
+    value: value.valueCode,
+    label: value.valueName,
+    code: value.valueCode,
+    order: value.displayOrder,
+    isActive: value.isActive,
+  }));
 
   // Find the selected option
   const selectedOption = options.find(option => option.value === value);
@@ -225,7 +196,16 @@ export function ConfigListMultiSelect({
   maxItems,
 }: ConfigListMultiSelectProps) {
   const [open, setOpen] = useState(false);
-  const { data: options = [], isLoading, error } = useConfigListValues(listCode);
+  const { data: configValues = [], isLoading, error } = useConfigListValuesByListCode(listCode);
+
+  // Transform config values to options format
+  const options: ConfigListValueOption[] = configValues.map(value => ({
+    value: value.valueCode,
+    label: value.valueName,
+    code: value.valueCode,
+    order: value.displayOrder,
+    isActive: value.isActive,
+  }));
 
   // Filter active options only
   const activeOptions = options.filter(option => option.isActive);

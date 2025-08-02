@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Dapper;
 using Xcianify.Core.Domain.Repositories;
 using Xcianify.Core.Model;
