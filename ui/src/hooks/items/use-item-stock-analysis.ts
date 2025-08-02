@@ -63,32 +63,32 @@ const getItemStockAnalysis = async (filter?: ItemStockAnalysisFilter): Promise<I
   if (filter?.page) params.append('page', filter.page.toString());
   if (filter?.pageSize) params.append('pageSize', filter.pageSize.toString());
 
-  const { data } = await api.get(`/item-stock-analysis?${params.toString()}`);
+  const { data } = await api.get(`/items/stock-analysis?${params.toString()}`);
   return data;
 };
 
-const getItemStockAnalysisById = async (id: number): Promise<ItemStockAnalysis> => {
-  const { data } = await api.get(`/item-stock-analysis/${id}`);
+const getItemStockAnalysisById = async (itemId: number, id: number): Promise<ItemStockAnalysis> => {
+  const { data } = await api.get(`/items/${itemId}/stock-analysis/${id}`);
   return data;
 };
 
 const getItemStockAnalysisByItemId = async (itemId: number): Promise<ItemStockAnalysis[]> => {
-  const { data } = await api.get(`/item-stock-analysis/item/${itemId}`);
+  const { data } = await api.get(`/items/${itemId}/stock-analysis`);
   return data;
 };
 
-const createItemStockAnalysis = async (analysisData: CreateItemStockAnalysisData): Promise<ItemStockAnalysis> => {
-  const { data } = await api.post('/item-stock-analysis', analysisData);
+const createItemStockAnalysis = async (itemId: number, analysisData: CreateItemStockAnalysisData): Promise<ItemStockAnalysis> => {
+  const { data } = await api.post(`/items/${itemId}/stock-analysis`, analysisData);
   return data;
 };
 
-const updateItemStockAnalysis = async (id: number, analysisData: UpdateItemStockAnalysisData): Promise<ItemStockAnalysis> => {
-  const { data } = await api.put(`/item-stock-analysis/${id}`, analysisData);
+const updateItemStockAnalysis = async (itemId: number, id: number, analysisData: UpdateItemStockAnalysisData): Promise<ItemStockAnalysis> => {
+  const { data } = await api.put(`/items/${itemId}/stock-analysis/${id}`, analysisData);
   return data;
 };
 
-const deleteItemStockAnalysis = async (id: number): Promise<void> => {
-  await api.delete(`/item-stock-analysis/${id}`);
+const deleteItemStockAnalysis = async (itemId: number, id: number): Promise<void> => {
+  await api.delete(`/items/${itemId}/stock-analysis/${id}`);
 };
 
 // React Query Hooks
@@ -99,11 +99,11 @@ export const useItemStockAnalysis = (filter?: ItemStockAnalysisFilter) => {
   });
 };
 
-export const useItemStockAnalysisById = (id: number) => {
+export const useItemStockAnalysisById = (itemId: number, id: number) => {
   return useQuery<ItemStockAnalysis, Error>({
-    queryKey: ['item-stock-analysis', id],
-    queryFn: () => getItemStockAnalysisById(id),
-    enabled: !!id,
+    queryKey: ['item-stock-analysis', itemId, id],
+    queryFn: () => getItemStockAnalysisById(itemId, id),
+    enabled: !!itemId && !!id,
   });
 };
 
@@ -117,31 +117,37 @@ export const useItemStockAnalysisByItemId = (itemId: number) => {
 
 export const useCreateItemStockAnalysis = () => {
   const queryClient = useQueryClient();
-  return useMutation<ItemStockAnalysis, Error, CreateItemStockAnalysisData>({
-    mutationFn: createItemStockAnalysis,
-    onSuccess: () => {
+  return useMutation<ItemStockAnalysis, Error, { itemId: number; data: CreateItemStockAnalysisData }>({
+    mutationFn: ({ itemId, data }) => createItemStockAnalysis(itemId, data),
+    onSuccess: (data, { itemId }) => {
       queryClient.invalidateQueries({ queryKey: ['item-stock-analysis'] });
+      queryClient.invalidateQueries({ queryKey: ['item-stock-analysis-by-item', itemId] });
+      queryClient.invalidateQueries({ queryKey: ['item-master', itemId] });
     },
   });
 };
 
 export const useUpdateItemStockAnalysis = () => {
   const queryClient = useQueryClient();
-  return useMutation<ItemStockAnalysis, Error, { id: number; data: UpdateItemStockAnalysisData }>({
-    mutationFn: ({ id, data }) => updateItemStockAnalysis(id, data),
-    onSuccess: (_, { id }) => {
+  return useMutation<ItemStockAnalysis, Error, { itemId: number; id: number; data: UpdateItemStockAnalysisData }>({
+    mutationFn: ({ itemId, id, data }) => updateItemStockAnalysis(itemId, id, data),
+    onSuccess: (data, { itemId, id }) => {
       queryClient.invalidateQueries({ queryKey: ['item-stock-analysis'] });
-      queryClient.invalidateQueries({ queryKey: ['item-stock-analysis', id] });
+      queryClient.invalidateQueries({ queryKey: ['item-stock-analysis', itemId, id] });
+      queryClient.invalidateQueries({ queryKey: ['item-stock-analysis-by-item', itemId] });
+      queryClient.invalidateQueries({ queryKey: ['item-master', itemId] });
     },
   });
 };
 
 export const useDeleteItemStockAnalysis = () => {
   const queryClient = useQueryClient();
-  return useMutation<void, Error, number>({
-    mutationFn: deleteItemStockAnalysis,
-    onSuccess: () => {
+  return useMutation<void, Error, { itemId: number; id: number }>({
+    mutationFn: ({ itemId, id }) => deleteItemStockAnalysis(itemId, id),
+    onSuccess: (_, { itemId }) => {
       queryClient.invalidateQueries({ queryKey: ['item-stock-analysis'] });
+      queryClient.invalidateQueries({ queryKey: ['item-stock-analysis-by-item', itemId] });
+      queryClient.invalidateQueries({ queryKey: ['item-master', itemId] });
     },
   });
 }; 

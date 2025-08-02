@@ -9,7 +9,7 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public int? ItemTypeId { get; set; }
         
         // Pagination and sorting
-        public string SortBy { get; set; } = "ItemName";
-        public bool SortDescending { get; set; } = false;
+        public string? SortBy { get; set; } = "ItemName";
+        public bool? SortDescending { get; set; } = false;
     }
 }

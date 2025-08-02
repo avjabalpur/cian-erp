@@ -62,32 +62,32 @@ const getItemSalesDetails = async (filter?: ItemSalesDetailFilter): Promise<Item
   if (filter?.page) params.append('page', filter.page.toString());
   if (filter?.pageSize) params.append('pageSize', filter.pageSize.toString());
 
-  const { data } = await api.get(`/item-sales-details?${params.toString()}`);
+  const { data } = await api.get(`/items/sales-details?${params.toString()}`);
   return data;
 };
 
-const getItemSalesDetailById = async (id: number): Promise<ItemSalesDetail> => {
-  const { data } = await api.get(`/item-sales-details/${id}`);
+const getItemSalesDetailById = async (itemId: number, id: number): Promise<ItemSalesDetail> => {
+  const { data } = await api.get(`/items/${itemId}/sales-details/${id}`);
   return data;
 };
 
 const getItemSalesDetailsByItemId = async (itemId: number): Promise<ItemSalesDetail[]> => {
-  const { data } = await api.get(`/item-sales-details/item/${itemId}`);
+  const { data } = await api.get(`/items/${itemId}/sales-details`);
   return data;
 };
 
-const createItemSalesDetail = async (detailData: CreateItemSalesDetailData): Promise<ItemSalesDetail> => {
-  const { data } = await api.post('/item-sales-details', detailData);
+const createItemSalesDetail = async (itemId: number, detailData: CreateItemSalesDetailData): Promise<ItemSalesDetail> => {
+  const { data } = await api.post(`/items/${itemId}/sales-details`, detailData);
   return data;
 };
 
-const updateItemSalesDetail = async (id: number, detailData: UpdateItemSalesDetailData): Promise<ItemSalesDetail> => {
-  const { data } = await api.put(`/item-sales-details/${id}`, detailData);
+const updateItemSalesDetail = async (itemId: number, id: number, detailData: UpdateItemSalesDetailData): Promise<ItemSalesDetail> => {
+  const { data } = await api.put(`/items/${itemId}/sales-details/${id}`, detailData);
   return data;
 };
 
-const deleteItemSalesDetail = async (id: number): Promise<void> => {
-  await api.delete(`/item-sales-details/${id}`);
+const deleteItemSalesDetail = async (itemId: number, id: number): Promise<void> => {
+  await api.delete(`/items/${itemId}/sales-details/${id}`);
 };
 
 // React Query Hooks
@@ -98,11 +98,11 @@ export const useItemSalesDetails = (filter?: ItemSalesDetailFilter) => {
   });
 };
 
-export const useItemSalesDetailById = (id: number) => {
+export const useItemSalesDetailById = (itemId: number, id: number) => {
   return useQuery<ItemSalesDetail, Error>({
-    queryKey: ['item-sales-detail', id],
-    queryFn: () => getItemSalesDetailById(id),
-    enabled: !!id,
+    queryKey: ['item-sales-detail', itemId, id],
+    queryFn: () => getItemSalesDetailById(itemId, id),
+    enabled: !!itemId && !!id,
   });
 };
 
@@ -116,31 +116,37 @@ export const useItemSalesDetailsByItemId = (itemId: number) => {
 
 export const useCreateItemSalesDetail = () => {
   const queryClient = useQueryClient();
-  return useMutation<ItemSalesDetail, Error, CreateItemSalesDetailData>({
-    mutationFn: createItemSalesDetail,
-    onSuccess: () => {
+  return useMutation<ItemSalesDetail, Error, { itemId: number; data: CreateItemSalesDetailData }>({
+    mutationFn: ({ itemId, data }) => createItemSalesDetail(itemId, data),
+    onSuccess: (data, { itemId }) => {
       queryClient.invalidateQueries({ queryKey: ['item-sales-details'] });
+      queryClient.invalidateQueries({ queryKey: ['item-sales-details-by-item', itemId] });
+      queryClient.invalidateQueries({ queryKey: ['item-master', itemId] });
     },
   });
 };
 
 export const useUpdateItemSalesDetail = () => {
   const queryClient = useQueryClient();
-  return useMutation<ItemSalesDetail, Error, { id: number; data: UpdateItemSalesDetailData }>({
-    mutationFn: ({ id, data }) => updateItemSalesDetail(id, data),
-    onSuccess: (_, { id }) => {
+  return useMutation<ItemSalesDetail, Error, { itemId: number; id: number; data: UpdateItemSalesDetailData }>({
+    mutationFn: ({ itemId, id, data }) => updateItemSalesDetail(itemId, id, data),
+    onSuccess: (data, { itemId, id }) => {
       queryClient.invalidateQueries({ queryKey: ['item-sales-details'] });
-      queryClient.invalidateQueries({ queryKey: ['item-sales-detail', id] });
+      queryClient.invalidateQueries({ queryKey: ['item-sales-detail', itemId, id] });
+      queryClient.invalidateQueries({ queryKey: ['item-sales-details-by-item', itemId] });
+      queryClient.invalidateQueries({ queryKey: ['item-master', itemId] });
     },
   });
 };
 
 export const useDeleteItemSalesDetail = () => {
   const queryClient = useQueryClient();
-  return useMutation<void, Error, number>({
-    mutationFn: deleteItemSalesDetail,
-    onSuccess: () => {
+  return useMutation<void, Error, { itemId: number; id: number }>({
+    mutationFn: ({ itemId, id }) => deleteItemSalesDetail(itemId, id),
+    onSuccess: (_, { itemId }) => {
       queryClient.invalidateQueries({ queryKey: ['item-sales-details'] });
+      queryClient.invalidateQueries({ queryKey: ['item-sales-details-by-item', itemId] });
+      queryClient.invalidateQueries({ queryKey: ['item-master', itemId] });
     },
   });
 }; 

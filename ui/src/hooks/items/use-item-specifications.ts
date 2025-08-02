@@ -61,18 +61,18 @@ const getItemSpecification = async (itemId: number): Promise<ItemSpecification |
   return data;
 };
 
-const createItemSpecification = async (specificationData: CreateItemSpecificationData): Promise<ItemSpecification> => {
-  const { data } = await api.post('/item-specifications', specificationData);
+const createItemSpecification = async (itemId: number, specificationData: CreateItemSpecificationData): Promise<ItemSpecification> => {
+  const { data } = await api.post(`/items/${itemId}/specification`, specificationData);
   return data;
 };
 
-const updateItemSpecification = async (id: number, specificationData: UpdateItemSpecificationData): Promise<ItemSpecification> => {
-  const { data } = await api.put(`/item-specifications/${id}`, specificationData);
+const updateItemSpecification = async (itemId: number, specificationData: UpdateItemSpecificationData): Promise<ItemSpecification> => {
+  const { data } = await api.put(`/items/${itemId}/specification`, specificationData);
   return data;
 };
 
-const deleteItemSpecification = async (id: number): Promise<void> => {
-  await api.delete(`/item-specifications/${id}`);
+const deleteItemSpecification = async (itemId: number): Promise<void> => {
+  await api.delete(`/items/${itemId}/specification`);
 };
 
 // React Query Hooks
@@ -86,30 +86,33 @@ export const useItemSpecification = (itemId: number) => {
 
 export const useCreateItemSpecification = () => {
   const queryClient = useQueryClient();
-  return useMutation<ItemSpecification, Error, CreateItemSpecificationData>({
-    mutationFn: createItemSpecification,
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['item-specification', variables.itemId] });
+  return useMutation<ItemSpecification, Error, { itemId: number; data: CreateItemSpecificationData }>({
+    mutationFn: ({ itemId, data }) => createItemSpecification(itemId, data),
+    onSuccess: (data, { itemId }) => {
+      queryClient.invalidateQueries({ queryKey: ['item-specification', itemId] });
+      queryClient.invalidateQueries({ queryKey: ['item-master', itemId] });
     },
   });
 };
 
 export const useUpdateItemSpecification = () => {
   const queryClient = useQueryClient();
-  return useMutation<ItemSpecification, Error, { id: number; data: UpdateItemSpecificationData }>({
-    mutationFn: ({ id, data }) => updateItemSpecification(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['item-specification'] });
+  return useMutation<ItemSpecification, Error, { itemId: number; data: UpdateItemSpecificationData }>({
+    mutationFn: ({ itemId, data }) => updateItemSpecification(itemId, data),
+    onSuccess: (data, { itemId }) => {
+      queryClient.invalidateQueries({ queryKey: ['item-specification', itemId] });
+      queryClient.invalidateQueries({ queryKey: ['item-master', itemId] });
     },
   });
 };
 
 export const useDeleteItemSpecification = () => {
   const queryClient = useQueryClient();
-  return useMutation<void, Error, number>({
-    mutationFn: deleteItemSpecification,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['item-specification'] });
+  return useMutation<void, Error, { itemId: number }>({
+    mutationFn: ({ itemId }) => deleteItemSpecification(itemId),
+    onSuccess: (_, { itemId }) => {
+      queryClient.invalidateQueries({ queryKey: ['item-specification', itemId] });
+      queryClient.invalidateQueries({ queryKey: ['item-master', itemId] });
     },
   });
 }; 

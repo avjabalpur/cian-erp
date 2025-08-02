@@ -64,18 +64,18 @@ const getItemExportDetails = async (itemId: number): Promise<ItemExportDetails |
   return data;
 };
 
-const createItemExportDetails = async (exportDetailsData: CreateItemExportDetailsData): Promise<ItemExportDetails> => {
-  const { data } = await api.post('/item-export-details', exportDetailsData);
+const createItemExportDetails = async (itemId: number, exportDetailsData: CreateItemExportDetailsData): Promise<ItemExportDetails> => {
+  const { data } = await api.post(`/items/${itemId}/export-details`, exportDetailsData);
   return data;
 };
 
-const updateItemExportDetails = async (id: number, exportDetailsData: UpdateItemExportDetailsData): Promise<ItemExportDetails> => {
-  const { data } = await api.put(`/item-export-details/${id}`, exportDetailsData);
+const updateItemExportDetails = async (itemId: number, id: number, exportDetailsData: UpdateItemExportDetailsData): Promise<ItemExportDetails> => {
+  const { data } = await api.put(`/items/${itemId}/export-details/${id}`, exportDetailsData);
   return data;
 };
 
-const deleteItemExportDetails = async (id: number): Promise<void> => {
-  await api.delete(`/item-export-details/${id}`);
+const deleteItemExportDetails = async (itemId: number, id: number): Promise<void> => {
+  await api.delete(`/items/${itemId}/export-details/${id}`);
 };
 
 // React Query Hooks
@@ -89,30 +89,33 @@ export const useItemExportDetails = (itemId: number) => {
 
 export const useCreateItemExportDetails = () => {
   const queryClient = useQueryClient();
-  return useMutation<ItemExportDetails, Error, CreateItemExportDetailsData>({
-    mutationFn: createItemExportDetails,
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['item-export-details', variables.itemId] });
+  return useMutation<ItemExportDetails, Error, { itemId: number; data: CreateItemExportDetailsData }>({
+    mutationFn: ({ itemId, data }) => createItemExportDetails(itemId, data),
+    onSuccess: (data, { itemId }) => {
+      queryClient.invalidateQueries({ queryKey: ['item-export-details', itemId] });
+      queryClient.invalidateQueries({ queryKey: ['item-master', itemId] });
     },
   });
 };
 
 export const useUpdateItemExportDetails = () => {
   const queryClient = useQueryClient();
-  return useMutation<ItemExportDetails, Error, { id: number; data: UpdateItemExportDetailsData }>({
-    mutationFn: ({ id, data }) => updateItemExportDetails(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['item-export-details'] });
+  return useMutation<ItemExportDetails, Error, { itemId: number; id: number; data: UpdateItemExportDetailsData }>({
+    mutationFn: ({ itemId, id, data }) => updateItemExportDetails(itemId, id, data),
+    onSuccess: (data, { itemId, id }) => {
+      queryClient.invalidateQueries({ queryKey: ['item-export-details', itemId] });
+      queryClient.invalidateQueries({ queryKey: ['item-master', itemId] });
     },
   });
 };
 
 export const useDeleteItemExportDetails = () => {
   const queryClient = useQueryClient();
-  return useMutation<void, Error, number>({
-    mutationFn: deleteItemExportDetails,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['item-export-details'] });
+  return useMutation<void, Error, { itemId: number; id: number }>({
+    mutationFn: ({ itemId, id }) => deleteItemExportDetails(itemId, id),
+    onSuccess: (_, { itemId }) => {
+      queryClient.invalidateQueries({ queryKey: ['item-export-details', itemId] });
+      queryClient.invalidateQueries({ queryKey: ['item-master', itemId] });
     },
   });
 }; 

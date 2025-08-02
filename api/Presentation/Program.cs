@@ -130,12 +130,9 @@ builder.Services.AddAutoMapper(
     typeof(DosageMapper)
 );
 
-// Register repositories
 builder.Services.AddScoped<ILocationTypeRepository, LocationTypeRepository>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<IOrganizationAccountRepository, OrganizationAccountRepository>();
-
-// Register services
 builder.Services.AddScoped<ILocationTypeService, LocationTypeService>();
 builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 builder.Services.AddScoped<IOrganizationAccountService, OrganizationAccountService>();
@@ -143,24 +140,15 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 builder.Services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
-
-// Register services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IRolePermissionService, RolePermissionService>();
-
-
-
-// Register Department services and repositories
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
-
-// Register Division services and repositories
 builder.Services.AddScoped<IDivisionRepository, DivisionRepository>();
 builder.Services.AddScoped<IDivisionService, DivisionService>();
 
-// Register Item Master services and repositories
 builder.Services.AddScoped<IItemMasterRepository, ItemMasterRepository>();
 builder.Services.AddScoped<IItemTypeRepository, ItemTypeRepository>();
 builder.Services.AddScoped<IItemTypeService, ItemTypeService>();
@@ -175,12 +163,13 @@ builder.Services.AddScoped<IItemSpecificationService, ItemSpecificationService>(
 builder.Services.AddScoped<IItemBoughtOutDetailsRepository, ItemBoughtOutDetailsRepository>();
 builder.Services.AddScoped<IItemBoughtOutDetailsService, ItemBoughtOutDetailsService>();
 builder.Services.AddScoped<IItemMasterService, ItemMasterService>();
-
-// Register Item Master mappers
+builder.Services.AddScoped<IItemMediaRepository, ItemMediaRepository>();
+builder.Services.AddScoped<IItemMediaService, ItemMediaService>();
+builder.Services.AddScoped<IItemOtherDetailsRepository, ItemOtherDetailsRepository>();
+builder.Services.AddScoped<IItemOtherDetailsService, ItemOtherDetailsService>();
 builder.Services.AddScoped<ItemSpecificationMapper>();
 builder.Services.AddScoped<ItemBoughtOutDetailsMapper>();
 
-// Register Config List services and repositories
 builder.Services.AddScoped<IConfigListRepository, ConfigListRepository>();
 builder.Services.AddScoped<IConfigListService, ConfigListService>();
 builder.Services.AddScoped<IConfigListValueRepository, ConfigListValueRepository>();
@@ -204,8 +193,6 @@ builder.Services.AddScoped<ISalesOrderQuotationRepository, SalesOrderQuotationRe
 builder.Services.AddScoped<ISalesOrderQuotationItemRepository, SalesOrderQuotationItemRepository>();
 builder.Services.AddScoped<ISalesOrderSaveTransactionRepository, SalesOrderSaveTransactionRepository>();
 builder.Services.AddScoped<ISalesOrderStageRepository, SalesOrderStageRepository>();
-
-// Register Sales Order services
 builder.Services.AddScoped<ISalesOrderService, SalesOrderService>();
 builder.Services.AddScoped<ISalesOrderCommentService, SalesOrderCommentService>();
 builder.Services.AddScoped<ISalesOrderChatService, SalesOrderChatService>();

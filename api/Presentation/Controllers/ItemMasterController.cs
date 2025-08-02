@@ -36,15 +36,15 @@ namespace Xcianify.Presentation.Controllers
             IItemBoughtOutDetailsService itemBoughtOutDetailsService,
             ILogger<ItemMasterController> logger)
         {
-            _itemMasterService = itemMasterService ?? throw new ArgumentNullException(nameof(itemMasterService));
-            _itemMediaService = itemMediaService ?? throw new ArgumentNullException(nameof(itemMediaService));
-            _itemOtherDetailsService = itemOtherDetailsService ?? throw new ArgumentNullException(nameof(itemOtherDetailsService));
-            _itemSalesDetailService = itemSalesDetailService ?? throw new ArgumentNullException(nameof(itemSalesDetailService));
-            _itemExportDetailsService = itemExportDetailsService ?? throw new ArgumentNullException(nameof(itemExportDetailsService));
-            _itemStockAnalysisService = itemStockAnalysisService ?? throw new ArgumentNullException(nameof(itemStockAnalysisService));
-            _itemSpecificationService = itemSpecificationService ?? throw new ArgumentNullException(nameof(itemSpecificationService));
-            _itemBoughtOutDetailsService = itemBoughtOutDetailsService ?? throw new ArgumentNullException(nameof(itemBoughtOutDetailsService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _itemMasterService = itemMasterService;
+            _itemMediaService = itemMediaService;
+            _itemOtherDetailsService = itemOtherDetailsService;
+            _itemSalesDetailService = itemSalesDetailService;
+            _itemExportDetailsService = itemExportDetailsService;
+            _itemStockAnalysisService = itemStockAnalysisService;
+            _itemSpecificationService = itemSpecificationService;
+            _itemBoughtOutDetailsService = itemBoughtOutDetailsService;
+            _logger = logger;
         }
 
         // --- Item Master Endpoints ---
