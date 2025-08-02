@@ -10,7 +10,6 @@ namespace Xcianify.Core.Domain.Services
 {
     public interface IConfigListValueService
     {
-        Task<PaginatedResult<ConfigListValueDto>> GetAllAsync(ConfigListValueFilterDto filter);
         Task<ConfigListValueDto?> GetByIdAsync(int id);
         Task<List<ConfigListValueDto>> GetByListIdAsync(int listId);
         Task<ConfigListValueDto> CreateAsync(CreateConfigListValueDto createDto);

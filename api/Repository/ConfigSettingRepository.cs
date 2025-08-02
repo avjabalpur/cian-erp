@@ -181,13 +181,18 @@ namespace Xcianify.Repository
         public async Task<bool> ExistsAsync(string settingKey, int? excludeId = null)
         {
             var query = $"SELECT COUNT(1) FROM {TableName} WHERE setting_key = @SettingKey";
+            var parameters = new DynamicParameters();
+            parameters.Add("@SettingKey", settingKey);
+            
             if (excludeId.HasValue)
             {
                 query += " AND id != @ExcludeId";
+                parameters.Add("@ExcludeId", excludeId.Value);
             }
 
             using var connection = _dbContext.GetConnection();
-            return await connection.ExecuteScalarAsync<bool>(query, new { SettingKey = settingKey, ExcludeId = excludeId });
+            var count = await connection.QuerySingleAsync<int>(query, parameters);
+            return count > 0;
         }
     }
 } 

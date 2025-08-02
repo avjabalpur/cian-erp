@@ -209,21 +209,26 @@ export default function ConfigListDrawer({
                 extraData: null,
               });
             } else if (value.isEdited && value.id) {
-              // Update existing value
-              console.log('Updating config value:', value);
-              await updateConfigListValueMutation.mutateAsync({
-                id: value.id,
-                data: {
-                  listId: createdConfigListId,
-                  valueCode: value.valueCode,
-                  valueName: value.valueName,
-                  displayOrder: value.displayOrder,
-                  isActive: value.isActive,
-                  extraData: null,
-                },
-              });
+              if (!value.isActive) {
+                // Delete the value
+                console.log('Deleting config value:', value);
+                await deleteConfigListValueMutation.mutateAsync(value.id);
+              } else {
+                // Update existing value
+                console.log('Updating config value:', value);
+                await updateConfigListValueMutation.mutateAsync({
+                  id: value.id,
+                  data: {
+                    listId: createdConfigListId,
+                    valueCode: value.valueCode,
+                    valueName: value.valueName,
+                    displayOrder: value.displayOrder,
+                    isActive: value.isActive,
+                    extraData: null,
+                  },
+                });
+              }
             }
-            // Note: Deleted values (isActive: false) are handled by the update above
           } catch (error) {
             console.error('Failed to process config value:', value, error);
             toast({

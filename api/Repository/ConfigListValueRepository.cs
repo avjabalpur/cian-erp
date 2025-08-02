@@ -14,75 +14,6 @@ namespace Xcianify.Repository
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public async Task<(List<ConfigListValue> Items, int TotalCount)> GetAllAsync(
-            int? listId = null,
-            string? search = null,
-            bool? isActive = null,
-            int pageNumber = 1,
-            int pageSize = 20,
-            string? sortBy = null,
-            string? sortOrder = null)
-        {
-            using var connection = _dbContext.GetConnection();
-
-            var offset = (pageNumber - 1) * pageSize;
-            var whereConditions = new List<string>();
-            var parameters = new DynamicParameters();
-
-            if (listId.HasValue)
-            {
-                whereConditions.Add("clv.list_id = @ListId");
-                parameters.Add("@ListId", listId.Value);
-            }
-
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                whereConditions.Add("(clv.value_code LIKE @search OR clv.value_name LIKE @search)");
-                parameters.Add("@search", $"%{search}%");
-            }
-
-            if (isActive.HasValue)
-            {
-                whereConditions.Add("clv.is_active = @IsActive");
-                parameters.Add("@IsActive", isActive.Value);
-            }
-
-            var whereClause = whereConditions.Count > 0 ? $"WHERE {string.Join(" AND ", whereConditions)}" : "";
-
-            // Default sorting
-            sortBy ??= "clv.display_order";
-            sortOrder ??= "asc";
-            var orderClause = $"ORDER BY {sortBy} {sortOrder.ToUpper()}";
-
-            var countSql = $@"
-                SELECT COUNT(*) 
-                FROM config_list_values clv
-                LEFT JOIN config_lists cl ON clv.list_id = cl.id
-                {whereClause}";
-
-            var totalCount = await connection.QuerySingleAsync<int>(countSql, parameters);
-
-            var sql = $@"
-                SELECT 
-                    clv.id, clv.list_id as ListId, clv.value_code as ValueCode, clv.value_name as ValueName, 
-                    clv.display_order as DisplayOrder, clv.is_active as IsActive, clv.extra_data as ExtraData,
-                    clv.created_at as CreatedAt, clv.updated_at as UpdatedAt, clv.created_by as CreatedBy, clv.updated_by as UpdatedBy,
-                    cl.list_code as ListCode, cl.list_name as ListName
-                FROM config_list_values clv
-                LEFT JOIN config_lists cl ON clv.list_id = cl.id
-                {whereClause}
-                {orderClause}
-                OFFSET @Offset ROWS 
-                FETCH NEXT @PageSize ROWS ONLY";
-
-            parameters.Add("@Offset", offset);
-            parameters.Add("@PageSize", pageSize);
-
-            var items = await connection.QueryAsync<ConfigListValue>(sql, parameters);
-
-            return (items.ToList(), totalCount);
-        }
-
         public async Task<ConfigListValue?> GetByIdAsync(int id)
         {
             using var connection = _dbContext.GetConnection();
@@ -169,7 +100,15 @@ namespace Xcianify.Repository
         {
             using var connection = _dbContext.GetConnection();
             var sql = "SELECT COUNT(1) FROM config_list_values WHERE list_id = @ListId AND value_code = @ValueCode";
-            var parameters = new { ListId = listId, ValueCode = valueCode };
+            var parameters = new DynamicParameters();
+            parameters.Add("@ListId", listId);
+            parameters.Add("@ValueCode", valueCode);
+
+            if (excludeId.HasValue)
+            {
+                sql += " AND id != @ExcludeId";
+                parameters.Add("@ExcludeId", excludeId.Value);
+            }
 
             var count = await connection.QuerySingleAsync<int>(sql, parameters);
             return count > 0;

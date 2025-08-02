@@ -130,7 +130,8 @@ builder.Services.AddAutoMapper(
     typeof(DosageMapper),
     typeof(ItemExportDetailsMapper),
     typeof(ItemMediaMapper),
-    typeof(ItemOtherDetailsMapper)
+    typeof(ItemOtherDetailsMapper),
+    typeof(ConfigSettingMapper)
 );
 
 builder.Services.AddScoped<ILocationTypeRepository, LocationTypeRepository>();
@@ -184,6 +185,10 @@ builder.Services.AddScoped<IConfigListRepository, ConfigListRepository>();
 builder.Services.AddScoped<IConfigListService, ConfigListService>();
 builder.Services.AddScoped<IConfigListValueRepository, ConfigListValueRepository>();
 builder.Services.AddScoped<IConfigListValueService, ConfigListValueService>();
+
+// Register Config Settings services
+builder.Services.AddScoped<IConfigSettingRepository, ConfigSettingRepository>();
+builder.Services.AddScoped<IConfigSettingService, ConfigSettingService>();
 
 // Register security services
 builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();

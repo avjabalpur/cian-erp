@@ -69,12 +69,10 @@ namespace Xcianify.Presentation.Controllers
             return NoContent();
         }
 
-        // Config List Values endpoints
         [HttpGet("{listId}/values")]
-        public async Task<ActionResult> GetValues(int listId, [FromQuery] ConfigListValueFilterDto filter)
+        public async Task<ActionResult> GetValues(int listId)
         {
-            filter.ListId = listId;
-            var result = await _configListValueService.GetAllAsync(filter);
+            var result = await _configListValueService.GetByListIdAsync(listId);
             return Ok(result);
         }
 
@@ -95,17 +93,8 @@ namespace Xcianify.Presentation.Controllers
             var configList = await _configListService.GetByCodeAsync(listCode);
             if (configList == null)
                 return NotFound(new { message = $"Config list with code '{listCode}' not found" });
-
-            // Then get all values for this list
-            var filter = new ConfigListValueFilterDto
-            {
-                ListId = configList.Id,
-                IsActive = true, // Only active values
-                PageNumber = 1,
-                PageSize = 1000 // Get all values
-            };
-
-            var result = await _configListValueService.GetAllAsync(filter);
+            
+            var result = await _configListValueService.GetByListIdAsync(configList.Id);
             return Ok(result);
         }
 

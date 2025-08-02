@@ -148,8 +148,15 @@ namespace Xcianify.Repository
         {
             using var connection = _dbContext.GetConnection();
             var sql = "SELECT COUNT(1) FROM config_lists WHERE list_code = @ListCode";
-            var parameters = new { ListCode = listCode };
-
+            var parameters = new DynamicParameters();
+            parameters.Add("@ListCode", listCode);
+            
+            if (excludeId.HasValue)
+            {
+                sql += " AND id != @ExcludeId";
+                parameters.Add("@ExcludeId", excludeId.Value);
+            }
+            
             var count = await connection.QuerySingleAsync<int>(sql, parameters);
             return count > 0;
         }

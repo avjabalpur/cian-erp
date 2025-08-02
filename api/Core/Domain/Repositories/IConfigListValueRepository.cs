@@ -4,15 +4,6 @@ namespace Xcianify.Core.Domain.Repositories
 {
     public interface IConfigListValueRepository
     {
-        Task<(List<ConfigListValue> Items, int TotalCount)> GetAllAsync(
-            int? listId = null,
-            string? search = null,
-            bool? isActive = null,
-            int pageNumber = 1,
-            int pageSize = 20,
-            string? sortBy = null,
-            string? sortOrder = null);
-
         Task<ConfigListValue?> GetByIdAsync(int id);
         Task<List<ConfigListValue>> GetByListIdAsync(int listId);
         Task<ConfigListValue> AddAsync(ConfigListValue configListValue);

@@ -67,7 +67,7 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
             <div className="space-y-2">
               <label className="text-sm font-medium">GS Ind.</label>
               <ConfigListSelect
-                listCode="GS_IND"
+                listCode="gs_id"
                 value={control._formValues?.gsInd}
                 onChange={(value) => {
                   control.setValue("gsInd", value);

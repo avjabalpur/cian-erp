@@ -18,26 +18,6 @@ namespace Xcianify.Services
             _mapper = mapper;
         }
 
-        public async Task<PaginatedResult<ConfigListValueDto>> GetAllAsync(ConfigListValueFilterDto filter)
-        {
-            var (items, totalCount) = await _configListValueRepository.GetAllAsync(
-                filter.ListId,
-                filter.Search,
-                filter.IsActive,
-                filter.PageNumber,
-                filter.PageSize);
-
-            var dtos = _mapper.Map<List<ConfigListValueDto>>(items);
-
-            return new PaginatedResult<ConfigListValueDto>
-            {
-                Items = dtos,
-                TotalCount = totalCount,
-                PageNumber = filter.PageNumber,
-                PageSize = filter.PageSize
-            };
-        }
-
         public async Task<ConfigListValueDto?> GetByIdAsync(int id)
         {
             var item = await _configListValueRepository.GetByIdAsync(id);
