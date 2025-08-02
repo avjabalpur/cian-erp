@@ -103,11 +103,10 @@ namespace Xcianify.Repository
             using var connection = _dbContext.GetConnection();
             var sql = @"
                 INSERT INTO config_lists (list_code, list_name, description, is_active, created_at, created_by)
-                VALUES (@ListCode, @ListName, @Description, @IsActive, @CreatedAt, @CreatedBy);
-                
-                SELECT CAST(SCOPE_IDENTITY() as int)";
+                VALUES (@ListCode, @ListName, @Description, @IsActive, @CreatedAt, @CreatedBy)
+                RETURNING id;";
 
-            var id = await connection.QuerySingleAsync<int>(sql, configList);
+            var id = await connection.ExecuteScalarAsync<int>(sql, configList);
             configList.Id = id;
             return configList;
         }

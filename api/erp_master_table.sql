@@ -1,6 +1,49 @@
 -- CIAN Pharma ERP Database Schema
 -- PostgreSQL Database Structure
 
+CREATE TABLE IF NOT EXISTS config_lists (
+    id SERIAL PRIMARY KEY,
+    list_code VARCHAR(50) UNIQUE NOT NULL,  -- 'hsn_type', 'gs_id', etc.
+    list_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by INTEGER,
+    updated_by INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS config_list_values (
+    id SERIAL PRIMARY KEY,
+    list_id INTEGER NOT NULL,
+    value_code VARCHAR(50) NOT NULL,
+    value_name VARCHAR(100) NOT NULL,
+    display_order INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by INTEGER,
+    updated_by INTEGER,
+    CONSTRAINT fk_config_list_values_list_id FOREIGN KEY (list_id) REFERENCES config_lists(id) ON DELETE CASCADE,
+    CONSTRAINT unique_list_value UNIQUE (list_id, value_code)
+);
+
+CREATE TABLE IF NOT EXISTS config_settings (
+    id SERIAL PRIMARY KEY,
+    setting_key VARCHAR(100) UNIQUE NOT NULL,
+    setting_name VARCHAR(150) NOT NULL,
+    description TEXT,
+    string_value TEXT,
+    integer_value BIGINT,
+    boolean_value BOOLEAN,
+    decimal_value NUMERIC(15,4),
+    default_value TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by INTEGER,
+    updated_by INTEGER
+);
 -- ============================================
 -- 1. USER MANAGEMENT & AUTHENTICATION
 -- ============================================

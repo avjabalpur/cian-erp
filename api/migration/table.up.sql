@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS config_list_values (
     value_name VARCHAR(100) NOT NULL,
     display_order INTEGER DEFAULT 0,
     is_active BOOLEAN DEFAULT TRUE,
-    extra_data JSONB,  -- For additional attributes if needed (using JSONB for better performance)
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     created_by INTEGER,

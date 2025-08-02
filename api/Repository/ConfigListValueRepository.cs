@@ -20,7 +20,7 @@ namespace Xcianify.Repository
             var sql = @"
                 SELECT 
                     clv.id, clv.list_id as ListId, clv.value_code as ValueCode, clv.value_name as ValueName, 
-                    clv.display_order as DisplayOrder, clv.is_active as IsActive, clv.extra_data as ExtraData,
+                    clv.display_order as DisplayOrder, clv.is_active as IsActive,
                     clv.created_at as CreatedAt, clv.updated_at as UpdatedAt, clv.created_by as CreatedBy, clv.updated_by as UpdatedBy,
                     cl.list_code as ListCode, cl.list_name as ListName
                 FROM config_list_values clv
@@ -36,7 +36,7 @@ namespace Xcianify.Repository
             var sql = @"
                 SELECT 
                     clv.id, clv.list_id as ListId, clv.value_code as ValueCode, clv.value_name as ValueName, 
-                    clv.display_order as DisplayOrder, clv.is_active as IsActive, clv.extra_data as ExtraData,
+                    clv.display_order as DisplayOrder, clv.is_active as IsActive,
                     clv.created_at as CreatedAt, clv.updated_at as UpdatedAt, clv.created_by as CreatedBy, clv.updated_by as UpdatedBy,
                     cl.list_code as ListCode, cl.list_name as ListName
                 FROM config_list_values clv
@@ -52,12 +52,11 @@ namespace Xcianify.Repository
         {
             using var connection = _dbContext.GetConnection();
             var sql = @"
-                INSERT INTO config_list_values (list_id, value_code, value_name, display_order, is_active, extra_data, created_at, created_by)
-                VALUES (@ListId, @ValueCode, @ValueName, @DisplayOrder, @IsActive, @ExtraData, @CreatedAt, @CreatedBy);
-                
-                SELECT CAST(SCOPE_IDENTITY() as int)";
+                INSERT INTO config_list_values (list_id, value_code, value_name, display_order, is_active, created_at, created_by)
+                VALUES (@ListId, @ValueCode, @ValueName, @DisplayOrder, @IsActive, @CreatedAt, @CreatedBy)
+                RETURNING id;";
 
-            var id = await connection.QuerySingleAsync<int>(sql, configListValue);
+            var id = await connection.ExecuteScalarAsync<int>(sql, configListValue);
             configListValue.Id = id;
             return configListValue;
         }
@@ -72,7 +71,7 @@ namespace Xcianify.Repository
                     value_name = @ValueName, 
                     display_order = @DisplayOrder,
                     is_active = @IsActive,
-                    extra_data = @ExtraData,
+                   
                     updated_at = @UpdatedAt,
                     updated_by = @UpdatedBy
                 WHERE id = @Id";
