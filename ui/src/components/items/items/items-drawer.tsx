@@ -9,7 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useCreateItemMaster, useUpdateItemMaster } from "@/hooks/items/use-item-master";
 import { RightDrawer } from "@/components/shared/right-drawer";
 import { ItemBasicInfoForm } from "./forms/item-basic-info-form";
-import { ItemManufacturingForm } from "./forms/item-manufacturing-form";
 import { ItemSalesForm } from "./forms/item-sales-form";
 import { ItemBoughtOutForm } from "./forms/item-bought-out-form";
 import { ItemStockAnalysisForm } from "./forms/item-stock-analysis-form";
@@ -131,7 +130,6 @@ export default function ItemsDrawer({
             <Tabs defaultValue="basic" className="w-full">
               <TabsList className="grid w-full grid-cols-8">
                 <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                <TabsTrigger value="manufacturing">Manufacturing</TabsTrigger>
                 <TabsTrigger value="sales">Sales</TabsTrigger>
                 <TabsTrigger value="bought-out">Bought Out</TabsTrigger>
                 <TabsTrigger value="stock">Stock Analysis</TabsTrigger>
@@ -144,9 +142,6 @@ export default function ItemsDrawer({
                 <ItemBasicInfoForm control={form.control} />
               </TabsContent>
 
-              <TabsContent value="manufacturing" className="space-y-3">
-                <ItemManufacturingForm control={form.control} itemId={currentItemId} />
-              </TabsContent>
 
               <TabsContent value="sales" className="space-y-3">
                 <ItemSalesForm control={form.control} itemId={currentItemId} />

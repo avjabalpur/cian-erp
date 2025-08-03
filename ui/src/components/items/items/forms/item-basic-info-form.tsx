@@ -62,7 +62,7 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-2">
         <FormSelect
