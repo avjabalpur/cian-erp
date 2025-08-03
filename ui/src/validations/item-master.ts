@@ -72,6 +72,8 @@ export const itemMasterSchema = z.object({
   pharmacopoeiaName: z.string().optional(),
   unitOfMeasure: z.string().optional(),
   issuingUnit: z.string().optional(),
+  hsn: z.string().optional(),
+  uqc: z.string().optional(),
   uomIssConvFactor: z.string()
     .optional()
     .transform((val) => {

@@ -1,10 +1,7 @@
-import { useEffect } from "react";
-import { useController } from "react-hook-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FormInput } from "@/components/shared/forms/form-input"
-import { FormTextarea } from "@/components/shared/forms/form-textarea"
 import { FormSelect } from "@/components/shared/forms/form-select"
-import { useItemExportDetails } from "@/hooks/items/use-item-export-details"
+import { FormTextArea } from "@/components/shared/forms/form-text-area"
 
 interface ItemExportFormProps {
   control: any;
@@ -12,101 +9,6 @@ interface ItemExportFormProps {
 }
 
 export function ItemExportForm({ control, itemId }: ItemExportFormProps) {
-  // Fetch item export details data
-  const { data: exportData, isLoading } = useItemExportDetails(itemId || 0);
-  
-  // Use controller to programmatically set form values
-  const { field: itemDescriptionField } = useController({
-    name: "itemDescriptionForExports",
-    control,
-  });
-
-  const { field: exportProductGroupCodeField } = useController({
-    name: "exportProductGroupCode",
-    control,
-  });
-
-  const { field: exportProductGroupNameField } = useController({
-    name: "exportProductGroupName",
-    control,
-  });
-
-  const { field: depbRateListSrlNoField } = useController({
-    name: "depbRateListSrlNo",
-    control,
-  });
-
-  const { field: depbRateField } = useController({
-    name: "depbRate",
-    control,
-  });
-
-  const { field: depbValueCapField } = useController({
-    name: "depbValueCap",
-    control,
-  });
-
-  const { field: depbRemarksField } = useController({
-    name: "depbRemarks",
-    control,
-  });
-
-  const { field: dutyDrawbackSrlNoField } = useController({
-    name: "dutyDrawbackSrlNo",
-    control,
-  });
-
-  const { field: dutyDrawbackRateTypeField } = useController({
-    name: "dutyDrawbackRateType",
-    control,
-  });
-
-  const { field: dutyDrawbackRatePercentField } = useController({
-    name: "dutyDrawbackRatePercent",
-    control,
-  });
-
-  const { field: dutyDrawbackRateFixedField } = useController({
-    name: "dutyDrawbackRateFixed",
-    control,
-  });
-
-  const { field: dutyDrawbackValueCapField } = useController({
-    name: "dutyDrawbackValueCap",
-    control,
-  });
-
-  const { field: dutyDrawbackRemarksField } = useController({
-    name: "dutyDrawbackRemarks",
-    control,
-  });
-
-  // Populate form when export data is loaded
-  useEffect(() => {
-    if (exportData && itemId) {
-      itemDescriptionField.onChange(exportData.itemDescriptionForExports || "");
-      exportProductGroupCodeField.onChange(exportData.exportProductGroupCode || "");
-      exportProductGroupNameField.onChange(exportData.exportProductGroupName || "");
-      depbRateListSrlNoField.onChange(exportData.depbRateListSrlNo || "");
-      depbRateField.onChange(exportData.depbRate?.toString() || "");
-      depbValueCapField.onChange(exportData.depbValueCap?.toString() || "");
-      depbRemarksField.onChange(exportData.depbRemarks || "");
-      dutyDrawbackSrlNoField.onChange(exportData.dutyDrawbackSrlNo || "");
-      dutyDrawbackRateTypeField.onChange(exportData.dutyDrawbackRateType || "");
-      dutyDrawbackRatePercentField.onChange(exportData.dutyDrawbackRatePercent?.toString() || "");
-      dutyDrawbackRateFixedField.onChange(exportData.dutyDrawbackRateFixed?.toString() || "");
-      dutyDrawbackValueCapField.onChange(exportData.dutyDrawbackValueCap?.toString() || "");
-      dutyDrawbackRemarksField.onChange(exportData.dutyDrawbackRemarks || "");
-    }
-  }, [exportData, itemId, itemDescriptionField, exportProductGroupCodeField, exportProductGroupNameField, depbRateListSrlNoField, depbRateField, depbValueCapField, depbRemarksField, dutyDrawbackSrlNoField, dutyDrawbackRateTypeField, dutyDrawbackRatePercentField, dutyDrawbackRateFixedField, dutyDrawbackValueCapField, dutyDrawbackRemarksField]);
-
-  if (isLoading && itemId) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-sm text-gray-500">Loading export details...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4">
@@ -116,7 +18,7 @@ export function ItemExportForm({ control, itemId }: ItemExportFormProps) {
           <CardTitle className="text-lg">Item Description for Exports</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <FormTextarea
+          <FormTextArea
             control={control}
             name="itemDescriptionForExports"
             label="Description"

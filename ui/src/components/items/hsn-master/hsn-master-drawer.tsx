@@ -8,11 +8,11 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useCreateHsnMaster, useUpdateHsnMaster } from "@/hooks/items/use-hsn-master";
 import { FormInput } from "@/components/shared/forms/form-input";
-import { FormTextarea } from "@/components/shared/forms/form-textarea";
 import { FormSelect } from "@/components/shared/forms/form-select";
 import { RightDrawer } from "@/components/shared/right-drawer";
 import { HsnMasterFormData, hsnMasterSchema } from "@/validations/item-master";
 import { HsnMaster } from "@/types/hsn-master";
+import { FormTextArea } from "@/components/shared/forms/form-text-area";
 
 interface HsnMasterDrawerProps {
   isOpen: boolean;
@@ -212,7 +212,7 @@ export default function HsnMasterDrawer({
             />
           </div>
 
-          <FormTextarea
+          <FormTextArea
             control={control}
             name="description"
             label="Description"

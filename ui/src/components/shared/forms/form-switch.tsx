@@ -25,7 +25,7 @@ export function FormSwitch<T extends FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem className={cn("flex flex-row items-center justify-between space-x-2 space-y-0", className)}>
-          <FormLabel className="text-sm font-normal">{label}</FormLabel>
+          <FormLabel className="text-[12px] font-medium">{label}</FormLabel>
           <FormControl>
             <Switch
               checked={field.value}

@@ -26,7 +26,7 @@ export function NuqsFormInput({
   }: NuqsFormInputProps) {
     return (
       <div className={cn("space-y-2", className)}>
-        <Label>{label}</Label>
+        <Label className="text-[12px] font-medium">{label}</Label>
         <div className="relative">
           {icon && (
             <div className="absolute left-3 top-3 h-4 w-4 text-muted-foreground">

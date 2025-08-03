@@ -48,7 +48,7 @@ export function FormSelect<T extends FieldValues>({
     return (
       <div className={cn('space-y-2', className)}>
         {showLabel && (
-          <FormLabel>
+          <FormLabel className="text-[12px] font-medium">
             {label} {required && <span className="text-destructive">*</span>}
           </FormLabel>
         )}
@@ -66,9 +66,9 @@ export function FormSelect<T extends FieldValues>({
       control={control}
       name={name}
       render={({ field, fieldState: { error } }) => (
-        <FormItem className={cn('space-y-2', className)}>
+        <FormItem className={cn('space-y-0', className)}>
           {showLabel && (
-            <FormLabel>
+            <FormLabel className="text-[12px] font-medium">
               {label} {required && <span className="text-destructive">*</span>}
             </FormLabel>
           )}

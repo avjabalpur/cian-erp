@@ -10,8 +10,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useCreateItemMedia, useUpdateItemMedia } from "@/hooks/items/use-item-media";
 import { FormInput } from "@/components/shared/forms/form-input";
 import { FormSelect } from "@/components/shared/forms/form-select";
-import { FormTextarea } from "@/components/shared/forms/form-textarea";
 import { RightDrawer } from "@/components/shared/right-drawer";
+import { FormTextArea } from "@/components/shared/forms/form-text-area";
 
 const itemMediaSchema = z.object({
   itemId: z.number().min(1, "Item ID is required"),
@@ -166,7 +166,7 @@ export default function ItemMediaDrawer({
             inputProps={{ type: "number" }}
           />
 
-          <FormTextarea
+          <FormTextArea
             control={form.control}
             name="description"
             label="Description"

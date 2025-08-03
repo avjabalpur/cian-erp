@@ -56,11 +56,20 @@ export default function ItemsDrawer({
     }
   }, [item, form, isOpen]);
 
+  // Force re-render of child components when item changes
+  const [currentItemId, setCurrentItemId] = useState<number | undefined>(undefined);
+  
+  useEffect(() => {
+    setCurrentItemId(item?.id);
+  }, [item?.id]);
+
   const onSubmit = async (data: ItemMasterFormData) => {
     try {
       console.log('Form data before transformation:', data);
       const transformedData = transformFormDataToApi(data);
       console.log('Transformed data:', transformedData);
+
+      let createdItemId: number;
 
       if (item) {
         const result = await updateItemMutation.mutateAsync({
@@ -68,22 +77,26 @@ export default function ItemsDrawer({
           data: transformedData as unknown as UpdateItemMasterData,
         });
         if (result) {
+          createdItemId = item.id;
           toast({
             title: "Success",
             description: "Item updated successfully",
           });
-          onSuccess();
         }
       } else {
         const result = await createItemMutation.mutateAsync(transformedData as unknown as CreateItemMasterData);
         if (result) {
+          createdItemId = result.id;
           toast({
             title: "Success",
             description: "Item created successfully",
           });
-          onSuccess();
         }
       }
+
+      // TODO: Save related data (specifications, export details, etc.) here
+      // For now, we'll just close the drawer
+      onSuccess();
     } catch (error: any) {
       console.error('Item operation failed:', error);
       toast({
@@ -110,7 +123,7 @@ export default function ItemsDrawer({
         ? "Update the item information below." 
         : "Fill in the information below to create a new item."
       }
-      size="4xl"
+      size="5xl"
     >
       <div className="mx-auto w-full">
         <FormProvider {...form}>
@@ -132,31 +145,31 @@ export default function ItemsDrawer({
               </TabsContent>
 
               <TabsContent value="manufacturing" className="space-y-3">
-                <ItemManufacturingForm control={form.control} itemId={item?.id} />
+                <ItemManufacturingForm control={form.control} itemId={currentItemId} />
               </TabsContent>
 
               <TabsContent value="sales" className="space-y-3">
-                <ItemSalesForm control={form.control} itemId={item?.id} />
+                <ItemSalesForm control={form.control} itemId={currentItemId} />
               </TabsContent>
 
               <TabsContent value="bought-out" className="space-y-3">
-                <ItemBoughtOutForm control={form.control} itemId={item?.id} />
+                <ItemBoughtOutForm control={form.control} itemId={currentItemId} />
               </TabsContent>
 
               <TabsContent value="stock" className="space-y-3">
-                <ItemStockAnalysisForm control={form.control} itemId={item?.id} />
+                <ItemStockAnalysisForm control={form.control} itemId={currentItemId} />
               </TabsContent>
 
               <TabsContent value="export" className="space-y-3">
-                <ItemExportForm control={form.control} itemId={item?.id} />
+                <ItemExportForm control={form.control} itemId={currentItemId} />
               </TabsContent>
 
               <TabsContent value="specifications" className="space-y-3">
-                <ItemSpecificationsForm control={form.control} itemId={item?.id} />
+                <ItemSpecificationsForm control={form.control} itemId={currentItemId} />
               </TabsContent>
 
               <TabsContent value="other" className="space-y-3">
-                <ItemOtherDetailsForm control={form.control} itemId={item?.id} />
+                <ItemOtherDetailsForm control={form.control} itemId={currentItemId} />
               </TabsContent>
             </Tabs>
 

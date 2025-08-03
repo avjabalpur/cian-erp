@@ -10,8 +10,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useCreateItemOtherDetail, useUpdateItemOtherDetail } from "@/hooks/items/use-item-other-details";
 import { FormInput } from "@/components/shared/forms/form-input";
 import { FormSelect } from "@/components/shared/forms/form-select";
-import { FormTextarea } from "@/components/shared/forms/form-textarea";
 import { RightDrawer } from "@/components/shared/right-drawer";
+import { FormTextArea } from "@/components/shared/forms/form-text-area";
 
 const itemOtherDetailSchema = z.object({
   itemId: z.number().min(1, "Item ID is required"),
@@ -154,7 +154,7 @@ export default function ItemOtherDetailsDrawer({
             placeholder="Enter detail value (optional)"
           />
 
-          <FormTextarea
+          <FormTextArea
             control={form.control}
             name="description"
             label="Description"

@@ -31,9 +31,9 @@ export function FormRadioGroup({
   })
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("space-y-0", className)}>
       {label && (
-        <Label className={cn("text-sm font-medium", required && "after:content-['*'] after:ml-0.5 after:text-red-500")}>
+        <Label className={cn("text-[12px] font-medium", required && "after:content-['*'] after:ml-0.5 after:text-red-500")}>
           {label}
         </Label>
       )}

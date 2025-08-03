@@ -37,7 +37,7 @@ export function NuqsFormSelect({
 }: NuqsFormSelectProps) {
   return (
     <div className={cn("space-y-2", className)}>
-      <Label>{label}</Label>
+      <Label className="text-[12px] font-medium">{label}</Label>
       <Select value={value || ""} onValueChange={(val) => onChange(val === "all" ? null : val)} disabled={disabled}>
         <SelectTrigger>
           <SelectValue placeholder={placeholder || `Select ${label}`} />

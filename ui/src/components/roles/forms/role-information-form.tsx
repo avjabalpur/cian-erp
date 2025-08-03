@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { FormInput } from "@/components/shared/forms/form-input"
 import { FormSwitch } from "@/components/shared/forms/form-switch"
-import { FormTextarea } from "@/components/shared/forms/form-textarea"
+import { FormTextArea } from "@/components/shared/forms/form-text-area"
 interface RoleInformationFormProps {
   control: any;
 }
@@ -30,14 +30,12 @@ export function RoleInformationForm({ control }: RoleInformationFormProps) {
             required
           />
 
-          <FormTextarea
+          <FormTextArea
             control={control}
             name="description"
             label="Description"
             placeholder="Enter role description (optional)"
-            textareaProps={{
-              rows: 3
-            }}
+            rows={3}
           />
 
           <div className="flex items-center space-x-2">

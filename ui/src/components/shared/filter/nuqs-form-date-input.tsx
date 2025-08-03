@@ -29,7 +29,7 @@ export function NuqsFormDateInput({
 }: NuqsFormDateInputProps) {
   return (
     <div className={cn("space-y-2", className)}>
-      <Label>{label}</Label>
+      <Label className="text-[12px] font-medium">{label}</Label>
       <Popover>
         <PopoverTrigger asChild>
           <Button

@@ -36,8 +36,8 @@ export function FormCustom<T extends FieldValues>({
       control={control}
       name={name}
       render={({ field, fieldState: { error } }) => (
-        <FormItem className={cn('space-y-2', containerClassName)}>
-          {showLabel && <FormLabel>{label}</FormLabel>}
+        <FormItem className={cn('space-y-0', containerClassName)}>
+          {showLabel && <FormLabel className="text-[12px] font-medium">{label}</FormLabel>}
           <FormControl>
             <div className={className}>
               {children({

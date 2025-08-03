@@ -1,106 +1,14 @@
-import { useEffect } from "react";
-import { useController } from "react-hook-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FormInput } from "@/components/shared/forms/form-input"
-import { FormTextarea } from "@/components/shared/forms/form-textarea"
 import { FormSelect } from "@/components/shared/forms/form-select"
-import { useItemSpecification } from "@/hooks/items/use-item-specifications"
-
+import { FormTextArea } from "@/components/shared/forms/form-text-area"
+  
 interface ItemSpecificationsFormProps {
   control: any;
   itemId?: number;
 }
 
 export function ItemSpecificationsForm({ control, itemId }: ItemSpecificationsFormProps) {
-  // Fetch item specification data
-  const { data: specificationData, isLoading } = useItemSpecification(itemId || 0);
-  
-  // Use controller to programmatically set form values
-  const { field: specificationField } = useController({
-    name: "itemSpecification",
-    control,
-  });
-
-  const { field: substituteItemField } = useController({
-    name: "substituteItemFor",
-    control,
-  });
-
-  const { field: customTariffField } = useController({
-    name: "customTariffNo",
-    control,
-  });
-
-  const { field: exciseTariffField } = useController({
-    name: "exciseTariffNo",
-    control,
-  });
-
-  const { field: vatCommField } = useController({
-    name: "vatCommCode",
-    control,
-  });
-
-  const { field: convFactorField } = useController({
-    name: "convFactor",
-    control,
-  });
-
-  const { field: oldCodeField } = useController({
-    name: "oldCode",
-    control,
-  });
-
-  const { field: standardWeightField } = useController({
-    name: "standardWeight",
-    control,
-  });
-
-  const { field: standardConversionCostFactorField } = useController({
-    name: "standardConversionCostFactor",
-    control,
-  });
-
-  const { field: standardPackingCostFactorField } = useController({
-    name: "standardPackingCostFactor",
-    control,
-  });
-
-  const { field: costFactorPercentField } = useController({
-    name: "costFactorPercent",
-    control,
-  });
-
-  const { field: packingCostRsField } = useController({
-    name: "packingCostRs",
-    control,
-  });
-
-  // Populate form when specification data is loaded
-  useEffect(() => {
-    if (specificationData && itemId) {
-      specificationField.onChange(specificationData.specification || "");
-      substituteItemField.onChange(specificationData.substituteItemFor || "");
-      customTariffField.onChange(specificationData.customTariffNo || "");
-      exciseTariffField.onChange(specificationData.exciseTariffNo || "");
-      vatCommField.onChange(specificationData.vatCommCode || "");
-      convFactorField.onChange(specificationData.convFactor?.toString() || "");
-      oldCodeField.onChange(specificationData.oldCode || "");
-      standardWeightField.onChange(specificationData.standardWeight?.toString() || "");
-      standardConversionCostFactorField.onChange(specificationData.standardConversionCostFactor?.toString() || "");
-      standardPackingCostFactorField.onChange(specificationData.standardPackingCostFactor?.toString() || "");
-      costFactorPercentField.onChange(specificationData.costFactorPercent?.toString() || "");
-      packingCostRsField.onChange(specificationData.packingCostRs?.toString() || "");
-    }
-  }, [specificationData, itemId, specificationField, substituteItemField, customTariffField, exciseTariffField, vatCommField, convFactorField, oldCodeField, standardWeightField, standardConversionCostFactorField, standardPackingCostFactorField, costFactorPercentField, packingCostRsField]);
-
-  if (isLoading && itemId) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-sm text-gray-500">Loading specifications...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4">
@@ -110,7 +18,7 @@ export function ItemSpecificationsForm({ control, itemId }: ItemSpecificationsFo
           <CardTitle className="text-lg">Item's Specification</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <FormTextarea
+          <FormTextArea
             control={control}
             name="itemSpecification"
             label="Specification"

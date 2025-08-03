@@ -25,8 +25,8 @@ export function FormTextArea<T extends FieldValues>({
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className={cn('space-y-2', className)}>
-          <FormLabel>{label}</FormLabel>
+        <FormItem className={cn('space-y-0', className)}>
+          <FormLabel className="text-[12px] font-medium">{label}</FormLabel>
           <FormControl>
             <Textarea
               placeholder={placeholder || label}

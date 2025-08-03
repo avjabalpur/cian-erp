@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useCreateItemType, useUpdateItemType } from "@/hooks/items/use-item-types";
 import { FormInput } from "@/components/shared/forms/form-input";
-import { FormTextarea } from "@/components/shared/forms/form-textarea";
 import { RightDrawer } from "@/components/shared/right-drawer";
 import { ItemTypeFormData, itemTypeSchema } from "@/validations/item-master";
 import { ItemType } from "@/types/item";
 import { FormCheckbox } from "@/components/shared/forms/form-checkbox";
+import { FormTextArea } from "@/components/shared/forms/form-text-area";
 
 interface ItemTypeDrawerProps {
   isOpen: boolean;
@@ -146,7 +146,7 @@ export default function ItemTypeDrawer({
             required
           />
 
-          <FormTextarea
+          <FormTextArea
             control={control}
             name="description"
             label="Description"

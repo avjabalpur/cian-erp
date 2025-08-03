@@ -2,8 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { FormInput } from "@/components/shared/forms/form-input"
 import { FormMultiSelect } from "@/components/shared/forms/form-multiselect"
 import { FormSwitch } from "@/components/shared/forms/form-switch"
-import { FormTextarea } from "@/components/shared/forms/form-textarea"
 import { FormSelect } from "@/components/shared/forms/form-select"
+import { FormTextArea } from "@/components/shared/forms/form-text-area"
 
 interface PermissionInformationFormProps {
   control: any;
@@ -65,14 +65,12 @@ export function PermissionInformationForm({ control }: PermissionInformationForm
             placeholder="Select one or more actions"
           />
 
-          <FormTextarea
+          <FormTextArea
             control={control}
             name="description"
             label="Description"
             placeholder="Enter permission description (optional)"
-            textareaProps={{
-              rows: 3
-            }}
+            rows={3}
           />
 
           <div className="flex items-center space-x-2">

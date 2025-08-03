@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FormInput } from "@/components/shared/forms/form-input"
 import { FormSwitch } from "@/components/shared/forms/form-switch"
-import { FormTextarea } from "@/components/shared/forms/form-textarea"
+
 
 interface ItemOtherDetailsFormProps {
   control: any;

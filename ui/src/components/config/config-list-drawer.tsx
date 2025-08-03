@@ -11,12 +11,12 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useCreateConfigList, useUpdateConfigList, useConfigListValuesByListId, useCreateConfigListValue, useUpdateConfigListValue, useDeleteConfigListValue } from "@/hooks/config/use-config-lists";
 import { FormInput } from "@/components/shared/forms/form-input";
-import { FormTextarea } from "@/components/shared/forms/form-textarea";
 import { FormCheckbox } from "@/components/shared/forms/form-checkbox";
 import { RightDrawer } from "@/components/shared/right-drawer";
 import { ConfigListFormData, configListSchema, ConfigListValueFormData } from "@/validations/config-list";
 import { ConfigList, ConfigListValue } from "@/types/config-list";
 import { Plus, X, Trash2, Edit2 } from "lucide-react";
+import { FormTextArea } from "../shared/forms/form-text-area";
 
 interface ConfigListDrawerProps {
   isOpen: boolean;
@@ -321,7 +321,7 @@ export default function ConfigListDrawer({
                 />
               </div>
 
-              <FormTextarea
+              <FormTextArea
                 control={control}
                 name="description"
                 label="Description"

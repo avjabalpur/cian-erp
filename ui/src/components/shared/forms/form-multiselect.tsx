@@ -16,7 +16,7 @@ interface FormMultiSelectProps {
 
 export const FormMultiSelect: React.FC<FormMultiSelectProps> = ({ control, name, label, options, placeholder }) => (
   <div>
-    <label className="block text-sm font-medium mb-1">{label}</label>
+    <label className="block text-[12px] font-medium mb-1">{label}</label>
     <Controller
       control={control}
       name={name}

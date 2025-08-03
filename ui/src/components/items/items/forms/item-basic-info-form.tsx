@@ -1,11 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FormInput } from "@/components/shared/forms/form-input"
 import { FormSelect } from "@/components/shared/forms/form-select"
-import { FormTextarea } from "@/components/shared/forms/form-textarea"
 import { FormSwitch } from "@/components/shared/forms/form-switch"
 import { ConfigListSelect } from "@/components/shared/config-list-select"
 import { useItemTypes, useParentTypes } from "@/hooks/items/use-item-types"
 import { useController } from "react-hook-form"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label"
 
 interface ItemBasicInfoFormProps {
   control: any;
@@ -42,181 +43,463 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
     { label: "MTR - Meters", value: "MTR" },
   ];
 
+  const productTypeOptions = [
+    { label: "Select Product Type", value: "-1" },
+    { label: "Sale Pack", value: "Sale Pack" },
+    { label: "Bulk", value: "Bulk" },
+    { label: "Sample", value: "Sample" },
+  ];
+
+  const salesDivisionOptions = [
+    { label: "Select Sales Division", value: "-1" },
+    { label: "TPT - THIRD PARTY", value: "TPT" },
+    { label: "DIRECT", value: "DIRECT" },
+  ];
+
+  const productGroupOptions = [
+    { label: "Select Product Group", value: "-1" },
+    { label: "CIAN HEALTHCARE LTD - CC03", value: "CIAN HEALTHCARE LTD" },
+  ];
+
   return (
     <div className="space-y-4">
-      {/* Item Identification */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Item Identification</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <FormSelect
-              control={control}
-              name="itemTypeId"
-              label="Item Type"
-              options={itemTypeOptions}
-              required
-            />
-            <FormSelect
-              control={control}
-              name="subType"
-              label="Sub Type"
-              options={subTypeOptions}
-            />
-            <div className="space-y-2">
-              <label className="text-sm font-medium">GS Ind.</label>
-              <ConfigListSelect
-                listCode="gs_id"
-                value={control._formValues?.gsInd}
-                onChange={(value) => {
-                  control.setValue("gsInd", value);
-                }}
-                placeholder="Select GS Ind."
+
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-2">
+        <FormSelect
+          control={control}
+          name="itemTypeId"
+          label="Item Type"
+          options={itemTypeOptions}
+          required
+        />
+        <FormSelect
+          control={control}
+          name="subType"
+          label="Sub-Type"
+          options={subTypeOptions}
+        />
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">GS Ind.</label>
+          <ConfigListSelect
+            listCode="gs_id"
+            value={control._formValues?.gsInd}
+            onChange={(value) => {
+              control.setValue("gsInd", value);
+            }}
+            placeholder="Select GS Ind."
+          />
+        </div>
+        <FormInput
+          control={control}
+          name="hsn"
+          label="HSN"
+          placeholder="Enter HSN code"
+        />
+        <div className="space-y-2">
+          <span className="text-sm font-medium">UQC:</span> <span className="text-sm font-medium">KGS</span>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <Card>
+            <CardContent className="space-y-2">
+              <FormInput
+                control={control}
+                name="itemName"
+                label="Item Name"
+                placeholder="Enter item name"
+                required
               />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <FormInput
-              control={control}
-              name="itemCode"
-              label="Item Code"
-              placeholder="Enter item code"
-              required
-            />
-            <FormInput
-              control={control}
-              name="itemName"
-              label="Item Name"
-              placeholder="Enter item name"
-              required
-            />
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <FormInput
-              control={control}
-              name="shortName"
-              label="Short Name"
-              placeholder="Enter short name"
-            />
-            <FormInput
-              control={control}
-              name="revNo"
-              label="Revision No"
-              placeholder="Enter revision number"
-            />
-          </div>
+              <FormInput
+                control={control}
+                name="shortName"
+                label="Short Name"
+                placeholder="Enter short name"
+              />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <FormInput
-              control={control}
-              name="pharmacopoeiaName"
-              label="Pharmacopoeia Name"
-              placeholder="Enter pharmacopoeia name"
-            />
-            <FormInput
-              control={control}
-              name="drawingRef"
-              label="Drawing Reference"
-              placeholder="Enter drawing reference"
-            />
-          </div>
-        </CardContent>
-      </Card>
+              <FormInput
+                control={control}
+                name="pharmacopoeiaName"
+                label="Pharmacopeia Name"
+                placeholder="Enter pharmacopeia name"
+              />
 
-      {/* Unit of Measure */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Unit of Measure</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <FormSelect
-              control={control}
-              name="unitOfMeasure"
-              label="Unit of Measure"
-              options={uqcOptions}
-            />
-            <FormSelect
-              control={control}
-              name="issuingUnit"
-              label="Issuing Unit"
-              options={uqcOptions}
-            />
-            <FormSwitch
-              control={control}
-              name="goodsType"
-              label="Goods Type"
-            />
-          </div>
+              <FormSelect
+                control={control}
+                name="unitOfMeasure"
+                label="Unit of Measure"
+                options={uqcOptions}
+              />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <FormInput
-              control={control}
-              name="uomIssConvFactor"
-              label="UOM ISS Conversion Factor"
-              placeholder="Enter conversion factor"
-              inputProps={{ type: "number", step: "0.01" }}
-            />
-            <FormInput
-              control={control}
-              name="uomUqcConvFactor"
-              label="UOM UQC Conversion Factor"
-              placeholder="Enter conversion factor"
-              inputProps={{ type: "number", step: "0.01" }}
-            />
-          </div>
-        </CardContent>
-      </Card>
+              <FormSelect
+                control={control}
+                name="issuingUnit"
+                label="Issuing Unit"
+                options={uqcOptions}
+              />
+            </CardContent>
+          </Card>
 
-      {/* Planning Information */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Planning Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <FormInput
-              control={control}
-              name="leadTimeDays"
-              label="Lead Time (Days)"
-              placeholder="Enter lead time"
-              inputProps={{ type: "number" }}
-            />
-            <FormInput
-              control={control}
-              name="economicOrderQty"
-              label="Economic Order Qty"
-              placeholder="Enter economic order quantity"
-              inputProps={{ type: "number" }}
-            />
-            <FormInput
-              control={control}
-              name="desiredPackSize"
-              label="Desired Pack Size"
-              placeholder="Enter desired pack size"
-              inputProps={{ type: "number" }}
-            />
-          </div>
+          <Card>
+            <CardContent className="space-y-2">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <FormInput
-              control={control}
-              name="currentBuyer"
-              label="Current Buyer"
-              placeholder="Enter current buyer"
-            />
-            <FormInput
-              control={control}
-              name="freightOn"
-              label="Freight On"
-              placeholder="Enter freight on"
-            />
-          </div>
-        </CardContent>
-      </Card>
+                <FormInput
+                  control={control}
+                  name="drawingRef"
+                  label="Drawing/Ref."
+                  placeholder="Enter drawing reference"
+                />
+                <FormInput
+                  control={control}
+                  name="stdAssayStrength"
+                  label="Std. Assay/Strength"
+                  placeholder="0.00"
+                  inputProps={{ type: "number", step: "0.01" }}
+                />
+                <FormInput
+                  control={control}
+                  name="shelfLifeMonths"
+                  label="Shelf Life (Months)"
+                  placeholder="0"
+                  inputProps={{ type: "number" }}
+                />
+                <FormInput
+                  control={control}
+                  name="stdRate"
+                  label="Std. Rate"
+                  placeholder="0.00000"
+                  inputProps={{ type: "number", step: "0.00001" }}
+                />
+                <FormInput
+                  control={control}
+                  name="leadTimeDays"
+                  label="Lead Time (in Days)"
+                  placeholder="0.000"
+                  inputProps={{ type: "number", step: "0.001" }}
+                />
+
+                <FormInput
+                  control={control}
+                  name="stdLossOnDry"
+                  label="Std Loss on Dry"
+                  placeholder="0.00"
+                  inputProps={{ type: "number", step: "0.01" }}
+                />
+
+                <FormInput
+                  control={control}
+                  name="shelfLifeDays"
+                  label="Shelf Life (Days)"
+                  placeholder="0"
+                  inputProps={{ type: "number" }}
+                />
+
+                <FormInput
+                  control={control}
+                  name="safetyStock"
+                  label="Safety Stock"
+                  placeholder="0"
+                  inputProps={{ type: "number" }}
+                />
+              </div>
+
+
+            </CardContent>
+          </Card>
+
+
+          <Card>
+            <CardContent className="space-y-2">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+                <FormSwitch
+                  control={control}
+                  name="batchNotApplicable"
+                  label="Batch Not Applicable (NA)"
+                />
+
+                <FormSwitch
+                  control={control}
+                  name="qcRequired"
+                  label="Q.C. Required"
+                />
+
+                <FormSwitch
+                  control={control}
+                  name="allergen"
+                  label="Allergen"
+                />
+
+                <FormSwitch
+                  control={control}
+                  name="mfgDateApplicable"
+                  label="Mfg. Date Applicable"
+                />
+
+                <FormSwitch
+                  control={control}
+                  name="expiryDateApplicable"
+                  label="Expiry Date Applicable"
+                />
+
+                <FormSwitch
+                  control={control}
+                  name="trackSerialNos"
+                  label="Track Serial Nos."
+                />
+
+                <FormSwitch
+                  control={control}
+                  name="packingFreightInsuranceServices"
+                  label="Packing,Freight and Insurance Services"
+                />
+
+                <FormSwitch
+                  control={control}
+                  name="activeIngredient"
+                  label="Active Ingredient"
+                />
+
+                <FormSwitch
+                  control={control}
+                  name="mfgLocNameRequired"
+                  label="Mfg. Loc/Name Required"
+                />
+
+                <FormSwitch
+                  control={control}
+                  name="mfgMmYyyyApplicable"
+                  label="Mfg. MMYY Applicable"
+                />
+
+                <FormSwitch
+                  control={control}
+                  name="expiryMmYyyyApplicable"
+                  label="Expiry MMYY Applicable"
+                />
+
+                <FormSwitch
+                  control={control}
+                  name="principalForStatutoryReporting"
+                  label="Principal Item for Statutory Reporting"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Middle Column - General, Conversion, and Manufacturing Details */}
+        <div className="space-y-4">
+          <Card>
+
+            <CardContent className="space-y-2">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mt-2">
+                <FormSwitch
+                  control={control}
+                  name="boughtOut"
+                  label="Bought-Out"
+                />
+
+                <FormSwitch
+                  control={control}
+                  name="jobWork"
+                  label="Job Work"
+                />
+
+                <FormSwitch
+                  control={control}
+                  name="imported"
+                  label="Imported"
+                />
+              </div>
+
+
+              <FormInput
+                control={control}
+                name="currentBuyer"
+                label="Current Buyer"
+                placeholder="Enter current buyer"
+              />
+
+              <div>
+                <FormInput
+                  control={control}
+                  name="economicOrderQty"
+                  label="Economic Ord. Qty."
+                  placeholder="0"
+                  inputProps={{ type: "number" }}
+
+                /> NOS
+              </div>
+              <div>
+                <FormInput
+                  control={control}
+                  name="desiredPackSize"
+                  label="Desired Pack Size"
+                  placeholder="0"
+                  inputProps={{ type: "number" }}
+                /> NOS
+              </div>
+
+
+              <FormSwitch
+                control={control}
+                name="taxCreditApplicable"
+                label="Tax Credit Applicable"
+              />
+
+              <FormInput
+                control={control}
+                name="freightOn"
+                label="Freight on"
+                placeholder="0.00"
+                inputProps={{ type: "number", step: "0.01" }}
+              />
+            </CardContent>
+          </Card>
+          <Card>
+
+            <CardContent className="space-y-2">
+
+
+              {/* Weight/Volume Radio Buttons */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Weight/Volume</label>
+                <RadioGroup defaultValue="weight" className="flex space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="weight" id="weight" />
+                    <Label htmlFor="weight">Weight</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="volume" id="volume" />
+                    <Label htmlFor="volume">Volume</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              <FormInput
+                control={control}
+                name="uomIssConvFactor"
+                label="Conv. Factor (UOM/Iss.UOM)"
+                placeholder="1.00000"
+                inputProps={{ type: "number", step: "0.00001" }}
+              />
+
+              <FormInput
+                control={control}
+                name="uomUqcConvFactor"
+                label="Conv. Factor (UOM/UQC)"
+                placeholder="1.00000"
+                inputProps={{ type: "number", step: "0.00001" }}
+              />
+
+
+
+              <FormSwitch
+                control={control}
+                name="manufactured"
+                label="Manufactured"
+              />
+
+              <FormInput
+                control={control}
+                name="allowedAllergenPercent"
+                label="Allowed Allergen %"
+                placeholder="0.00"
+                inputProps={{ type: "number", step: "0.01" }}
+              />
+
+              <FormInput
+                control={control}
+                name="stdMfgFeesPerUnit"
+                label="Std. Mfg. Fees/Unit"
+                placeholder="0.00000"
+                inputProps={{ type: "number", step: "0.00001" }}
+              />
+
+              <FormInput
+                control={control}
+                name="mainProdCentre"
+                label="Main Prod. Centre"
+                placeholder="Enter main production centre"
+              />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Column - Sales and Other Flags */}
+        <div className="space-y-4">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Sales & Other Flags</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <FormSwitch
+                control={control}
+                name="sold"
+                label="Sold"
+              />
+
+              <FormSwitch
+                control={control}
+                name="keyProduct"
+                label="Key Product"
+              />
+
+              <FormSwitch
+                control={control}
+                name="exported"
+                label="Exported"
+              />
+
+              <FormSelect
+                control={control}
+                name="productType"
+                label="Product Type"
+                options={productTypeOptions}
+              />
+
+              <FormSelect
+                control={control}
+                name="salesDivision"
+                label="Sales Division"
+                options={salesDivisionOptions}
+              />
+
+              <FormSelect
+                control={control}
+                name="productGroup"
+                label="Product Group"
+                options={productGroupOptions}
+              />
+
+              <FormInput
+                control={control}
+                name="conversionFactor"
+                label="Conversion Factor"
+                placeholder="NOS/NOS"
+              />
+
+              <FormInput
+                control={control}
+                name="vendorPartNo"
+                label="Vendor's Part No."
+                placeholder="Enter vendor part number"
+              />
+
+              {/* Various Flags Checkboxes */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Item Flags</label>
+                <div className="space-y-2">
+
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   )
 } 

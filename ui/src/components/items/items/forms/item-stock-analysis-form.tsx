@@ -1,9 +1,6 @@
-import { useEffect } from "react";
-import { useController } from "react-hook-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FormInput } from "@/components/shared/forms/form-input"
-import { FormTextarea } from "@/components/shared/forms/form-textarea"
-import { useItemStockAnalysisByItemId } from "@/hooks/items/use-item-stock-analysis"
+
 
 interface ItemStockAnalysisFormProps {
   control: any;
@@ -11,61 +8,6 @@ interface ItemStockAnalysisFormProps {
 }
 
 export function ItemStockAnalysisForm({ control, itemId }: ItemStockAnalysisFormProps) {
-  // Fetch item stock analysis data
-  const { data: stockData, isLoading } = useItemStockAnalysisByItemId(itemId || 0);
-  
-  // Use controller to programmatically set form values
-  const { field: currentStockField } = useController({
-    name: "currentStock",
-    control,
-  });
-
-  const { field: minimumStockField } = useController({
-    name: "minimumStock",
-    control,
-  });
-
-  const { field: maximumStockField } = useController({
-    name: "maximumStock",
-    control,
-  });
-
-  const { field: reorderPointField } = useController({
-    name: "reorderPoint",
-    control,
-  });
-
-  const { field: averageConsumptionField } = useController({
-    name: "averageConsumption",
-    control,
-  });
-
-  const { field: leadTimeField } = useController({
-    name: "leadTime",
-    control,
-  });
-
-  // Populate form when stock data is loaded
-  useEffect(() => {
-    if (stockData && itemId && stockData.length > 0) {
-      // Take the first stock analysis record
-      const firstStockData = stockData[0];
-      currentStockField.onChange(firstStockData.currentStock?.toString() || "");
-      minimumStockField.onChange(firstStockData.minimumStock?.toString() || "");
-      maximumStockField.onChange(firstStockData.maximumStock?.toString() || "");
-      reorderPointField.onChange(firstStockData.reorderPoint?.toString() || "");
-      averageConsumptionField.onChange(firstStockData.averageConsumption?.toString() || "");
-      leadTimeField.onChange(firstStockData.leadTime?.toString() || "");
-    }
-  }, [stockData, itemId, currentStockField, minimumStockField, maximumStockField, reorderPointField, averageConsumptionField, leadTimeField]);
-
-  if (isLoading && itemId) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-sm text-gray-500">Loading stock analysis...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4">
