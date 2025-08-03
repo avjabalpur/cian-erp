@@ -14,7 +14,7 @@ export function ItemExportForm({ control, itemId }: ItemExportFormProps) {
     <div className="space-y-4">
       {/* Item Description for Exports */}
       <Card>
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-1">
           <CardTitle className="text-lg">Item Description for Exports</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -29,7 +29,7 @@ export function ItemExportForm({ control, itemId }: ItemExportFormProps) {
 
       {/* Export Product Group */}
       <Card>
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-1">
           <CardTitle className="text-lg">Export Product Group</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -52,7 +52,7 @@ export function ItemExportForm({ control, itemId }: ItemExportFormProps) {
 
       {/* DEPB Rate Details */}
       <Card>
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-1">
           <CardTitle className="text-lg">DEPB Rate Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -89,7 +89,7 @@ export function ItemExportForm({ control, itemId }: ItemExportFormProps) {
 
       {/* Duty Drawback Details */}
       <Card>
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-1">
           <CardTitle className="text-lg">Duty Drawback Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
