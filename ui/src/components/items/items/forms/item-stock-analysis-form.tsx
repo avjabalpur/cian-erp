@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FormInput } from "@/components/shared/forms/form-input"
-
+import { FormHorizontalRadioGroup } from "@/components/shared/forms/form-horizontal-radio-group"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Info } from "lucide-react"
 
 interface ItemStockAnalysisFormProps {
   control: any;
@@ -9,76 +11,84 @@ interface ItemStockAnalysisFormProps {
 
 export function ItemStockAnalysisForm({ control, itemId }: ItemStockAnalysisFormProps) {
 
+  const abcOptions = [
+    { label: "A", value: "A" },
+    { label: "B", value: "B" },
+    { label: "C", value: "C" },
+    { label: "None", value: "none" },
+  ];
+
+  const xyzOptions = [
+    { label: "X", value: "X" },
+    { label: "Y", value: "Y" },
+    { label: "Z", value: "Z" },
+    { label: "None", value: "none" },
+  ];
+
+  const fsnOptions = [
+    { label: "F", value: "F" },
+    { label: "S", value: "S" },
+    { label: "N", value: "N" },
+    { label: "None", value: "none" },
+  ];
+
+  const vedOptions = [
+    { label: "V", value: "V" },
+    { label: "E", value: "E" },
+    { label: "D", value: "D" },
+    { label: "None", value: "none" },
+  ];
+
   return (
     <div className="space-y-4">
-      {/* Current Stock */}
+      {/* Stock Analysis Criteria */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Current Stock</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <FormInput
-            control={control}
-            name="currentStock"
-            label="Current Stock"
-            placeholder="0"
-            inputProps={{ type: "number" }}
-          />
-        </CardContent>
-      </Card>
+        <CardContent className="space-y-4">
+          {/* Instructional Banner */}
+          <Alert className="bg-teal-600 text-white border-teal-600">
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              You may categorise this Item for each of the following Criteria, so that this Item can be automatically be included in respective Reports by default.
+            </AlertDescription>
+          </Alert>
 
-      {/* Stock Levels */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Stock Levels</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <FormInput
+          {/* ABC Consumption Value */}
+          <div className="flex items-center">
+            <label className="text-[12px] font-medium min-w-[170px]">ABC Consumption Value:</label>
+            <FormHorizontalRadioGroup
               control={control}
-              name="minimumStock"
-              label="Minimum Stock"
-              placeholder="0"
-              inputProps={{ type: "number" }}
-            />
-            <FormInput
-              control={control}
-              name="maximumStock"
-              label="Maximum Stock"
-              placeholder="0"
-              inputProps={{ type: "number" }}
-            />
-            <FormInput
-              control={control}
-              name="reorderPoint"
-              label="Reorder Point"
-              placeholder="0"
-              inputProps={{ type: "number" }}
+              name="abcConsumptionValue"
+              options={abcOptions}
             />
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Consumption Analysis */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Consumption Analysis</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <FormInput
+          {/* XYZ Stock Value */}
+          <div className="flex items-center ">
+            <label className="text-[12px] font-medium min-w-[170px]">XYZ Stock Value:</label>
+            <FormHorizontalRadioGroup
               control={control}
-              name="averageConsumption"
-              label="Average Consumption"
-              placeholder="0"
-              inputProps={{ type: "number" }}
+              name="xyzStockValue"
+              options={xyzOptions}
             />
-            <FormInput
+          </div>
+
+          {/* FSN Movement */}
+          <div className="flex items-center ">
+            <label className="text-[12px] font-medium min-w-[170px]">FSN Movement:</label>
+            <FormHorizontalRadioGroup
               control={control}
-              name="leadTime"
-              label="Lead Time (Days)"
-              placeholder="0"
-              inputProps={{ type: "number" }}
+              name="fsnMovement"
+              options={fsnOptions}
+            />
+          </div>
+
+          {/* VED Analysis */}
+          <div className="flex items-center">
+            <label className="text-[12px] font-medium min-w-[170px]">VED Analysis:</label>
+            <FormHorizontalRadioGroup
+              control={control}
+              name="vedAnalysis"
+              options={vedOptions}
             />
           </div>
         </CardContent>

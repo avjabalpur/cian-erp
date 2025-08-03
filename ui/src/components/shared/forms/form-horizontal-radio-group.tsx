@@ -1,27 +1,24 @@
 import { useController } from "react-hook-form"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
 
-interface FormRadioGroupProps {
+interface FormHorizontalRadioGroupProps {
   control: any
   name: string
-  label?: string
   options: { value: string; label: string }[]
   className?: string
   required?: boolean
   disabled?: boolean
 }
 
-export function FormRadioGroup({
+export function FormHorizontalRadioGroup({
   control,
   name,
-  label,
   options,
   className,
   required,
   disabled,
-}: FormRadioGroupProps) {
+}: FormHorizontalRadioGroupProps) {
   const {
     field,
     fieldState: { error },
@@ -31,17 +28,12 @@ export function FormRadioGroup({
   })
 
   return (
-    <div className={cn("space-y-0", className)}>
-      {label && (
-        <Label className={cn("text-[12px] font-medium", required && "after:content-['*'] after:ml-0.5 after:text-red-500")}>
-          {label}
-        </Label>
-      )}
+    <div className={`flex items-center space-x-4 ${className || ""}`}>
       <RadioGroup
         value={field.value}
         onValueChange={field.onChange}
         disabled={disabled}
-        className="space-y-2"
+        className="flex items-center space-x-4"
       >
         {options.map((option) => (
           <div key={option.value} className="flex items-center space-x-2">

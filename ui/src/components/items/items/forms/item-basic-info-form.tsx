@@ -79,8 +79,8 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
           options={subTypeOptions}
         />
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">GS Ind.</label>
+        <div className="">
+          <label className="text-[12px] font-medium">GS Ind.</label>
           <ConfigListSelect
             listCode="gs_id"
             value={control._formValues?.gsInd}
