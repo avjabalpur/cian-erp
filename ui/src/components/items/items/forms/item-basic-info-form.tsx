@@ -126,19 +126,38 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
                 placeholder="Enter pharmacopeia name"
               />
 
-              <FormSelect
-                control={control}
-                name="unitOfMeasure"
-                label="Unit of Measure"
-                options={uqcOptions}
-              />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+                <FormSelect
+                  control={control}
+                  name="unitOfMeasure"
+                  label="Unit of Measure"
+                  options={uqcOptions}
+                />
 
-              <FormSelect
-                control={control}
-                name="issuingUnit"
-                label="Issuing Unit"
-                options={uqcOptions}
-              />
+                <FormInput
+                  control={control}
+                  name="uomIssConvFactor"
+                  label="Conv. Factor (UOM/Iss.UOM)"
+                  placeholder="1.00000"
+                  inputProps={{ type: "number", step: "0.00001" }}
+                />
+
+                <FormSelect
+                  control={control}
+                  name="issuingUnit"
+                  label="Issuing Unit"
+                  options={uqcOptions}
+                />
+
+                <FormInput
+                  control={control}
+                  name="uomUqcConvFactor"
+                  label="Conv. Factor (UOM/UQC)"
+                  placeholder="1.00000"
+                  inputProps={{ type: "number", step: "0.00001" }}
+                />
+              </div>
+
             </CardContent>
           </Card>
 
@@ -205,8 +224,6 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
                   inputProps={{ type: "number" }}
                 />
               </div>
-
-
             </CardContent>
           </Card>
 
@@ -314,8 +331,6 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
                   label="Imported"
                 />
               </div>
-
-
               <FormInput
                 control={control}
                 name="currentBuyer"
@@ -323,26 +338,28 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
                 placeholder="Enter current buyer"
               />
 
-              <div>
+              <div className="flex items-end gap-2">
                 <FormInput
                   control={control}
                   name="economicOrderQty"
                   label="Economic Ord. Qty."
                   placeholder="0"
                   inputProps={{ type: "number" }}
-
-                /> NOS
+                  className="w-full"
+                />
+                <span className="text-[10px] font-medium">NOS</span>
               </div>
-              <div>
+              <div className="flex items-end gap-2">
                 <FormInput
                   control={control}
                   name="desiredPackSize"
                   label="Desired Pack Size"
                   placeholder="0"
                   inputProps={{ type: "number" }}
-                /> NOS
+                  className="w-full"
+                />
+                <span className="text-[10px] font-medium">NOS</span>
               </div>
-
 
               <FormSwitch
                 control={control}
@@ -350,23 +367,8 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
                 label="Tax Credit Applicable"
               />
 
-              <FormInput
-                control={control}
-                name="freightOn"
-                label="Freight on"
-                placeholder="0.00"
-                inputProps={{ type: "number", step: "0.01" }}
-              />
-            </CardContent>
-          </Card>
-          <Card>
-
-            <CardContent className="space-y-2">
-
-
-              {/* Weight/Volume Radio Buttons */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Weight/Volume</label>
+              <div className="space-y-2 pt-4">
+                <label className="text-sm font-medium">Freight on</label>
                 <RadioGroup defaultValue="weight" className="flex space-x-4">
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="weight" id="weight" />
@@ -379,23 +381,11 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
                 </RadioGroup>
               </div>
 
-              <FormInput
-                control={control}
-                name="uomIssConvFactor"
-                label="Conv. Factor (UOM/Iss.UOM)"
-                placeholder="1.00000"
-                inputProps={{ type: "number", step: "0.00001" }}
-              />
+            </CardContent>
+          </Card>
+          <Card>
 
-              <FormInput
-                control={control}
-                name="uomUqcConvFactor"
-                label="Conv. Factor (UOM/UQC)"
-                placeholder="1.00000"
-                inputProps={{ type: "number", step: "0.00001" }}
-              />
-
-
+            <CardContent className="space-y-2">
 
               <FormSwitch
                 control={control}
@@ -427,15 +417,9 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
               />
             </CardContent>
           </Card>
-        </div>
-
-        {/* Right Column - Sales and Other Flags */}
-        <div className="space-y-4">
           <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Sales & Other Flags</CardTitle>
-            </CardHeader>
             <CardContent className="space-y-3">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
               <FormSwitch
                 control={control}
                 name="sold"
@@ -453,6 +437,7 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
                 name="exported"
                 label="Exported"
               />
+              </div>
 
               <FormSelect
                 control={control}
@@ -460,7 +445,12 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
                 label="Product Type"
                 options={productTypeOptions}
               />
-
+            <FormSelect
+                control={control}
+                name="productGroup"
+                label="Product Group"
+                options={productGroupOptions}
+              />
               <FormSelect
                 control={control}
                 name="salesDivision"
@@ -468,12 +458,7 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
                 options={salesDivisionOptions}
               />
 
-              <FormSelect
-                control={control}
-                name="productGroup"
-                label="Product Group"
-                options={productGroupOptions}
-              />
+              
 
               <FormInput
                 control={control}
@@ -488,14 +473,6 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
                 label="Vendor's Part No."
                 placeholder="Enter vendor part number"
               />
-
-              {/* Various Flags Checkboxes */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Item Flags</label>
-                <div className="space-y-2">
-
-                </div>
-              </div>
             </CardContent>
           </Card>
         </div>
