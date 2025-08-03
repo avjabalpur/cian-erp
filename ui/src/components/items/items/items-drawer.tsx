@@ -18,6 +18,7 @@ import { ItemOtherDetailsForm } from "./forms/item-other-details-form";
 import { CreateItemMasterData, UpdateItemMasterData, ItemMaster } from "@/types/item-master";
 import { ItemMasterFormData, itemMasterSchema } from "@/validations/item-master";
 import { getItemMasterDefaultValues, mapItemToFormData, transformFormDataToApi } from "@/lib/utils/item-master-utils";
+import { ItemMediaForm } from "./forms/item-media-form";
 
 interface ItemsDrawerProps {
   isOpen: boolean;
@@ -136,6 +137,8 @@ export default function ItemsDrawer({
                 <TabsTrigger value="export">Export</TabsTrigger>
                 <TabsTrigger value="specifications">Specifications</TabsTrigger>
                 <TabsTrigger value="other">Other Details</TabsTrigger>
+                <TabsTrigger value="media">Media</TabsTrigger>
+
               </TabsList>
 
               <TabsContent value="basic" className="space-y-3">
@@ -165,6 +168,10 @@ export default function ItemsDrawer({
 
               <TabsContent value="other" className="space-y-3">
                 <ItemOtherDetailsForm control={form.control} itemId={currentItemId} />
+              </TabsContent>
+
+              <TabsContent value="media" className="space-y-3">
+                <ItemMediaForm control={form.control} itemId={currentItemId} />
               </TabsContent>
             </Tabs>
 
