@@ -78,7 +78,7 @@ export function ItemExportForm({ control, itemId }: ItemExportFormProps) {
               inputProps={{ type: "number", step: "0.01" }}
             />
           </div>
-          <FormTextarea
+          <FormTextArea
             control={control}
             name="depbRemarks"
             label="DEPB Remarks"
@@ -130,7 +130,7 @@ export function ItemExportForm({ control, itemId }: ItemExportFormProps) {
               inputProps={{ type: "number", step: "0.01" }}
             />
           </div>
-          <FormTextarea
+          <FormTextArea
             control={control}
             name="dutyDrawbackRemarks"
             label="Duty Drawback Remarks"
