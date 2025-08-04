@@ -134,7 +134,7 @@ export function ProductGroupDrawer({
           description: "Product group created successfully",
         });
       }
-
+      handleClose();
       onSuccess?.();
     } catch (error: any) {
       toast({

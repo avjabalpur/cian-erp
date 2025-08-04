@@ -132,7 +132,8 @@ builder.Services.AddAutoMapper(
     typeof(ItemMediaMapper),
     typeof(ItemOtherDetailsMapper),
     typeof(ConfigSettingMapper),
-    typeof(ProductGroupMapper)
+    typeof(ProductGroupMapper),
+    typeof(DivisionMapper)
 );
 
 builder.Services.AddScoped<ILocationTypeRepository, LocationTypeRepository>();
