@@ -131,7 +131,8 @@ builder.Services.AddAutoMapper(
     typeof(ItemExportDetailsMapper),
     typeof(ItemMediaMapper),
     typeof(ItemOtherDetailsMapper),
-    typeof(ConfigSettingMapper)
+    typeof(ConfigSettingMapper),
+    typeof(ProductGroupMapper)
 );
 
 builder.Services.AddScoped<ILocationTypeRepository, LocationTypeRepository>();
@@ -152,6 +153,8 @@ builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IDivisionRepository, DivisionRepository>();
 builder.Services.AddScoped<IDivisionService, DivisionService>();
+builder.Services.AddScoped<IProductGroupRepository, ProductGroupRepository>();
+builder.Services.AddScoped<IProductGroupService, ProductGroupService>();
 
 builder.Services.AddScoped<IItemMasterRepository, ItemMasterRepository>();
 builder.Services.AddScoped<IItemTypeRepository, ItemTypeRepository>();

@@ -13,6 +13,7 @@ import { useCreateItemBoughtOutDetails, useUpdateItemBoughtOutDetails } from "@/
 import { useCreateItemStockAnalysis, useUpdateItemStockAnalysis } from "@/hooks/items/use-item-stock-analysis";
 import { useCreateItemExportDetails, useUpdateItemExportDetails } from "@/hooks/items/use-item-export-details";
 import { useCreateItemOtherDetail, useUpdateItemOtherDetail } from "@/hooks/items/use-item-other-details";
+import { useCreateItemMedia, useUpdateItemMedia } from "@/hooks/items/use-item-media";
 import { RightDrawer } from "@/components/shared/right-drawer";
 import { ItemBasicInfoForm } from "./forms/item-basic-info-form";
 import { ItemSalesForm } from "./forms/item-sales-form";
@@ -63,6 +64,9 @@ export default function ItemsDrawer({
   
   const createOtherDetailsMutation = useCreateItemOtherDetail();
   const updateOtherDetailsMutation = useUpdateItemOtherDetail();
+
+  const createMediaMutation = useCreateItemMedia();
+  const updateMediaMutation = useUpdateItemMedia();
 
   const form = useForm<ItemMasterFormData>({
     resolver: zodResolver(itemMasterSchema),
@@ -165,7 +169,7 @@ export default function ItemsDrawer({
           data: boughtOutData as any
         }));
       } else {
-        promises.push(createBoughtOutDetailsMutation.mutateAsync({ itemId, data: boughtOutData }));
+        promises.push(createBoughtOutDetailsMutation.mutateAsync({ itemId, data: boughtOutData as any }));
       }
     }
 
@@ -318,11 +322,20 @@ export default function ItemsDrawer({
 
       // Save related data
       if (createdItemId > 0) {
-        await saveRelatedData(createdItemId, data);
-        toast({
-          title: "Success",
-          description: "Item and related data saved successfully",
-        });
+        try {
+          await saveRelatedData(createdItemId, data);
+          toast({
+            title: "Success",
+            description: "Item and related data saved successfully",
+          });
+        } catch (relatedDataError: any) {
+          console.error('Related data save error:', relatedDataError);
+          toast({
+            title: "Warning",
+            description: "Item saved but some related data could not be saved. Please check the details.",
+            variant: "destructive",
+          });
+        }
       }
 
       onSuccess();
@@ -330,7 +343,7 @@ export default function ItemsDrawer({
       console.error('Item operation failed:', error);
       toast({
         title: "Error",
-        description: error?.message || "An error occurred. Please try again.",
+        description: error?.response?.data?.message || error?.message || "An error occurred. Please try again.",
         variant: "destructive",
       });
     }

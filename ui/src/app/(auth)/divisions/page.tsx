@@ -1,4 +1,3 @@
-'use client'
 
 import DivisionsManagement from "@/components/divisions/divisions-management"
 

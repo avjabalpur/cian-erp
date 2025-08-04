@@ -91,6 +91,13 @@ const allMenuItems: MenuItem[] = [
         roles: ["SUPER_ADMIN"],
       },
       {
+        id: "product-groups",
+        label: "Product Groups",
+        href: "/product-groups",
+        icon: Package,
+        roles: ["SUPER_ADMIN"],
+      },
+      {
         id: "customers",
         label: "Customers",
         href: "/customers",

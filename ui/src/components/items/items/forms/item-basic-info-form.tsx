@@ -4,15 +4,22 @@ import { FormSelect } from "@/components/shared/forms/form-select"
 import { FormSwitch } from "@/components/shared/forms/form-switch"
 import { ConfigListSelect } from "@/components/shared/config-list-select"
 import { useItemTypes, useParentTypes } from "@/hooks/items/use-item-types"
+import { useProductGroups } from "@/hooks/use-product-groups"
 import { useController } from "react-hook-form"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Search } from "lucide-react"
+import { DivisionLookup } from "@/components/shared/lookups/division-lookup"
 
 interface ItemBasicInfoFormProps {
   control: any;
 }
 
 export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
+  const [isDivisionLookupOpen, setIsDivisionLookupOpen] = useState(false);
+  
   // Fetch item types and parent types
   const { data: itemTypes = { items: [] } } = useItemTypes();
   const { data: parentTypes = [] } = useParentTypes();
@@ -56,9 +63,19 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
     { label: "DIRECT", value: "DIRECT" },
   ];
 
+  const handleDivisionSelect = (divisionId: number) => {
+    control.setValue("salesDivision", divisionId.toString());
+  };
+
+  // Fetch product groups
+  const { data: productGroups = [] } = useProductGroups();
+
   const productGroupOptions = [
     { label: "Select Product Group", value: "-1" },
-    { label: "CIAN HEALTHCARE LTD - CC03", value: "CIAN HEALTHCARE LTD" },
+    ...productGroups.map((productGroup) => ({
+      label: `${productGroup.code} - ${productGroup.productGroupName}`,
+      value: productGroup.id.toString(),
+    })),
   ];
 
   return (
@@ -451,12 +468,26 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
                 label="Product Group"
                 options={productGroupOptions}
               />
-              <FormSelect
-                control={control}
-                name="salesDivision"
-                label="Sales Division"
-                options={salesDivisionOptions}
-              />
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Sales Division</label>
+                <div className="flex gap-2">
+                  <FormSelect
+                    control={control}
+                    name="salesDivision"
+                    label=""
+                    options={salesDivisionOptions}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsDivisionLookupOpen(true)}
+                    className="px-3"
+                  >
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
 
               
 
@@ -477,6 +508,13 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
           </Card>
         </div>
       </div>
+
+      <DivisionLookup
+        isOpen={isDivisionLookupOpen}
+        onClose={() => setIsDivisionLookupOpen(false)}
+        onSelect={handleDivisionSelect}
+        title="Select Sales Division"
+      />
     </div>
   )
 } 
