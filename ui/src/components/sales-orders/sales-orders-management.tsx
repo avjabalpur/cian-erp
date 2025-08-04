@@ -8,6 +8,8 @@ import { SalesOrderFilter } from "./sales-order-filter"
 import { useRouter } from "next/navigation"
 import { SalesOrder } from "@/types/sales-order"
 import { useSalesOrders, useDeleteSalesOrder } from "@/hooks/sales-order/use-sales-orders";
+import { useSalesOrderById } from "@/hooks/sales-order/use-sales-orders";
+import api from "@/lib/api";
 import { Plus, Download, Upload } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
@@ -19,6 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import SalesOrderDrawer from "./sales-order-drawer"
+import { CreateApprovalFormModal } from "./create-approval-form-modal"
 import { salesOrderParsers } from "@/lib/utils/sales-order-utils"
 
 export default function SalesOrdersManagement() {
@@ -26,6 +29,7 @@ export default function SalesOrdersManagement() {
   const [selectedSalesOrder, setSelectedSalesOrder] = useState<SalesOrder | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [salesOrderToDelete, setSalesOrderToDelete] = useState<SalesOrder | null>(null)
+  const [approvalFormOpen, setApprovalFormOpen] = useState(false)
 
   const router = useRouter()
   const { toast } = useToast()
@@ -101,16 +105,33 @@ export default function SalesOrdersManagement() {
   }
 
   const handleViewComments = (salesOrder: SalesOrder) => {
-    router.push(`/sales-orders/${salesOrder.id}/comments`)
   }
 
   const handleViewQuotations = (salesOrder: SalesOrder) => {
-    router.push(`/sales-orders/${salesOrder.id}/quotations`)
   }
 
   const handleViewDocuments = (salesOrder: SalesOrder) => {
-    router.push(`/sales-orders/${salesOrder.id}/documents`)
   }
+
+  const handleNewSalesOrder = () => {
+    setApprovalFormOpen(true)
+  }
+
+  const handleApprovalFormSuccess = async (salesOrderId: number) => {
+    try {
+      // Fetch the created sales order from the API
+      const { data: newSalesOrder } = await api.get(`/sales-order/${salesOrderId}`);
+      setSelectedSalesOrder(newSalesOrder);
+      setDrawerOpen(true);
+    } catch (error) {
+      console.error('Error fetching created sales order:', error);
+      toast({
+        title: "Warning",
+        description: "Sales order created but there was an issue loading it for editing. Please refresh the page.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -130,9 +151,9 @@ export default function SalesOrdersManagement() {
             <Upload className="mr-2 h-4 w-4" />
             Import
           </Button>
-          <Button onClick={() => setDrawerOpen(true)}>
+          <Button onClick={handleNewSalesOrder}>
             <Plus className="mr-2 h-4 w-4" />
-            New Sales Order
+            Create Approval Form
           </Button>
         </div>
       </div>
@@ -172,6 +193,12 @@ export default function SalesOrdersManagement() {
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         salesOrder={selectedSalesOrder}
+      />
+
+      <CreateApprovalFormModal
+        isOpen={approvalFormOpen}
+        onClose={() => setApprovalFormOpen(false)}
+        onSuccess={handleApprovalFormSuccess}
       />
 
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
