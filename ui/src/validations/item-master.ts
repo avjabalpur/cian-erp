@@ -201,6 +201,38 @@ export const itemMasterSchema = z.object({
   expiryMmYyyyApplicable: z.boolean().default(false),
   principalForStatutoryReporting: z.boolean().default(false),
 
+  // Sales Details
+  sellingPrice: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  currencyId: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseInt(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  isTaxInclusive: z.boolean().default(false),
+  discountPercentage: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  minimumOrderQuantity: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  notes: z.string().optional(),
+
   // Bought Out Details
   purchaseBasedOn: z.string().optional(),
   excessPlanningPercent: z.string()
@@ -273,6 +305,43 @@ export const itemMasterSchema = z.object({
   xyzStockValue: z.string().optional(),
   fsnMovement: z.string().optional(),
   vedAnalysis: z.string().optional(),
+  minimumStockLevel: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  maximumStockLevel: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  economicOrderQuantity: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  averageUsagePerDay: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  lastStockCheckDate: z.string().optional(),
+  lastStockQuantity: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  nextStockCheckDate: z.string().optional(),
 
   // Export Details
   itemDescriptionForExports: z.string().optional(),

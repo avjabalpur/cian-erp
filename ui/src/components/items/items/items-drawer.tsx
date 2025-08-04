@@ -7,6 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useCreateItemMaster, useUpdateItemMaster } from "@/hooks/items/use-item-master";
+import { useCreateItemSpecification, useUpdateItemSpecification } from "@/hooks/items/use-item-specifications";
+import { useCreateItemSalesDetail, useUpdateItemSalesDetail } from "@/hooks/items/use-item-sales-details";
+import { useCreateItemBoughtOutDetails, useUpdateItemBoughtOutDetails } from "@/hooks/items/use-item-bought-out-details";
+import { useCreateItemStockAnalysis, useUpdateItemStockAnalysis } from "@/hooks/items/use-item-stock-analysis";
+import { useCreateItemExportDetails, useUpdateItemExportDetails } from "@/hooks/items/use-item-export-details";
+import { useCreateItemOtherDetail, useUpdateItemOtherDetail } from "@/hooks/items/use-item-other-details";
 import { RightDrawer } from "@/components/shared/right-drawer";
 import { ItemBasicInfoForm } from "./forms/item-basic-info-form";
 import { ItemSalesForm } from "./forms/item-sales-form";
@@ -15,10 +21,10 @@ import { ItemStockAnalysisForm } from "./forms/item-stock-analysis-form";
 import { ItemExportForm } from "./forms/item-export-form";
 import { ItemSpecificationsForm } from "./forms/item-specifications-form";
 import { ItemOtherDetailsForm } from "./forms/item-other-details-form";
-import { CreateItemMasterData, UpdateItemMasterData, ItemMaster } from "@/types/item-master";
+import { ItemMediaForm } from "./forms/item-media-form";
+import { CreateItemMasterData, UpdateItemMasterData, ItemMaster, UpdateItemSalesDetailData } from "@/types/item-master";
 import { ItemMasterFormData, itemMasterSchema } from "@/validations/item-master";
 import { getItemMasterDefaultValues, mapItemToFormData, transformFormDataToApi } from "@/lib/utils/item-master-utils";
-import { ItemMediaForm } from "./forms/item-media-form";
 
 interface ItemsDrawerProps {
   isOpen: boolean;
@@ -34,8 +40,29 @@ export default function ItemsDrawer({
   onSuccess,
 }: ItemsDrawerProps) {
   const { toast } = useToast();
+  
+  // Main item mutations
   const createItemMutation = useCreateItemMaster();
   const updateItemMutation = useUpdateItemMaster();
+  
+  // Related data mutations
+  const createSpecificationMutation = useCreateItemSpecification();
+  const updateSpecificationMutation = useUpdateItemSpecification();
+  
+  const createSalesDetailMutation = useCreateItemSalesDetail();
+  const updateSalesDetailMutation = useUpdateItemSalesDetail();
+  
+  const createBoughtOutDetailsMutation = useCreateItemBoughtOutDetails();
+  const updateBoughtOutDetailsMutation = useUpdateItemBoughtOutDetails();
+  
+  const createStockAnalysisMutation = useCreateItemStockAnalysis();
+  const updateStockAnalysisMutation = useUpdateItemStockAnalysis();
+  
+  const createExportDetailsMutation = useCreateItemExportDetails();
+  const updateExportDetailsMutation = useUpdateItemExportDetails();
+  
+  const createOtherDetailsMutation = useCreateItemOtherDetail();
+  const updateOtherDetailsMutation = useUpdateItemOtherDetail();
 
   const form = useForm<ItemMasterFormData>({
     resolver: zodResolver(itemMasterSchema),
@@ -63,13 +90,208 @@ export default function ItemsDrawer({
     setCurrentItemId(item?.id);
   }, [item?.id]);
 
+  const saveRelatedData = async (itemId: number, formData: ItemMasterFormData) => {
+    const promises = [];
+
+    // Save specification
+    if (formData.itemSpecification) {
+      const specData = { 
+        itemId,
+        specification: formData.itemSpecification,
+        substituteItemFor: formData.substituteItemFor,
+        customTariffNo: formData.customTariffNo,
+        exciseTariffNo: formData.exciseTariffNo,
+        vatCommCode: formData.vatCommCode,
+        convFactor: formData.convFactor ? formData.convFactor : undefined,
+        oldCode: formData.oldCode,
+        standardWeight: formData.standardWeight ? formData.standardWeight : undefined,
+        standardConversionCostFactor: formData.standardConversionCostFactor ? formData.standardConversionCostFactor : undefined,
+        standardPackingCostFactor: formData.standardPackingCostFactor ? formData.standardPackingCostFactor : undefined,
+        costFactorPercent: formData.costFactorPercent ? formData.costFactorPercent : undefined,
+        packingCostRs: formData.packingCostRs ? formData.packingCostRs : undefined,
+      };
+      if (item?.specification) {
+        promises.push(updateSpecificationMutation.mutateAsync({ itemId, data: specData }));
+      } else {
+        promises.push(createSpecificationMutation.mutateAsync({ itemId, data: specData }));
+      }
+    }
+
+    // Save sales details
+    if (formData.sellingPrice || formData.currencyId || formData.isTaxInclusive !== undefined) {
+      const salesData = {
+        itemId,
+        sellingPrice: formData.sellingPrice ? formData.sellingPrice : undefined,
+        currencyId: formData.currencyId ? formData.currencyId : undefined,
+        isTaxInclusive: formData.isTaxInclusive || false,
+        discountPercentage: formData.discountPercentage ? formData.discountPercentage : undefined,
+        minimumOrderQuantity: formData.minimumOrderQuantity ? formData.minimumOrderQuantity : undefined,
+        isActive: true,
+        notes: formData.notes,
+      };
+      
+      if (item?.salesDetail) {
+        promises.push(updateSalesDetailMutation.mutateAsync({ 
+          itemId, 
+          id: item.salesDetail.id, 
+          data: salesData  as any
+        }));
+      } else {
+        promises.push(createSalesDetailMutation.mutateAsync({ itemId, data: salesData as any }));
+      }
+    }
+
+    // Save bought out details
+    if (formData.purchaseBasedOn || formData.excessPlanningPercent !== undefined) {
+      const boughtOutData = {
+        itemId,
+        purchaseBasedOn: formData.purchaseBasedOn,
+        excessPlanningPercent: formData.excessPlanningPercent ? formData.excessPlanningPercent : undefined,
+        reorderLevel: formData.reorderLevel ? formData.reorderLevel : undefined,
+        minStockLevel: formData.minStockLevel ? formData.minStockLevel : undefined,
+        maxStockLevel: formData.maxStockLevel ? formData.maxStockLevel : undefined,
+        minBalanceShelfLifeDays: formData.minBalanceShelfLifeDays ? formData.minBalanceShelfLifeDays : undefined,
+        customDutyPercent: formData.customDutyPercent ? formData.customDutyPercent : undefined,
+        igstPercent: formData.igstPercent ? formData.igstPercent : undefined,
+        swsPercent: formData.swsPercent ? formData.swsPercent : undefined,
+        maxPurchaseRate: formData.maxPurchaseRate ? formData.maxPurchaseRate : undefined,
+        stopProcurement: formData.stopProcurement || false,
+      };
+      
+      if (item?.boughtOutDetails) {
+        promises.push(updateBoughtOutDetailsMutation.mutateAsync({ 
+          itemId, 
+          id: item.boughtOutDetails.id, 
+          data: boughtOutData as any
+        }));
+      } else {
+        promises.push(createBoughtOutDetailsMutation.mutateAsync({ itemId, data: boughtOutData }));
+      }
+    }
+
+    // Save stock analysis
+    if (formData.abcConsumptionValue || formData.xyzStockValue || formData.fsnMovement || formData.vedAnalysis) {
+      const stockAnalysisData = {
+        itemId,
+        minimumStockLevel: formData.minimumStockLevel ? formData.minimumStockLevel : undefined,
+        maximumStockLevel: formData.maximumStockLevel ? formData.maximumStockLevel : undefined,
+        reorderLevel: formData.reorderLevel ? formData.reorderLevel : undefined,
+        economicOrderQuantity: formData.economicOrderQuantity ? formData.economicOrderQuantity : undefined,
+        leadTimeDays: formData.leadTimeDays ? formData.leadTimeDays : undefined,
+        averageUsagePerDay: formData.averageUsagePerDay ? formData.averageUsagePerDay : undefined,
+        lastStockCheckDate: formData.lastStockCheckDate,
+        lastStockQuantity: formData.lastStockQuantity ? formData.lastStockQuantity : undefined,
+        nextStockCheckDate: formData.nextStockCheckDate,
+        isActive: true,
+        notes: formData.notes,
+      };
+      
+      if (item?.stockAnalysis) {
+        promises.push(updateStockAnalysisMutation.mutateAsync({ 
+          itemId, 
+          id: item.stockAnalysis.id, 
+          data: stockAnalysisData as any
+        }));
+      } else {
+        promises.push(createStockAnalysisMutation.mutateAsync({ itemId, data: stockAnalysisData as any }));
+      }
+    }
+
+    // Save export details
+    if (formData.itemDescriptionForExports || formData.exportProductGroupCode) {
+      const exportData = {
+        itemId,
+        itemDescriptionForExports: formData.itemDescriptionForExports,
+        exportProductGroupCode: formData.exportProductGroupCode,
+        exportProductGroupName: formData.exportProductGroupName,
+        depbRateListSrlNo: formData.depbRateListSrlNo,
+        depbRate: formData.depbRate ? formData.depbRate : undefined,
+        depbValueCap: formData.depbValueCap ? formData.depbValueCap : undefined,
+        depbRemarks: formData.depbRemarks,
+        dutyDrawbackSrlNo: formData.dutyDrawbackSrlNo,
+        dutyDrawbackRateType: formData.dutyDrawbackRateType,
+        dutyDrawbackRatePercent: formData.dutyDrawbackRatePercent ? formData.dutyDrawbackRatePercent : undefined,
+        dutyDrawbackRateFixed: formData.dutyDrawbackRateFixed ? formData.dutyDrawbackRateFixed : undefined,
+        dutyDrawbackValueCap: formData.dutyDrawbackValueCap ? formData.dutyDrawbackValueCap : undefined,
+        dutyDrawbackRemarks: formData.dutyDrawbackRemarks,
+      };
+      
+      if (item?.exportDetails) {
+        promises.push(updateExportDetailsMutation.mutateAsync({ 
+          itemId, 
+          id: item.exportDetails.id, 
+          data: exportData 
+        }));
+      } else {
+        promises.push(createExportDetailsMutation.mutateAsync({ itemId, data: exportData }));
+      }
+    }
+
+    // Save other details
+    if (formData.packShort || formData.productCast || formData.pvcColor) {
+      const otherDetailsData = {
+        itemId,
+        packShort: formData.packShort,
+        productCast: formData.productCast,
+        pvcColor: formData.pvcColor,
+        color: formData.color,
+        flavour: formData.flavour,
+        fragrance: formData.fragrance,
+        form: formData.form,
+        packagingStyle: formData.packagingStyle,
+        changePart: formData.changePart,
+        size: formData.size,
+        withLeaflet: formData.withLeaflet || false,
+        withApplicator: formData.withApplicator || false,
+        withWad: formData.withWad || false,
+        withSilica: formData.withSilica || false,
+        withCotton: formData.withCotton || false,
+        withMeasuringCap: formData.withMeasuringCap || false,
+        withSpoon: formData.withSpoon || false,
+        packingNp: formData.packingNp,
+        packingNpQty: formData.packingNpQty ? formData.packingNpQty : undefined,
+        packingStylePtd: formData.packingStylePtd,
+        packingStylePtdQty: formData.packingStylePtdQty ? formData.packingStylePtdQty : undefined,
+        notePerStrip: formData.notePerStrip,
+        packShortPtdSpec: formData.packShortPtdSpec,
+        packShortPtdSize: formData.packShortPtdSize,
+        packShortPtdQty: formData.packShortPtdQty ? formData.packShortPtdQty : undefined,
+        packingStyleNpSize: formData.packingStyleNpSize,
+        packingStyleNpQty: formData.packingStyleNpQty ? formData.packingStyleNpQty : undefined,
+        noteForCtn: formData.noteForCtn,
+        outerSize: formData.outerSize,
+        outerQty: formData.outerQty ? formData.outerQty : undefined,
+        shrink: formData.shrink,
+        shrinkPacking: formData.shrinkPacking,
+        shipperSize: formData.shipperSize,
+        qtyPerShipper: formData.qtyPerShipper ? formData.qtyPerShipper : undefined,
+        shipperNote: formData.shipperNote,
+      };
+      
+      if (item?.otherDetails) {
+        promises.push(updateOtherDetailsMutation.mutateAsync({ 
+          itemId, 
+          id: item.otherDetails.id, 
+          data: otherDetailsData as any
+        }));
+      } else {
+        promises.push(createOtherDetailsMutation.mutateAsync({ itemId, data: otherDetailsData as any }));
+      }
+    }
+
+    // Execute all promises
+    if (promises.length > 0) {
+      await Promise.all(promises);
+    }
+  };
+
   const onSubmit = async (data: ItemMasterFormData) => {
     try {
       console.log('Form data before transformation:', data);
       const transformedData = transformFormDataToApi(data);
       console.log('Transformed data:', transformedData);
 
-      let createdItemId: number;
+      let createdItemId: number = 0;
 
       if (item) {
         const result = await updateItemMutation.mutateAsync({
@@ -94,8 +316,15 @@ export default function ItemsDrawer({
         }
       }
 
-      // TODO: Save related data (specifications, export details, etc.) here
-      // For now, we'll just close the drawer
+      // Save related data
+      if (createdItemId > 0) {
+        await saveRelatedData(createdItemId, data);
+        toast({
+          title: "Success",
+          description: "Item and related data saved successfully",
+        });
+      }
+
       onSuccess();
     } catch (error: any) {
       console.error('Item operation failed:', error);
@@ -138,13 +367,11 @@ export default function ItemsDrawer({
                 <TabsTrigger value="specifications">Specifications</TabsTrigger>
                 <TabsTrigger value="other">Other Details</TabsTrigger>
                 <TabsTrigger value="media">Media</TabsTrigger>
-
               </TabsList>
 
               <TabsContent value="basic" className="space-y-3">
                 <ItemBasicInfoForm control={form.control} />
               </TabsContent>
-
 
               <TabsContent value="sales" className="space-y-3">
                 <ItemSalesForm control={form.control} itemId={currentItemId} />

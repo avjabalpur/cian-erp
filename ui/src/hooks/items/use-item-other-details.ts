@@ -1,64 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
+import { CreateItemOtherDetailData, ItemOtherDetail, UpdateItemOtherDetailData } from '@/types/item-master';
 
-// Types
-export interface ItemOtherDetail {
-  id: number;
-  itemId: number;
-  itemName?: string;
-  detailName: string;
-  detailValue?: string;
-  detailType: string;
-  description?: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt?: string;
-  createdBy?: number;
-  createdByName?: string;
-  updatedBy?: number;
-  updatedByName?: string;
-}
-
-export interface CreateItemOtherDetailData {
-  itemId: number;
-  detailName: string;
-  detailValue?: string;
-  detailType: string;
-  description?: string;
-  isActive?: boolean;
-}
-
-export interface UpdateItemOtherDetailData {
-  itemId: number;
-  detailName: string;
-  detailValue?: string;
-  detailType: string;
-  description?: string;
-  isActive?: boolean;
-}
-
-export interface ItemOtherDetailFilter {
-  search?: string;
-  itemId?: string;
-  detailType?: string;
-  isActive?: boolean;
-  page?: number;
-  pageSize?: number;
-}
-
-// API Functions
-const getItemOtherDetails = async (filter?: ItemOtherDetailFilter): Promise<ItemOtherDetail[]> => {
-  const params = new URLSearchParams();
-  if (filter?.search) params.append('search', filter.search);
-  if (filter?.itemId) params.append('itemId', filter.itemId);
-  if (filter?.detailType) params.append('detailType', filter.detailType);
-  if (filter?.isActive !== undefined) params.append('isActive', filter.isActive.toString());
-  if (filter?.page) params.append('page', filter.page.toString());
-  if (filter?.pageSize) params.append('pageSize', filter.pageSize.toString());
-
-  const { data } = await api.get(`/items/other-details?${params.toString()}`);
-  return data;
-};
 
 const getItemOtherDetailById = async (itemId: number, id: number): Promise<ItemOtherDetail> => {
   const { data } = await api.get(`/items/${itemId}/other-details/${id}`);
@@ -84,13 +27,6 @@ const deleteItemOtherDetail = async (itemId: number, id: number): Promise<void> 
   await api.delete(`/items/${itemId}/other-details/${id}`);
 };
 
-// React Query Hooks
-export const useItemOtherDetails = (filter?: ItemOtherDetailFilter) => {
-  return useQuery<ItemOtherDetail[], Error>({
-    queryKey: ['item-other-details', filter],
-    queryFn: () => getItemOtherDetails(filter),
-  });
-};
 
 export const useItemOtherDetailById = (itemId: number, id: number) => {
   return useQuery<ItemOtherDetail, Error>({

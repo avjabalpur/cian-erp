@@ -1,61 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
+import { CreateItemExportDetailsData, ItemExportDetails, UpdateItemExportDetailsData } from '@/types/item-master';
 
-// Types
-export interface ItemExportDetails {
-  id: number;
-  itemId: number;
-  itemDescriptionForExports?: string;
-  exportProductGroupCode?: string;
-  exportProductGroupName?: string;
-  depbRateListSrlNo?: string;
-  depbRate?: number;
-  depbValueCap?: number;
-  depbRemarks?: string;
-  dutyDrawbackSrlNo?: string;
-  dutyDrawbackRateType?: string;
-  dutyDrawbackRatePercent?: number;
-  dutyDrawbackRateFixed?: number;
-  dutyDrawbackValueCap?: number;
-  dutyDrawbackRemarks?: string;
-  createdAt: string;
-  updatedAt?: string;
-  createdBy?: number;
-  updatedBy?: number;
-}
-
-export interface CreateItemExportDetailsData {
-  itemId: number;
-  itemDescriptionForExports?: string;
-  exportProductGroupCode?: string;
-  exportProductGroupName?: string;
-  depbRateListSrlNo?: string;
-  depbRate?: number;
-  depbValueCap?: number;
-  depbRemarks?: string;
-  dutyDrawbackSrlNo?: string;
-  dutyDrawbackRateType?: string;
-  dutyDrawbackRatePercent?: number;
-  dutyDrawbackRateFixed?: number;
-  dutyDrawbackValueCap?: number;
-  dutyDrawbackRemarks?: string;
-}
-
-export interface UpdateItemExportDetailsData {
-  itemDescriptionForExports?: string;
-  exportProductGroupCode?: string;
-  exportProductGroupName?: string;
-  depbRateListSrlNo?: string;
-  depbRate?: number;
-  depbValueCap?: number;
-  depbRemarks?: string;
-  dutyDrawbackSrlNo?: string;
-  dutyDrawbackRateType?: string;
-  dutyDrawbackRatePercent?: number;
-  dutyDrawbackRateFixed?: number;
-  dutyDrawbackValueCap?: number;
-  dutyDrawbackRemarks?: string;
-}
 
 // API Functions
 const getItemExportDetails = async (itemId: number): Promise<ItemExportDetails | null> => {
