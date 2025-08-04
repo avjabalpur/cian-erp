@@ -1,5 +1,5 @@
-import { ItemMasterManagement } from "@/components/items/item-master/item-master-management";
+import ItemsManagement from "@/components/items/items/items-management";
 
 export default function ItemMasterPage() {
-  return <ItemMasterManagement />;
+  return <ItemsManagement />;
 } 
