@@ -162,6 +162,7 @@ export function ProductGroupDrawer({
           ? "Update the product group information below."
           : "Fill in the information below to create a new product group."
       }
+      size="2xl"
     >
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
