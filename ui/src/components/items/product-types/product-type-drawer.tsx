@@ -3,37 +3,36 @@
 import { useState, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useCreateItemType, useItemTypes, useUpdateItemType } from "@/hooks/items/use-item-types";
+import { useCreateProductType, useProductTypes, useUpdateProductType } from "@/hooks/items/use-product-types";
 import { FormInput } from "@/components/shared/forms/form-input";
 import { RightDrawer } from "@/components/shared/right-drawer";
-import { ItemTypeFormData, itemTypeSchema } from "@/validations/item-master";
-import { ItemType } from "@/types/item";
+import { ProductTypeFormData, productTypeSchema } from "@/validations/product-type";
+import { ProductType } from "@/types/product-type";
 import { FormCheckbox } from "@/components/shared/forms/form-checkbox";
 import { FormTextArea } from "@/components/shared/forms/form-text-area";
 import { FormSelect } from "@/components/shared/forms/form-select";
-import { useItemTypeOptions } from "@/components/shared/options";
+import { useProductTypeOptions } from "@/components/shared/options";
 
-interface ItemTypeDrawerProps {
+interface ProductTypeDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  itemType?: ItemType | null;
+  productType?: ProductType | null;
   onSuccess: () => void;
 }
 
-export default function ItemTypeDrawer({
+export default function ProductTypeDrawer({
   isOpen,
   onClose,
-  itemType,
+  productType,
   onSuccess,
-}: ItemTypeDrawerProps) {
+}: ProductTypeDrawerProps) {
   const { toast } = useToast();
-  const createItemTypeMutation = useCreateItemType();
-  const updateItemTypeMutation = useUpdateItemType();
-  const form = useForm<ItemTypeFormData>({
-    resolver: zodResolver(itemTypeSchema),
+  const createProductTypeMutation = useCreateProductType();
+  const updateProductTypeMutation = useUpdateProductType();
+  const form = useForm<ProductTypeFormData>({
+    resolver: zodResolver(productTypeSchema),
     defaultValues: {
       code: "",
       name: "",
@@ -46,13 +45,13 @@ export default function ItemTypeDrawer({
   const { control, handleSubmit, reset, formState: { isSubmitting, errors } } = form;
 
   useEffect(() => {
-    if (itemType) {
+    if (productType) {
       reset({
-        code: itemType.code || "",
-        name: itemType.name || "",
-        description: itemType.description || "",
-        parentTypeId: itemType.parentTypeId || undefined,
-        isActive: itemType.isActive ?? true,
+        code: productType.code || "",
+        name: productType.name || "",
+        description: productType.description || "",
+        parentTypeId: productType.parentTypeId || undefined,
+        isActive: productType.isActive ?? true,
       });
     } else {
       reset({
@@ -63,12 +62,11 @@ export default function ItemTypeDrawer({
         isActive: true,
       });
     }
-  }, [itemType, reset]);
+  }, [productType, reset]);
 
-  const itemTypeOptions = useItemTypeOptions();
+  const productTypeOptions = useProductTypeOptions();
 
-  const onSubmit = async (data: ItemTypeFormData) => {
-    
+  const onSubmit = async (data: ProductTypeFormData) => {
     try {
       const payload = {
         code: data.code,
@@ -78,33 +76,30 @@ export default function ItemTypeDrawer({
         isActive: data.isActive,
       };
 
-
-      if (itemType) {
-        const result = await updateItemTypeMutation.mutateAsync({
-          id: itemType.id,
+      if (productType) {
+        const result = await updateProductTypeMutation.mutateAsync({
+          id: productType.id,
           data: payload,
         });
         toast({
           title: "Success",
-          description: "Item type updated successfully",
+          description: "Product type updated successfully",
         });
       } else {
-        const result = await createItemTypeMutation.mutateAsync(payload);
+        const result = await createProductTypeMutation.mutateAsync(payload);
         toast({
           title: "Success",
-          description: "Item type created successfully",
+          description: "Product type created successfully",
         });
       }
       reset();
       onSuccess();
       onClose();
     } catch (error: any) {
-
-      
       // Handle specific error cases
-      let errorMessage = itemType 
-        ? "Failed to update item type" 
-        : "Failed to create item type";
+      let errorMessage = productType 
+        ? "Failed to update product type" 
+        : "Failed to create product type";
       
       toast({
         title: "Error",
@@ -119,33 +114,33 @@ export default function ItemTypeDrawer({
     onClose();
   };
 
-  const isLoading = createItemTypeMutation.isPending || updateItemTypeMutation.isPending;
+  const isLoading = createProductTypeMutation.isPending || updateProductTypeMutation.isPending;
+  
   return (
     <RightDrawer
       isOpen={isOpen}
       onClose={handleClose}
-      title={itemType ? "Edit Item Type" : "Create New Item Type"}
-      description={itemType 
-        ? "Update the item type information below." 
-        : "Fill in the information below to create a new item type."
+      title={productType ? "Edit Product Type" : "Create New Product Type"}
+      description={productType 
+        ? "Update the product type information below." 
+        : "Fill in the information below to create a new product type."
       }
     >
       <FormProvider {...form}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
-        <FormSelect
-          control={control}
-          name="parentTypeId"
-          label="Parent Item Type"
-          options={itemTypeOptions}
-          required
-        />
+          <FormSelect
+            control={control}
+            name="parentTypeId"
+            label="Parent Product Type"
+            options={productTypeOptions}
+          />
 
           <FormInput
             control={control}
             name="code"
             label="Code"
-            placeholder="Enter item type code"
+            placeholder="Enter product type code"
             required
           />
 
@@ -153,7 +148,7 @@ export default function ItemTypeDrawer({
             control={control}
             name="name"
             label="Name"
-            placeholder="Enter item type name"
+            placeholder="Enter product type name"
             required
           />
 
@@ -161,17 +156,15 @@ export default function ItemTypeDrawer({
             control={control}
             name="description"
             label="Description"
-            placeholder="Enter item type description"
+            placeholder="Enter product type description"
           />
 
-         
-
           <FormCheckbox
-                  control={control}
-                  name="isActive"
-                  label="Active Status"
-                  inline={true}
-                />
+            control={control}
+            name="isActive"
+            label="Active Status"
+            inline={true}
+          />
 
           <div className="flex justify-end gap-4 pt-4">
             <Button
@@ -186,7 +179,7 @@ export default function ItemTypeDrawer({
               type="submit"
               disabled={isSubmitting || isLoading}
             >
-              {isLoading ? "Saving..." : itemType ? "Update Item Type" : "Create Item Type"}
+              {isLoading ? "Saving..." : productType ? "Update Product Type" : "Create Product Type"}
             </Button>
           </div>
         </form>
