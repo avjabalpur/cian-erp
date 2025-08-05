@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../lib/api';
-import { ProductGroup, CreateProductGroupData, UpdateProductGroupData, ProductGroupFilter } from '../types/product-group';
+import api from '../../lib/api';
+import { ProductGroup, CreateProductGroupData, UpdateProductGroupData, ProductGroupFilter } from '../../types/product-group';
 
 // API Functions
 const getProductGroups = async (filter?: ProductGroupFilter): Promise<ProductGroup[]> => {

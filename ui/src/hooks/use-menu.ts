@@ -90,13 +90,7 @@ const allMenuItems: MenuItem[] = [
         icon: UserCheck,
         roles: ["SUPER_ADMIN"],
       },
-      {
-        id: "product-groups",
-        label: "Product Groups",
-        href: "/product-groups",
-        icon: Package,
-        roles: ["SUPER_ADMIN"],
-      },
+     
       {
         id: "customers",
         label: "Customers",
@@ -142,6 +136,20 @@ const allMenuItems: MenuItem[] = [
         roles: ["SUPER_ADMIN", "ADMIN"],
       },
       {
+        id: "product-groups",
+        label: "Product Groups",
+        href: "/product-groups",
+        icon: Package,
+        roles: ["SUPER_ADMIN"],
+      },
+      {
+        id: "product-types",
+        label: "Product Types",
+        href: "/product-types",
+        icon: Package,
+        roles: ["SUPER_ADMIN"],
+      },
+      {
         id: "hsn-master",
         label: "HSN Master",
         href: "/items/hsn-master",
@@ -168,7 +176,7 @@ const allMenuItems: MenuItem[] = [
     
       {
         id: "sales-orders",
-        label: "Sales Orders Approval",
+        label: "Orders Approval",
         href: "/sales/order-approval",
         icon: ShoppingCart,
         roles: ["SUPER_ADMIN", "SALES_MANAGER", "SALES_EXECUTIVE"],

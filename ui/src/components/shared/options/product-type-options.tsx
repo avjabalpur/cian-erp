@@ -12,6 +12,7 @@ interface UseProductTypeOptionsProps {
   defaultLabel?: string;
   defaultValue?: string;
   filterActive?: boolean;
+  excludeId?: number;
 }
 
 export function useProductTypeOptions({
@@ -19,6 +20,7 @@ export function useProductTypeOptions({
   defaultLabel = "Select product type",
   defaultValue = "-1",
   filterActive = true,
+  excludeId,
 }: UseProductTypeOptionsProps = {}): ProductTypeOption[] {
   const { data: productTypes = [] } = useActiveProductTypes();
 
@@ -32,10 +34,15 @@ export function useProductTypeOptions({
     });
   }
 
-  // Filter active items if requested
-  const items = filterActive 
+  // Filter active items if requested and exclude current item if editing
+  let items = filterActive 
     ? productTypes.filter(item => item.isActive)
     : productTypes;
+
+  // Exclude current item if excludeId is provided
+  if (excludeId) {
+    items = items.filter(item => item.id !== excludeId);
+  }
 
   // Add product type options
   const productTypeOptions = items.map((productType) => ({
@@ -59,12 +66,14 @@ export function ProductTypeOptions({
   defaultLabel = "Select product type",
   defaultValue = "-1",
   filterActive = true,
+  excludeId,
 }: UseProductTypeOptionsProps) {
   const options = useProductTypeOptions({
     includeDefault,
     defaultLabel,
     defaultValue,
     filterActive,
+    excludeId,
   });
 
   return options;

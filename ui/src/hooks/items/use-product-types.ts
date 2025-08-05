@@ -1,92 +1,99 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
-import { ProductType, CreateProductTypeData, UpdateProductTypeData } from "@/types/product-type";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import api from '../../lib/api';
+import { ProductType, CreateProductTypeData, UpdateProductTypeData } from '@/types/product-type';
 
-// Get all product types
-export function useProductTypes() {
-  return useQuery({
-    queryKey: ["product-types"],
-    queryFn: async () => {
-      const response = await apiClient.get<ProductType[]>("/product-types");
-      return response.data;
-    },
+// API Functions
+const getProductTypes = async (): Promise<ProductType[]> => {
+  const { data } = await api.get('/product-types');
+  return data;
+};
+
+const getActiveProductTypes = async (): Promise<ProductType[]> => {
+  const { data } = await api.get('/product-types/active');
+  return data;
+};
+
+const getParentProductTypes = async (): Promise<ProductType[]> => {
+  const { data } = await api.get('/product-types/parent-types');
+  return data;
+};
+
+const getProductTypeById = async (id: string): Promise<ProductType> => {
+  const { data } = await api.get(`/product-types/${id}`);
+  return data;
+};
+
+const createProductType = async (productTypeData: CreateProductTypeData): Promise<ProductType> => {
+  const { data } = await api.post('/product-types', productTypeData);
+  return data;
+};
+
+const updateProductType = async ({ id, data }: { id: number; data: UpdateProductTypeData }): Promise<ProductType> => {
+  const { data: responseData } = await api.put(`/product-types/${id}`, data);
+  return responseData;
+};
+
+const deleteProductType = async (id: number): Promise<void> => {
+  await api.delete(`/product-types/${id}`);
+};
+
+// React Query Hooks
+export const useProductTypes = () => {
+  return useQuery<ProductType[], Error>({
+    queryKey: ['product-types'],
+    queryFn: getProductTypes,
   });
-}
+};
 
-// Get active product types
-export function useActiveProductTypes() {
-  return useQuery({
-    queryKey: ["product-types", "active"],
-    queryFn: async () => {
-      const response = await apiClient.get<ProductType[]>("/product-types/active");
-      return response.data;
-    },
+export const useActiveProductTypes = () => {
+  return useQuery<ProductType[], Error>({
+    queryKey: ['product-types', 'active'],
+    queryFn: getActiveProductTypes,
   });
-}
+};
 
-// Get parent product types
-export function useParentProductTypes() {
-  return useQuery({
-    queryKey: ["product-types", "parent-types"],
-    queryFn: async () => {
-      const response = await apiClient.get<ProductType[]>("/product-types/parent-types");
-      return response.data;
-    },
+export const useParentProductTypes = () => {
+  return useQuery<ProductType[], Error>({
+    queryKey: ['product-types', 'parent-types'],
+    queryFn: getParentProductTypes,
   });
-}
+};
 
-// Get product type by ID
-export function useProductTypeById(id: string) {
-  return useQuery({
-    queryKey: ["product-types", id],
-    queryFn: async () => {
-      const response = await apiClient.get<ProductType>(`/product-types/${id}`);
-      return response.data;
-    },
+export const useProductTypeById = (id: string) => {
+  return useQuery<ProductType, Error>({
+    queryKey: ['product-type', id],
+    queryFn: () => getProductTypeById(id),
     enabled: !!id,
   });
-}
+};
 
-// Create product type
-export function useCreateProductType() {
+export const useCreateProductType = () => {
   const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: async (data: CreateProductTypeData) => {
-      const response = await apiClient.post<ProductType>("/product-types", data);
-      return response.data;
-    },
+  return useMutation<ProductType, Error, CreateProductTypeData>({
+    mutationFn: createProductType,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["product-types"] });
+      queryClient.invalidateQueries({ queryKey: ['product-types'] });
     },
   });
-}
+};
 
-// Update product type
-export function useUpdateProductType() {
+export const useUpdateProductType = () => {
   const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: UpdateProductTypeData }) => {
-      const response = await apiClient.put<ProductType>(`/product-types/${id}`, data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["product-types"] });
+  return useMutation<ProductType, Error, { id: number; data: UpdateProductTypeData }>({
+    mutationFn: updateProductType,
+    onSuccess: (data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['product-types'] });
+      queryClient.invalidateQueries({ queryKey: ['product-type', id] });
     },
   });
-}
+};
 
-// Delete product type
-export function useDeleteProductType() {
+export const useDeleteProductType = () => {
   const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: async (id: number) => {
-      await apiClient.delete(`/product-types/${id}`);
-    },
+  return useMutation<void, Error, number>({
+    mutationFn: deleteProductType,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["product-types"] });
+      queryClient.invalidateQueries({ queryKey: ['product-types'] });
     },
   });
-} 
+}; 
