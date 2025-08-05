@@ -72,7 +72,11 @@ export default function ItemsDrawer({
     resolver: zodResolver(itemMasterSchema),
     defaultValues: getItemMasterDefaultValues(),
   });
-
+ const onError = (errors: typeof form.formState.errors) => {
+  const currentValues = form.getValues();
+  console.log("❌ Errors:", errors);
+  console.log("⚠️ Data at time of error:", currentValues);
+};
   useEffect(() => {
     if (isOpen) {
       if (item) {
@@ -300,7 +304,7 @@ export default function ItemsDrawer({
       if (item) {
         const result = await updateItemMutation.mutateAsync({
           id: item.id,
-          data: transformedData as unknown as UpdateItemMasterData,
+          data: {...transformedData,itemCode: "AMX250CAP"}as unknown as UpdateItemMasterData,
         });
         if (result) {
           createdItemId = item.id;
@@ -310,7 +314,7 @@ export default function ItemsDrawer({
           });
         }
       } else {
-        const result = await createItemMutation.mutateAsync(transformedData as unknown as CreateItemMasterData);
+        const result = await createItemMutation.mutateAsync({...transformedData,itemCode: "A250CQAP"}as unknown as CreateItemMasterData);
         if (result) {
           createdItemId = result.id;
           toast({
@@ -369,7 +373,7 @@ export default function ItemsDrawer({
     >
       <div className="mx-auto w-full">
         <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit,onError)} className="space-y-4">
             <Tabs defaultValue="basic" className="w-full">
               <TabsList className="grid w-full grid-cols-8">
                 <TabsTrigger value="basic">Basic Info</TabsTrigger>

@@ -67,10 +67,11 @@ namespace Xcianify.Services
                 {
                     var specification = _mapper.Map<ItemSpecification>(createDto.Specification);
                     specification.Id = createdItem.Id;
-                    specification.CreatedBy = 1; // TODO: Get from current user context
-                    specification.UpdatedBy = 1;
-                    specification.CreatedAt = DateTime.UtcNow;
-                    specification.UpdatedAt = DateTime.UtcNow;
+                    specification.ItemId = 1;
+                   // specification.CreatedBy = 1; // TODO: Get from current user context
+                   // specification.UpdatedBy = 1;
+                   // specification.CreatedAt = DateTime.UtcNow;
+                  //  specification.UpdatedAt = DateTime.UtcNow;
                     
                     await _itemSpecificationRepository.CreateAsync(specification);
                 }

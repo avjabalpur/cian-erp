@@ -55,7 +55,7 @@ export const hsnMasterSchema = z.object({
 // Comprehensive Item Master Schema
 export const itemMasterSchema = z.object({
   // Basic Info
-  itemCode: z.string().min(1, "Item Code is required"),
+  //itemCode: z.string().min(1, "Item Code is required"),
   revNo: z.string().optional(),
   itemTypeId: z.string()
     .min(1, "Item Type is required")
@@ -66,7 +66,7 @@ export const itemMasterSchema = z.object({
     }),
   subType: z.string().optional(),
   gsInd: z.string().optional(),
-  goodsType: z.boolean().default(false),
+  goodsType: z.string().optional(),
   itemName: z.string().min(1, "Item Name is required"),
   shortName: z.string().optional(),
   pharmacopoeiaName: z.string().optional(),
@@ -190,12 +190,12 @@ export const itemMasterSchema = z.object({
   manufactured: z.boolean().default(false),
   batchNotApplicable: z.boolean().default(false),
   qcRequired: z.boolean().default(false),
-  allergen: z.string().optional(),
+  allergen: z.boolean().default(false),
   mfgDateApplicable: z.boolean().default(false),
   expiryDateApplicable: z.boolean().default(false),
   trackSerialNos: z.boolean().default(false),
-  packingFreightInsuranceServices: z.string().optional(),
-  activeIngredient: z.string().optional(),
+  packingFreightInsuranceServices: z.boolean().default(false),
+  activeIngredient: z.boolean().default(false),
   mfgLocNameRequired: z.boolean().default(false),
   mfgMmYyyyApplicable: z.boolean().default(false),
   expiryMmYyyyApplicable: z.boolean().default(false),

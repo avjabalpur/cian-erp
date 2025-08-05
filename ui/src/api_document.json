@@ -943,7 +943,7 @@
               "in": "query",
               "style": "form",
               "schema": {
-                "type": "string"
+                "type": "boolean"
               }
             },
             {
@@ -1341,15 +1341,7 @@
                 "format": "date-time"
               }
             },
-            {
-              "name": "CreatedTo",
-              "in": "query",
-              "style": "form",
-              "schema": {
-                "type": "string",
-                "format": "date-time"
-              }
-            },
+           
             {
               "name": "UpdatedFrom",
               "in": "query",
@@ -5674,12 +5666,7 @@
               "type": "string",
               "nullable": true
             },
-            "goodsType": {
-              "maxLength": 50,
-              "minLength": 0,
-              "type": "string",
-              "nullable": true
-            },
+           
             "itemName": {
               "maxLength": 100,
               "minLength": 0,

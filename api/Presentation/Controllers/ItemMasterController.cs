@@ -71,9 +71,9 @@ namespace Xcianify.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateItemMasterDto createDto)
+        public async Task<IActionResult> Create([FromBody] CreateItemMasterDto request)
         {
-            var item = await _itemMasterService.CreateItemAsync(createDto);
+            var item = await _itemMasterService.CreateItemAsync(request);
             return CreatedAtAction(nameof(GetById), new { id = item.Id }, item);
         }
 

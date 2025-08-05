@@ -20,8 +20,8 @@ namespace Xcianify.Core.DTOs.ItemMaster
         [StringLength(10, ErrorMessage = "GS indicator cannot be longer than 10 characters")]
         public string GsInd { get; set; }
 
-        [StringLength(50, ErrorMessage = "Goods type cannot be longer than 50 characters")]
-        public string GoodsType { get; set; }
+        //[StringLength(50, ErrorMessage = "Goods type cannot be longer than 50 characters")]
+        //public string GoodsType { get; set; }
 
         [Required(ErrorMessage = "Item name is required")]
         [StringLength(100, ErrorMessage = "Item name cannot be longer than 100 characters")]
@@ -135,6 +135,6 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public bool ExpiryMmYyyyApplicable { get; set; }
         public bool PrincipalForStatutoryReporting { get; set; }
 
-        public CreateItemSpecificationDto Specification { get; set; }
+        public CreateItemSpecificationDto? Specification { get; set; }
     }
 }

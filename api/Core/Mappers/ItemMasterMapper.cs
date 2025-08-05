@@ -15,6 +15,11 @@ namespace Xcianify.Core.Mappers
             CreateMap<ItemSpecificationDto, ItemSpecification>();
             CreateMap<ItemSpecification, ItemSpecificationDto>();
 
+            
+
+            CreateMap<ItemSpecification, ItemSpecificationDto>();
+            CreateMap<CreateItemSpecificationDto, ItemSpecification>();
+
             //CreateMap<ItemMaster, ItemMaster>()
             //    .ForMember(dest => dest.Id, opt => opt.Ignore());
 

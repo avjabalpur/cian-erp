@@ -52,13 +52,13 @@ namespace Xcianify.Repository
                     custom_tariff_no, excise_tariff_no, vat_comm_code, 
                     conversion_factor, old_code, standard_weight, 
                     standard_conversion_cost_factor, standard_packing_cost_factor, 
-                    markup_percentage, markup_amount, created_by, updated_by
+                    markup_percentage, markup_amount
                 ) VALUES (
                     @ItemId, @Specification, @SubstituteForItemCode, 
                     @CustomTariffNo, @ExciseTariffNo, @VatCommCode, 
                     @ConversionFactor, @OldCode, @StandardWeight, 
                     @StandardConversionCostFactor, @StandardPackingCostFactor, 
-                    @MarkupPercentage, @MarkupAmount, @CreatedBy, @UpdatedBy
+                    @MarkupPercentage, @MarkupAmount
                 )";
 
             using var connection = _dbContext.GetConnection();
