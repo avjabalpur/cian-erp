@@ -3,7 +3,7 @@ import { FormInput } from "@/components/shared/forms/form-input"
 import { FormSelect } from "@/components/shared/forms/form-select"
 import { FormSwitch } from "@/components/shared/forms/form-switch"
 import { ConfigListSelect } from "@/components/shared/config-list-select"
-import { useProductGroups } from "@/hooks/items/use-product-groups"
+import { useProductGroupOptions } from "@/components/shared/options"
 import { useItemTypeOptions, useProductTypeOptions } from "@/components/shared/options"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
@@ -57,16 +57,8 @@ export function ItemBasicInfoForm({ control, itemId }: ItemBasicInfoFormProps) {
     control.setValue("salesDivision", divisionId.toString());
   };
 
-  // Fetch product groups
-  const { data: productGroups = [] } = useProductGroups();
-
-  const productGroupOptions = [
-    { label: "Select Product Group", value: "-1" },
-    ...productGroups.map((productGroup) => ({
-      label: `${productGroup.code} - ${productGroup.productGroupName}`,
-      value: productGroup.id.toString(),
-    })),
-  ];
+  // Get product group options
+  const productGroupOptions = useProductGroupOptions();
 
   return (
     <div className="space-y-2">

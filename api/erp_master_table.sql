@@ -507,136 +507,167 @@ CREATE TABLE IF NOT EXISTS item_media (
 -- ============================================
 -- 4. CUSTOMER MASTER
 -- ============================================
-
-CREATE TABLE customer_categories (
+CREATE TABLE IF NOT EXISTS customer_types (
     id SERIAL PRIMARY KEY,
-    code VARCHAR(10) UNIQUE NOT NULL,
-    name VARCHAR(50) NOT NULL, -- HOSPITAL, PHARMACY, DISTRIBUTOR, RETAILER
+    code VARCHAR(10) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
     description TEXT,
-    discount_percentage DECIMAL(5,2) DEFAULT 0.00,
-    credit_limit DECIMAL(12,2) DEFAULT 0.00,
-    credit_days INTEGER DEFAULT 0,
+    is_export_type BOOLEAN DEFAULT FALSE,
+    is_domestic_type BOOLEAN DEFAULT TRUE,
+    requires_drug_license BOOLEAN DEFAULT FALSE,
+    credit_terms_applicable BOOLEAN DEFAULT TRUE,
     is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by INTEGER,
+    updated_by INTEGER
+);
+-- 1. Main Customers Table
+CREATE TABLE IF NOT EXISTS customers (
+    id SERIAL PRIMARY KEY,
+    location_code VARCHAR(10),
+    customer_number VARCHAR(20) UNIQUE NOT NULL,
+    customer_code VARCHAR(20) UNIQUE NOT NULL,
+    customer_name VARCHAR(255) NOT NULL,
+    short_name VARCHAR(100),
+    payee_name VARCHAR(255),
+    customer_type_code VARCHAR(10),
+    segment_code VARCHAR(10),
+    income_tax_pan_number VARCHAR(20),
+    customer_sale_type VARCHAR(10),
+    export_type VARCHAR(20),
+    gstin VARCHAR(20),
+    drug_license_number VARCHAR(50),
+    drug_license_expiry_date DATE,
+    other_license_number VARCHAR(50),
+    old_code VARCHAR(20),
+    customer_lot_number VARCHAR(20),
+    stop_invoice BOOLEAN DEFAULT FALSE,
+    is_export_customer BOOLEAN DEFAULT FALSE,
+    is_registered_dealer BOOLEAN DEFAULT FALSE,
+    is_record_closed BOOLEAN DEFAULT FALSE,
+    is_active BOOLEAN DEFAULT TRUE,
+    continent VARCHAR(50),
+    rebates TEXT,
+    external_information TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by INTEGER,
+    updated_by INTEGER,
+    id_deleted boolean default false
+);
+
+-- 2. Customer Addresses & Contacts Table
+CREATE TABLE IF NOT EXISTS customer_addresses (
+    id SERIAL PRIMARY KEY,
+    customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    address_line_1 TEXT,
+    address_line_2 TEXT,
+    address_line_3 TEXT,
+    city VARCHAR(100),
+    zip_code VARCHAR(20),
+    country VARCHAR(100),
+    state_code VARCHAR(10),
+    gst_state_code VARCHAR(10),
+    contact_person VARCHAR(100),
+    telephone_number VARCHAR(20),
+    mobile_number VARCHAR(20),
+    fax_number VARCHAR(20),
+    email_id VARCHAR(100),
+    website VARCHAR(100),
+    is_primary BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
-
-
-CREATE TABLE customer_category_mapping (
+-- 3. Customer Banking Details Table
+CREATE TABLE IF NOT EXISTS customer_banking_details (
     id SERIAL PRIMARY KEY,
-    customer_id INTEGER NOT NULL REFERENCES customers(id),
-    category_id INTEGER NOT NULL REFERENCES customer_categories(id),
-    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    assigned_by INTEGER REFERENCES users(id),
-    is_active BOOLEAN DEFAULT TRUE,
-    UNIQUE(customer_id, category_id)
+    customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    bank_ifsc_code VARCHAR(20),
+    bank_account_number VARCHAR(30),
+    bank_name VARCHAR(200),
+    customer_banker VARCHAR(100),
+    customer_vpa VARCHAR(100),
+    bank_account_type_code VARCHAR(10),
+    bank_branch VARCHAR(100),
+    bank_location VARCHAR(100),
+    is_primary BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
-CREATE TABLE customers (
+-- 4. Customer Shipping & Financial Terms Table
+CREATE TABLE IF NOT EXISTS customer_business_terms (
     id SERIAL PRIMARY KEY,
-    customer_number TEXT,
-    customer_code TEXT,
-    customer_name TEXT,
-    short_name TEXT,
-    payee_name TEXT,
-    customer_type_code TEXT,
-    customer_created_date TEXT,
-    segment_code TEXT,
-    export_type TEXT,
-    gstin TEXT,
-    income_tax_pan_number TEXT,
-    customer_status TEXT,
-    is_exempt_tcs TEXT,
-    tcs_type TEXT,
-    is_high_gst_rate_applicable TEXT,
-    is_ddn_non_resident TEXT,
-    is_ddn_premises_established TEXT,
-    is_exempt_discount TEXT,
-    is_reverse_eoy TEXT,
-    is_export_customer TEXT,
-    is_registered_dealer TEXT,
-    customer_interface_code DOUBLE PRECISION,
-    interface_file_format TEXT,
-    customer_location_code TEXT,
-    continent TEXT,
-    old_code TEXT,
-    stop_invoice TEXT,
-    external_info TEXT,
-    is_record_closed TEXT,
-    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    -- Shipping & Logistics
+    destination_code VARCHAR(10),
+    transport_mode_code VARCHAR(10),
+    transporter_code VARCHAR(10),
+    lead_days INTEGER,
+    customer_distance NUMERIC(10,2),
+    freight_indicator VARCHAR(10),
+    supply_stock_location VARCHAR(20),
+    allow_consignment_on_booking BOOLEAN DEFAULT FALSE,
+    -- Financial Terms
+    customer_account_code VARCHAR(20),
+    credit_limit NUMERIC(15,2),
+    minimum_invoice_amount NUMERIC(15,2),
+    customer_scheme_code VARCHAR(20),
+    customer_broker_code VARCHAR(20),
+    customer_broker_rate NUMERIC(5,2),
+    cash_discount_percentage NUMERIC(5,2),
+    misc_charge_percentage NUMERIC(5,2),
+    misc_discount_percentage NUMERIC(5,2),
+    payment_term_code VARCHAR(20),
+    credit_period_days INTEGER,
+    new_party_credit_period_days INTEGER,
+    is_overdue_check BOOLEAN DEFAULT TRUE,
+    number_of_bills INTEGER,
+    outstanding_bill_period_days INTEGER,
+    outstanding_bill_account_indicator VARCHAR(10),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE customer_addresses (
+-- 5. Customer Tax & Compliance Configuration Table
+CREATE TABLE IF NOT EXISTS customer_tax_compliance (
     id SERIAL PRIMARY KEY,
-    customer_id INTEGER REFERENCES customers(id),
-    address_line_1 TEXT,
-    address_line_2 TEXT,
-    address_line_3 TEXT,
-    city TEXT,
-    zip_code TEXT,
-    state_code TEXT,
-    gst_state_code TEXT,
-    country TEXT,
-    contact_person TEXT,
-    phone_number TEXT,
-    mobile_number TEXT,
-    fax_number TEXT,
-    email TEXT,
-    website TEXT,
-    destination_code TEXT,
-    transport_mode_code TEXT,
-    transporter_code TEXT,
-    bank_location TEXT,
-    bank_branch TEXT
-);
-
-CREATE TABLE customer_commercials (
-    id SERIAL PRIMARY KEY,
-    customer_id INTEGER REFERENCES customers(id),
-    credit_limit TEXT,
-    minimum_invoice_amount TEXT,
-    cash_discount TEXT,
-    miscellaneous_charges_percent TEXT,
-    miscellaneous_discount_percent TEXT,
-    bank_ifsc_code TEXT,
-    bank_account_number TEXT,
-    bank_name TEXT,
-    customer_banker TEXT,
-    customer_virtual_payment_address TEXT,
-    bank_account_type_code TEXT,
-    credit_period TEXT,
-    new_credit_period TEXT,
-    allow_consign_on_backorder TEXT,
-    number_of_dispatches TEXT,
-    label_layout TEXT,
-    number_of_copies TEXT,
+    customer_id INTEGER NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+    -- Tax Configuration
+    vat_form_code VARCHAR(20),
+    central_form_code VARCHAR(20),
+    is_eligible_for_tcs BOOLEAN DEFAULT FALSE,
+    tcs_type VARCHAR(20),
+    is_applicable_higher_rate BOOLEAN DEFAULT FALSE,
+    is_deemed_non_resident BOOLEAN DEFAULT FALSE,
+    is_deemed_permanent_establishment BOOLEAN DEFAULT FALSE,
+    is_bill_discount BOOLEAN DEFAULT FALSE,
+    is_reverse_end_of_year BOOLEAN DEFAULT FALSE,
+    -- Interface & Document Configuration
+    customer_interface_code NUMERIC,
+    interface_file_format VARCHAR(20),
+    projection_ratio NUMERIC(5,2),
+    number_of_displays INTEGER,
+    label_layout VARCHAR(50),
+    number_of_copies INTEGER,
     special_terms TEXT,
-    payment_terms_code TEXT,
-    documents_through TEXT,
-    is_overdue_check TEXT,
-    number_of_bills TEXT,
-    billing_period TEXT,
-    billing_account_indicator TEXT,
-    tax_revision_number DOUBLE PRECISION,
-    update_by TEXT,
-    update_datetime TEXT,
-    drug_license_number TEXT,
-    drug_license_expiry_date TEXT,
-    other_license_number TEXT,
-    scheme_code TEXT,
-    broker_code TEXT,
-    broker_rate TEXT,
-    vat_form_code TEXT,
-    central_excise_form_code TEXT,
-    distribution_lead_days TEXT,
-    customer_distribution TEXT,
-    freight_indicator TEXT
+    documents_through VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create indexes for better performance
+CREATE INDEX idx_customers_customer_number ON customers(customer_number);
+CREATE INDEX idx_customers_customer_code ON customers(customer_code);
+CREATE INDEX idx_customers_customer_name ON customers(customer_name);
+CREATE INDEX idx_customers_is_active ON customers(is_active);
+
+CREATE INDEX idx_customer_addresses_customer_id ON customer_addresses(customer_id);
+CREATE INDEX idx_customer_banking_customer_id ON customer_banking_details(customer_id);
+CREATE INDEX idx_customer_business_customer_id ON customer_business_terms(customer_id);
+CREATE INDEX idx_customer_tax_customer_id ON customer_tax_compliance(customer_id);
 
 
 -- ============================================

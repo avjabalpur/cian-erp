@@ -34,7 +34,7 @@ export function useProductTypeOptions({
     });
   }
 
-  // Filter active items if requested and exclude current item if editing
+  // Filter active items if requested
   let items = filterActive 
     ? productTypes.filter(item => item.isActive)
     : productTypes;

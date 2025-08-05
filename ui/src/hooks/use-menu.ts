@@ -140,14 +140,14 @@ const allMenuItems: MenuItem[] = [
         label: "Product Groups",
         href: "/product-groups",
         icon: Package,
-        roles: ["SUPER_ADMIN"],
+        roles: ["SUPER_ADMIN", "ADMIN"],
       },
       {
         id: "product-types",
         label: "Product Types",
         href: "/product-types",
         icon: Package,
-        roles: ["SUPER_ADMIN"],
+        roles: ["SUPER_ADMIN", "ADMIN"],
       },
       {
         id: "hsn-master",
