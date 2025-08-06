@@ -670,6 +670,217 @@ CREATE INDEX idx_customer_business_customer_id ON customer_business_terms(custom
 CREATE INDEX idx_customer_tax_customer_id ON customer_tax_compliance(customer_id);
 
 
+
+CREATE TABLE IF NOT EXISTS sales_orders (
+  id SERIAL PRIMARY KEY,
+  created_by INTEGER,
+  created_at TIMESTAMP NULL,
+  updated_by INTEGER,
+  updated_at TIMESTAMP NULL,
+  current_status VARCHAR(200),
+  comments TEXT,
+  is_submitted INTEGER DEFAULT 0,
+  is_deleted INTEGER DEFAULT 0,
+  assigned_designer INTEGER,
+  plant_email_sent INTEGER,
+  so_number VARCHAR(200),
+  so_date TIMESTAMP,
+  so_status TEXT CHECK (so_status IN ('new', 'repeat', 'revised')),
+  organization_id INTEGER,
+  customer_id INTEGER,
+  payment_term VARCHAR(200),
+  quotation_date TIMESTAMP,
+  quotation_no VARCHAR(200),
+  hsn_code VARCHAR(200),
+  item_id INTEGER,
+  dosage_name VARCHAR(200),
+  divisionId INTEGER,
+  design_under VARCHAR(200),
+  packing_style_description TEXT,
+  composition TEXT,
+  pack_short VARCHAR(200),
+  tablet_type VARCHAR(200),
+  tablet_size VARCHAR(200),
+  change_part VARCHAR(200),
+  capsule_size VARCHAR(200),
+  shipper_size VARCHAR(200),
+  qty_per_shipper VARCHAR(200),
+  no_of_shipper VARCHAR(200),
+  flavour VARCHAR(200),
+  fragrance VARCHAR(200),
+  quantity VARCHAR(200),
+  foc_qty VARCHAR(20),
+  mrp VARCHAR(200),
+  billing_rate VARCHAR(200),
+  costing VARCHAR(200),
+  inventory_charges VARCHAR(200),
+  cylinder_charge VARCHAR(200),
+  plate_charges VARCHAR(200),
+  domino VARCHAR(200),
+  stereo VARCHAR(200),
+  shipper_drawing_ref_code VARCHAR(200),
+  ctn_outer_drawing_ref_no VARCHAR(200),
+  ctn_inner_drawing_ref_no VARCHAR(200),
+  foil_drawing_ref_no VARCHAR(200),
+  leaflet_drawing_ref_no VARCHAR(200),
+  tube_drawing_ref_no VARCHAR(200),
+  label_drawing_ref_no VARCHAR(200),
+  pm_outer_ctn_stock VARCHAR(200),
+  pm_inner_ctn_stock VARCHAR(200),
+  pm_foil_stock VARCHAR(200),
+  pm_leaflet_stock VARCHAR(200),
+  pm_tube_stock VARCHAR(200),
+  pm_label_stock VARCHAR(200),
+  drug_approval_under VARCHAR(200)
+);
+
+CREATE TABLE IF NOT EXISTS sales_order_stages (
+  id SERIAL PRIMARY KEY,
+  sales_order_id INTEGER,
+  stage_name VARCHAR(200),
+  is_approved INTEGER DEFAULT 0,
+  created_by INTEGER,
+  created_at TIMESTAMP NULL,
+  updated_by INTEGER,
+  updated_at TIMESTAMP NULL,
+  is_deleted INTEGER DEFAULT 0
+);
+
+
+CREATE TABLE IF NOT EXISTS sales_order_chat (
+  id SERIAL PRIMARY KEY,
+  sales_order_id INTEGER,
+  comment TEXT,
+  created_by INTEGER,
+  created_at TIMESTAMP NULL,
+  CONSTRAINT fk_sales_order
+    FOREIGN KEY (sales_order_id) 
+    REFERENCES sales_orders(id)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS sales_order_comments (
+  id SERIAL PRIMARY KEY,
+  sales_order_id INTEGER,
+  created_by INTEGER,
+  created_at TIMESTAMP NULL,
+  comments VARCHAR(500),
+  status VARCHAR(200),
+  type VARCHAR(200),
+  is_deleted INTEGER DEFAULT 0,
+  CONSTRAINT fk_sales_order_comments
+    FOREIGN KEY (sales_order_id) 
+    REFERENCES sales_orders(id)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS sales_order_documents (
+  id SERIAL PRIMARY KEY,
+  sales_order_id INTEGER,
+  tag VARCHAR(200),
+  file_name VARCHAR(200),
+  file_path VARCHAR(500),
+  file_type VARCHAR(100),
+  metadata TEXT,
+  is_deleted INTEGER DEFAULT 0,
+  created_by INTEGER,
+  created_at TIMESTAMP NULL,
+  CONSTRAINT fk_sales_order_documents
+    FOREIGN KEY (sales_order_id) 
+    REFERENCES sales_orders(id)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS sales_order_performa_invoice (
+  id SERIAL PRIMARY KEY,
+  created_at TIMESTAMP NULL,
+  created_by INTEGER,
+  is_deleted INTEGER DEFAULT 0,
+  exporter_name VARCHAR(200),
+  organization_id INTEGER,
+  consignee_name VARCHAR(400),
+  consignee_contact_details VARCHAR(400),
+  consignee_address TEXT,
+  performa_invoice_number VARCHAR(40),
+  performa_invoice_date DATE,
+  exporters_reference_number VARCHAR(200),
+  other_references VARCHAR(400),
+  other_buyer_name VARCHAR(400),
+  country_of_origin VARCHAR(60),
+  country_of_final_destination VARCHAR(60),
+  prepration VARCHAR(200),
+  port_of_discharge VARCHAR(400),
+  place_of_receipt_by_pre_carrier VARCHAR(200),
+  final_destination VARCHAR(200),
+  terms_of_delivery VARCHAR(400),
+  payment_terms VARCHAR(400),
+  shipment_mode VARCHAR(60),
+  port_of_loading VARCHAR(60),
+  additionalCharges TEXT,
+  total_amount FLOAT,
+  previous_performa_invoice_id INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS sales_order_performa_invoice_items (
+  id SERIAL PRIMARY KEY,
+  performa_invoice_id INTEGER,
+  sales_order_id INTEGER,
+  is_deleted INTEGER DEFAULT 0,
+  item_id INTEGER,
+  composition TEXT,
+  dosage_name VARCHAR(200),
+  product_cast VARCHAR(200),
+  p_pack_short TEXT,
+  p_quantity FLOAT,
+  p_foc_qty FLOAT,
+  p_billing_rate FLOAT
+);
+
+CREATE TABLE IF NOT EXISTS sales_order_quotation (
+  id SERIAL PRIMARY KEY,
+  created_at TIMESTAMP NULL,
+  created_by INTEGER,
+  is_deleted INTEGER DEFAULT 0,
+  organization_id INTEGER,
+  quotation_number VARCHAR(200),
+  quotation_date DATE,
+  customer_id INTEGER,
+  advance_percentage FLOAT,
+  charges TEXT,
+  total_amount FLOAT,
+  advance_amount FLOAT,
+  prev_copy_quotation_id INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS sales_order_quotation_items (
+  id SERIAL PRIMARY KEY,
+  quotation_id INTEGER,
+  sales_order_id INTEGER,
+  is_deleted INTEGER DEFAULT 0,
+  item_id INTEGER,
+  composition TEXT,
+  dosage_name VARCHAR(200),
+  product_cast VARCHAR(200),
+  p_pack_short TEXT,
+  so_status VARCHAR(200),
+  p_quantity FLOAT,
+  p_foc_qty FLOAT,
+  p_mrp FLOAT,
+  p_billing_rate FLOAT,
+  comments TEXT,
+  tax_percent FLOAT,
+  product_extra_charges FLOAT,
+  product_extra_charges_tax_percent FLOAT
+);
+
+CREATE TABLE IF NOT EXISTS sales_order_save_transactions (
+  id SERIAL PRIMARY KEY,
+  sales_order_id INTEGER,
+  created_by INTEGER,
+  created_at TIMESTAMP NULL,
+  diff TEXT
+);
+
 -- ============================================
 -- 5. WAREHOUSE & INVENTORY MANAGEMENT
 -- ============================================

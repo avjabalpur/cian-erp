@@ -6,9 +6,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { FormSelect } from "@/components/shared/forms/form-select";
-import { salesOrderStatusOptions } from "@/lib/utils/sales-order-utils";
-import { useCreateSalesOrder } from "@/hooks/sales-order/use-sales-orders";
-import { useDosages } from "@/hooks/use-dosages";
+import { soStatusOptions } from "@/lib/utils/sales-order-utils";
+import { useCreateSalesOrderApproval } from "@/hooks/sales-order/use-sales-orders";
+import { useDosageOptions } from "@/components/shared/options";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -40,13 +40,10 @@ export function CreateApprovalFormModal({
   onSuccess,
 }: CreateApprovalFormModalProps) {
   const { toast } = useToast();
-  const createSalesOrderMutation = useCreateSalesOrder();
+  const createSalesOrderApprovalMutation = useCreateSalesOrderApproval();
   
-  // Fetch dosages from API
-  const { data: dosagesData, isLoading: dosagesLoading } = useDosages({
-    isActive: true,
-    pageSize: 100 // Get all active dosages
-  });
+  // Get dosage options using the new hook
+  const dosageOptions = useDosageOptions();
 
   const form = useForm<ApprovalFormData>({
     resolver: zodResolver(approvalFormSchema),
@@ -56,76 +53,24 @@ export function CreateApprovalFormModal({
     },
   });
 
-  // Transform dosages data for the dropdown
-  const dosageOptions = dosagesData?.items?.map(dosage => ({
-    label: dosage.name,
-    value: dosage.name,
-  })) || [];
-
   // Set default dosage if available
   React.useEffect(() => {
-    if (dosageOptions.length > 0 && !form.getValues("dosageName")) {
-      form.setValue("dosageName", dosageOptions[0].value);
+    if (dosageOptions.length > 1 && !form.getValues("dosageName")) {
+      // Skip the first option (default "Select dosage") and use the second one
+      form.setValue("dosageName", dosageOptions[1].value);
     }
   }, [dosageOptions, form]);
 
   const onSubmit = async (data: ApprovalFormData) => {
     try {
-      // Create a basic sales order with the selected values
-      const salesOrderData = {
-        soNumber: `SO-${Date.now()}`, // Generate a temporary SO number
+      const result = await createSalesOrderApprovalMutation.mutateAsync({
         soStatus: data.soStatus,
-        dosageName: data.dosageName,
-        isSubmitted: false,
-        isDeleted: false,
-        // Add other required fields with default values
-        soDate: new Date().toISOString().split('T')[0],
-        quantity: "0",
-        mrp: "0",
-        billingRate: "0",
-        costing: "0",
-        inventoryCharges: "0",
-        cylinderCharge: "0",
-        plateCharges: "0",
-        domino: "DOMINO",
-        stereo: "STEREO",
-        packShort: "",
-        composition: "",
-        packingStyleDescription: "",
-        tabletType: "",
-        tabletSize: "",
-        changePart: "",
-        capsuleSize: "",
-        shipperSize: "",
-        qtyPerShipper: "0",
-        noOfShipper: "0",
-        flavour: "",
-        fragrance: "",
-        focQty: "0",
-        shipperDrawingRefCode: "",
-        ctnOuterDrawingRefNo: "",
-        ctnInnerDrawingRefNo: "",
-        foilDrawingRefNo: "",
-        leafletDrawingRefNo: "",
-        tubeDrawingRefNo: "",
-        labelDrawingRefNo: "",
-        pmOuterCtnStock: "0",
-        pmInnerCtnStock: "0",
-        pmFoilStock: "0",
-        pmLeafletStock: "0",
-        pmTubeStock: "0",
-        pmLabelStock: "0",
-        drugApprovalUnder: "",
-        currentStatus: "new",
-        comments: "",
-        plantEmailSent: false,
-      };
-
-      const result = await createSalesOrderMutation.mutateAsync(salesOrderData);
+        dosageName: data.dosageName
+      });
       
       toast({
         title: "Success",
-        description: "Sales order created successfully",
+        description: "Sales order approval created successfully",
       });
 
       onClose();
@@ -133,7 +78,7 @@ export function CreateApprovalFormModal({
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error?.message || "Failed to create sales order",
+        description: error?.message || "Failed to create sales order approval",
         variant: "destructive",
       });
     }
@@ -144,7 +89,7 @@ export function CreateApprovalFormModal({
     onClose();
   };
 
-  const isLoading = createSalesOrderMutation.isPending;
+  const isLoading = createSalesOrderApprovalMutation.isPending;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -159,20 +104,19 @@ export function CreateApprovalFormModal({
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-4">
-              <FormSelect
-                control={form.control}
-                name="dosageName"
-                label="Dosage Name"
-                options={dosageOptions}
-                required
-                disabled={dosagesLoading}
-              />
+                             <FormSelect
+                 control={form.control}
+                 name="dosageName"
+                 label="Dosage Name"
+                 options={dosageOptions}
+                 required
+               />
 
               <FormSelect
                 control={form.control}
                 name="soStatus"
                 label="SO Status"
-                options={salesOrderStatusOptions.map(option => ({
+                options={soStatusOptions.map(option => ({
                   label: option.label,
                   value: option.value,
                 }))}
@@ -189,7 +133,7 @@ export function CreateApprovalFormModal({
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isLoading || dosagesLoading}>
+              <Button type="submit" disabled={isLoading}>
                 {isLoading ? "Creating..." : "Submit"}
               </Button>
             </DialogFooter>

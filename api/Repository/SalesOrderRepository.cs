@@ -292,5 +292,45 @@ namespace Xcianify.Repository
 
             return await connection.QuerySingleAsync<int>(query);
         }
+
+        public async Task<int> CreateApprovalAsync(string soStatus, string dosageName, int createdBy)
+        {
+            using var connection = _context.GetConnection();
+            
+            var currentTime = DateTime.UtcNow;
+            
+            var query = @"
+                INSERT INTO sales_orders (
+                    so_status,
+                    dosage_name,
+                    created_by,
+                    created_at,
+                    updated_by,
+                    updated_at,
+                    current_status,
+                    is_deleted,
+                    is_submitted
+                ) VALUES (
+                    @SoStatus,
+                    @DosageName,
+                    @CreatedBy,
+                    @CreatedAt,
+                    @CreatedBy,
+                    @CreatedAt,
+                    'IN-PROGRESS',
+                    0,
+                    0
+                ) RETURNING id";
+
+            var parameters = new
+            {
+                SoStatus = soStatus,
+                DosageName = dosageName,
+                CreatedBy = createdBy,
+                CreatedAt = currentTime
+            };
+
+            return await connection.QuerySingleAsync<int>(query, parameters);
+        }
     }
 } 

@@ -38,6 +38,7 @@ import { Separator } from "@/components/ui/separator"
 import { SalesOrder, CreateSalesOrderData, UpdateSalesOrderData } from "@/types/sales-order"
 import { salesOrderApi } from "@/lib/api/sales-order"
 import { toast } from "sonner"
+import { useDosageOptions } from "@/components/shared/options"
 
 const salesOrderSchema = z.object({
   soNumber: z.string().min(1, "SO Number is required"),
@@ -105,6 +106,9 @@ interface SalesOrderFormProps {
 export default function SalesOrderForm({ salesOrder, isOpen, onClose, onSuccess }: SalesOrderFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [generatedSoNumber, setGeneratedSoNumber] = useState("")
+  
+  // Get dosage options using the new hook
+  const dosageOptions = useDosageOptions()
 
   const form = useForm<z.infer<typeof salesOrderSchema>>({
     resolver: zodResolver(salesOrderSchema),
@@ -531,7 +535,21 @@ export default function SalesOrderForm({ salesOrder, isOpen, onClose, onSuccess 
                           <FormItem>
                             <FormLabel>Dosage Name</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Dosage name" />
+                              <Select
+                                value={field.value ?? ''}
+                                onValueChange={field.onChange}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select dosage" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {dosageOptions.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                      {option.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             </FormControl>
                             <FormMessage />
                           </FormItem>

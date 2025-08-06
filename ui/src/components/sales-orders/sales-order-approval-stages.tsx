@@ -94,7 +94,7 @@ export function SalesOrderApprovalStages({ salesOrderId }: SalesOrderApprovalSta
         const stageData = getStageData(stageName);
 
         return (
-          <div key={stageName} className="flex items-center justify-between p-3 border rounded-lg">
+          <div key={`${stageName}-${index}`} className="flex items-center justify-between p-3 border rounded-lg">
             <div className="flex items-center gap-3">
               {getStatusIcon(status)}
               <div>
