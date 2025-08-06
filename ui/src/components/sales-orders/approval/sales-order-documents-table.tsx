@@ -9,7 +9,7 @@ import { FileText, Download, Edit, Trash2, Search, Plus, Upload } from "lucide-r
 import { useDocumentsBySalesOrder, useDeleteSalesOrderDocument, useCreateSalesOrderDocument } from "@/hooks/sales-order/use-sales-order-documents";
 import type { SalesOrderDocument, CreateSalesOrderDocumentData } from "@/types/sales-order-extended";
 import { format } from "date-fns";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 

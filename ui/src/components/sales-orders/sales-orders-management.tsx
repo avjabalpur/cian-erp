@@ -3,8 +3,8 @@
 import { useState } from "react"
 import { useQueryState } from "nuqs"
 import { Button } from "@/components/ui/button"
-import SalesOrderApprovalTable from "./sales-order-approval-table"
-import { SalesOrderFilter } from "./sales-order-filter"
+import SalesOrderApprovalTable from "./approval/sales-order-approval-table"
+import { SalesOrderFilter } from "./approval/sales-order-filter"
 import { useRouter } from "next/navigation"
 import { SalesOrder } from "@/types/sales-order"
 import { useSalesOrdersWithApprovals } from "@/hooks/sales-order/use-sales-order-approvals";
@@ -20,9 +20,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { CreateApprovalFormModal } from "./create-approval-form-modal"
+import { CreateApprovalFormModal } from "./approval/create-approval-form-modal"
 import { salesOrderParsers } from "@/lib/utils/sales-order-utils"
-import { SalesOrderDrawer } from "./sales-order-drawer"
+import { SalesOrderDrawer } from "./approval/sales-order-drawer"
 
 export default function SalesOrdersManagement() {
   const [drawerOpen, setDrawerOpen] = useState(false)

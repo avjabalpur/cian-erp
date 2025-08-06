@@ -9,7 +9,7 @@ import { MessageSquare, Plus, Edit, Trash2, Paperclip } from "lucide-react";
 import { useCommentsBySalesOrder, useCreateSalesOrderComment, useUpdateSalesOrderComment, useDeleteSalesOrderComment } from "@/hooks/sales-order/use-sales-order-comments";
 import type { SalesOrderComment, CreateSalesOrderCommentData } from "@/types/sales-order-extended";
 import { format } from "date-fns";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "../../ui/card";
 
 interface SalesOrderCommentsProps {
   salesOrderId: number;

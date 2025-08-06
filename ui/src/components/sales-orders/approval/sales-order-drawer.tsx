@@ -52,63 +52,10 @@ import { SalesOrderChat } from "./sales-order-chat";
 import { SalesOrderComments } from "./sales-order-comments-table";
 import { SalesOrderDocuments } from "./sales-order-documents-table";
 import { SalesOrderApprovalStages } from "./sales-order-approval-stages";
-import { RightDrawer } from "../shared/right-drawer";
+import { RightDrawer } from "../../shared/right-drawer";
+import { salesOrderSchema, SalesOrderUpdateFormValues, salesOrderUpdateSchema } from "@/validations/sales-order";
 
-const salesOrderSchema = z.object({
-  soNumber: z.string().min(1, "SO Number is required"),
-  soDate: z.string().optional(),
-  soStatus: z.string().min(1, "Status is required"),
-  organizationId: z.number().optional(),
-  customerId: z.number().min(1, "Customer is required"),
-  paymentTerm: z.string().optional(),
-  quotationDate: z.string().optional(),
-  quotationNo: z.string().optional(),
-  hsnCode: z.string().optional(),
-  itemId: z.number().optional(),
-  dosageName: z.string().optional(),
-  divisionId: z.number().optional(),
-  designUnder: z.string().optional(),
-  packingStyleDescription: z.string().optional(),
-  composition: z.string().optional(),
-  packShort: z.string().optional(),
-  tabletType: z.string().optional(),
-  tabletSize: z.string().optional(),
-  changePart: z.string().optional(),
-  capsuleSize: z.string().optional(),
-  shipperSize: z.string().optional(),
-  qtyPerShipper: z.string().optional(),
-  noOfShipper: z.string().optional(),
-  flavour: z.string().optional(),
-  fragrance: z.string().optional(),
-  quantity: z.string().optional(),
-  focQty: z.string().optional(),
-  mrp: z.string().optional(),
-  billingRate: z.string().optional(),
-  costing: z.string().optional(),
-  inventoryCharges: z.string().optional(),
-  cylinderCharge: z.string().optional(),
-  plateCharges: z.string().optional(),
-  domino: z.string().optional(),
-  stereo: z.string().optional(),
-  shipperDrawingRefCode: z.string().optional(),
-  ctnOuterDrawingRefNo: z.string().optional(),
-  ctnInnerDrawingRefNo: z.string().optional(),
-  foilDrawingRefNo: z.string().optional(),
-  leafletDrawingRefNo: z.string().optional(),
-  tubeDrawingRefNo: z.string().optional(),
-  labelDrawingRefNo: z.string().optional(),
-  pmOuterCtnStock: z.string().optional(),
-  pmInnerCtnStock: z.string().optional(),
-  pmFoilStock: z.string().optional(),
-  pmLeafletStock: z.string().optional(),
-  pmTubeStock: z.string().optional(),
-  pmLabelStock: z.string().optional(),
-  drugApprovalUnder: z.string().optional(),
-  currentStatus: z.string().optional(),
-  comments: z.string().optional(),
-  assignedDesigner: z.number().optional(),
-  plantEmailSent: z.boolean().optional(),
-});
+
 
 interface SalesOrderDrawerProps {
   salesOrderId: number;
@@ -128,8 +75,8 @@ export function SalesOrderDrawer({
   const updateSalesOrderMutation = useUpdateSalesOrder();
   const dosageOptions = useDosageOptions();
 
-  const form = useForm<z.infer<typeof salesOrderSchema>>({
-    resolver: zodResolver(salesOrderSchema),
+  const form = useForm<SalesOrderUpdateFormValues>({
+    resolver: zodResolver(salesOrderUpdateSchema),
     defaultValues: {
       soNumber: "",
       soDate: "",
@@ -141,7 +88,6 @@ export function SalesOrderDrawer({
     },
   });
 
-  // Update form values when sales order data loads
   React.useEffect(() => {
     if (salesOrder) {
       form.reset({
@@ -202,7 +148,7 @@ export function SalesOrderDrawer({
     }
   }, [salesOrder, form]);
 
-  const onSubmit = async (values: z.infer<typeof salesOrderSchema>) => {
+  const onSubmit = async (values: SalesOrderUpdateFormValues) => {
     try {
       await updateSalesOrderMutation.mutateAsync({
         id: salesOrderId.toString(),
