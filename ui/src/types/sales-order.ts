@@ -4,6 +4,7 @@ export interface SalesOrder {
   soDate?: string;
   soStatus: string;
   organizationId?: number;
+  organizationName?: string;
   customerId?: number;
   customerName?: string;
   paymentTerm?: string;

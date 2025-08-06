@@ -1,321 +1,560 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer"
-import { SalesOrder } from "@/types/sales-order"
-import { formatDate } from "@/lib/date-utils"
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { 
+  X, 
+  Save, 
+  Copy, 
+  MessageSquare, 
+  FileText, 
+  Settings,
+  CheckCircle,
+  User,
+  Calendar,
+  Clock,
+  ArrowLeft
+} from "lucide-react";
+import { SalesOrder, UpdateSalesOrderData } from "@/types/sales-order";
+import { useSalesOrderById } from "@/hooks/sales-order/use-sales-orders";
+import { useUpdateSalesOrder } from "@/hooks/sales-order/use-sales-orders";
+import { useDosageOptions } from "@/components/shared/options";
+import { useToast } from "@/hooks/use-toast";
+import { formatDate } from "@/lib/date-utils";
+import { SalesOrderChat } from "./sales-order-chat";
+import { SalesOrderComments } from "./sales-order-comments-table";
+import { SalesOrderDocuments } from "./sales-order-documents-table";
+import { SalesOrderApprovalStages } from "./sales-order-approval-stages";
+import { RightDrawer } from "../shared/right-drawer";
+
+const salesOrderSchema = z.object({
+  soNumber: z.string().min(1, "SO Number is required"),
+  soDate: z.string().optional(),
+  soStatus: z.string().min(1, "Status is required"),
+  organizationId: z.number().optional(),
+  customerId: z.number().min(1, "Customer is required"),
+  paymentTerm: z.string().optional(),
+  quotationDate: z.string().optional(),
+  quotationNo: z.string().optional(),
+  hsnCode: z.string().optional(),
+  itemId: z.number().optional(),
+  dosageName: z.string().optional(),
+  divisionId: z.number().optional(),
+  designUnder: z.string().optional(),
+  packingStyleDescription: z.string().optional(),
+  composition: z.string().optional(),
+  packShort: z.string().optional(),
+  tabletType: z.string().optional(),
+  tabletSize: z.string().optional(),
+  changePart: z.string().optional(),
+  capsuleSize: z.string().optional(),
+  shipperSize: z.string().optional(),
+  qtyPerShipper: z.string().optional(),
+  noOfShipper: z.string().optional(),
+  flavour: z.string().optional(),
+  fragrance: z.string().optional(),
+  quantity: z.string().optional(),
+  focQty: z.string().optional(),
+  mrp: z.string().optional(),
+  billingRate: z.string().optional(),
+  costing: z.string().optional(),
+  inventoryCharges: z.string().optional(),
+  cylinderCharge: z.string().optional(),
+  plateCharges: z.string().optional(),
+  domino: z.string().optional(),
+  stereo: z.string().optional(),
+  shipperDrawingRefCode: z.string().optional(),
+  ctnOuterDrawingRefNo: z.string().optional(),
+  ctnInnerDrawingRefNo: z.string().optional(),
+  foilDrawingRefNo: z.string().optional(),
+  leafletDrawingRefNo: z.string().optional(),
+  tubeDrawingRefNo: z.string().optional(),
+  labelDrawingRefNo: z.string().optional(),
+  pmOuterCtnStock: z.string().optional(),
+  pmInnerCtnStock: z.string().optional(),
+  pmFoilStock: z.string().optional(),
+  pmLeafletStock: z.string().optional(),
+  pmTubeStock: z.string().optional(),
+  pmLabelStock: z.string().optional(),
+  drugApprovalUnder: z.string().optional(),
+  currentStatus: z.string().optional(),
+  comments: z.string().optional(),
+  assignedDesigner: z.number().optional(),
+  plantEmailSent: z.boolean().optional(),
+});
 
 interface SalesOrderDrawerProps {
-  salesOrder: SalesOrder | null
-  isOpen: boolean
-  onClose: () => void
+  salesOrderId: number;
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess?: () => void;
 }
 
-export default function SalesOrderDrawer({ salesOrder, isOpen, onClose }: SalesOrderDrawerProps) {
-  if (!salesOrder) return null
+export function SalesOrderDrawer({ 
+  salesOrderId, 
+  isOpen, 
+  onClose, 
+  onSuccess 
+}: SalesOrderDrawerProps) {
+  const { toast } = useToast();
+  const { data: salesOrder, isLoading } = useSalesOrderById(salesOrderId.toString());
+  const updateSalesOrderMutation = useUpdateSalesOrder();
+  const dosageOptions = useDosageOptions();
 
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      Draft: { label: "Draft", variant: "secondary" as const },
-      Submitted: { label: "Submitted", variant: "default" as const },
-      Approved: { label: "Approved", variant: "default" as const },
-      Rejected: { label: "Rejected", variant: "destructive" as const },
-      "In Progress": { label: "In Progress", variant: "outline" as const },
-      Completed: { label: "Completed", variant: "default" as const },
-    }[status] || { label: status, variant: "default" as const }
-    
-    return <Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>
-  }
+  const form = useForm<z.infer<typeof salesOrderSchema>>({
+    resolver: zodResolver(salesOrderSchema),
+    defaultValues: {
+      soNumber: "",
+      soDate: "",
+      soStatus: "",
+      customerId: 0,
+      dosageName: "",
+      currentStatus: "",
+      plantEmailSent: false,
+    },
+  });
+
+  // Update form values when sales order data loads
+  React.useEffect(() => {
+    if (salesOrder) {
+      form.reset({
+        soNumber: salesOrder.soNumber || "",
+        soDate: salesOrder.soDate || "",
+        soStatus: salesOrder.soStatus || "",
+        organizationId: salesOrder.organizationId,
+        customerId: salesOrder.customerId || 0,
+        paymentTerm: salesOrder.paymentTerm || "",
+        quotationDate: salesOrder.quotationDate || "",
+        quotationNo: salesOrder.quotationNo || "",
+        hsnCode: salesOrder.hsnCode || "",
+        itemId: salesOrder.itemId,
+        dosageName: salesOrder.dosageName || "",
+        divisionId: salesOrder.divisionId,
+        designUnder: salesOrder.designUnder || "",
+        packingStyleDescription: salesOrder.packingStyleDescription || "",
+        composition: salesOrder.composition || "",
+        packShort: salesOrder.packShort || "",
+        tabletType: salesOrder.tabletType || "",
+        tabletSize: salesOrder.tabletSize || "",
+        changePart: salesOrder.changePart || "",
+        capsuleSize: salesOrder.capsuleSize || "",
+        shipperSize: salesOrder.shipperSize || "",
+        qtyPerShipper: salesOrder.qtyPerShipper || "",
+        noOfShipper: salesOrder.noOfShipper || "",
+        flavour: salesOrder.flavour || "",
+        fragrance: salesOrder.fragrance || "",
+        quantity: salesOrder.quantity || "",
+        focQty: salesOrder.focQty || "",
+        mrp: salesOrder.mrp || "",
+        billingRate: salesOrder.billingRate || "",
+        costing: salesOrder.costing || "",
+        inventoryCharges: salesOrder.inventoryCharges || "",
+        cylinderCharge: salesOrder.cylinderCharge || "",
+        plateCharges: salesOrder.plateCharges || "",
+        domino: salesOrder.domino || "",
+        stereo: salesOrder.stereo || "",
+        shipperDrawingRefCode: salesOrder.shipperDrawingRefCode || "",
+        ctnOuterDrawingRefNo: salesOrder.ctnOuterDrawingRefNo || "",
+        ctnInnerDrawingRefNo: salesOrder.ctnInnerDrawingRefNo || "",
+        foilDrawingRefNo: salesOrder.foilDrawingRefNo || "",
+        leafletDrawingRefNo: salesOrder.leafletDrawingRefNo || "",
+        tubeDrawingRefNo: salesOrder.tubeDrawingRefNo || "",
+        labelDrawingRefNo: salesOrder.labelDrawingRefNo || "",
+        pmOuterCtnStock: salesOrder.pmOuterCtnStock || "",
+        pmInnerCtnStock: salesOrder.pmInnerCtnStock || "",
+        pmFoilStock: salesOrder.pmFoilStock || "",
+        pmLeafletStock: salesOrder.pmLeafletStock || "",
+        pmTubeStock: salesOrder.pmTubeStock || "",
+        pmLabelStock: salesOrder.pmLabelStock || "",
+        drugApprovalUnder: salesOrder.drugApprovalUnder || "",
+        currentStatus: salesOrder.currentStatus || "",
+        comments: salesOrder.comments || "",
+        assignedDesigner: salesOrder.assignedDesigner,
+        plantEmailSent: salesOrder.plantEmailSent || false,
+      });
+    }
+  }, [salesOrder, form]);
+
+  const onSubmit = async (values: z.infer<typeof salesOrderSchema>) => {
+    try {
+      await updateSalesOrderMutation.mutateAsync({
+        id: salesOrderId.toString(),
+        data: values as UpdateSalesOrderData,
+      });
+      
+      toast({
+        title: "Success",
+        description: "Sales order updated successfully",
+      });
+      
+      onSuccess?.();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to update sales order",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCopyLink = () => {
+    const url = `${window.location.origin}/sales-orders/${salesOrderId}`;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "Link copied",
+      description: "Sales order link copied to clipboard",
+    });
+  };
 
   return (
-    <Drawer open={isOpen} onOpenChange={onClose}>
-      <DrawerContent>
-        <div className="mx-auto w-full max-w-2xl">
-          <DrawerHeader>
-            <DrawerTitle className="flex items-center gap-2">
-              Sales Order: {salesOrder.soNumber}
-            </DrawerTitle>
-            <DrawerDescription>
-              View sales order details and specifications
-            </DrawerDescription>
-          </DrawerHeader>
+    <RightDrawer isOpen={isOpen} onClose={onClose} title="Sales Order Details" size="full">
 
-          <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
-            {/* Basic Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Basic Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+      {isLoading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading sales order details...</p>
+          </div>
+        </div>
+      ) : (
+        <div className="flex h-full">
+          {/* Main Content Area */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Header */}
+            <div className="border-b p-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-4">
+                  <Button variant="ghost" size="sm" onClick={onClose}>
+                    <ArrowLeft className="h-4 w-4" />
+                  </Button>
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">SO Number</label>
-                    <p className="text-sm">{salesOrder.soNumber}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">SO Date</label>
-                    <p className="text-sm">{salesOrder.soDate ? formatDate(salesOrder.soDate) : 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Status</label>
-                    <div className="mt-1">{getStatusBadge(salesOrder.soStatus)}</div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Current Status</label>
-                    <p className="text-sm">{salesOrder.currentStatus || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Customer</label>
-                    <p className="text-sm">{salesOrder.customerName || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Payment Term</label>
-                    <p className="text-sm">{salesOrder.paymentTerm || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Quotation No</label>
-                    <p className="text-sm">{salesOrder.quotationNo || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Quotation Date</label>
-                    <p className="text-sm">{salesOrder.quotationDate ? formatDate(salesOrder.quotationDate) : 'N/A'}</p>
+                    <h2 className="text-xl font-semibold">
+                      Sales Order Approval | {salesOrderId}
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      {salesOrder?.soNumber} - {salesOrder?.customerName}
+                    </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Product Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Item</label>
-                    <p className="text-sm">{salesOrder.itemName || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">HSN Code</label>
-                    <p className="text-sm">{salesOrder.hsnCode || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Dosage Name</label>
-                    <p className="text-sm">{salesOrder.dosageName || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Division</label>
-                    <p className="text-sm">{salesOrder.divisionName || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Quantity</label>
-                    <p className="text-sm">{salesOrder.quantity || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">FOC Quantity</label>
-                    <p className="text-sm">{salesOrder.focQty || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">MRP</label>
-                    <p className="text-sm">{salesOrder.mrp || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Billing Rate</label>
-                    <p className="text-sm">{salesOrder.billingRate || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Costing</label>
-                    <p className="text-sm">{salesOrder.costing || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Composition</label>
-                    <p className="text-sm">{salesOrder.composition || 'N/A'}</p>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={handleCopyLink}>
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy Link
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <User className="h-4 w-4 mr-2" />
+                    Assigned Designer
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <User className="h-4 w-4 mr-2" />
+                    Created By {salesOrder?.createdByName}
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Tools
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={onClose}>
+                    Back
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    onClick={form.handleSubmit(onSubmit)}
+                    disabled={updateSalesOrderMutation.isPending}
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    {updateSalesOrderMutation.isPending ? "Saving..." : "Save"}
+                  </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
 
-            {/* Packaging Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Packaging Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Pack Short</label>
-                    <p className="text-sm">{salesOrder.packShort || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Tablet Type</label>
-                    <p className="text-sm">{salesOrder.tabletType || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Tablet Size</label>
-                    <p className="text-sm">{salesOrder.tabletSize || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Capsule Size</label>
-                    <p className="text-sm">{salesOrder.capsuleSize || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Shipper Size</label>
-                    <p className="text-sm">{salesOrder.shipperSize || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Qty Per Shipper</label>
-                    <p className="text-sm">{salesOrder.qtyPerShipper || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">No. of Shipper</label>
-                    <p className="text-sm">{salesOrder.noOfShipper || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Flavour</label>
-                    <p className="text-sm">{salesOrder.flavour || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Fragrance</label>
-                    <p className="text-sm">{salesOrder.fragrance || 'N/A'}</p>
-                  </div>
+              {/* Form Actions */}
+              <div className="flex items-center justify-between">
+                <Button variant="outline" size="sm" className="border-dashed border-red-500 text-red-500">
+                  CANCEL FORM
+                </Button>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="email-sent" className="text-sm">Email Sent</Label>
+                  <Switch id="email-sent" />
                 </div>
+              </div>
 
-                {salesOrder.packingStyleDescription && (
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Packing Style Description</label>
-                    <p className="text-sm mt-1">{salesOrder.packingStyleDescription}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Drawing References */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Drawing References</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Shipper Drawing Ref</label>
-                    <p className="text-sm">{salesOrder.shipperDrawingRefCode || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">CTN Outer Drawing Ref</label>
-                    <p className="text-sm">{salesOrder.ctnOuterDrawingRefNo || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">CTN Inner Drawing Ref</label>
-                    <p className="text-sm">{salesOrder.ctnInnerDrawingRefNo || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Foil Drawing Ref</label>
-                    <p className="text-sm">{salesOrder.foilDrawingRefNo || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Leaflet Drawing Ref</label>
-                    <p className="text-sm">{salesOrder.leafletDrawingRefNo || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Tube Drawing Ref</label>
-                    <p className="text-sm">{salesOrder.tubeDrawingRefNo || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Label Drawing Ref</label>
-                    <p className="text-sm">{salesOrder.labelDrawingRefNo || 'N/A'}</p>
-                  </div>
+              {/* Current Status */}
+              <div className="flex items-center gap-4 mt-4">
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm font-medium">Current Status:</Label>
+                  <Select value={form.watch("currentStatus")} onValueChange={(value) => form.setValue("currentStatus", value)}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ADDED-TO-PROGEN">ADDED-TO-PROGEN</SelectItem>
+                      <SelectItem value="IN-PROGRESS">IN-PROGRESS</SelectItem>
+                      <SelectItem value="COMPLETED">COMPLETED</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              </CardContent>
-            </Card>
+                <Button variant="outline" size="sm">
+                  Request Changes
+                </Button>
+              </div>
+            </div>
 
-            {/* Additional Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Additional Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Design Under</label>
-                    <p className="text-sm">{salesOrder.designUnder || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Drug Approval Under</label>
-                    <p className="text-sm">{salesOrder.drugApprovalUnder || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Assigned Designer</label>
-                    <p className="text-sm">{salesOrder.assignedDesignerName || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Plant Email Sent</label>
-                    <p className="text-sm">{salesOrder.plantEmailSent ? 'Yes' : 'No'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Is Submitted</label>
-                    <p className="text-sm">{salesOrder.isSubmitted ? 'Yes' : 'No'}</p>
-                  </div>
-                </div>
+            {/* Tabs */}
+            <Tabs defaultValue="basic-info" className="flex-1 flex flex-col">
+              <div className="border-b px-4">
+                <TabsList className="grid w-full grid-cols-5">
+                  <TabsTrigger value="basic-info">Basic Info</TabsTrigger>
+                  <TabsTrigger value="compare-progen">Compare With Progen</TabsTrigger>
+                  <TabsTrigger value="quotations">Quotations</TabsTrigger>
+                  <TabsTrigger value="performa-invoice">Performa Invoice</TabsTrigger>
+                  <TabsTrigger value="save-history">Save History</TabsTrigger>
+                </TabsList>
+              </div>
 
-                {salesOrder.comments && (
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Comments</label>
-                    <p className="text-sm mt-1">{salesOrder.comments}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              {/* Tab Content */}
+              <div className="flex-1 overflow-auto p-4">
+                <TabsContent value="basic-info" className="space-y-6">
+                  {/* Approval Stages */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Approval Stages</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <SalesOrderApprovalStages salesOrderId={salesOrderId} />
+                    </CardContent>
+                  </Card>
 
-            {/* Audit Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Audit Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Created By</label>
-                    <p className="text-sm">{salesOrder.createdByName || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Created At</label>
-                    <p className="text-sm">{formatDate(salesOrder.createdAt)}</p>
-                  </div>
-                  {salesOrder.updatedByName && (
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Updated By</label>
-                      <p className="text-sm">{salesOrder.updatedByName}</p>
-                    </div>
-                  )}
-                  {salesOrder.updatedAt && (
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Updated At</label>
-                      <p className="text-sm">{formatDate(salesOrder.updatedAt)}</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                  {/* Reference Documents */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Reference Documents</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex gap-2">
+                        <Button variant="outline">
+                          <FileText className="h-4 w-4 mr-2" />
+                          Upload File
+                        </Button>
+                        <Button variant="outline">
+                          <FileText className="h-4 w-4 mr-2" />
+                          Attached Documents
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* SO Info */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>SO Info</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Form {...form}>
+                        <form className="space-y-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={form.control}
+                              name="soNumber"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>SONO</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} readOnly />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="soDate"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>SO Date</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} type="date" />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="dosageName"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Dosage Name</FormLabel>
+                                  <FormControl>
+                                    <Select value={field.value} onValueChange={field.onChange}>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select dosage" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {dosageOptions.map((option) => (
+                                          <SelectItem key={option.value} value={option.value}>
+                                            {option.label}
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="composition"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Composition</FormLabel>
+                                  <FormControl>
+                                    <Textarea {...field} rows={3} />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </form>
+                      </Form>
+                    </CardContent>
+                  </Card>
+
+                  {/* Product Info */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Product Info</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-4 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="quantity"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>P Quantity</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="focQty"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>P FOC Qty</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="billingRate"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>P Billing Rate</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="mrp"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>P MRP</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="compare-progen">
+                  <Card>
+                    <CardContent className="p-6">
+                      <p className="text-muted-foreground">Compare With Progen functionality will be implemented here.</p>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="quotations">
+                  <Card>
+                    <CardContent className="p-6">
+                      <p className="text-muted-foreground">Quotations functionality will be implemented here.</p>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="performa-invoice">
+                  <Card>
+                    <CardContent className="p-6">
+                      <p className="text-muted-foreground">Performa Invoice functionality will be implemented here.</p>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="save-history">
+                  <Card>
+                    <CardContent className="p-6">
+                      <p className="text-muted-foreground">Save History functionality will be implemented here.</p>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </div>
+            </Tabs>
           </div>
 
-          <DrawerFooter>
-            <DrawerClose asChild>
-              <Button variant="outline">Close</Button>
-            </DrawerClose>
-          </DrawerFooter>
+          {/* Right Sidebar - Chat */}
+          <div className="w-80 border-l flex flex-col">
+            <div className="border-b p-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold">Chat Comments</h3>
+                <Button variant="ghost" size="sm">
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="flex-1 overflow-auto">
+              <SalesOrderChat salesOrderId={salesOrderId} />
+            </div>
+          </div>
         </div>
-      </DrawerContent>
-    </Drawer>
-  )
+      )}
+    </RightDrawer>
+  );
 } 
