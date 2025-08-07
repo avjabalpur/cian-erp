@@ -89,19 +89,6 @@ export function CustomerAddressForm({ customerId }: CustomerAddressFormProps) {
     }
   };
 
-  if (!customerId) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Addresses</CardTitle>
-          <CardDescription>
-            Customer addresses will be available after saving the customer
-          </CardDescription>
-        </CardHeader>
-      </Card>
-    );
-  }
-
   return (
     <Card>
       <CardHeader>

@@ -555,7 +555,7 @@ CREATE TABLE IF NOT EXISTS customers (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_by INTEGER,
     updated_by INTEGER,
-    id_deleted boolean default false
+    is_deleted boolean default false
 );
 
 -- 2. Customer Addresses & Contacts Table

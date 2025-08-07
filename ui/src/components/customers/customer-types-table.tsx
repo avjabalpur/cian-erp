@@ -3,12 +3,12 @@
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { Column } from "@/components/shared/advanced-table/types";
 import AdvancedTable from "@/components/shared/advanced-table";
 import { CustomerType } from "@/types/customer-type";
 import { formatDate } from "@/lib/date-utils";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 interface CustomerTypesTableProps {
   customerTypes: CustomerType[];
@@ -31,26 +31,44 @@ const ActionButtonsRenderer = ({ row, onEdit, onDelete }: {
   onDelete: (customerType: CustomerType) => void;
 }) => {
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => onEdit(row)}>
-          <Edit className="mr-2 h-4 w-4" />
-          Edit
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onDelete(row)}>
-          <Trash2 className="mr-2 h-4 w-4" />
-          Delete
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
+    <div className="flex gap-2">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            size="sm"
+            variant="default"
+            onClick={(e) => {
+              e.stopPropagation()
+              onEdit(row)
+            }}
+          >
+            <Edit className="h-3 w-3" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Edit</p>
+        </TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={(e) => {
+              e.stopPropagation()
+              onDelete(row)
+            }}
+          >
+            <Trash2 className="h-3 w-3" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Delete</p>
+        </TooltipContent>
+      </Tooltip>
+    </div>
+  )
+}
 
 export default function CustomerTypesTable({
   customerTypes,
@@ -129,46 +147,30 @@ export default function CustomerTypesTable({
     },
   ], [onEdit, onDelete]);
 
-  const actionButtons = {
-    onEdit: onEdit,
-    onDelete: onDelete,
-    customActions: [
-      {
-        label: 'Edit',
-        icon: Edit,
-        onClick: onEdit,
-        variant: 'outline' as const,
-      },
-      ...(onDelete ? [{
-        label: 'Delete',
-        icon: Trash2,
-        onClick: onDelete,
-        variant: 'destructive' as const,
-      }] : []),
-    ]
-  };
   return (
-    <div className="w-full">
-      <AdvancedTable
-        data={customerTypes}
-        columnMeta={columnMeta}
-        isLoading={isLoading}
-        groupingEnabled={false}
-        globalFilterEnabled={true}
-        dragDropGroupingEnabled={false}
-        onRowClick={onEdit}
-        className="w-full"
-        // Server-side pagination
-        manualPagination={true}
-        pageCount={pagination.pageCount}
-        pageSize={pagination.pageSize}
-        pageIndex={pagination.pageIndex}
-        totalCount={pagination.totalCount}
-        onPaginationChange={onPaginationChange}
-        // Server-side filtering and sorting
-        manualFiltering={false}
-        manualSorting={true}
-      />
-    </div>
+    <TooltipProvider>
+      <div className="w-full">
+        <AdvancedTable
+          data={customerTypes}
+          columnMeta={columnMeta}
+          isLoading={isLoading}
+          groupingEnabled={false}
+          globalFilterEnabled={true}
+          dragDropGroupingEnabled={false}
+          onRowClick={onEdit}
+          className="w-full"
+          // Server-side pagination
+          manualPagination={true}
+          pageCount={pagination.pageCount}
+          pageSize={pagination.pageSize}
+          pageIndex={pagination.pageIndex}
+          totalCount={pagination.totalCount}
+          onPaginationChange={onPaginationChange}
+          // Server-side filtering and sorting
+          manualFiltering={false}
+          manualSorting={true}
+        />
+      </div>
+    </TooltipProvider>
   );
 }

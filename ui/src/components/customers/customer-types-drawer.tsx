@@ -101,7 +101,7 @@ export default function CustomerTypesDrawer({
     >
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <CustomerTypeForm />
+          <CustomerTypeForm control={form.control} />
 
           <div className="flex justify-end space-x-2 pt-6 border-t">
             <Button type="button" variant="outline" onClick={handleClose}>

@@ -65,7 +65,7 @@ namespace Xcianify.Repository
             }
 
             // Always filter out deleted records
-            whereConditions.Add("id_deleted = false");
+            whereConditions.Add("is_deleted = false");
 
             var whereClause = whereConditions.Count > 0 ? $"WHERE {string.Join(" AND ", whereConditions)}" : "";
 
@@ -91,14 +91,14 @@ namespace Xcianify.Repository
 
             var sql = $@"
                 SELECT 
-                    id, location_code, customer_number, customer_code, customer_name, 
-                    short_name, payee_name, customer_type_code, segment_code, 
-                    income_tax_pan_number, customer_sale_type, export_type, gstin, 
-                    drug_license_number, drug_license_expiry_date, other_license_number, 
-                    old_code, customer_lot_number, stop_invoice, is_export_customer, 
-                    is_registered_dealer, is_record_closed, is_active, continent, 
-                    rebates, external_information, created_at, updated_at, created_by, 
-                    updated_by, id_deleted as is_deleted
+                    id, location_code as locationCode, customer_number as customerNumber, customer_code as customerCode, customer_name as customerName, 
+                    short_name as shortName, payee_name as payeeName, customer_type_code as customerTypeCode, segment_code as segmentCode, 
+                    income_tax_pan_number as incomeTaxPanNumber, customer_sale_type as customerSaleType, export_type as exportType, gstin as gstin, 
+                    drug_license_number as drugLicenseNumber, drug_license_expiry_date as drugLicenseExpiryDate, other_license_number as otherLicenseNumber, 
+                    old_code as oldCode, customer_lot_number as customerLotNumber, stop_invoice as stopInvoice, is_export_customer as isExportCustomer, 
+                    is_registered_dealer as isRegisteredDealer, is_record_closed as isRecordClosed, is_active as isActive, continent as continent, 
+                    rebates as rebates, external_information as externalInformation, created_at as createdAt, updated_at as updatedAt, created_by as createdBy, 
+                    updated_by as updatedBy, is_deleted as isDeleted    
                 FROM customers 
                 {whereClause}
                 ORDER BY {sortColumn} {orderBy}
@@ -117,16 +117,16 @@ namespace Xcianify.Repository
             
             var sql = @"
                 SELECT 
-                    id, location_code, customer_number, customer_code, customer_name, 
-                    short_name, payee_name, customer_type_code, segment_code, 
-                    income_tax_pan_number, customer_sale_type, export_type, gstin, 
-                    drug_license_number, drug_license_expiry_date, other_license_number, 
-                    old_code, customer_lot_number, stop_invoice, is_export_customer, 
-                    is_registered_dealer, is_record_closed, is_active, continent, 
-                    rebates, external_information, created_at, updated_at, created_by, 
-                    updated_by, id_deleted as is_deleted
+                    id, location_code as locationCode, customer_number as customerNumber, customer_code as customerCode, customer_name as customerName, 
+                    short_name as shortName, payee_name as payeeName, customer_type_code as customerTypeCode, segment_code as segmentCode, 
+                    income_tax_pan_number as incomeTaxPanNumber, customer_sale_type as customerSaleType, export_type as exportType, gstin as gstin, 
+                    drug_license_number as drugLicenseNumber, drug_license_expiry_date as drugLicenseExpiryDate, other_license_number as otherLicenseNumber, 
+                    old_code as oldCode, customer_lot_number as customerLotNumber, stop_invoice as stopInvoice, is_export_customer as isExportCustomer, 
+                    is_registered_dealer as isRegisteredDealer, is_record_closed as isRecordClosed, is_active as isActive, continent as continent, 
+                    rebates as rebates, external_information as externalInformation, created_at as createdAt, updated_at as updatedAt, created_by as createdBy, 
+                    updated_by as updatedBy, is_deleted as isDeleted
                 FROM customers 
-                WHERE id = @Id AND id_deleted = false";
+                WHERE id = @Id AND is_deleted = false";
 
             return await connection.QueryFirstOrDefaultAsync<Customer>(sql, new { Id = id });
         }
@@ -137,16 +137,16 @@ namespace Xcianify.Repository
             
             var sql = @"
                 SELECT 
-                    id, location_code, customer_number, customer_code, customer_name, 
-                    short_name, payee_name, customer_type_code, segment_code, 
-                    income_tax_pan_number, customer_sale_type, export_type, gstin, 
-                    drug_license_number, drug_license_expiry_date, other_license_number, 
-                    old_code, customer_lot_number, stop_invoice, is_export_customer, 
-                    is_registered_dealer, is_record_closed, is_active, continent, 
-                    rebates, external_information, created_at, updated_at, created_by, 
-                    updated_by, id_deleted as is_deleted
+                    id, location_code as locationCode, customer_number as customerNumber, customer_code as customerCode, customer_name as customerName, 
+                    short_name as shortName, payee_name as payeeName, customer_type_code as customerTypeCode, segment_code as segmentCode, 
+                    income_tax_pan_number as incomeTaxPanNumber, customer_sale_type as customerSaleType, export_type as exportType, gstin as gstin, 
+                    drug_license_number as drugLicenseNumber, drug_license_expiry_date as drugLicenseExpiryDate, other_license_number as otherLicenseNumber, 
+                    old_code as oldCode, customer_lot_number as customerLotNumber, stop_invoice as stopInvoice, is_export_customer as isExportCustomer, 
+                    is_registered_dealer as isRegisteredDealer, is_record_closed as isRecordClosed, is_active as isActive, continent as continent, 
+                    rebates as rebates, external_information as externalInformation, created_at as createdAt, updated_at as updatedAt, created_by as createdBy, 
+                    updated_by as updatedBy, is_deleted as isDeleted
                 FROM customers 
-                WHERE customer_code = @CustomerCode AND id_deleted = false";
+                WHERE customer_code = @CustomerCode AND is_deleted = false";
 
             return await connection.QueryFirstOrDefaultAsync<Customer>(sql, new { CustomerCode = customerCode });
         }
@@ -164,7 +164,7 @@ namespace Xcianify.Repository
                     old_code, customer_lot_number, stop_invoice, is_export_customer, 
                     is_registered_dealer, is_record_closed, is_active, continent, 
                     rebates, external_information, created_at, updated_at, created_by, 
-                    updated_by, id_deleted
+                    updated_by, is_deleted
                 ) VALUES (
                     @LocationCode, @CustomerNumber, @CustomerCode, @CustomerName, 
                     @ShortName, @PayeeName, @CustomerTypeCode, @SegmentCode, 
@@ -201,7 +201,7 @@ namespace Xcianify.Repository
                     continent = @Continent, rebates = @Rebates, 
                     external_information = @ExternalInformation, 
                     updated_at = @UpdatedAt, updated_by = @UpdatedBy
-                WHERE id = @Id AND id_deleted = false
+                WHERE id = @Id AND is_deleted = false
                 RETURNING *";
 
             return await connection.QueryFirstAsync<Customer>(sql, customer);
@@ -213,8 +213,8 @@ namespace Xcianify.Repository
             
             var sql = @"
                 UPDATE customers 
-                SET id_deleted = true, updated_at = CURRENT_TIMESTAMP 
-                WHERE id = @Id AND id_deleted = false";
+                SET is_deleted = true, updated_at = CURRENT_TIMESTAMP 
+                WHERE id = @Id AND is_deleted = false";
 
             var rowsAffected = await connection.ExecuteAsync(sql, new { Id = id });
             return rowsAffected > 0;
@@ -224,7 +224,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var sql = "SELECT COUNT(*) FROM customers WHERE id = @Id AND id_deleted = false";
+            var sql = "SELECT COUNT(*) FROM customers WHERE id = @Id AND is_deleted = false";
             var count = await connection.ExecuteScalarAsync<int>(sql, new { Id = id });
             return count > 0;
         }
@@ -233,7 +233,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var sql = "SELECT COUNT(*) FROM customers WHERE customer_code = @CustomerCode AND id_deleted = false";
+            var sql = "SELECT COUNT(*) FROM customers WHERE customer_code = @CustomerCode AND is_deleted = false";
             var count = await connection.ExecuteScalarAsync<int>(sql, new { CustomerCode = customerCode });
             return count > 0;
         }

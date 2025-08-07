@@ -1,7 +1,6 @@
 import { createParser } from 'nuqs/server';
 import { z } from 'zod';
 
-// --- Filter Parsers ---
 
 export const customerFilterParsers = {
   pageNumber: createParser(z.coerce.number().min(1).default(1)),
@@ -20,7 +19,7 @@ export const customerFilterParsers = {
 // --- Static Options ---
 
 export const customerTypeOptions = [
-  { label: "Select Customer Type", value: "" },
+  { label: "Select Customer Type", value: "-1" },
   { label: "Domestic", value: "DOMESTIC" },
   { label: "Export", value: "EXPORT" },
   { label: "Government", value: "GOVERNMENT" },
@@ -30,7 +29,7 @@ export const customerTypeOptions = [
 ];
 
 export const segmentOptions = [
-  { label: "Select Segment", value: "" },
+  { label: "Select Segment", value: "-1" },
   { label: "Pharmaceutical", value: "PHARMA" },
   { label: "Healthcare", value: "HEALTHCARE" },
   { label: "Cosmetics", value: "COSMETICS" },
@@ -40,14 +39,14 @@ export const segmentOptions = [
 ];
 
 export const exportTypeOptions = [
-  { label: "Select Export Type", value: "" },
+  { label: "Select Export Type", value: "-1" },
   { label: "Direct Export", value: "DIRECT" },
   { label: "Indirect Export", value: "INDIRECT" },
   { label: "Deemed Export", value: "DEEMED" },
 ];
 
 export const continentOptions = [
-  { label: "Select Continent", value: "" },
+  { label: "Select Continent", value: "-1" },
   { label: "Asia", value: "ASIA" },
   { label: "Europe", value: "EUROPE" },
   { label: "North America", value: "NORTH_AMERICA" },
@@ -58,7 +57,7 @@ export const continentOptions = [
 ];
 
 export const customerSaleTypeOptions = [
-  { label: "Select Sale Type", value: "" },
+  { label: "Select Sale Type", value: "-1" },
   { label: "Cash", value: "CASH" },
   { label: "Credit", value: "CREDIT" },
   { label: "Consignment", value: "CONSIGNMENT" },

@@ -13,13 +13,13 @@ import { useCreateCustomerBusinessTerm, useUpdateCustomerBusinessTerm } from "@/
 import { useCreateCustomerTaxCompliance, useUpdateCustomerTaxCompliance } from "@/hooks/customers/use-customer-tax-compliance";
 import { RightDrawer } from "@/components/shared/right-drawer";
 import { CustomerBasicInfoForm } from "./forms/customer-basic-info-form";
+import { Customer, CreateCustomerData, UpdateCustomerData } from "@/types/customer";
+import { CustomerFormData, customerSchema } from "@/validations/customer";
+import { getCustomerDefaultValues, mapCustomerToFormData, transformFormDataToApi } from "@/lib/utils/customer-utils";
 import { CustomerAddressForm } from "./forms/customer-address-form";
 import { CustomerBankingDetailsForm } from "./forms/customer-banking-details-form";
 import { CustomerBusinessTermsForm } from "./forms/customer-business-terms-form";
 import { CustomerTaxComplianceForm } from "./forms/customer-tax-compliance-form";
-import { Customer, CreateCustomerData, UpdateCustomerData } from "@/types/customer";
-import { CustomerFormData, customerSchema } from "@/validations/customer";
-import { getCustomerDefaultValues, mapCustomerToFormData, transformFormDataToApi } from "@/lib/utils/customer-utils";
 
 interface CustomersDrawerProps {
   isOpen: boolean;
@@ -85,6 +85,7 @@ export default function CustomersDrawer({
     // Save address if provided
     if (formData.addresses && formData.addresses.length > 0) {
       const addressData = {
+        customerId,
         addressLine1: formData.addresses[0].addressLine1,
         addressLine2: formData.addresses[0].addressLine2,
         addressLine3: formData.addresses[0].addressLine3,
@@ -99,14 +100,14 @@ export default function CustomersDrawer({
         faxNumber: formData.addresses[0].faxNumber,
         emailId: formData.addresses[0].emailId,
         website: formData.addresses[0].website,
-        isPrimary: formData.addresses[0].isPrimary || true,
+        isPrimary: formData.addresses[0].isPrimary ?? true,
       };
       
       if (customer?.addresses && customer.addresses.length > 0) {
         promises.push(updateAddressMutation.mutateAsync({ 
           customerId, 
           addressId: customer.addresses[0].id, 
-          data: addressData 
+          data: { ...addressData, id: customer.addresses[0].id } 
         }));
       } else {
         promises.push(createAddressMutation.mutateAsync({ customerId, data: addressData }));
@@ -116,6 +117,7 @@ export default function CustomersDrawer({
     // Save banking details if provided
     if (formData.bankingDetails && formData.bankingDetails.length > 0) {
       const bankingData = {
+        customerId,
         bankIfscCode: formData.bankingDetails[0].bankIfscCode,
         bankAccountNumber: formData.bankingDetails[0].bankAccountNumber,
         bankName: formData.bankingDetails[0].bankName,
@@ -124,14 +126,14 @@ export default function CustomersDrawer({
         bankAccountTypeCode: formData.bankingDetails[0].bankAccountTypeCode,
         bankBranch: formData.bankingDetails[0].bankBranch,
         bankLocation: formData.bankingDetails[0].bankLocation,
-        isPrimary: formData.bankingDetails[0].isPrimary || true,
+        isPrimary: formData.bankingDetails[0].isPrimary ?? true,
       };
       
       if (customer?.bankingDetails && customer.bankingDetails.length > 0) {
         promises.push(updateBankingDetailMutation.mutateAsync({ 
           customerId, 
           bankingDetailId: customer.bankingDetails[0].id, 
-          data: bankingData 
+          data: { ...bankingData, id: customer.bankingDetails[0].id } 
         }));
       } else {
         promises.push(createBankingDetailMutation.mutateAsync({ customerId, data: bankingData }));
@@ -141,6 +143,7 @@ export default function CustomersDrawer({
     // Save business terms if provided
     if (formData.businessTerms && formData.businessTerms.length > 0) {
       const businessTermsData = {
+        customerId,
         destinationCode: formData.businessTerms[0].destinationCode,
         transportModeCode: formData.businessTerms[0].transportModeCode,
         transporterCode: formData.businessTerms[0].transporterCode,
@@ -148,7 +151,7 @@ export default function CustomersDrawer({
         customerDistance: formData.businessTerms[0].customerDistance,
         freightIndicator: formData.businessTerms[0].freightIndicator,
         supplyStockLocation: formData.businessTerms[0].supplyStockLocation,
-        allowConsignmentOnBooking: formData.businessTerms[0].allowConsignmentOnBooking,
+        allowConsignmentOnBooking: formData.businessTerms[0].allowConsignmentOnBooking ?? false,
         customerAccountCode: formData.businessTerms[0].customerAccountCode,
         creditLimit: formData.businessTerms[0].creditLimit,
         minimumInvoiceAmount: formData.businessTerms[0].minimumInvoiceAmount,
@@ -161,7 +164,7 @@ export default function CustomersDrawer({
         paymentTermCode: formData.businessTerms[0].paymentTermCode,
         creditPeriodDays: formData.businessTerms[0].creditPeriodDays,
         newPartyCreditPeriodDays: formData.businessTerms[0].newPartyCreditPeriodDays,
-        isOverdueCheck: formData.businessTerms[0].isOverdueCheck,
+        isOverdueCheck: formData.businessTerms[0].isOverdueCheck ?? false,
         numberOfBills: formData.businessTerms[0].numberOfBills,
         outstandingBillPeriodDays: formData.businessTerms[0].outstandingBillPeriodDays,
         outstandingBillAccountIndicator: formData.businessTerms[0].outstandingBillAccountIndicator,
@@ -171,7 +174,7 @@ export default function CustomersDrawer({
         promises.push(updateBusinessTermsMutation.mutateAsync({ 
           customerId, 
           businessTermId: customer.businessTerms[0].id, 
-          data: businessTermsData 
+          data: { ...businessTermsData, id: customer.businessTerms[0].id } 
         }));
       } else {
         promises.push(createBusinessTermsMutation.mutateAsync({ customerId, data: businessTermsData }));
@@ -181,15 +184,16 @@ export default function CustomersDrawer({
     // Save tax compliance if provided
     if (formData.taxCompliance && formData.taxCompliance.length > 0) {
       const taxComplianceData = {
+        customerId,
         vatFormCode: formData.taxCompliance[0].vatFormCode,
         centralFormCode: formData.taxCompliance[0].centralFormCode,
-        isEligibleForTcs: formData.taxCompliance[0].isEligibleForTcs,
+        isEligibleForTcs: formData.taxCompliance[0].isEligibleForTcs ?? false,
         tcsType: formData.taxCompliance[0].tcsType,
-        isApplicableHigherRate: formData.taxCompliance[0].isApplicableHigherRate,
-        isDeemedNonResident: formData.taxCompliance[0].isDeemedNonResident,
-        isDeemedPermanentEstablishment: formData.taxCompliance[0].isDeemedPermanentEstablishment,
-        isBillDiscount: formData.taxCompliance[0].isBillDiscount,
-        isReverseEndOfYear: formData.taxCompliance[0].isReverseEndOfYear,
+        isApplicableHigherRate: formData.taxCompliance[0].isApplicableHigherRate ?? false,
+        isDeemedNonResident: formData.taxCompliance[0].isDeemedNonResident ?? false,
+        isDeemedPermanentEstablishment: formData.taxCompliance[0].isDeemedPermanentEstablishment ?? false,
+        isBillDiscount: formData.taxCompliance[0].isBillDiscount ?? false,
+        isReverseEndOfYear: formData.taxCompliance[0].isReverseEndOfYear ?? false,
         customerInterfaceCode: formData.taxCompliance[0].customerInterfaceCode,
         interfaceFileFormat: formData.taxCompliance[0].interfaceFileFormat,
         projectionRatio: formData.taxCompliance[0].projectionRatio,
@@ -204,7 +208,7 @@ export default function CustomersDrawer({
         promises.push(updateTaxComplianceMutation.mutateAsync({ 
           customerId, 
           taxComplianceId: customer.taxCompliance[0].id, 
-          data: taxComplianceData 
+          data: { ...taxComplianceData, id: customer.taxCompliance[0].id } 
         }));
       } else {
         promises.push(createTaxComplianceMutation.mutateAsync({ customerId, data: taxComplianceData }));
@@ -227,7 +231,7 @@ export default function CustomersDrawer({
 
       if (customer) {
         const result = await updateCustomerMutation.mutateAsync({
-          id: customer.id,
+          id: customer.id.toString(),
           data: transformedData as unknown as UpdateCustomerData,
         });
         if (result) {
@@ -308,7 +312,7 @@ export default function CustomersDrawer({
               </TabsList>
 
               <TabsContent value="basic-info" className="space-y-3">
-                <CustomerBasicInfoForm />
+                <CustomerBasicInfoForm control={form.control} customerId={currentCustomerId} />
               </TabsContent>
 
               <TabsContent value="addresses" className="space-y-3">
@@ -316,15 +320,15 @@ export default function CustomersDrawer({
               </TabsContent>
 
               <TabsContent value="banking" className="space-y-3">
-                <CustomerBankingDetailsForm customerId={currentCustomerId} />
+                <CustomerBankingDetailsForm control={form.control} customerId={currentCustomerId} />
               </TabsContent>
 
               <TabsContent value="business-terms" className="space-y-3">
-                <CustomerBusinessTermsForm customerId={currentCustomerId} />
+                <CustomerBusinessTermsForm control={form.control} customerId={currentCustomerId} />
               </TabsContent>
 
               <TabsContent value="tax-compliance" className="space-y-3">
-                <CustomerTaxComplianceForm customerId={currentCustomerId} />
+                <CustomerTaxComplianceForm control={form.control} customerId={currentCustomerId} />
               </TabsContent>
             </Tabs>
 

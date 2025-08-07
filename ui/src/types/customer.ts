@@ -1,3 +1,8 @@
+import { CustomerAddress } from "./customer-address";
+import { CustomerBankingDetails } from "./customer-banking-details";
+import { CustomerBusinessTerms } from "./customer-business-terms";
+import { CustomerTaxCompliance } from "./customer-tax-compliance";
+
 export interface Customer {
   id: number;
   locationCode: string;
@@ -45,10 +50,10 @@ export interface CustomerFilter {
   gstin?: string;
   isActive?: boolean;
   isExportCustomer?: boolean;
-  page: number;
-  pageSize: number;
-  sortBy: string;
-  sortDescending: boolean;
+  page?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDescending?: boolean;
 }
 
 export type CreateCustomerData = Omit<Customer, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy' | 'isDeleted' | 'addresses' | 'bankingDetails' | 'businessTerms' | 'taxCompliance'>;

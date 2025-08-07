@@ -1,12 +1,11 @@
 "use client";
 
-import { useFormContext } from "react-hook-form";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { FormInput } from "@/components/shared/forms/form-input";
+import { FormSelect } from "@/components/shared/forms/form-select";
+import { FormCheckbox } from "@/components/shared/forms/form-checkbox";
+import { FormTextArea } from "@/components/shared/forms/form-text-area";
+import { Control } from "react-hook-form";
 import { CustomerFormData } from "@/validations/customer";
 import { 
   customerTypeOptions, 
@@ -16,414 +15,188 @@ import {
   customerSaleTypeOptions 
 } from "@/lib/utils/customer-utils";
 
-export function CustomerBasicInfoForm() {
-  const form = useFormContext<CustomerFormData>();
+interface CustomerBasicInfoFormProps {
+  control: Control<CustomerFormData>;
+  customerId?: number;
+}
 
+export function CustomerBasicInfoForm({ control, customerId }: CustomerBasicInfoFormProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Basic Information</CardTitle>
-        <CardDescription>
-          Enter the basic customer information
-        </CardDescription>
-      </CardHeader>
+    <Card className="pt-3">
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+          <FormInput
+            control={control}
             name="locationCode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Location Code</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter location code" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Location Code"
+            placeholder="Enter location code"
+            required
           />
 
-          <FormField
-            control={form.control}
+          <FormInput
+            control={control}
             name="customerNumber"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Customer Number *</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter customer number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Customer Number"
+            placeholder="Enter customer number"
+            required
           />
 
-          <FormField
-            control={form.control}
+          <FormInput
+            control={control}
             name="customerCode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Customer Code *</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter customer code" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Customer Code"
+            placeholder="Enter customer code"
+            required
           />
 
-          <FormField
-            control={form.control}
+          <FormInput
+            control={control}
             name="customerName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Customer Name *</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter customer name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Customer Name"
+            placeholder="Enter customer name"
+            required
           />
 
-          <FormField
-            control={form.control}
+          <FormInput
+            control={control}
             name="shortName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Short Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter short name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Short Name"
+            placeholder="Enter short name"
           />
 
-          <FormField
-            control={form.control}
+          <FormInput
+            control={control}
             name="payeeName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Payee Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter payee name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Payee Name"
+            placeholder="Enter payee name"
           />
 
-          <FormField
-            control={form.control}
+          <FormSelect
+            control={control}
             name="customerTypeCode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Customer Type</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select customer type" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {customerTypeOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Customer Type"
+            options={customerTypeOptions}
+            placeholder="Select customer type"
           />
 
-          <FormField
-            control={form.control}
+          <FormSelect
+            control={control}
             name="segmentCode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Segment</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select segment" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {segmentOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Segment"
+            options={segmentOptions}
+            placeholder="Select segment"
           />
 
-          <FormField
-            control={form.control}
+          <FormInput
+            control={control}
             name="incomeTaxPanNumber"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Income Tax PAN Number</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter PAN number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Income Tax PAN Number"
+            placeholder="Enter PAN number"
           />
 
-          <FormField
-            control={form.control}
+          <FormSelect
+            control={control}
             name="customerSaleType"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Customer Sale Type</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select sale type" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {customerSaleTypeOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Customer Sale Type"
+            options={customerSaleTypeOptions}
+            placeholder="Select sale type"
           />
 
-          <FormField
-            control={form.control}
+          <FormSelect
+            control={control}
             name="exportType"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Export Type</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select export type" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {exportTypeOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Export Type"
+            options={exportTypeOptions}
+            placeholder="Select export type"
           />
 
-          <FormField
-            control={form.control}
+          <FormInput
+            control={control}
             name="gstin"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>GSTIN</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter GSTIN" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="GSTIN"
+            placeholder="Enter GSTIN"
           />
 
-          <FormField
-            control={form.control}
+          <FormInput
+            control={control}
             name="drugLicenseNumber"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Drug License Number</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter drug license number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Drug License Number"
+            placeholder="Enter drug license number"
           />
 
-          <FormField
-            control={form.control}
+          <FormInput
+            control={control}
             name="otherLicenseNumber"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Other License Number</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter other license number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Other License Number"
+            placeholder="Enter other license number"
           />
 
-          <FormField
-            control={form.control}
+          <FormInput
+            control={control}
             name="oldCode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Old Code</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter old code" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Old Code"
+            placeholder="Enter old code"
           />
 
-          <FormField
-            control={form.control}
+          <FormInput
+            control={control}
             name="customerLotNumber"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Customer Lot Number</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter customer lot number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Customer Lot Number"
+            placeholder="Enter lot number"
           />
 
-          <FormField
-            control={form.control}
+          <FormSelect
+            control={control}
             name="continent"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Continent</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select continent" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {continentOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Continent"
+            options={continentOptions}
+            placeholder="Select continent"
           />
         </div>
 
-        <div className="space-y-4">
-          <FormField
-            control={form.control}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormTextArea
+            control={control}
             name="rebates"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Rebates</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Enter rebates information" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Rebates"
+            placeholder="Enter rebates information"
           />
 
-          <FormField
-            control={form.control}
+          <FormTextArea
+            control={control}
             name="externalInformation"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>External Information</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Enter external information" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="External Information"
+            placeholder="Enter external information"
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <FormField
-            control={form.control}
+          <FormCheckbox
+            control={control}
             name="stopInvoice"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Stop Invoice</FormLabel>
-                </div>
-              </FormItem>
-            )}
+            label="Stop Invoice"
+            description="Stop invoice generation for this customer"
           />
 
-          <FormField
-            control={form.control}
+          <FormCheckbox
+            control={control}
             name="isExportCustomer"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Export Customer</FormLabel>
-                </div>
-              </FormItem>
-            )}
+            label="Export Customer"
+            description="Indicates if this is an export customer"
           />
 
-          <FormField
-            control={form.control}
+          <FormCheckbox
+            control={control}
             name="isRegisteredDealer"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Registered Dealer</FormLabel>
-                </div>
-              </FormItem>
-            )}
+            label="Registered Dealer"
+            description="Indicates if this is a registered dealer"
           />
 
-          <FormField
-            control={form.control}
+          <FormCheckbox
+            control={control}
             name="isActive"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Active</FormLabel>
-                </div>
-              </FormItem>
-            )}
+            label="Active"
+            description="Indicates if this customer is active"
           />
         </div>
       </CardContent>

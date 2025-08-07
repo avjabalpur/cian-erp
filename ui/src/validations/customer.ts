@@ -1,7 +1,7 @@
 import z from "zod"
 
 // Address schema - updated to match actual database structure
-const addressSchema = z.object({
+export const addressSchema = z.object({
   addressLine1: z.string().optional(),
   addressLine2: z.string().optional(),
   addressLine3: z.string().optional(),
@@ -20,7 +20,7 @@ const addressSchema = z.object({
 });
 
 // Banking details schema - updated to match actual database structure
-const bankingDetailsSchema = z.object({
+export const bankingDetailsSchema = z.object({
   bankIfscCode: z.string().optional(),
   bankAccountNumber: z.string().optional(),
   bankName: z.string().optional(),
@@ -33,7 +33,7 @@ const bankingDetailsSchema = z.object({
 });
 
 // Business terms schema - updated to match actual database structure
-const businessTermsSchema = z.object({
+export const businessTermsSchema = z.object({
   destinationCode: z.string().optional(),
   transportModeCode: z.string().optional(),
   transporterCode: z.string().optional(),
@@ -61,7 +61,7 @@ const businessTermsSchema = z.object({
 });
 
 // Tax compliance schema - updated to match actual database structure
-const taxComplianceSchema = z.object({
+export const taxComplianceSchema = z.object({
   vatFormCode: z.string().optional(),
   centralFormCode: z.string().optional(),
   isEligibleForTcs: z.boolean().optional(),
@@ -119,3 +119,5 @@ export type CustomerFormData = z.infer<typeof customerSchema>
 export const customerUpdateSchema = customerSchema.partial();
 
 export type CustomerUpdateFormValues = z.infer<typeof customerUpdateSchema>; 
+
+export type AddressFormData = z.infer<typeof addressSchema>;

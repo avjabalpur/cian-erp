@@ -1,33 +1,24 @@
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useFormContext } from "react-hook-form";
+import { FormInput } from "@/components/shared/forms/form-input";
+import { FormSelect } from "@/components/shared/forms/form-select";
+import { Control } from "react-hook-form";
+import { CustomerFormData } from "@/validations/customer";
 
 interface CustomerBankingDetailsFormProps {
+  control: Control<CustomerFormData>;
   customerId?: number;
 }
 
-export function CustomerBankingDetailsForm({ customerId }: CustomerBankingDetailsFormProps) {
-  const form = useFormContext();
+export function CustomerBankingDetailsForm({ control, customerId }: CustomerBankingDetailsFormProps) {
 
-  if (!customerId) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Banking Details</CardTitle>
-          <CardDescription>Customer banking information</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Please save the customer first to add banking details.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
+  const accountTypeOptions = [
+    { label: "Select account type", value: "-1" },
+    { label: "Savings", value: "SAVINGS" },
+    { label: "Current", value: "CURRENT" },
+    { label: "Fixed Deposit", value: "FIXED" },
+  ];
 
   return (
     <Card>
@@ -37,87 +28,43 @@ export function CustomerBankingDetailsForm({ customerId }: CustomerBankingDetail
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
+          <FormInput
+            control={control}
             name="bankingDetails.0.bankName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Bank Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter bank name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Bank Name"
+            placeholder="Enter bank name"
           />
 
-          <FormField
-            control={form.control}
-            name="bankingDetails.0.accountNumber"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Account Number</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter account number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+          <FormInput
+            control={control}
+            name="bankingDetails.0.bankAccountNumber"
+            label="Account Number"
+            placeholder="Enter account number"
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="bankingDetails.0.ifscCode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>IFSC Code</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter IFSC code" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+          <FormInput
+            control={control}
+            name="bankingDetails.0.bankIfscCode"
+            label="IFSC Code"
+            placeholder="Enter IFSC code"
           />
 
-          <FormField
-            control={form.control}
-            name="bankingDetails.0.branchName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Branch Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter branch name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+          <FormInput
+            control={control}
+            name="bankingDetails.0.bankBranch"
+            label="Branch Name"
+            placeholder="Enter branch name"
           />
         </div>
 
-        <FormField
-          control={form.control}
-          name="bankingDetails.0.accountType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Account Type</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select account type" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="SAVINGS">Savings</SelectItem>
-                  <SelectItem value="CURRENT">Current</SelectItem>
-                  <SelectItem value="FIXED_DEPOSIT">Fixed Deposit</SelectItem>
-                  <SelectItem value="RECURRING_DEPOSIT">Recurring Deposit</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+        <FormSelect
+          control={control}
+          name="bankingDetails.0.bankAccountTypeCode"
+          label="Account Type"
+          options={accountTypeOptions}
+          placeholder="Select account type"
         />
       </CardContent>
     </Card>

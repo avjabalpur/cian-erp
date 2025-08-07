@@ -1,16 +1,18 @@
 "use client";
 
-import { useFormContext } from "react-hook-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
+import { FormInput } from "@/components/shared/forms/form-input";
+import { FormSelect } from "@/components/shared/forms/form-select";
+import { FormCheckbox } from "@/components/shared/forms/form-checkbox";
+import { FormTextArea } from "@/components/shared/forms/form-text-area";
+import { Control } from "react-hook-form";
 import { CustomerTypeFormData } from "@/validations/customer-type";
 
-export function CustomerTypeForm() {
-  const form = useFormContext<CustomerTypeFormData>();
+interface CustomerTypeFormProps {
+  control: Control<CustomerTypeFormData>;
+}
 
+export function CustomerTypeForm({ control }: CustomerTypeFormProps) {
   return (
     <div className="space-y-6">
       <Card>
@@ -20,47 +22,28 @@ export function CustomerTypeForm() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
+            <FormInput
+              control={control}
               name="code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Code *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter customer type code" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Code"
+              placeholder="Enter customer type code"
+              required
             />
 
-            <FormField
-              control={form.control}
+            <FormInput
+              control={control}
               name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter customer type name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Name"
+              placeholder="Enter customer type name"
+              required
             />
           </div>
 
-          <FormField
-            control={form.control}
+          <FormTextArea
+            control={control}
             name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Enter description" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Description"
+            placeholder="Enter description"
           />
         </CardContent>
       </Card>
@@ -72,97 +55,42 @@ export function CustomerTypeForm() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
+            <FormCheckbox
+              control={control}
               name="isExportType"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Export Type</FormLabel>
-                  </div>
-                </FormItem>
-              )}
+              label="Export Type"
+              description="Indicates if this is an export customer type"
             />
 
-            <FormField
-              control={form.control}
+            <FormCheckbox
+              control={control}
               name="isDomesticType"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Domestic Type</FormLabel>
-                  </div>
-                </FormItem>
-              )}
+              label="Domestic Type"
+              description="Indicates if this is a domestic customer type"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
+            <FormCheckbox
+              control={control}
               name="requiresDrugLicense"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Requires Drug License</FormLabel>
-                  </div>
-                </FormItem>
-              )}
+              label="Requires Drug License"
+              description="Indicates if drug license is required for this type"
             />
 
-            <FormField
-              control={form.control}
+            <FormCheckbox
+              control={control}
               name="creditTermsApplicable"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Credit Terms Applicable</FormLabel>
-                  </div>
-                </FormItem>
-              )}
+              label="Credit Terms Applicable"
+              description="Indicates if credit terms are applicable for this type"
             />
           </div>
 
-          <FormField
-            control={form.control}
+          <FormCheckbox
+            control={control}
             name="isActive"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Active</FormLabel>
-                </div>
-              </FormItem>
-            )}
+            label="Active"
+            description="Indicates if this customer type is active"
           />
         </CardContent>
       </Card>

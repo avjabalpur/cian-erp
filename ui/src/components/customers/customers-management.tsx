@@ -9,14 +9,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useCustomers, useDeleteCustomer } from "@/hooks/customers/use-customers";
 import { useQueryState } from "nuqs";
 import { customerFilterParsers } from "@/lib/utils/customer-utils";
-import CustomersTable from "./customers-table";
-import CustomersFilter from "./customers-filter";
-import CustomersDrawer from "./customers-drawer";
 import { CustomerFilter, Customer } from "@/types/customer";
 import { useCustomerAddresses } from "@/hooks/customers/use-customer-addresses";
 import { useCustomerBankingDetails } from "@/hooks/customers/use-customer-banking-details";
 import { useCustomerBusinessTerms } from "@/hooks/customers/use-customer-business-terms";
 import { useCustomerTaxCompliance } from "@/hooks/customers/use-customer-tax-compliance";
+import CustomersFilter from "./customers-filter";
+import CustomersTable from "./customers-table";
+import CustomersDrawer from "./customers-drawer";
 
 export default function CustomersManagement() {
   const router = useRouter();
@@ -35,32 +35,23 @@ export default function CustomersManagement() {
   // URL state management with nuqs
   const [page, setPage] = useQueryState("page", customerFilterParsers.pageNumber);
   const [pageSize, setPageSize] = useQueryState("pageSize", customerFilterParsers.pageSize);
-  const [search, setSearch] = useQueryState("search", customerFilterParsers.search);
-  const [customerCode, setCustomerCode] = useQueryState("customerCode", customerFilterParsers.customerCode);
-  const [customerName, setCustomerName] = useQueryState("customerName", customerFilterParsers.customerName);
-  const [customerTypeCode, setCustomerTypeCode] = useQueryState("customerTypeCode", customerFilterParsers.customerTypeCode);
-  const [gstin, setGstin] = useQueryState("gstin", customerFilterParsers.gstin);
-  const [isActive, setIsActive] = useQueryState("isActive", customerFilterParsers.isActive);
-  const [isExportCustomer, setIsExportCustomer] = useQueryState("isExportCustomer", customerFilterParsers.isExportCustomer);
   const [sortBy, setSortBy] = useQueryState("sortBy", customerFilterParsers.sortBy);
   const [sortDescending, setSortDescending] = useQueryState("sortDescending", customerFilterParsers.sortDescending);
+  const [search] = useQueryState("search", customerFilterParsers.search);
+  const [customerCode] = useQueryState("customerCode", customerFilterParsers.customerCode);
+  const [customerName] = useQueryState("customerName", customerFilterParsers.customerName);
+  const [isActive] = useQueryState("isActive", customerFilterParsers.isActive);
 
-  // Construct filter object for API
-  const filter: CustomerFilter = {
-    page: page || 1,
-    pageSize: pageSize || 20,
-    search: search || undefined,
-    customerCode: customerCode || undefined,
-    customerName: customerName || undefined,
-    customerTypeCode: customerTypeCode || undefined,
-    gstin: gstin || undefined,
-    isActive: isActive || undefined,
-    isExportCustomer: isExportCustomer || undefined,
-    sortBy: sortBy || 'customerName',
-    sortDescending: sortDescending || false,
-  };
-
-  const { data: customersData, isLoading, refetch } = useCustomers(filter);
+  const { data: customersData, isLoading, refetch } = useCustomers({
+    page: (page as number) || 1,
+    pageSize: (pageSize as number) || 20,
+    search: search as string | undefined,
+    customerCode: customerCode as string | undefined,
+    customerName: customerName as string | undefined,
+    isActive: isActive === true ? true : isActive === false ? false : undefined,
+    sortBy: (sortBy as string) || "customerName",
+    sortDescending: (sortDescending as boolean) || false
+  });
   const customers = customersData?.items || [];
   const totalCount = customersData?.totalCount || 0;
 
@@ -106,7 +97,7 @@ export default function CustomersManagement() {
 
   const handleDeleteCustomer = async (customer: Customer) => {
     try {
-      await deleteCustomerMutation.mutateAsync(customer.id);
+      await deleteCustomerMutation.mutateAsync(customer.id.toString());
       toast({
         title: "Success",
         description: "Customer deleted successfully",
@@ -133,7 +124,7 @@ export default function CustomersManagement() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold tracking-tight">Customers</h1>
         <Button onClick={handleCreateCustomer} className="flex items-center space-x-2">
@@ -144,28 +135,16 @@ export default function CustomersManagement() {
 
       <Card>
         <CardContent className="space-y-4 pt-4">
-          <CustomersFilter
-            filter={filter}
-            onFilterChange={(newFilter) => {
-              setPage(1);
-              setSearch(newFilter.search);
-              setCustomerCode(newFilter.customerCode);
-              setCustomerName(newFilter.customerName);
-              setCustomerTypeCode(newFilter.customerTypeCode);
-              setGstin(newFilter.gstin);
-              setIsActive(newFilter.isActive);
-              setIsExportCustomer(newFilter.isExportCustomer);
-            }}
-          />
+          <CustomersFilter />
           <CustomersTable
             customers={customers}
             isLoading={isLoading}
             onEdit={handleEditCustomer}
             onDelete={handleDeleteCustomer}
             pagination={{
-              pageIndex: (page || 1) - 1,
-              pageSize: pageSize || 20,
-              pageCount: Math.ceil(totalCount / (pageSize || 20)),
+              pageIndex: ((page as number) || 1) - 1,
+              pageSize: (pageSize as number) || 20,
+              pageCount: Math.ceil(totalCount / ((pageSize as number) || 20)),
               totalCount,
             }}
             onPaginationChange={handlePaginationChange}

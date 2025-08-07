@@ -21,34 +21,30 @@ export default function CustomerTypesManagement() {
   const [selectedCustomerType, setSelectedCustomerType] = useState<CustomerType | null>(null);
 
   // URL state management with nuqs
-  const [page, setPage] = useQueryState("page", customerTypeFilterParsers.pageNumber);
-  const [pageSize, setPageSize] = useQueryState("pageSize", customerTypeFilterParsers.pageSize);
-  const [search, setSearch] = useQueryState("search", customerTypeFilterParsers.search);
-  const [code, setCode] = useQueryState("code", customerTypeFilterParsers.code);
-  const [name, setName] = useQueryState("name", customerTypeFilterParsers.name);
-  const [isActive, setIsActive] = useQueryState("isActive", customerTypeFilterParsers.isActive);
-  const [sortBy, setSortBy] = useQueryState("sortBy", customerTypeFilterParsers.sortBy);
-  const [sortDescending, setSortDescending] = useQueryState("sortDescending", customerTypeFilterParsers.sortDescending);
+  const [page] = useQueryState("page", customerTypeFilterParsers.pageNumber);
+  const [pageSize] = useQueryState("pageSize", customerTypeFilterParsers.pageSize);
+  const [search] = useQueryState("search", customerTypeFilterParsers.search);
+  const [code] = useQueryState("code", customerTypeFilterParsers.code);
+  const [name] = useQueryState("name", customerTypeFilterParsers.name);
+  const [isActive] = useQueryState("isActive", customerTypeFilterParsers.isActive);
+  const [sortBy] = useQueryState("sortBy", customerTypeFilterParsers.sortBy);
+  const [sortDescending] = useQueryState("sortDescending", customerTypeFilterParsers.sortDescending);
 
-  // Construct filter object for API
-  const filter: CustomerTypeFilter = {
+  const { data: customerTypesData, isLoading, refetch } = useCustomerTypes({
     page: page || 1,
-    pageSize: pageSize || 20,
+    pageSize: pageSize || 10,
     search: search || undefined,
     code: code || undefined,
     name: name || undefined,
-    isActive: isActive || undefined,
-    sortBy: sortBy || 'name',
-    sortDescending: sortDescending || false,
-  };
-
-  const { data: customerTypesData, isLoading, refetch } = useCustomerTypes(filter);
+    isActive: isActive === true ? true : isActive === false ? false : undefined,
+    sortBy: sortBy || "name",
+    sortDescending: sortDescending || false
+  });
   const customerTypes = customerTypesData?.items || [];
   const totalCount = customerTypesData?.totalCount || 0;
 
   const handlePaginationChange = (pageIndex: number, newPageSize: number) => {
-    setPage(pageIndex + 1); // Convert to 1-based indexing
-    setPageSize(newPageSize);
+    // Handle pagination if needed
   };
 
   const handleCreateCustomerType = () => {
@@ -100,7 +96,9 @@ export default function CustomerTypesManagement() {
         </Button>
       </div>
 
-      <CustomerTypesTable
+      <Card>
+        <CardContent className="space-y-4 pt-4">
+          <CustomerTypesTable
             customerTypes={customerTypes}
             isLoading={isLoading}
             onEdit={handleEditCustomerType}
@@ -113,6 +111,8 @@ export default function CustomerTypesManagement() {
             }}
             onPaginationChange={handlePaginationChange}
           />
+        </CardContent>
+      </Card>
 
       <CustomerTypesDrawer
         isOpen={drawerOpen}
