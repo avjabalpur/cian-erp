@@ -52,7 +52,7 @@ const allMenuItems: MenuItem[] = [
     id: "admin",
     label: "Administration",
     href: "/dashboard",
-    icon: Settings,
+    icon: Users,
     roles: ["SUPER_ADMIN", "ADMIN"],
     children: [
       {
@@ -75,29 +75,31 @@ const allMenuItems: MenuItem[] = [
         href: "/permissions",
         icon: UserCheck,
         roles: ["SUPER_ADMIN"],
-      },
+      }
+    ],
+  },
+  {
+    id: "masters",
+    label: "Masters",
+    href: "/masters",
+    icon: Settings,
+    roles: ["SUPER_ADMIN", "ADMIN"],
+    children: [
       {
         id: "departments",
         label: "Departments",
         href: "/departments",
         icon: UserCheck,
-        roles: ["SUPER_ADMIN"],
+        roles: ["SUPER_ADMIN", "ADMIN"],
       },
       {
         id: "divisions",
         label: "Divisions",
         href: "/divisions",
         icon: UserCheck,
-        roles: ["SUPER_ADMIN"],
-      },
-     
-      {
-        id: "customers",
-        label: "Customers",
-        href: "/customers",
-        icon: Building2,
         roles: ["SUPER_ADMIN", "ADMIN"],
       },
+     
       {
         id: "location-types",
         label: "Location Types",
@@ -119,6 +121,29 @@ const allMenuItems: MenuItem[] = [
         icon: Building2,
         roles: ["SUPER_ADMIN", "ADMIN"],
       },
+    ],
+  },
+  {
+    id: "customers",
+    label: "Customers",
+    href: "/customers",
+    icon: Users,
+    roles: ["SUPER_ADMIN", "ADMIN"],
+    children: [ 
+      {
+        id: "customer-types",
+        label: "Customer Types",
+        href: "/customers/customer-types",
+        icon: Package,
+        roles: ["SUPER_ADMIN", "ADMIN"],
+      },
+      {
+        id: "customers",
+        label: "Customers",
+        href: "/customers",
+        icon: Package,
+        roles: ["SUPER_ADMIN", "ADMIN"],
+      }
     ],
   },
   {

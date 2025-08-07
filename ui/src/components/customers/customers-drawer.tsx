@@ -1,23 +1,27 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RightDrawer } from "@/components/shared/right-drawer";
-import { CustomerForm } from "./customer-form";
-import { Customer, CreateCustomerData, UpdateCustomerData } from "@/types/customer";
-import { CustomerFormValues, customerSchema, customerUpdateSchema } from "@/validations/customer";
-import { useCreateCustomer, useUpdateCustomer } from "@/hooks/customers/use-customers";
 import { useToast } from "@/hooks/use-toast";
+import { useCreateCustomer, useUpdateCustomer } from "@/hooks/customers/use-customers";
+import { RightDrawer } from "@/components/shared/right-drawer";
+import { CustomerBasicInfoForm } from "./forms/customer-basic-info-form";
+import { CustomerAddressForm } from "./forms/customer-address-form";
+import { CustomerBankingDetailsForm } from "./forms/customer-banking-details-form";
+import { CustomerBusinessTermsForm } from "./forms/customer-business-terms-form";
+import { CustomerTaxComplianceForm } from "./forms/customer-tax-compliance-form";
+import { Customer, CreateCustomerData, UpdateCustomerData } from "@/types/customer";
+import { CustomerFormData, customerSchema } from "@/validations/customer";
+import { getCustomerDefaultValues, mapCustomerToFormData, transformFormDataToApi } from "@/lib/utils/customer-utils";
 
 interface CustomersDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   customer?: Customer | null;
-  onSuccess?: () => void;
+  onSuccess: () => void;
 }
 
 export default function CustomersDrawer({
@@ -27,196 +31,130 @@ export default function CustomersDrawer({
   onSuccess,
 }: CustomersDrawerProps) {
   const { toast } = useToast();
+  
+  // Main customer mutations
   const createCustomerMutation = useCreateCustomer();
   const updateCustomerMutation = useUpdateCustomer();
 
-  const isEditing = !!customer;
-  const title = isEditing ? `Edit Customer - ${customer.customerName}` : "Add New Customer";
-
-  const form = useForm<CustomerFormValues>({
-    resolver: zodResolver(isEditing ? customerUpdateSchema : customerSchema),
-    defaultValues: {
-      locationCode: "",
-      customerNumber: "",
-      customerCode: "",
-      customerName: "",
-      shortName: "",
-      payeeName: "",
-      customerTypeCode: "",
-      segmentCode: "",
-      incomeTaxPanNumber: "",
-      customerSaleType: "",
-      exportType: "",
-      gstin: "",
-      drugLicenseNumber: "",
-      drugLicenseExpiryDate: "",
-      otherLicenseNumber: "",
-      oldCode: "",
-      customerLotNumber: "",
-      stopInvoice: false,
-      isExportCustomer: false,
-      isRegisteredDealer: false,
-      isRecordClosed: false,
-      isActive: true,
-      continent: "",
-      rebates: "",
-      externalInformation: "",
-    },
+  const form = useForm<CustomerFormData>({
+    resolver: zodResolver(customerSchema),
+    defaultValues: getCustomerDefaultValues(),
   });
 
   useEffect(() => {
-    if (customer && isOpen) {
-      form.reset({
-        locationCode: customer.locationCode || "",
-        customerNumber: customer.customerNumber || "",
-        customerCode: customer.customerCode || "",
-        customerName: customer.customerName || "",
-        shortName: customer.shortName || "",
-        payeeName: customer.payeeName || "",
-        customerTypeCode: customer.customerTypeCode || "",
-        segmentCode: customer.segmentCode || "",
-        incomeTaxPanNumber: customer.incomeTaxPanNumber || "",
-        customerSaleType: customer.customerSaleType || "",
-        exportType: customer.exportType || "",
-        gstin: customer.gstin || "",
-        drugLicenseNumber: customer.drugLicenseNumber || "",
-        drugLicenseExpiryDate: customer.drugLicenseExpiryDate || "",
-        otherLicenseNumber: customer.otherLicenseNumber || "",
-        oldCode: customer.oldCode || "",
-        customerLotNumber: customer.customerLotNumber || "",
-        stopInvoice: customer.stopInvoice || false,
-        isExportCustomer: customer.isExportCustomer || false,
-        isRegisteredDealer: customer.isRegisteredDealer || false,
-        isRecordClosed: customer.isRecordClosed || false,
-        isActive: customer.isActive ?? true,
-        continent: customer.continent || "",
-        rebates: customer.rebates || "",
-        externalInformation: customer.externalInformation || "",
-      });
-    } else if (!customer && isOpen) {
-      form.reset({
-        locationCode: "",
-        customerNumber: "",
-        customerCode: "",
-        customerName: "",
-        shortName: "",
-        payeeName: "",
-        customerTypeCode: "",
-        segmentCode: "",
-        incomeTaxPanNumber: "",
-        customerSaleType: "",
-        exportType: "",
-        gstin: "",
-        drugLicenseNumber: "",
-        drugLicenseExpiryDate: "",
-        otherLicenseNumber: "",
-        oldCode: "",
-        customerLotNumber: "",
-        stopInvoice: false,
-        isExportCustomer: false,
-        isRegisteredDealer: false,
-        isRecordClosed: false,
-        isActive: true,
-        continent: "",
-        rebates: "",
-        externalInformation: "",
-      });
+    if (isOpen) {
+      if (customer) {
+        console.log('Loading customer data:', customer);
+        const formData = mapCustomerToFormData(customer);
+        console.log('Mapped form data:', formData);
+        form.reset(formData);
+      } else {
+        console.log('Resetting to default values');
+        form.reset(getCustomerDefaultValues());
+      }
     }
-  }, [customer, isOpen, form]);
+  }, [customer, form, isOpen]);
 
-  const onSubmit = async (values: CustomerFormValues) => {
+  // Force re-render of child components when customer changes
+  const [currentCustomerId, setCurrentCustomerId] = useState<number | undefined>(undefined);
+  
+  useEffect(() => {
+    setCurrentCustomerId(customer?.id);
+  }, [customer?.id]);
+
+  const onSubmit = async (data: CustomerFormData) => {
     try {
-      if (isEditing && customer) {
+      if (customer) {
+        // Update existing customer
         const updateData: UpdateCustomerData = {
           id: customer.id,
-          ...values,
+          ...transformFormDataToApi(data),
         };
-        await updateCustomerMutation.mutateAsync({ id: customer.id.toString(), data: updateData });
+        
+        await updateCustomerMutation.mutateAsync(updateData);
         toast({
           title: "Success",
           description: "Customer updated successfully",
         });
       } else {
-        const createData: CreateCustomerData = {
-          ...values,
-        };
-        await createCustomerMutation.mutateAsync(createData);
+        // Create new customer
+        const createData: CreateCustomerData = transformFormDataToApi(data);
+        
+        const newCustomer = await createCustomerMutation.mutateAsync(createData);
         toast({
           title: "Success",
           description: "Customer created successfully",
         });
       }
-      onSuccess?.();
-      onClose();
+      
+      onSuccess();
     } catch (error: any) {
+      console.error('Error saving customer:', error);
       toast({
         title: "Error",
-        description: error?.message || "Failed to save customer",
+        description: error.response?.data?.message || "Failed to save customer",
         variant: "destructive",
       });
     }
   };
 
-  const isLoading = createCustomerMutation.isPending || updateCustomerMutation.isPending;
+  const handleClose = () => {
+    form.reset();
+    onClose();
+  };
+
+  const isSubmitting = createCustomerMutation.isPending || updateCustomerMutation.isPending;
 
   return (
-    <RightDrawer isOpen={isOpen} onClose={onClose} title={title} size="full">
+    <RightDrawer
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={customer ? "Edit Customer" : "Create Customer"}
+      description={customer ? "Update customer information" : "Add a new customer"}
+      size="xl"
+    >
       <FormProvider {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="h-full flex flex-col">
-          <div className="flex-1 overflow-auto p-6">
-            <Tabs defaultValue="basic-info" className="h-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="basic-info">Basic Information</TabsTrigger>
-                <TabsTrigger value="licenses">Licenses & Compliance</TabsTrigger>
-                <TabsTrigger value="settings">Settings & Preferences</TabsTrigger>
-              </TabsList>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <Tabs defaultValue="basic-info" className="w-full">
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="basic-info">Basic Info</TabsTrigger>
+              <TabsTrigger value="addresses">Addresses</TabsTrigger>
+              <TabsTrigger value="banking">Banking</TabsTrigger>
+              <TabsTrigger value="business-terms">Business Terms</TabsTrigger>
+              <TabsTrigger value="tax-compliance">Tax Compliance</TabsTrigger>
+            </TabsList>
 
-              <div className="mt-6">
-                <TabsContent value="basic-info" className="space-y-6">
-                  <CustomerForm />
-                </TabsContent>
+            <TabsContent value="basic-info" className="space-y-4">
+              <CustomerBasicInfoForm />
+            </TabsContent>
 
-                <TabsContent value="licenses" className="space-y-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Licenses & Compliance</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-muted-foreground">
-                        License and compliance information will be implemented here.
-                      </p>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
+            <TabsContent value="addresses" className="space-y-4">
+              <CustomerAddressForm customerId={currentCustomerId} />
+            </TabsContent>
 
-                <TabsContent value="settings" className="space-y-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Settings & Preferences</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-muted-foreground">
-                        Settings and preferences will be implemented here.
-                      </p>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </div>
-            </Tabs>
-          </div>
+            <TabsContent value="banking" className="space-y-4">
+              <CustomerBankingDetailsForm customerId={currentCustomerId} />
+            </TabsContent>
 
-          <div className="border-t p-6">
-            <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Saving..." : isEditing ? "Update Customer" : "Create Customer"}
-              </Button>
-            </div>
+            <TabsContent value="business-terms" className="space-y-4">
+              <CustomerBusinessTermsForm customerId={currentCustomerId} />
+            </TabsContent>
+
+            <TabsContent value="tax-compliance" className="space-y-4">
+              <CustomerTaxComplianceForm customerId={currentCustomerId} />
+            </TabsContent>
+          </Tabs>
+
+          <div className="flex justify-end space-x-2 pt-6 border-t">
+            <Button type="button" variant="outline" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : customer ? "Update Customer" : "Create Customer"}
+            </Button>
           </div>
         </form>
       </FormProvider>
     </RightDrawer>
   );
-} 
+}

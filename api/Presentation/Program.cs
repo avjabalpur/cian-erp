@@ -136,7 +136,11 @@ builder.Services.AddAutoMapper(
      typeof(ProductTypeMapper),
     typeof(DivisionMapper),
     typeof(CustomerMapper),
-    typeof(CustomerTypeMapper)
+    typeof(CustomerTypeMapper),
+    typeof(CustomerAddressMapper),
+    typeof(CustomerBankingDetailsMapper),
+    typeof(CustomerBusinessTermsMapper),
+    typeof(CustomerTaxComplianceMapper)
 );
 
 builder.Services.AddScoped<ILocationTypeRepository, LocationTypeRepository>();
@@ -235,8 +239,14 @@ builder.Services.AddScoped<IDosageService, DosageService>();
 // Register Customer services and repositories
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
-
-// Register CustomerType services and repositories
+builder.Services.AddScoped<ICustomerAddressRepository, CustomerAddressRepository>();
+builder.Services.AddScoped<ICustomerAddressService, CustomerAddressService>();
+builder.Services.AddScoped<ICustomerBankingDetailsRepository, CustomerBankingDetailsRepository>();
+builder.Services.AddScoped<ICustomerBankingDetailsService, CustomerBankingDetailsService>();
+builder.Services.AddScoped<ICustomerBusinessTermsRepository, CustomerBusinessTermsRepository>();
+builder.Services.AddScoped<ICustomerBusinessTermsService, CustomerBusinessTermsService>();
+builder.Services.AddScoped<ICustomerTaxComplianceRepository, CustomerTaxComplianceRepository>();
+builder.Services.AddScoped<ICustomerTaxComplianceService, CustomerTaxComplianceService>();
 builder.Services.AddScoped<ICustomerTypeRepository, CustomerTypeRepository>();
 builder.Services.AddScoped<ICustomerTypeService, CustomerTypeService>();
 

@@ -1,20 +1,18 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Edit, Trash2, Eye } from "lucide-react";
-import { AdvancedTableWrapper } from "@/components/shared/advanced-table";
-import { Customer } from "@/types/customer";
-import { getCustomerTypeLabel, getSegmentLabel, getExportTypeLabel, getContinentLabel, getCustomerSaleTypeLabel } from "@/lib/utils/customer-utils";
+import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import { AdvancedTable } from "@/components/shared/advanced-table";
+import { CustomerType } from "@/types/customer-type";
 import { formatDate } from "@/lib/date-utils";
 
-interface CustomersTableProps {
-  customers: Customer[];
+interface CustomerTypesTableProps {
+  customerTypes: CustomerType[];
   isLoading: boolean;
-  onEdit: (customer: Customer) => void;
-  onDelete: (customer: Customer) => void;
+  onEdit: (customerType: CustomerType) => void;
+  onDelete: (customerType: CustomerType) => void;
   pagination: {
     pageIndex: number;
     pageSize: number;
@@ -24,50 +22,34 @@ interface CustomersTableProps {
   onPaginationChange: (pageIndex: number, pageSize: number) => void;
 }
 
-export default function CustomersTable({
-  customers,
+export default function CustomerTypesTable({
+  customerTypes,
   isLoading,
   onEdit,
   onDelete,
   pagination,
   onPaginationChange,
-}: CustomersTableProps) {
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-
-  const columns = [
+}: CustomerTypesTableProps) {
+  const columnMeta = [
     {
-      accessorKey: "customerCode",
-      header: "Customer Code",
+      accessorKey: "code",
+      header: "Code",
       cell: ({ row }: any) => (
-        <div className="font-medium">{row.original.customerCode}</div>
+        <div className="font-medium">{row.original.code}</div>
       ),
     },
     {
-      accessorKey: "customerName",
-      header: "Customer Name",
+      accessorKey: "name",
+      header: "Name",
       cell: ({ row }: any) => (
-        <div className="font-medium">{row.original.customerName}</div>
+        <div className="font-medium">{row.original.name}</div>
       ),
     },
     {
-      accessorKey: "shortName",
-      header: "Short Name",
+      accessorKey: "description",
+      header: "Description",
       cell: ({ row }: any) => (
-        <div>{row.original.shortName || "-"}</div>
-      ),
-    },
-    {
-      accessorKey: "customerTypeCode",
-      header: "Customer Type",
-      cell: ({ row }: any) => (
-        <div>{row.original.customerTypeCode ? getCustomerTypeLabel(row.original.customerTypeCode) : "-"}</div>
-      ),
-    },
-    {
-      accessorKey: "gstin",
-      header: "GSTIN",
-      cell: ({ row }: any) => (
-        <div>{row.original.gstin || "-"}</div>
+        <div>{row.original.description || "-"}</div>
       ),
     },
     {
@@ -76,15 +58,6 @@ export default function CustomersTable({
       cell: ({ row }: any) => (
         <Badge variant={row.original.isActive ? "default" : "secondary"}>
           {row.original.isActive ? "Active" : "Inactive"}
-        </Badge>
-      ),
-    },
-    {
-      accessorKey: "isExportCustomer",
-      header: "Export Customer",
-      cell: ({ row }: any) => (
-        <Badge variant={row.original.isExportCustomer ? "default" : "outline"}>
-          {row.original.isExportCustomer ? "Yes" : "No"}
         </Badge>
       ),
     },
@@ -99,7 +72,7 @@ export default function CustomersTable({
       id: "actions",
       header: "Actions",
       cell: ({ row }: any) => {
-        const customer = row.original;
+        const customerType = row.original;
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -109,11 +82,11 @@ export default function CustomersTable({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onEdit(customer)}>
+              <DropdownMenuItem onClick={() => onEdit(customerType)}>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onDelete(customer)}>
+              <DropdownMenuItem onClick={() => onDelete(customerType)}>
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
               </DropdownMenuItem>
@@ -125,13 +98,13 @@ export default function CustomersTable({
   ];
 
   return (
-    <AdvancedTableWrapper
-      data={customers}
-      columns={columns}
+    <AdvancedTable
+      data={customerTypes}
+      columnMeta={columns}
       isLoading={isLoading}
       pagination={pagination}
       onPaginationChange={onPaginationChange}
-      searchPlaceholder="Search customers..."
+      searchPlaceholder="Search customer types..."
       enableSearch={false}
       enableColumnFilters={false}
       enableSorting={true}
@@ -141,7 +114,7 @@ export default function CustomersTable({
       enableDensityToggle={true}
       enableFullScreenToggle={true}
       enableExport={true}
-      exportFileName="customers"
+      exportFileName="customer-types"
     />
   );
 }

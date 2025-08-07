@@ -60,4 +60,27 @@ export const getCreditTermsLabel = (value: boolean): string => {
 
 export const getActiveStatusLabel = (value: boolean): string => {
   return value ? "Active" : "Inactive";
-}; 
+};
+
+// --- Form Data Functions ---
+
+export const getCustomerTypeDefaultValues = () => ({
+  code: "",
+  name: "",
+  description: "",
+  isActive: true,
+});
+
+export const mapCustomerTypeToFormData = (customerType: any) => ({
+  code: customerType.code || "",
+  name: customerType.name || "",
+  description: customerType.description || "",
+  isActive: customerType.isActive ?? true,
+});
+
+export const transformFormDataToApi = (formData: any) => ({
+  code: formData.code,
+  name: formData.name,
+  description: formData.description || null,
+  isActive: formData.isActive,
+}); 
