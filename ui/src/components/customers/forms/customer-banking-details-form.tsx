@@ -21,11 +21,7 @@ export function CustomerBankingDetailsForm({ control, customerId }: CustomerBank
   ];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Banking Details</CardTitle>
-        <CardDescription>Customer banking information</CardDescription>
-      </CardHeader>
+    <Card className="pt-3">
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput

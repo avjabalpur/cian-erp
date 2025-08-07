@@ -13,11 +13,7 @@ interface CustomerBusinessTermsFormProps {
 export function CustomerBusinessTermsForm({ control, customerId }: CustomerBusinessTermsFormProps) {
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Business Terms</CardTitle>
-        <CardDescription>Customer business terms and conditions</CardDescription>
-      </CardHeader>
+    <Card className="pt-3">
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput

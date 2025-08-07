@@ -2,19 +2,19 @@ import z from "zod"
 
 // Address schema - updated to match actual database structure
 export const addressSchema = z.object({
-  addressLine1: z.string().optional(),
+  addressLine1: z.string(),
   addressLine2: z.string().optional(),
   addressLine3: z.string().optional(),
-  city: z.string().optional(),
-  zipCode: z.string().optional(),
-  country: z.string().optional(),
+  city: z.string(),
+  zipCode: z.string(),
+  country: z.string(),
   stateCode: z.string().optional(),
   gstStateCode: z.string().optional(),
   contactPerson: z.string().optional(),
   telephoneNumber: z.string().optional(),
   mobileNumber: z.string().optional(),
   faxNumber: z.string().optional(),
-  emailId: z.string().optional(),
+  emailId: z.string().email(),
   website: z.string().optional(),
   isPrimary: z.boolean().optional(),
 });

@@ -1,191 +1,132 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useCustomerAddresses, useCreateCustomerAddress, useUpdateCustomerAddress, useDeleteCustomerAddress } from "@/hooks/customers/use-customer-addresses";
-import { CustomerAddress } from "@/types/customer-address";
-import { CustomerAddressDialog } from "./customer-address-dialog";
+import { FormInput } from "@/components/shared/forms/form-input";
+import { FormTextArea } from "@/components/shared/forms/form-text-area";
+import { FormCheckbox } from "@/components/shared/forms/form-checkbox";
+import { Control } from "react-hook-form";
+import { CustomerFormData } from "@/validations/customer";
 
 interface CustomerAddressFormProps {
+  control: Control<CustomerFormData>;
   customerId?: number;
 }
 
-export function CustomerAddressForm({ customerId }: CustomerAddressFormProps) {
-  const { toast } = useToast();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState<CustomerAddress | null>(null);
-
-  const { data: addresses = [], isLoading, refetch } = useCustomerAddresses(customerId || 0);
-  const createAddressMutation = useCreateCustomerAddress();
-  const updateAddressMutation = useUpdateCustomerAddress();
-  const deleteAddressMutation = useDeleteCustomerAddress();
-
-  const handleCreateAddress = () => {
-    setSelectedAddress(null);
-    setIsDialogOpen(true);
-  };
-
-  const handleEditAddress = (address: CustomerAddress) => {
-    setSelectedAddress(address);
-    setIsDialogOpen(true);
-  };
-
-  const handleDeleteAddress = async (address: CustomerAddress) => {
-    if (!customerId) return;
-
-    try {
-      await deleteAddressMutation.mutateAsync({ customerId, addressId: address.id });
-      toast({
-        title: "Success",
-        description: "Address deleted successfully",
-      });
-      refetch();
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.response?.data?.message || "Failed to delete address",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleSaveAddress = async (data: any) => {
-    if (!customerId) return;
-
-    try {
-      if (selectedAddress) {
-        await updateAddressMutation.mutateAsync({
-          customerId,
-          addressId: selectedAddress.id,
-          data: { ...data, customerId }
-        });
-        toast({
-          title: "Success",
-          description: "Address updated successfully",
-        });
-      } else {
-        await createAddressMutation.mutateAsync({
-          customerId,
-          data: { ...data, customerId }
-        });
-        toast({
-          title: "Success",
-          description: "Address created successfully",
-        });
-      }
-      setIsDialogOpen(false);
-      setSelectedAddress(null);
-      refetch();
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.response?.data?.message || "Failed to save address",
-        variant: "destructive",
-      });
-    }
-  };
-
+export function CustomerAddressForm({ control, customerId }: CustomerAddressFormProps) {
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>Addresses</CardTitle>
-            <CardDescription>
-              Manage customer addresses and contact information
-            </CardDescription>
-          </div>
-          <Button onClick={handleCreateAddress} size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Address
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {isLoading ? (
-          <div className="text-center py-4">Loading addresses...</div>
-        ) : addresses.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            No addresses found. Click "Add Address" to create one.
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {addresses.map((address) => (
-              <div key={address.id} className="border rounded-lg p-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h4 className="font-medium">
-                        {address.contactPerson || "No Contact Person"}
-                      </h4>
-                      {address.isPrimary && (
-                        <Badge variant="default">Primary</Badge>
-                      )}
-                    </div>
-                    
-                    <div className="space-y-1 text-sm text-muted-foreground">
-                      {address.addressLine1 && <div>{address.addressLine1}</div>}
-                      {address.addressLine2 && <div>{address.addressLine2}</div>}
-                      {address.addressLine3 && <div>{address.addressLine3}</div>}
-                      <div>
-                        {[address.city, address.stateCode, address.zipCode, address.country]
-                          .filter(Boolean)
-                          .join(", ")}
-                      </div>
-                      
-                      <div className="flex flex-wrap gap-4 mt-2">
-                        {address.telephoneNumber && (
-                          <div>📞 {address.telephoneNumber}</div>
-                        )}
-                        {address.mobileNumber && (
-                          <div>📱 {address.mobileNumber}</div>
-                        )}
-                        {address.emailId && (
-                          <div>✉️ {address.emailId}</div>
-                        )}
-                        {address.website && (
-                          <div>🌐 {address.website}</div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEditAddress(address)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteAddress(address)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
+    <Card className="pt-3">
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <FormInput
+            control={control}
+            name="addresses.0.contactPerson"
+            label="Contact Person"
+            placeholder="Enter contact person name"
+          />
 
-      <CustomerAddressDialog
-        isOpen={isDialogOpen}
-        onClose={() => {
-          setIsDialogOpen(false);
-          setSelectedAddress(null);
-        }}
-        address={selectedAddress}
-        onSave={handleSaveAddress}
-      />
+          <FormInput
+            control={control}
+            name="addresses.0.telephoneNumber"
+            label="Telephone Number"
+            placeholder="Enter telephone number"
+          />
+
+          <FormInput
+            control={control}
+            name="addresses.0.mobileNumber"
+            label="Mobile Number"
+            placeholder="Enter mobile number"
+          />
+
+          <FormInput
+            control={control}
+            name="addresses.0.emailId"
+            label="Email"
+            placeholder="Enter email address"
+            inputProps={{ type: "email" }}
+          />
+
+          <FormInput
+            control={control}
+            name="addresses.0.website"
+            label="Website"
+            placeholder="Enter website URL"
+          />
+
+          <FormInput
+            control={control}
+            name="addresses.0.faxNumber"
+            label="Fax Number"
+            placeholder="Enter fax number"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <FormInput
+            control={control}
+            name="addresses.0.addressLine1"
+            label="Address Line 1"
+            placeholder="Enter address line 1"
+          />
+
+          <FormInput
+            control={control}
+            name="addresses.0.addressLine2"
+            label="Address Line 2"
+            placeholder="Enter address line 2"
+          />
+
+          <FormInput
+            control={control}
+            name="addresses.0.addressLine3"
+            label="Address Line 3"
+            placeholder="Enter address line 3"
+          />
+
+          <FormInput
+            control={control}
+            name="addresses.0.city"
+            label="City"
+            placeholder="Enter city"
+          />
+
+          <FormInput
+            control={control}
+            name="addresses.0.stateCode"
+            label="State Code"
+            placeholder="Enter state code"
+          />
+
+          <FormInput
+            control={control}
+            name="addresses.0.zipCode"
+            label="ZIP Code"
+            placeholder="Enter ZIP code"
+          />
+
+          <FormInput
+            control={control}
+            name="addresses.0.country"
+            label="Country"
+            placeholder="Enter country"
+          />
+
+          <FormInput
+            control={control}
+            name="addresses.0.gstStateCode"
+            label="GST State Code"
+            placeholder="Enter GST state code"
+          />
+        </div>
+
+        <FormCheckbox
+          control={control}
+          name="addresses.0.isPrimary"
+          label="Primary Address"
+          description="Mark this as the primary address for the customer"
+          className="rounded-md border p-4"
+        />
+      </CardContent>
     </Card>
   );
 }

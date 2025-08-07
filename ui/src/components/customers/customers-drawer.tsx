@@ -316,7 +316,7 @@ export default function CustomersDrawer({
               </TabsContent>
 
               <TabsContent value="addresses" className="space-y-3">
-                <CustomerAddressForm customerId={currentCustomerId} />
+                <CustomerAddressForm control={form.control} customerId={currentCustomerId} />
               </TabsContent>
 
               <TabsContent value="banking" className="space-y-3">
