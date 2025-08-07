@@ -517,6 +517,7 @@ CREATE TABLE IF NOT EXISTS customer_types (
     requires_drug_license BOOLEAN DEFAULT FALSE,
     credit_terms_applicable BOOLEAN DEFAULT TRUE,
     is_active BOOLEAN DEFAULT TRUE,
+    is_deleted BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_by INTEGER,

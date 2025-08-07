@@ -54,6 +54,10 @@ export const salesOrderSchema = z.object({
   comments: z.string().optional(),
   assignedDesigner: z.number().optional(),
   plantEmailSent: z.boolean().optional(),
+  isSubmitted: z.boolean().optional(),
+  productCode: z.string().optional(),
+  country: z.string().optional(),
+  customerGstNo: z.string().optional(),
 });
 
 export type SalesOrderFormValues = z.infer<typeof salesOrderSchema>

@@ -79,6 +79,10 @@ export default function SalesOrdersManagement() {
     setDrawerOpen(true)
   }
 
+  const handleOpenInPage = (salesOrder: SalesOrder) => {
+    router.push(`/sales-order-approval/${salesOrder.id}`)
+  }
+
   const handleDelete = (salesOrder: SalesOrder) => {
     setSalesOrderToDelete(salesOrder)
     setDeleteDialogOpen(true)
@@ -123,11 +127,11 @@ export default function SalesOrdersManagement() {
   };
 
   const handleCopyLink = (salesOrder: SalesOrder) => {
-    const url = `${window.location.origin}/sales-orders/${salesOrder.id}`;
+    const url = `${window.location.origin}/sales/order-approval/${salesOrder.id}`;
     navigator.clipboard.writeText(url);
     toast({
       title: "Link copied",
-      description: "Sales order link copied to clipboard",
+      description: "Sales order approval link copied to clipboard",
     });
   };
 

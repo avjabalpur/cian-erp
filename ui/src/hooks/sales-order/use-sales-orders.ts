@@ -43,9 +43,9 @@ const createSalesOrderApproval = async (approvalData: { soStatus: string; dosage
   return data;
 };
 
-const updateSalesOrder = async ({ id, ...salesOrderData }: { id: string; data: UpdateSalesOrderData }): Promise<SalesOrder> => {
-  const { data } = await api.put(`/sales-order/${id}`, salesOrderData.data);
-  return data;
+const updateSalesOrder = async ({ id, data }: { id: string; data: UpdateSalesOrderData }): Promise<SalesOrder> => {
+  const { data: responseData } = await api.put(`/sales-order`, { ...data, id: parseInt(id) });
+  return responseData;
 };
 
 const deleteSalesOrder = async (id: string): Promise<void> => {

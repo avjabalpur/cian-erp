@@ -66,6 +66,9 @@ export interface SalesOrder {
   createdByName?: string;
   updatedBy?: number;
   updatedByName?: string;
+  productCode?: string;
+  country?: string;
+  customerGstNo?: string;
 }
 
 export interface SalesOrderStage {

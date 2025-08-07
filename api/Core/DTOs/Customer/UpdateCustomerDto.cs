@@ -2,7 +2,7 @@ using System;
 
 namespace Xcianify.Core.DTOs.Customer
 {
-    public class CreateCustomerDto
+    public class UpdateCustomerDto
     {
         public string LocationCode { get; set; } = string.Empty;
         public string CustomerNumber { get; set; } = string.Empty;
@@ -30,4 +30,4 @@ namespace Xcianify.Core.DTOs.Customer
         public string? Rebates { get; set; }
         public string? ExternalInformation { get; set; }
     }
-}
+} 

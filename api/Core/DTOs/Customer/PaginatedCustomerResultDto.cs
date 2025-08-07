@@ -1,4 +1,5 @@
 ﻿using Xcianify.Core.DTOs;
+using Xcianify.Core.DTOs.Customer;
 
 namespace Xcianify.Core.DTOs
 {

@@ -32,9 +32,9 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
         
         <FormInput
           control={control}
-          name="colour"
-          label="P Colour"
-          placeholder="Enter colour"
+          name="composition"
+          label="P Composition"
+          placeholder="Enter composition"
           disabled={disabled}
         />
         
@@ -104,14 +104,9 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
 
         <FormSelect
           control={control}
-          name="shelfLife"
-          label="P Shelf Life"
-          options={[
-            { label: "Select Shelf Life", value: "-1" },
-            { label: "12 Months", value: "12" },
-            { label: "24 Months", value: "24" },
-            { label: "36 Months", value: "36" }
-          ]}
+          name="drugApprovalUnder"
+          label="Drug Approval Under"
+          options={drugApprovalOptions}
           disabled={disabled}
         />
         
@@ -123,19 +118,19 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
           disabled={disabled}
         />
         
-        <FormInput
+        <FormSelect
           control={control}
           name="tabletSize"
           label="P Tablet Size"
-          placeholder="Enter tablet size"
+          options={tabletSizeOptions}
           disabled={disabled}
         />
         
-        <FormInput
+        <FormSelect
           control={control}
           name="changePart"
           label="P Change Part"
-          placeholder="Enter change part"
+          options={changePartOptions}
           disabled={disabled}
         />
         
@@ -157,9 +152,9 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
         
         <FormInput
           control={control}
-          name="cylinderPlateCharges"
-          label="Cylinder / Plate Charges"
-          placeholder="Enter cylinder/plate charges"
+          name="cylinderCharge"
+          label="Cylinder Charge"
+          placeholder="Enter cylinder charge"
           disabled={disabled}
         />
         
@@ -180,6 +175,150 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
           name="pmOuterCtnStock"
           label="PM Outer CTN Stock"
           placeholder="Enter outer CTN stock"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="plateCharges"
+          label="Plate Charges"
+          placeholder="Enter plate charges"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="stereo"
+          label="Stereo"
+          placeholder="Enter stereo"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="fragrance"
+          label="Fragrance"
+          placeholder="Enter fragrance"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="quantity"
+          label="Quantity"
+          placeholder="Enter quantity"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="focQty"
+          label="FOC Quantity"
+          placeholder="Enter FOC quantity"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="mrp"
+          label="MRP"
+          placeholder="Enter MRP"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="billingRate"
+          label="Billing Rate"
+          placeholder="Enter billing rate"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="capsuleSize"
+          label="Capsule Size"
+          placeholder="Enter capsule size"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="ctnInnerDrawingRefNo"
+          label="CTN Inner Drawing Ref No"
+          placeholder="Enter inner drawing ref"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="foilDrawingRefNo"
+          label="Foil Drawing Ref No"
+          placeholder="Enter foil drawing ref"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="leafletDrawingRefNo"
+          label="Leaflet Drawing Ref No"
+          placeholder="Enter leaflet drawing ref"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="tubeDrawingRefNo"
+          label="Tube Drawing Ref No"
+          placeholder="Enter tube drawing ref"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="labelDrawingRefNo"
+          label="Label Drawing Ref No"
+          placeholder="Enter label drawing ref"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="pmInnerCtnStock"
+          label="PM Inner CTN Stock"
+          placeholder="Enter inner CTN stock"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="pmFoilStock"
+          label="PM Foil Stock"
+          placeholder="Enter foil stock"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="pmLeafletStock"
+          label="PM Leaflet Stock"
+          placeholder="Enter leaflet stock"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="pmTubeStock"
+          label="PM Tube Stock"
+          placeholder="Enter tube stock"
+          disabled={disabled}
+        />
+        
+        <FormInput
+          control={control}
+          name="pmLabelStock"
+          label="PM Label Stock"
+          placeholder="Enter label stock"
           disabled={disabled}
         />
     </div>

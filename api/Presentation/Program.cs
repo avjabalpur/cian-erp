@@ -134,7 +134,9 @@ builder.Services.AddAutoMapper(
     typeof(ConfigSettingMapper),
     typeof(ProductGroupMapper),
      typeof(ProductTypeMapper),
-    typeof(DivisionMapper)
+    typeof(DivisionMapper),
+    typeof(CustomerMapper),
+    typeof(CustomerTypeMapper)
 );
 
 builder.Services.AddScoped<ILocationTypeRepository, LocationTypeRepository>();
@@ -229,6 +231,14 @@ builder.Services.AddScoped<ISalesOrderStageService, SalesOrderStageService>();
 // Register Dosage services and repositories
 builder.Services.AddScoped<IDosageRepository, DosageRepository>();
 builder.Services.AddScoped<IDosageService, DosageService>();
+
+// Register Customer services and repositories
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+
+// Register CustomerType services and repositories
+builder.Services.AddScoped<ICustomerTypeRepository, CustomerTypeRepository>();
+builder.Services.AddScoped<ICustomerTypeService, CustomerTypeService>();
 
 // Add Controllers
 builder.Services.AddControllers();
