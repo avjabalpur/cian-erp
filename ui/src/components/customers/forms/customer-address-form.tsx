@@ -59,9 +59,7 @@ export function CustomerAddressForm({ control, customerId }: CustomerAddressForm
             label="Fax Number"
             placeholder="Enter fax number"
           />
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormInput
             control={control}
             name="addresses.0.addressLine1"
@@ -117,7 +115,7 @@ export function CustomerAddressForm({ control, customerId }: CustomerAddressForm
             label="GST State Code"
             placeholder="Enter GST state code"
           />
-        </div>
+        
 
         <FormCheckbox
           control={control}
@@ -126,6 +124,7 @@ export function CustomerAddressForm({ control, customerId }: CustomerAddressForm
           description="Mark this as the primary address for the customer"
           className="rounded-md border p-4"
         />
+        </div>
       </CardContent>
     </Card>
   );

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import api from '@/lib/api';
 import { CustomerTaxCompliance, CreateCustomerTaxComplianceData, UpdateCustomerTaxComplianceData } from '@/types/customer-tax-compliance';
 
 // Get customer tax compliance by customer ID

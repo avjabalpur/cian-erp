@@ -119,11 +119,11 @@ export const getCustomerDefaultValues = () => ({
   continent: "",
   rebates: "",
   externalInformation: "",
-  // Related tables
-  addresses: [],
-  bankingDetails: [],
-  businessTerms: [],
-  taxCompliance: [],
+  // Related tables - provide empty objects for form fields to work
+  addresses: [{}],
+  bankingDetails: [{}],
+  businessTerms: [{}],
+  taxCompliance: [{}],
 });
 
 export const mapCustomerToFormData = (customer: any) => ({
@@ -152,11 +152,11 @@ export const mapCustomerToFormData = (customer: any) => ({
   continent: customer.continent || "",
   rebates: customer.rebates || "",
   externalInformation: customer.externalInformation || "",
-  // Related tables
-  addresses: customer.addresses || [],
-  bankingDetails: customer.bankingDetails || [],
-  businessTerms: customer.businessTerms || [],
-  taxCompliance: customer.taxCompliance || [],
+  // Related tables - ensure at least one object exists for each array
+  addresses: customer.addresses && customer.addresses.length > 0 ? customer.addresses : [{}],
+  bankingDetails: customer.bankingDetails && customer.bankingDetails.length > 0 ? customer.bankingDetails : [{}],
+  businessTerms: customer.businessTerms && customer.businessTerms.length > 0 ? customer.businessTerms : [{}],
+  taxCompliance: customer.taxCompliance && customer.taxCompliance.length > 0 ? customer.taxCompliance : [{}],
 });
 
 export const transformFormDataToApi = (formData: any) => ({
