@@ -21,7 +21,7 @@ interface ProductInfoFormProps {
 
 export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-4 gap-4">
         <FormInput
           control={control}
           name="costing"
