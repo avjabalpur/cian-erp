@@ -199,7 +199,7 @@ export function SalesOrderDrawer({
   };
 
   return (
-    <RightDrawer isOpen={isOpen} onClose={onClose} title="Sales Order Details" size="full">
+    <RightDrawer isOpen={isOpen} onClose={onClose} title={`Sales Order Approval | ${salesOrderId}`} size="full">
       {isLoading ? (
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
@@ -210,25 +210,19 @@ export function SalesOrderDrawer({
       ) : (
         <div className="flex h-full">
           {/* Main Content Area */}
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 flex flex-col">
             <FormProvider {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="h-full flex flex-col">
                 {/* Header */}
-                <div className="border-b p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-4">
-                      <Button variant="ghost" size="sm" onClick={onClose}>
-                        <ArrowLeft className="h-4 w-4" />
-                      </Button>
-                      <div>
-                        <h2 className="text-xl font-semibold">
-                          Sales Order Approval | {salesOrderId}
-                        </h2>
-                        <p className="text-sm text-muted-foreground">
-                          {salesOrder?.soNumber} - {salesOrder?.customerName}
-                        </p>
-                      </div>
+                <div className="border-b p-3">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">Current Status:</span>
+                      <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200">
+                        IN-PROGRESS
+                      </Badge>
                     </div>
+
                     <div className="flex items-center gap-2">
                       <Button variant="outline" size="sm" onClick={handleCopyLink}>
                         <Copy className="h-4 w-4 mr-2" />
@@ -246,11 +240,12 @@ export function SalesOrderDrawer({
                         <Settings className="h-4 w-4 mr-2" />
                         Tools
                       </Button>
-                      <Button variant="outline" size="sm" onClick={onClose}>
-                        Back
-                      </Button>
-                      <Button 
-                        size="sm" 
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">Email Sent</span>
+                        <Switch />
+                      </div>
+                      <Button
+                        size="sm"
                         type="submit"
                         disabled={updateSalesOrderMutation.isPending}
                       >
@@ -260,35 +255,13 @@ export function SalesOrderDrawer({
                     </div>
                   </div>
 
-                  {/* Form Actions */}
-                  <div className="flex items-center justify-between">
-                    <Button variant="outline" size="sm" className="border-dashed border-red-500 text-red-500">
-                      CANCEL FORM
-                    </Button>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm">Email Sent</span>
-                      <Switch />
-                    </div>
-                  </div>
 
-                  {/* Current Status */}
-                  <div className="flex items-center gap-4 mt-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">Current Status:</span>
-                      <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200">
-                        IN-PROGRESS
-                      </Badge>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      Request Changes
-                    </Button>
-                  </div>
                 </div>
 
                 {/* Content with Tabs */}
                 <div className="flex-1 flex flex-col">
-                  <Tabs defaultValue="basic-info" className="flex-1 flex flex-col">
-                    <div className="border-b px-4">
+                  <Tabs defaultValue="basic-info" className="border-0 flex-1 flex flex-col">
+                    <div className="px-3">
                       <TabsList className="grid w-full grid-cols-5">
                         <TabsTrigger value="basic-info">Basic Info</TabsTrigger>
                         <TabsTrigger value="compare-progen">Compare With Progen</TabsTrigger>
@@ -298,12 +271,11 @@ export function SalesOrderDrawer({
                       </TabsList>
                     </div>
 
-                    <div className="flex-1 overflow-auto p-4">
-                      <TabsContent value="basic-info" className="space-y-6 h-full">
-                        {/* Approval Buttons */}
+                    <div className="flex-1 p-3">
+                      <TabsContent value="basic-info" className="space-y-2 h-full">
                         <Card>
                           <CardHeader>
-                            <CardTitle>Approval Stages</CardTitle>
+                            <CardTitle className="text-lg font-semibold">Approval Stages</CardTitle>
                           </CardHeader>
                           <CardContent>
                             <ApprovalButtons
@@ -317,7 +289,7 @@ export function SalesOrderDrawer({
                         {/* Reference Documents */}
                         <Card>
                           <CardHeader>
-                            <CardTitle>Reference Documents</CardTitle>
+                            <CardTitle className="text-lg font-semibold">Reference Documents</CardTitle>
                           </CardHeader>
                           <CardContent>
                             <ReferenceDocuments
@@ -331,7 +303,7 @@ export function SalesOrderDrawer({
                         {/* SO Info Form */}
                         <Card>
                           <CardHeader>
-                            <CardTitle>SO Info</CardTitle>
+                            <CardTitle className="text-lg font-semibold">SO Info</CardTitle>
                           </CardHeader>
                           <CardContent>
                             <SOInfoForm
@@ -344,17 +316,17 @@ export function SalesOrderDrawer({
                         {/* Product Info Form */}
                         <Card>
                           <CardHeader>
-                            <CardTitle>Product Info</CardTitle>
+                            <CardTitle className="text-lg font-semibold">Product Info</CardTitle>
                           </CardHeader>
                           <CardContent>
-                            <div className="flex gap-6">
+                            <div className="flex gap-4">
                               <div className="flex-1">
                                 <ProductInfoForm
                                   control={form.control}
                                   disabled={updateSalesOrderMutation.isPending}
                                 />
                               </div>
-                              <div className="w-48">
+                              <div className="w-40">
                                 <MetricsDisplay
                                   marginPercentage={metricsData.marginPercentage}
                                   value={metricsData.value}

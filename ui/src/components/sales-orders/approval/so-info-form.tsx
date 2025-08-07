@@ -5,6 +5,7 @@ import { FormInput } from "@/components/shared/forms/form-input";
 import { FormTextArea } from "@/components/shared/forms/form-text-area";
 import { FormSelect } from "@/components/shared/forms/form-select";
 import { SalesOrderUpdateFormValues } from "@/validations/sales-order";
+import { soStatusOptions, paymentTermOptions } from "@/lib/utils/sales-order-utils";
 
 interface SOInfoFormProps {
   control: Control<SalesOrderUpdateFormValues>;
@@ -13,9 +14,7 @@ interface SOInfoFormProps {
 
 export function SOInfoForm({ control, disabled }: SOInfoFormProps) {
   return (
-    <div className="grid grid-cols-2 gap-6">
-      {/* Left Column */}
-      <div className="space-y-4">
+    <div className="grid grid-cols-3 gap-4">
         <FormInput
           control={control}
           name="soNumber"
@@ -66,10 +65,7 @@ export function SOInfoForm({ control, disabled }: SOInfoFormProps) {
           placeholder="Enter product name"
           disabled={disabled}
         />
-      </div>
-
-      {/* Right Column */}
-      <div className="space-y-4">
+    
         <FormInput
           control={control}
           name="soDate"
@@ -124,7 +120,7 @@ export function SOInfoForm({ control, disabled }: SOInfoFormProps) {
         
         <FormInput
           control={control}
-          name="productCode"
+          name="itemId"
           label="Product Code"
           placeholder="Enter product code"
           disabled={disabled}
@@ -141,7 +137,6 @@ export function SOInfoForm({ control, disabled }: SOInfoFormProps) {
           ]}
           disabled={disabled}
         />
-      </div>
     </div>
   );
 } 

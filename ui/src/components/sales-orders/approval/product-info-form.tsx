@@ -4,6 +4,15 @@ import { Control } from "react-hook-form";
 import { FormInput } from "@/components/shared/forms/form-input";
 import { FormSelect } from "@/components/shared/forms/form-select";
 import { SalesOrderUpdateFormValues } from "@/validations/sales-order";
+import { 
+  pShelfLifeOptions, 
+  pDominoOptions, 
+  tabletTypeOptions, 
+  tabletSizeOptions, 
+  changePartOptions, 
+  shipperSizeOptions, 
+  drugApprovalOptions 
+} from "@/lib/utils/sales-order-utils";
 
 interface ProductInfoFormProps {
   control: Control<SalesOrderUpdateFormValues>;
@@ -12,9 +21,7 @@ interface ProductInfoFormProps {
 
 export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
   return (
-    <div className="grid grid-cols-2 gap-6">
-      {/* Left Column */}
-      <div className="space-y-4">
+    <div className="grid grid-cols-3 gap-3">
         <FormInput
           control={control}
           name="costing"
@@ -39,11 +46,11 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
           disabled={disabled}
         />
         
-        <FormInput
+        <FormSelect
           control={control}
           name="tabletType"
           label="P Tablet Type"
-          placeholder="Enter tablet type"
+          options={tabletTypeOptions}
           disabled={disabled}
         />
         
@@ -51,12 +58,7 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
           control={control}
           name="shipperSize"
           label="P Shipper Size"
-          options={[
-            { label: "Select Shipper Size", value: "-1" },
-            { label: "Small", value: "SMALL" },
-            { label: "Medium", value: "MEDIUM" },
-            { label: "Large", value: "LARGE" }
-          ]}
+          options={shipperSizeOptions}
           disabled={disabled}
         />
         
@@ -78,13 +80,9 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
         
         <FormSelect
           control={control}
-          name="dominoStereo"
+          name="domino"
           label="Domino / Stereo"
-          options={[
-            { label: "Select Option", value: "-1" },
-            { label: "Domino", value: "DOMINO" },
-            { label: "Stereo", value: "STEREO" }
-          ]}
+          options={pDominoOptions}
           disabled={disabled}
         />
         
@@ -103,10 +101,7 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
           placeholder="Enter outer drawing ref"
           disabled={disabled}
         />
-      </div>
 
-      {/* Right Column */}
-      <div className="space-y-4">
         <FormSelect
           control={control}
           name="shelfLife"
@@ -187,7 +182,6 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
           placeholder="Enter outer CTN stock"
           disabled={disabled}
         />
-      </div>
     </div>
   );
 } 
