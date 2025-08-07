@@ -120,6 +120,11 @@ export const getCustomerDefaultValues = () => ({
   continent: "",
   rebates: "",
   externalInformation: "",
+  // Related tables
+  addresses: [],
+  bankingDetails: [],
+  businessTerms: [],
+  taxCompliance: [],
 });
 
 export const mapCustomerToFormData = (customer: any) => ({
@@ -140,18 +145,23 @@ export const mapCustomerToFormData = (customer: any) => ({
   otherLicenseNumber: customer.otherLicenseNumber || "",
   oldCode: customer.oldCode || "",
   customerLotNumber: customer.customerLotNumber || "",
-  stopInvoice: customer.stopInvoice || false,
-  isExportCustomer: customer.isExportCustomer || false,
-  isRegisteredDealer: customer.isRegisteredDealer || false,
-  isRecordClosed: customer.isRecordClosed || false,
+  stopInvoice: customer.stopInvoice ?? false,
+  isExportCustomer: customer.isExportCustomer ?? false,
+  isRegisteredDealer: customer.isRegisteredDealer ?? false,
+  isRecordClosed: customer.isRecordClosed ?? false,
   isActive: customer.isActive ?? true,
   continent: customer.continent || "",
   rebates: customer.rebates || "",
   externalInformation: customer.externalInformation || "",
+  // Related tables
+  addresses: customer.addresses || [],
+  bankingDetails: customer.bankingDetails || [],
+  businessTerms: customer.businessTerms || [],
+  taxCompliance: customer.taxCompliance || [],
 });
 
 export const transformFormDataToApi = (formData: any) => ({
-  locationCode: formData.locationCode || null,
+  locationCode: formData.locationCode,
   customerNumber: formData.customerNumber,
   customerCode: formData.customerCode,
   customerName: formData.customerName,

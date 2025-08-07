@@ -133,25 +133,9 @@ export default function CustomersManagement() {
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.back()}
-            className="flex items-center space-x-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Back</span>
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
-            <p className="text-muted-foreground">
-              Manage your customer information and related data
-            </p>
-          </div>
-        </div>
+        <h1 className="text-xl font-bold tracking-tight">Customers</h1>
         <Button onClick={handleCreateCustomer} className="flex items-center space-x-2">
           <Plus className="h-4 w-4" />
           <span>Add Customer</span>
@@ -159,13 +143,7 @@ export default function CustomersManagement() {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Customer Management</CardTitle>
-          <CardDescription>
-            View, create, edit, and delete customers with their complete information
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-4">
           <CustomersFilter
             filter={filter}
             onFilterChange={(newFilter) => {

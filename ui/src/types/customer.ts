@@ -30,6 +30,11 @@ export interface Customer {
   createdBy?: number;
   updatedBy?: number;
   isDeleted: boolean;
+  // Related tables
+  addresses?: CustomerAddress[];
+  bankingDetails?: CustomerBankingDetails[];
+  businessTerms?: CustomerBusinessTerms[];
+  taxCompliance?: CustomerTaxCompliance[];
 }
 
 export interface CustomerFilter {
@@ -46,8 +51,8 @@ export interface CustomerFilter {
   sortDescending: boolean;
 }
 
-export type CreateCustomerData = Omit<Customer, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy' | 'isDeleted'>;
+export type CreateCustomerData = Omit<Customer, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy' | 'isDeleted' | 'addresses' | 'bankingDetails' | 'businessTerms' | 'taxCompliance'>;
 
-export type UpdateCustomerData = Partial<Omit<Customer, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy' | 'isDeleted'>> & {
+export type UpdateCustomerData = Partial<Omit<Customer, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy' | 'isDeleted' | 'addresses' | 'bankingDetails' | 'businessTerms' | 'taxCompliance'>> & {
   id: number;
 };
