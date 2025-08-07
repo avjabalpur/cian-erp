@@ -1,10 +1,12 @@
 "use client";
 
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
-import { AdvancedTable } from "@/components/shared/advanced-table";
+import { Column } from "@/components/shared/advanced-table/types";
+import AdvancedTable from "@/components/shared/advanced-table";
 import { CustomerType } from "@/types/customer-type";
 import { formatDate } from "@/lib/date-utils";
 
@@ -22,6 +24,34 @@ interface CustomerTypesTableProps {
   onPaginationChange: (pageIndex: number, pageSize: number) => void;
 }
 
+// Action buttons renderer
+const ActionButtonsRenderer = ({ row, onEdit, onDelete }: { 
+  row: any; 
+  onEdit: (customerType: CustomerType) => void;
+  onDelete: (customerType: CustomerType) => void;
+}) => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => onEdit(row)}>
+          <Edit className="mr-2 h-4 w-4" />
+          Edit
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onDelete(row)}>
+          <Trash2 className="mr-2 h-4 w-4" />
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
 export default function CustomerTypesTable({
   customerTypes,
   isLoading,
@@ -30,91 +60,115 @@ export default function CustomerTypesTable({
   pagination,
   onPaginationChange,
 }: CustomerTypesTableProps) {
-  const columnMeta = [
-    {
-      accessorKey: "code",
-      header: "Code",
-      cell: ({ row }: any) => (
-        <div className="font-medium">{row.original.code}</div>
-      ),
+  const columnMeta: Column[] = useMemo(() => [
+    { 
+      name: 'code', 
+      data_type: 'string', 
+      description: 'Code', 
+      isDefault: true,
+      displayName: 'Code',
+      render: (value: string) => (
+        <div className="font-medium">{value || "-"}</div>
+      )
     },
-    {
-      accessorKey: "name",
-      header: "Name",
-      cell: ({ row }: any) => (
-        <div className="font-medium">{row.original.name}</div>
-      ),
+    { 
+      name: 'name', 
+      data_type: 'string', 
+      description: 'Name', 
+      isDefault: true,
+      displayName: 'Name',
+      render: (value: string) => (
+        <div className="font-medium">{value || "-"}</div>
+      )
     },
-    {
-      accessorKey: "description",
-      header: "Description",
-      cell: ({ row }: any) => (
-        <div>{row.original.description || "-"}</div>
-      ),
+    { 
+      name: 'description', 
+      data_type: 'string', 
+      description: 'Description', 
+      isDefault: true,
+      displayName: 'Description',
+      render: (value: string) => (
+        <div>{value || "-"}</div>
+      )
     },
-    {
-      accessorKey: "isActive",
-      header: "Status",
-      cell: ({ row }: any) => (
-        <Badge variant={row.original.isActive ? "default" : "secondary"}>
-          {row.original.isActive ? "Active" : "Inactive"}
+    { 
+      name: 'isActive', 
+      data_type: 'boolean', 
+      description: 'Status', 
+      isDefault: true,
+      displayName: 'Status',
+      render: (value: boolean) => (
+        <Badge variant={value ? "default" : "secondary"}>
+          {value ? "Active" : "Inactive"}
         </Badge>
-      ),
+      )
     },
-    {
-      accessorKey: "createdAt",
-      header: "Created Date",
-      cell: ({ row }: any) => (
-        <div>{formatDate(row.original.createdAt)}</div>
-      ),
+    { 
+      name: 'createdAt', 
+      data_type: 'date', 
+      description: 'Created Date', 
+      isDefault: true,
+      displayName: 'Created Date',
+      render: (value: string) => (
+        <div>{formatDate(value)}</div>
+      )
     },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }: any) => {
-        const customerType = row.original;
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onEdit(customerType)}>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onDelete(customerType)}>
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
+    { 
+      name: 'actions', 
+      data_type: 'string', 
+      description: 'Actions', 
+      isDefault: true,
+      displayName: 'Actions',
+      render: (value: any, row: any) => (
+        <ActionButtonsRenderer 
+          row={row} 
+          onEdit={onEdit} 
+          onDelete={onDelete} 
+        />
+      )
     },
-  ];
+  ], [onEdit, onDelete]);
 
+  const actionButtons = {
+    onEdit: onEdit,
+    onDelete: onDelete,
+    customActions: [
+      {
+        label: 'Edit',
+        icon: Edit,
+        onClick: onEdit,
+        variant: 'outline' as const,
+      },
+      ...(onDelete ? [{
+        label: 'Delete',
+        icon: Trash2,
+        onClick: onDelete,
+        variant: 'destructive' as const,
+      }] : []),
+    ]
+  };
   return (
-    <AdvancedTable
-      data={customerTypes}
-      columnMeta={columns}
-      isLoading={isLoading}
-      pagination={pagination}
-      onPaginationChange={onPaginationChange}
-      searchPlaceholder="Search customer types..."
-      enableSearch={false}
-      enableColumnFilters={false}
-      enableSorting={true}
-      enableColumnResizing={true}
-      enableRowSelection={false}
-      enableGrouping={false}
-      enableDensityToggle={true}
-      enableFullScreenToggle={true}
-      enableExport={true}
-      exportFileName="customer-types"
-    />
+    <div className="w-full">
+      <AdvancedTable
+        data={customerTypes}
+        columnMeta={columnMeta}
+        isLoading={isLoading}
+        groupingEnabled={false}
+        globalFilterEnabled={true}
+        dragDropGroupingEnabled={false}
+        onRowClick={onEdit}
+        className="w-full"
+        // Server-side pagination
+        manualPagination={true}
+        pageCount={pagination.pageCount}
+        pageSize={pagination.pageSize}
+        pageIndex={pagination.pageIndex}
+        totalCount={pagination.totalCount}
+        onPaginationChange={onPaginationChange}
+        // Server-side filtering and sorting
+        manualFiltering={false}
+        manualSorting={true}
+      />
+    </div>
   );
 }

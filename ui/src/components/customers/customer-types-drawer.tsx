@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useCreateCustomerType, useUpdateCustomerType } from "@/hooks/customers/use-customer-types";
 import { RightDrawer } from "@/components/shared/right-drawer";
-import { CustomerTypeForm } from "./forms/customer-type-form";
 import { CustomerType, CreateCustomerTypeData, UpdateCustomerTypeData } from "@/types/customer-type";
-import { CustomerTypeFormData, customerTypeSchema } from "@/validations/customer-type";
+import { customerTypeSchema, CustomerTypeFormData } from "@/validations/customer-type";
 import { getCustomerTypeDefaultValues, mapCustomerTypeToFormData, transformFormDataToApi } from "@/lib/utils/customer-type-utils";
+import { CustomerTypeForm } from "./forms/customer-type-form";
 
 interface CustomerTypesDrawerProps {
   isOpen: boolean;
@@ -30,7 +30,7 @@ export default function CustomerTypesDrawer({
   const createCustomerTypeMutation = useCreateCustomerType();
   const updateCustomerTypeMutation = useUpdateCustomerType();
 
-  const form = useForm<CustomerTypeFormData>({
+  const form = useForm<CustomerType>({
     resolver: zodResolver(customerTypeSchema),
     defaultValues: getCustomerTypeDefaultValues(),
   });
@@ -54,7 +54,7 @@ export default function CustomerTypesDrawer({
       if (customerType) {
         // Update existing customer type
         const updateData: UpdateCustomerTypeData = {
-          id: customerType.id,
+          id: customerType.id.toString(),
           ...transformFormDataToApi(data),
         };
         
@@ -102,7 +102,7 @@ export default function CustomerTypesDrawer({
     >
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <CustomerTypeForm />
+          <CustomerTypeForm customerType={customerType} />
 
           <div className="flex justify-end space-x-2 pt-6 border-t">
             <Button type="button" variant="outline" onClick={handleClose}>

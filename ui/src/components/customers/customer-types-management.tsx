@@ -10,7 +10,6 @@ import { useCustomerTypes, useDeleteCustomerType } from "@/hooks/customers/use-c
 import { useQueryState } from "nuqs";
 import { customerTypeFilterParsers } from "@/lib/utils/customer-type-utils";
 import CustomerTypesTable from "./customer-types-table";
-import CustomerTypesFilter from "./customer-types-filter";
 import CustomerTypesDrawer from "./customer-types-drawer";
 import { CustomerTypeFilter, CustomerType } from "@/types/customer-type";
 
@@ -64,7 +63,7 @@ export default function CustomerTypesManagement() {
 
   const handleDeleteCustomerType = async (customerType: CustomerType) => {
     try {
-      await deleteCustomerTypeMutation.mutateAsync(customerType.id);
+      await deleteCustomerTypeMutation.mutateAsync(customerType.id.toString());
       toast({
         title: "Success",
         description: "Customer type deleted successfully",
@@ -90,24 +89,10 @@ export default function CustomerTypesManagement() {
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.back()}
-            className="flex items-center space-x-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Back</span>
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Customer Types</h1>
-            <p className="text-muted-foreground">
-              Manage customer types and categories
-            </p>
-          </div>
+          <h1 className="text-3xl font-bold tracking-tight">Customer Types</h1>
         </div>
         <Button onClick={handleCreateCustomerType} className="flex items-center space-x-2">
           <Plus className="h-4 w-4" />
@@ -115,25 +100,7 @@ export default function CustomerTypesManagement() {
         </Button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Customer Type Management</CardTitle>
-          <CardDescription>
-            View, create, edit, and delete customer types
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <CustomerTypesFilter
-            filter={filter}
-            onFilterChange={(newFilter) => {
-              setPage(1);
-              setSearch(newFilter.search);
-              setCode(newFilter.code);
-              setName(newFilter.name);
-              setIsActive(newFilter.isActive);
-            }}
-          />
-          <CustomerTypesTable
+      <CustomerTypesTable
             customerTypes={customerTypes}
             isLoading={isLoading}
             onEdit={handleEditCustomerType}
@@ -146,8 +113,6 @@ export default function CustomerTypesManagement() {
             }}
             onPaginationChange={handlePaginationChange}
           />
-        </CardContent>
-      </Card>
 
       <CustomerTypesDrawer
         isOpen={drawerOpen}

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Edit, Trash2, Eye } from "lucide-react";
-import { AdvancedTableWrapper } from "@/components/shared/advanced-table";
+import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import { Column } from "@/components/shared/advanced-table/types";
+import AdvancedTable from "@/components/shared/advanced-table";
 import { Customer } from "@/types/customer";
 import { getCustomerTypeLabel, getSegmentLabel, getExportTypeLabel, getContinentLabel, getCustomerSaleTypeLabel } from "@/lib/utils/customer-utils";
 import { formatDate } from "@/lib/date-utils";
@@ -24,6 +25,34 @@ interface CustomersTableProps {
   onPaginationChange: (pageIndex: number, pageSize: number) => void;
 }
 
+// Action buttons renderer
+const ActionButtonsRenderer = ({ row, onEdit, onDelete }: { 
+  row: any; 
+  onEdit: (customer: Customer) => void;
+  onDelete: (customer: Customer) => void;
+}) => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => onEdit(row)}>
+          <Edit className="mr-2 h-4 w-4" />
+          Edit
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onDelete(row)}>
+          <Trash2 className="mr-2 h-4 w-4" />
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
 export default function CustomersTable({
   customers,
   isLoading,
@@ -32,116 +61,129 @@ export default function CustomersTable({
   pagination,
   onPaginationChange,
 }: CustomersTableProps) {
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-
-  const columns = [
-    {
-      accessorKey: "customerCode",
-      header: "Customer Code",
-      cell: ({ row }: any) => (
-        <div className="font-medium">{row.original.customerCode}</div>
-      ),
+  const columnMeta: Column[] = useMemo(() => [
+    { 
+      name: 'customerCode', 
+      data_type: 'string', 
+      description: 'Customer Code', 
+      isDefault: true,
+      displayName: 'Customer Code',
+      render: (value: string) => (
+        <div className="font-medium">{value || "-"}</div>
+      )
     },
-    {
-      accessorKey: "customerName",
-      header: "Customer Name",
-      cell: ({ row }: any) => (
-        <div className="font-medium">{row.original.customerName}</div>
-      ),
+    { 
+      name: 'customerName', 
+      data_type: 'string', 
+      description: 'Customer Name', 
+      isDefault: true,
+      displayName: 'Customer Name',
+      render: (value: string) => (
+        <div className="font-medium">{value || "-"}</div>
+      )
     },
-    {
-      accessorKey: "shortName",
-      header: "Short Name",
-      cell: ({ row }: any) => (
-        <div>{row.original.shortName || "-"}</div>
-      ),
+    { 
+      name: 'shortName', 
+      data_type: 'string', 
+      description: 'Short Name', 
+      isDefault: true,
+      displayName: 'Short Name',
+      render: (value: string) => (
+        <div>{value || "-"}</div>
+      )
     },
-    {
-      accessorKey: "customerTypeCode",
-      header: "Customer Type",
-      cell: ({ row }: any) => (
-        <div>{row.original.customerTypeCode ? getCustomerTypeLabel(row.original.customerTypeCode) : "-"}</div>
-      ),
+    { 
+      name: 'customerTypeCode', 
+      data_type: 'string', 
+      description: 'Customer Type', 
+      isDefault: true,
+      displayName: 'Customer Type',
+      render: (value: string) => (
+        <div>{value ? getCustomerTypeLabel(value) : "-"}</div>
+      )
     },
-    {
-      accessorKey: "gstin",
-      header: "GSTIN",
-      cell: ({ row }: any) => (
-        <div>{row.original.gstin || "-"}</div>
-      ),
+    { 
+      name: 'gstin', 
+      data_type: 'string', 
+      description: 'GSTIN', 
+      isDefault: true,
+      displayName: 'GSTIN',
+      render: (value: string) => (
+        <div>{value || "-"}</div>
+      )
     },
-    {
-      accessorKey: "isActive",
-      header: "Status",
-      cell: ({ row }: any) => (
-        <Badge variant={row.original.isActive ? "default" : "secondary"}>
-          {row.original.isActive ? "Active" : "Inactive"}
+    { 
+      name: 'isActive', 
+      data_type: 'boolean', 
+      description: 'Status', 
+      isDefault: true,
+      displayName: 'Status',
+      render: (value: boolean) => (
+        <Badge variant={value ? "default" : "secondary"}>
+          {value ? "Active" : "Inactive"}
         </Badge>
-      ),
+      )
     },
-    {
-      accessorKey: "isExportCustomer",
-      header: "Export Customer",
-      cell: ({ row }: any) => (
-        <Badge variant={row.original.isExportCustomer ? "default" : "outline"}>
-          {row.original.isExportCustomer ? "Yes" : "No"}
+    { 
+      name: 'isExportCustomer', 
+      data_type: 'boolean', 
+      description: 'Export Customer', 
+      isDefault: true,
+      displayName: 'Export Customer',
+      render: (value: boolean) => (
+        <Badge variant={value ? "default" : "outline"}>
+          {value ? "Yes" : "No"}
         </Badge>
-      ),
+      )
     },
-    {
-      accessorKey: "createdAt",
-      header: "Created Date",
-      cell: ({ row }: any) => (
-        <div>{formatDate(row.original.createdAt)}</div>
-      ),
+    { 
+      name: 'createdAt', 
+      data_type: 'date', 
+      description: 'Created Date', 
+      isDefault: true,
+      displayName: 'Created Date',
+      render: (value: string) => (
+        <div>{formatDate(value)}</div>
+      )
     },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }: any) => {
-        const customer = row.original;
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onEdit(customer)}>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onDelete(customer)}>
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
+    { 
+      name: 'actions', 
+      data_type: 'string', 
+      description: 'Actions', 
+      isDefault: true,
+      displayName: 'Actions',
+      render: (value: any, row: any) => (
+        <ActionButtonsRenderer 
+          row={row} 
+          onEdit={onEdit} 
+          onDelete={onDelete} 
+        />
+      )
     },
-  ];
+  ], [onEdit, onDelete]);
 
   return (
-    <AdvancedTableWrapper
-      data={customers}
-      columns={columns}
-      isLoading={isLoading}
-      pagination={pagination}
-      onPaginationChange={onPaginationChange}
-      searchPlaceholder="Search customers..."
-      enableSearch={false}
-      enableColumnFilters={false}
-      enableSorting={true}
-      enableColumnResizing={true}
-      enableRowSelection={false}
-      enableGrouping={false}
-      enableDensityToggle={true}
-      enableFullScreenToggle={true}
-      enableExport={true}
-      exportFileName="customers"
-    />
+    <div className="w-full">
+      <AdvancedTable
+        data={customers}
+        columnMeta={columnMeta}
+        isLoading={isLoading}
+        groupingEnabled={false}
+        globalFilterEnabled={true}
+        dragDropGroupingEnabled={false}
+        onRowClick={onEdit}
+        className="w-full"
+        // Server-side pagination
+        manualPagination={true}
+        pageCount={pagination.pageCount}
+        pageSize={pagination.pageSize}
+        pageIndex={pagination.pageIndex}
+        totalCount={pagination.totalCount}
+        onPaginationChange={onPaginationChange}
+        // Server-side filtering and sorting
+        manualFiltering={false}
+        manualSorting={true}
+      />
+    </div>
   );
 }
