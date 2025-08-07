@@ -228,7 +228,7 @@ export default function CustomersDrawer({
       console.log('Transformed data:', transformedData);
 
       let createdCustomerId: number = 0;
-
+debugger;
       if (customer) {
         const result = await updateCustomerMutation.mutateAsync({
           id: customer.id.toString(),

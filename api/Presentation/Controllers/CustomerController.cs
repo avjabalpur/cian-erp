@@ -118,27 +118,21 @@ namespace Xcianify.Presentation.Controllers
         [HttpPost("{customerId}/addresses")]
         public async Task<IActionResult> CreateAddress(int customerId, [FromBody] CreateCustomerAddressDto createDto)
         {
-            var userId = CurrentUserId;
-            if (userId <= 0)
-                return Unauthorized(new { message = "Invalid user" });
-
+         
             createDto.CustomerId = customerId;
-            var result = await _customerAddressService.CreateAsync(createDto, userId);
+            var result = await _customerAddressService.CreateAsync(createDto, CurrentUserId);
             return CreatedAtAction(nameof(GetAddressById), new { customerId, id = result.Id }, result);
         }
 
         [HttpPut("{customerId}/addresses/{id}")]
         public async Task<IActionResult> UpdateAddress(int customerId, int id, [FromBody] UpdateCustomerAddressDto updateDto)
         {
-            var userId = CurrentUserId;
-            if (userId <= 0)
-                return Unauthorized(new { message = "Invalid user" });
 
             var address = await _customerAddressService.GetByIdAsync(id);
             if (address == null || address.CustomerId != customerId)
                 return NotFound();
 
-            var result = await _customerAddressService.UpdateAsync(id, updateDto, userId);
+            var result = await _customerAddressService.UpdateAsync(id, updateDto, CurrentUserId);
             return Ok(result);
         }
 
@@ -177,27 +171,20 @@ namespace Xcianify.Presentation.Controllers
         [HttpPost("{customerId}/banking-details")]
         public async Task<IActionResult> CreateBankingDetails(int customerId, [FromBody] CreateCustomerBankingDetailsDto createDto)
         {
-            var userId = CurrentUserId;
-            if (userId <= 0)
-                return Unauthorized(new { message = "Invalid user" });
-
             createDto.CustomerId = customerId;
-            var result = await _customerBankingDetailsService.CreateAsync(createDto, userId);
+            var result = await _customerBankingDetailsService.CreateAsync(createDto, CurrentUserId);
             return CreatedAtAction(nameof(GetBankingDetailsById), new { customerId, id = result.Id }, result);
         }
 
         [HttpPut("{customerId}/banking-details/{id}")]
         public async Task<IActionResult> UpdateBankingDetails(int customerId, int id, [FromBody] UpdateCustomerBankingDetailsDto updateDto)
         {
-            var userId = CurrentUserId;
-            if (userId <= 0)
-                return Unauthorized(new { message = "Invalid user" });
 
             var bankingDetails = await _customerBankingDetailsService.GetByIdAsync(id);
             if (bankingDetails == null || bankingDetails.CustomerId != customerId)
                 return NotFound();
 
-            var result = await _customerBankingDetailsService.UpdateAsync(id, updateDto, userId);
+            var result = await _customerBankingDetailsService.UpdateAsync(id, updateDto, CurrentUserId);
             return Ok(result);
         }
 
@@ -236,27 +223,21 @@ namespace Xcianify.Presentation.Controllers
         [HttpPost("{customerId}/business-terms")]
         public async Task<IActionResult> CreateBusinessTerms(int customerId, [FromBody] CreateCustomerBusinessTermsDto createDto)
         {
-            var userId = CurrentUserId;
-            if (userId <= 0)
-                return Unauthorized(new { message = "Invalid user" });
+      
 
             createDto.CustomerId = customerId;
-            var result = await _customerBusinessTermsService.CreateAsync(createDto, userId);
+            var result = await _customerBusinessTermsService.CreateAsync(createDto, CurrentUserId);
             return CreatedAtAction(nameof(GetBusinessTermsById), new { customerId, id = result.Id }, result);
         }
 
         [HttpPut("{customerId}/business-terms/{id}")]
         public async Task<IActionResult> UpdateBusinessTerms(int customerId, int id, [FromBody] UpdateCustomerBusinessTermsDto updateDto)
         {
-            var userId = CurrentUserId;
-            if (userId <= 0)
-                return Unauthorized(new { message = "Invalid user" });
-
             var businessTerms = await _customerBusinessTermsService.GetByIdAsync(id);
             if (businessTerms == null || businessTerms.CustomerId != customerId)
                 return NotFound();
 
-            var result = await _customerBusinessTermsService.UpdateAsync(id, updateDto, userId);
+            var result = await _customerBusinessTermsService.UpdateAsync(id, updateDto, CurrentUserId);
             return Ok(result);
         }
 
@@ -295,27 +276,19 @@ namespace Xcianify.Presentation.Controllers
         [HttpPost("{customerId}/tax-compliance")]
         public async Task<IActionResult> CreateTaxCompliance(int customerId, [FromBody] CreateCustomerTaxComplianceDto createDto)
         {
-            var userId = CurrentUserId;
-            if (userId <= 0)
-                return Unauthorized(new { message = "Invalid user" });
-
             createDto.CustomerId = customerId;
-            var result = await _customerTaxComplianceService.CreateAsync(createDto, userId);
+            var result = await _customerTaxComplianceService.CreateAsync(createDto, CurrentUserId);
             return CreatedAtAction(nameof(GetTaxComplianceById), new { customerId, id = result.Id }, result);
         }
 
         [HttpPut("{customerId}/tax-compliance/{id}")]
         public async Task<IActionResult> UpdateTaxCompliance(int customerId, int id, [FromBody] UpdateCustomerTaxComplianceDto updateDto)
         {
-            var userId = CurrentUserId;
-            if (userId <= 0)
-                return Unauthorized(new { message = "Invalid user" });
-
             var taxCompliance = await _customerTaxComplianceService.GetByIdAsync(id);
             if (taxCompliance == null || taxCompliance.CustomerId != customerId)
                 return NotFound();
 
-            var result = await _customerTaxComplianceService.UpdateAsync(id, updateDto, userId);
+            var result = await _customerTaxComplianceService.UpdateAsync(id, updateDto, CurrentUserId);
             return Ok(result);
         }
 

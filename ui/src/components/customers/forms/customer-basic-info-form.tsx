@@ -8,12 +8,13 @@ import { FormTextArea } from "@/components/shared/forms/form-text-area";
 import { Control } from "react-hook-form";
 import { CustomerFormData } from "@/validations/customer";
 import { 
-  customerTypeOptions, 
   segmentOptions, 
   exportTypeOptions, 
   continentOptions, 
   customerSaleTypeOptions 
 } from "@/lib/utils/customer-utils";
+import { useCustomerTypeOptions } from "@/components/shared/options/customer-type-options";
+import { useLocationTypeOptions } from "@/components/shared/options/location-type-options";
 
 interface CustomerBasicInfoFormProps {
   control: Control<CustomerFormData>;
@@ -21,17 +22,30 @@ interface CustomerBasicInfoFormProps {
 }
 
 export function CustomerBasicInfoForm({ control, customerId }: CustomerBasicInfoFormProps) {
+  const customerTypeOptions = useCustomerTypeOptions();
+  const locationTypeOptions = useLocationTypeOptions();
+
   return (
     <Card className="pt-3">
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
-          <FormInput
+          <FormSelect
             control={control}
             name="locationCode"
             label="Location Code"
-            placeholder="Enter location code"
+            options={locationTypeOptions}
+            placeholder="Select location code"
             required
           />
+
+<FormSelect
+            control={control}
+            name="customerSaleType"
+            label="Customer Sale Type"
+            options={customerSaleTypeOptions}
+            placeholder="Select sale type"
+          />
+          
 
           <FormInput
             control={control}
@@ -94,13 +108,7 @@ export function CustomerBasicInfoForm({ control, customerId }: CustomerBasicInfo
             placeholder="Enter PAN number"
           />
 
-          <FormSelect
-            control={control}
-            name="customerSaleType"
-            label="Customer Sale Type"
-            options={customerSaleTypeOptions}
-            placeholder="Select sale type"
-          />
+         
 
           <FormSelect
             control={control}
@@ -122,6 +130,14 @@ export function CustomerBasicInfoForm({ control, customerId }: CustomerBasicInfo
             name="drugLicenseNumber"
             label="Drug License Number"
             placeholder="Enter drug license number"
+          />
+
+          <FormInput
+            control={control}
+            name="drugLicenseExpiryDate"
+            label="Drug License Expiry Date"
+            placeholder="Enter expiry date"
+            inputProps={{ type: "date" }}
           />
 
           <FormInput
