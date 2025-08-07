@@ -68,6 +68,10 @@ export const getCustomerTypeDefaultValues = () => ({
   code: "",
   name: "",
   description: "",
+  isExportType: false,
+  isDomesticType: true,
+  requiresDrugLicense: false,
+  creditTermsApplicable: false,
   isActive: true,
 });
 
@@ -75,6 +79,10 @@ export const mapCustomerTypeToFormData = (customerType: any) => ({
   code: customerType.code || "",
   name: customerType.name || "",
   description: customerType.description || "",
+  isExportType: customerType.isExportType ?? false,
+  isDomesticType: customerType.isDomesticType ?? true,
+  requiresDrugLicense: customerType.requiresDrugLicense ?? false,
+  creditTermsApplicable: customerType.creditTermsApplicable ?? false,
   isActive: customerType.isActive ?? true,
 });
 
@@ -82,5 +90,9 @@ export const transformFormDataToApi = (formData: any) => ({
   code: formData.code,
   name: formData.name,
   description: formData.description || null,
+  isExportType: formData.isExportType,
+  isDomesticType: formData.isDomesticType,
+  requiresDrugLicense: formData.requiresDrugLicense,
+  creditTermsApplicable: formData.creditTermsApplicable,
   isActive: formData.isActive,
 }); 

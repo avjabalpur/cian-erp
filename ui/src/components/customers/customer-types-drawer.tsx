@@ -30,7 +30,7 @@ export default function CustomerTypesDrawer({
   const createCustomerTypeMutation = useCreateCustomerType();
   const updateCustomerTypeMutation = useUpdateCustomerType();
 
-  const form = useForm<CustomerType>({
+  const form = useForm<CustomerTypeFormData>({
     resolver: zodResolver(customerTypeSchema),
     defaultValues: getCustomerTypeDefaultValues(),
   });
@@ -54,11 +54,10 @@ export default function CustomerTypesDrawer({
       if (customerType) {
         // Update existing customer type
         const updateData: UpdateCustomerTypeData = {
-          id: customerType.id.toString(),
           ...transformFormDataToApi(data),
         };
         
-        await updateCustomerTypeMutation.mutateAsync(updateData);
+        await updateCustomerTypeMutation.mutateAsync({ id: customerType.id.toString(), ...updateData });
         toast({
           title: "Success",
           description: "Customer type updated successfully",
@@ -67,7 +66,7 @@ export default function CustomerTypesDrawer({
         // Create new customer type
         const createData: CreateCustomerTypeData = transformFormDataToApi(data);
         
-        const newCustomerType = await createCustomerTypeMutation.mutateAsync(createData);
+        await createCustomerTypeMutation.mutateAsync(createData);
         toast({
           title: "Success",
           description: "Customer type created successfully",
@@ -102,7 +101,7 @@ export default function CustomerTypesDrawer({
     >
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <CustomerTypeForm customerType={customerType} />
+          <CustomerTypeForm />
 
           <div className="flex justify-end space-x-2 pt-6 border-t">
             <Button type="button" variant="outline" onClick={handleClose}>
