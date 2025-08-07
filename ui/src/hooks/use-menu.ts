@@ -158,6 +158,22 @@ const allMenuItems: MenuItem[] = [
       
     ],
   },
+   {
+    id: "customer-master",
+    label: "customer Master",
+    href: "/customer-master",
+    icon: Package,
+    roles: ["SUPER_ADMIN", "ADMIN"],
+    children: [ 
+      {
+        id: "customer",
+        label: "customer",
+        href: "/customer-master",
+        icon: Package,
+        roles: ["SUPER_ADMIN", "ADMIN"],
+      },
+    ],
+  },
   {
     id: "sales",
     label: "Sales",
