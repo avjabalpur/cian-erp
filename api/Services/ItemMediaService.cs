@@ -49,7 +49,17 @@ namespace Xcianify.Services
 
         public async Task<ItemMediaDto> CreateAsync(CreateItemMediaDto createDto, int userId)
         {
-            var entity = _mapper.Map<ItemMedia>(createDto);
+            // Create entity manually instead of using AutoMapper to avoid validation issues
+            var entity = new ItemMedia
+            {
+                ItemId = createDto.ItemId,
+                MediaType = createDto.MediaType,
+                Description = createDto.Description ?? string.Empty,
+                CreatedBy = userId,
+                UpdatedBy = userId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
             
             // Handle file upload if file is provided
             if (createDto.File != null)
@@ -61,6 +71,15 @@ namespace Xcianify.Services
                 entity.MimeType = fileInfo.MimeType;
                 entity.MediaUrl = fileInfo.MediaUrl;
                 entity.MediaType = GetMediaType(fileInfo.FileExtension);
+            }
+            else
+            {
+                // Set default values for required fields if no file
+                entity.FileName = string.Empty;
+                entity.FileExtension = string.Empty;
+                entity.MimeType = string.Empty;
+                entity.MediaUrl = string.Empty;
+                entity.MediaType = createDto.MediaType ?? "other";
             }
             
             var id = await _repository.CreateAsync(entity);
@@ -74,9 +93,18 @@ namespace Xcianify.Services
             if (existing == null)
                 throw new NotFoundException("ItemMedia not found");
             
-            var entity = _mapper.Map<ItemMedia>(updateDto);
-            entity.Id = id;
-            entity.ItemId = existing.ItemId; // Preserve the original ItemId
+            // Create entity manually instead of using AutoMapper
+            var entity = new ItemMedia
+            {
+                Id = id,
+                ItemId = existing.ItemId, // Preserve the original ItemId
+                MediaType = updateDto.MediaType ?? existing.MediaType,
+                Description = updateDto.Description ?? existing.Description ?? string.Empty,
+                CreatedBy = existing.CreatedBy, // Preserve original creator
+                CreatedAt = existing.CreatedAt, // Preserve original creation date
+                UpdatedBy = userId,
+                UpdatedAt = DateTime.UtcNow
+            };
             
             // Handle file upload if new file is provided
             if (updateDto.File != null)
@@ -98,12 +126,12 @@ namespace Xcianify.Services
             else
             {
                 // Preserve existing file info if no new file
-                entity.FileName = existing.FileName;
-                entity.FileExtension = existing.FileExtension;
+                entity.FileName = existing.FileName ?? string.Empty;
+                entity.FileExtension = existing.FileExtension ?? string.Empty;
                 entity.FileSizeBytes = existing.FileSizeBytes;
-                entity.MimeType = existing.MimeType;
-                entity.MediaUrl = existing.MediaUrl;
-                entity.MediaType = existing.MediaType;
+                entity.MimeType = existing.MimeType ?? string.Empty;
+                entity.MediaUrl = existing.MediaUrl ?? string.Empty;
+                entity.MediaType = existing.MediaType ?? "other";
             }
                    
             var success = await _repository.UpdateAsync(entity);
@@ -129,7 +157,7 @@ namespace Xcianify.Services
                 throw new ArgumentException("File is empty or null");
 
             // Generate unique filename
-            var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            var fileExtension = Path.GetExtension(file.FileName ?? "unknown").ToLowerInvariant();
             var fileName = $"{Guid.NewGuid()}{fileExtension}";
             var filePath = Path.Combine(_uploadPath, fileName);
             
@@ -142,20 +170,23 @@ namespace Xcianify.Services
             // Generate URL (adjust base URL as needed)
             var mediaUrl = $"/uploads/item-media/{fileName}";
             
-            return (fileName, fileExtension, file.Length, file.ContentType, mediaUrl);
+            return (fileName, fileExtension, file.Length, file.ContentType ?? "application/octet-stream", mediaUrl);
         }
 
-        private void DeleteFile(string mediaUrl)
+        private void DeleteFile(string? mediaUrl)
         {
             try
             {
                 if (!string.IsNullOrEmpty(mediaUrl))
                 {
                     var fileName = Path.GetFileName(mediaUrl);
-                    var filePath = Path.Combine(_uploadPath, fileName);
-                    if (File.Exists(filePath))
+                    if (!string.IsNullOrEmpty(fileName))
                     {
-                        File.Delete(filePath);
+                        var filePath = Path.Combine(_uploadPath, fileName);
+                        if (File.Exists(filePath))
+                        {
+                            File.Delete(filePath);
+                        }
                     }
                 }
             }
@@ -165,8 +196,11 @@ namespace Xcianify.Services
             }
         }
 
-        private string GetMediaType(string fileExtension)
+        private string GetMediaType(string? fileExtension)
         {
+            if (string.IsNullOrEmpty(fileExtension))
+                return "other";
+                
             return fileExtension.ToLowerInvariant() switch
             {
                 ".jpg" or ".jpeg" or ".png" or ".gif" or ".bmp" => "image",

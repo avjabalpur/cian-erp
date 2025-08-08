@@ -113,9 +113,11 @@ namespace Xcianify.Repository
         {
             const string query = @"
                 INSERT INTO item_other_details (
-                    item_id, pack_short, product_cast, pvc_color, color, flavour, fragrance, form, packaging_style, change_part, size, with_leaflet, with_applicator, with_wad, with_silica, with_cotton, with_measuring_cap, with_spoon, packing_np, packing_np_qty, packing_style_ptd, packing_style_ptd_qty, note_per_strip, pack_short_ptd_spec, pack_short_ptd_size, pack_short_ptd_qty, packing_style_np_size, packing_style_np_qty, note_for_ctn, outer_size, outer_qty, shrink, shrink_packing, shipper_size, qty_per_shipper, shipper_note
+                    item_id, pack_short, product_cast, pvc_color, color, flavour, fragrance, form, packaging_style, change_part, size, with_leaflet, with_applicator, with_wad, with_silica, with_cotton, with_measuring_cap, with_spoon, packing_np, packing_np_qty, packing_style_ptd, packing_style_ptd_qty, note_per_strip, pack_short_ptd_spec, pack_short_ptd_size, pack_short_ptd_qty, packing_style_np_size, packing_style_np_qty, note_for_ctn, outer_size, outer_qty, shrink, shrink_packing, shipper_size, qty_per_shipper, shipper_note,
+                    created_at, updated_at, created_by, updated_by
                 ) VALUES (
-                    @ItemId, @PackShort, @ProductCast, @PvcColor, @Color, @Flavour, @Fragrance, @Form, @PackagingStyle, @ChangePart, @Size, @WithLeaflet, @WithApplicator, @WithWad, @WithSilica, @WithCotton, @WithMeasuringCap, @WithSpoon, @PackingNp, @PackingNpQty, @PackingStylePtd, @PackingStylePtdQty, @NotePerStrip, @PackShortPtdSpec, @PackShortPtdSize, @PackShortPtdQty, @PackingStyleNpSize, @PackingStyleNpQty, @NoteForCtn, @OuterSize, @OuterQty, @Shrink, @ShrinkPacking, @ShipperSize, @QtyPerShipper, @ShipperNote
+                    @ItemId, @PackShort, @ProductCast, @PvcColor, @Color, @Flavour, @Fragrance, @Form, @PackagingStyle, @ChangePart, @Size, @WithLeaflet, @WithApplicator, @WithWad, @WithSilica, @WithCotton, @WithMeasuringCap, @WithSpoon, @PackingNp, @PackingNpQty, @PackingStylePtd, @PackingStylePtdQty, @NotePerStrip, @PackShortPtdSpec, @PackShortPtdSize, @PackShortPtdQty, @PackingStyleNpSize, @PackingStyleNpQty, @NoteForCtn, @OuterSize, @OuterQty, @Shrink, @ShrinkPacking, @ShipperSize, @QtyPerShipper, @ShipperNote,
+                    @CreatedAt, @UpdatedAt, @CreatedBy, @UpdatedBy
                 ) RETURNING id;";
             using var connection = _dbContext.GetConnection();
             return await connection.ExecuteScalarAsync<int>(query, entity);
@@ -158,7 +160,9 @@ namespace Xcianify.Repository
                 shrink_packing = @ShrinkPacking,
                 shipper_size = @ShipperSize,
                 qty_per_shipper = @QtyPerShipper,
-                shipper_note = @ShipperNote
+                shipper_note = @ShipperNote,
+                updated_at = @UpdatedAt,
+                updated_by = @UpdatedBy
             WHERE id = @Id;";
             using var connection = _dbContext.GetConnection();
             return await connection.ExecuteAsync(query, entity) > 0;

@@ -17,7 +17,7 @@ namespace Xcianify.Presentation.Controllers
                     
                     return userId;
                 }
-                return 2;
+                return 0;
             }
         }
 

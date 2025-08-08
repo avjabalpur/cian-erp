@@ -119,7 +119,7 @@ export default function ItemsDrawer({
       const specData = { 
         itemId,
         specification: formData.itemSpecification,
-        substituteItemFor: formData.substituteItemFor,
+        SubstituteForItemCode: formData.SubstituteForItemCode,
         customTariffNo: formData.customTariffNo,
         exciseTariffNo: formData.exciseTariffNo,
         vatCommCode: formData.vatCommCode,

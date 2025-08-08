@@ -72,11 +72,13 @@ namespace Xcianify.Repository
             const string query = @"INSERT INTO item_export_details (
                 export_description, export_product_group_code, export_product_group_name, 
                 depb_rate_list_srl_no, depb_rate, depb_value_cap, depb_remarks, 
-                drawback_srl_no, drawback_rate, drawback_rate_type, drawback_value_cap, drawback_remarks,item_id
+                drawback_srl_no, drawback_rate, drawback_rate_type, drawback_value_cap, drawback_remarks,item_id,
+                created_at, updated_at, created_by, updated_by
             ) VALUES (
                 @ItemDescriptionForExports, @ExportProductGroupCode, @ExportProductGroupName,
                 @DepbRateListSrlNo, @DepbRate, @DepbValueCap, @DepbRemarks,
-                @DutyDrawbackSrlNo , @DutyDrawbackRate , @DutyDrawbackRateType , @DutyDrawbackValueCap , @DutyDrawbackRemarks,@ItemId
+                @DutyDrawbackSrlNo, @DutyDrawbackRate , @DutyDrawbackRateType , @DutyDrawbackValueCap , @DutyDrawbackRemarks,@ItemId,
+                @CreatedAt, @UpdatedAt, @CreatedBy, @UpdatedBy
             ) RETURNING id;";
             
             using var connection = _dbContext.GetConnection();
@@ -100,7 +102,9 @@ UPDATE item_export_details SET
     drawback_rate = @DutyDrawbackRate,
     drawback_rate_type = @DutyDrawbackRateType,
     drawback_value_cap = @DutyDrawbackValueCap,
-    drawback_remarks = @DutyDrawbackRemarks
+    drawback_remarks = @DutyDrawbackRemarks,
+    updated_at = @UpdatedAt,
+    updated_by = @UpdatedBy
 WHERE id = @Id;";
 
             using var connection = _dbContext.GetConnection();

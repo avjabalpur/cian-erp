@@ -425,7 +425,7 @@ export const itemMasterSchema = z.object({
 
   // Specifications
   itemSpecification: z.string().optional(),
-  substituteItemFor: z.string().optional(),
+  SubstituteForItemCode: z.string().optional(),
   customTariffNo: z.string().optional(),
   exciseTariffNo: z.string().optional(),
   vatCommCode: z.string().optional(),

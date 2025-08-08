@@ -42,6 +42,10 @@ namespace Xcianify.Services
             try
             {
                 var entity = _mapper.Map<ItemExportDetails>(createDto);
+                entity.CreatedBy = userId;
+                entity.UpdatedBy = userId;
+                entity.CreatedAt = DateTime.UtcNow;
+                entity.UpdatedAt = DateTime.UtcNow;
               
                var id = await _repository.CreateAsync(entity);
                entity.Id = id;
@@ -60,8 +64,8 @@ namespace Xcianify.Services
             if (existing == null)
                 throw new NotFoundException("ItemExportDetails not found");
             var entity = _mapper.Map(updateDto, existing);
-            //entity.UpdatedBy = userId;
-            //entity.UpdatedAt = DateTime.UtcNow;
+            entity.UpdatedBy = userId;
+            entity.UpdatedAt = DateTime.UtcNow;
             await _repository.UpdateAsync(entity);
             return _mapper.Map<ItemExportDetailsDto>(entity);
         }

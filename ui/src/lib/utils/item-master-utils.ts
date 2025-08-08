@@ -252,7 +252,7 @@ export const getItemMasterDefaultValues = (): ItemMasterFormData => ({
     dutyDrawbackRemarks: "",
   // Specifications
   itemSpecification: "",
-  substituteItemFor: "",
+  SubstituteForItemCode: "",
   customTariffNo: "",
   exciseTariffNo: "",
   vatCommCode: "",
@@ -386,7 +386,7 @@ export const mapItemToFormData = (item: any): ItemMasterFormData => {
     specs: item.salesDetail?.specs || "",
     // Map specification data
     itemSpecification: item.specification?.specification || "",
-    substituteItemFor: item.specification?.substituteForItemCode || "",
+    SubstituteForItemCode: item.specification?.substituteForItemCode || "",
     customTariffNo: item.specification?.customTariffNo || "",
     exciseTariffNo: item.specification?.exciseTariffNo || "",
     vatCommCode: item.specification?.vatCommCode || "",
@@ -538,7 +538,7 @@ export const transformFormDataToApi = (data: ItemMasterFormData) => {
   // Remove nested form fields from the main item data
   const {
     itemSpecification,
-    substituteItemFor,
+    SubstituteForItemCode,
     customTariffNo,
     exciseTariffNo,
     vatCommCode,
@@ -672,9 +672,9 @@ export const transformFormDataToApi = (data: ItemMasterFormData) => {
       specs,
     } : undefined,
     // Include specification data if any fields are filled
-    specification: (itemSpecification || substituteItemFor || customTariffNo || exciseTariffNo || vatCommCode || convFactor || oldCode || standardWeight || standardConversionCostFactor || standardPackingCostFactor || costFactorPercent || packingCostRs) ? {
+    specification: (itemSpecification || SubstituteForItemCode || customTariffNo || exciseTariffNo || vatCommCode || convFactor || oldCode || standardWeight || standardConversionCostFactor || standardPackingCostFactor || costFactorPercent || packingCostRs) ? {
       specification: itemSpecification,
-        SubstituteForItemCode: substituteItemFor || "N/A",
+        SubstituteForItemCode: SubstituteForItemCode || "N/A",
         CustomTariffNo: customTariffNo || "",
         ExciseTariffNo: exciseTariffNo || "",
         VatCommCode: vatCommCode || "",

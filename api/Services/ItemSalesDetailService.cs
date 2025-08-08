@@ -61,10 +61,10 @@ namespace Xcianify.Services
                     throw new ValidationException("Sales detail already exists for this item");
 
                 var salesDetail = _mapper.Map<ItemSalesDetail>(dto);
-                //salesDetail.CreatedBy = userId;
-                //salesDetail.UpdatedBy = userId;
-                //salesDetail.CreatedAt = DateTime.UtcNow;
-                //salesDetail.UpdatedAt = DateTime.UtcNow;
+                salesDetail.CreatedBy = userId;
+                salesDetail.UpdatedBy = userId;
+                salesDetail.CreatedAt = DateTime.UtcNow;
+                salesDetail.UpdatedAt = DateTime.UtcNow;
 
                 var createdDetail = await _salesDetailRepository.CreateAsync(salesDetail);
                 return _mapper.Map<ItemSalesDetailDto>(createdDetail);

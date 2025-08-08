@@ -80,9 +80,8 @@ namespace Xcianify.Services
                 {
                     var stockAnalysis = _mapper.Map<ItemStockAnalysis>(dto);
                     _logger.LogInformation("AutoMapper mapping successful");
-                    // Don't set created_by and updated_by to avoid foreign key constraint issues
-                    // stockAnalysis.CreatedBy = userId;
-                    // stockAnalysis.UpdatedBy = userId;
+                    stockAnalysis.CreatedBy = userId;
+                    stockAnalysis.UpdatedBy = userId;
                     stockAnalysis.CreatedAt = DateTime.UtcNow;
                     stockAnalysis.UpdatedAt = DateTime.UtcNow;
                     
@@ -99,9 +98,8 @@ namespace Xcianify.Services
                     var stockAnalysis = new ItemStockAnalysis
                     {
                         ItemId = dto.ItemId,
-                        // Don't set created_by and updated_by to avoid foreign key constraint issues
-                        // CreatedBy = userId,
-                        // UpdatedBy = userId,
+                        CreatedBy = userId,
+                        UpdatedBy = userId,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     };
@@ -141,13 +139,12 @@ namespace Xcianify.Services
                 // Get existing stock analysis
                 var existingAnalysis = await _stockAnalysisRepository.GetByIdAsync(id);
                 if (existingAnalysis == null)
-                    throw new NotFoundException("Stock analysis not found");
+                   throw new NotFoundException("Stock analysis not found");
 
                 // Update fields from DTO
                 _mapper.Map(dto, existingAnalysis);
-                // Don't set updated_by to avoid foreign key constraint issues
-                // existingAnalysis.UpdatedBy = userId;
                 existingAnalysis.UpdatedAt = DateTime.UtcNow;
+                existingAnalysis.UpdatedBy = userId;
 
                 var success = await _stockAnalysisRepository.UpdateAsync(existingAnalysis);
                 if (!success)

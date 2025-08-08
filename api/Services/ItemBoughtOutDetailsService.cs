@@ -48,11 +48,11 @@ namespace Xcianify.Services
                 throw new ArgumentException("Item not found");
 
             var boughtOutDetails = _mapper.MapToEntity(createDto);
-            //boughtOutDetails.ItemId = createDto.ItemId;
-            //boughtOutDetails.CreatedBy = userId;
-            //boughtOutDetails.UpdatedBy = userId;
-            //boughtOutDetails.CreatedAt = DateTime.UtcNow;
-            //boughtOutDetails.UpdatedAt = DateTime.UtcNow;
+            boughtOutDetails.ItemId = createDto.ItemId;
+            boughtOutDetails.CreatedBy = userId;
+            boughtOutDetails.UpdatedBy = userId;
+            boughtOutDetails.CreatedAt = DateTime.UtcNow;
+            boughtOutDetails.UpdatedAt = DateTime.UtcNow;
 
             var result = await _itemBoughtOutDetailsRepository.CreateAsync(boughtOutDetails);
             return _mapper.MapToDto(result);
@@ -67,10 +67,10 @@ namespace Xcianify.Services
             var boughtOutDetails = _mapper.MapToEntity(updateDto);
             boughtOutDetails.Id = id;
             boughtOutDetails.ItemId = existingDetails.ItemId;
-            //boughtOutDetails.CreatedBy = existingDetails.CreatedBy; // Preserve original creator
-            //boughtOutDetails.CreatedAt = existingDetails.CreatedAt; // Preserve original creation date
-            //boughtOutDetails.UpdatedBy = userId;
-            //boughtOutDetails.UpdatedAt = DateTime.UtcNow;
+            boughtOutDetails.CreatedBy = existingDetails.CreatedBy; // Preserve original creator
+            boughtOutDetails.CreatedAt = existingDetails.CreatedAt; // Preserve original creation date
+            boughtOutDetails.UpdatedBy = userId;
+            boughtOutDetails.UpdatedAt = DateTime.UtcNow;
 
             var success = await _itemBoughtOutDetailsRepository.UpdateAsync(boughtOutDetails);
             if (!success)

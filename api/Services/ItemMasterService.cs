@@ -133,7 +133,7 @@ namespace Xcianify.Services
             return itemDto;
         }
 
-        public async Task<ItemMasterDto> CreateItemAsync(CreateItemMasterDto createDto)
+        public async Task<ItemMasterDto> CreateItemAsync(CreateItemMasterDto createDto, int userId)
         {
             // Check if item code already exists
             if (await _itemMasterRepository.ItemCodeExistsAsync(createDto.ItemCode))
@@ -148,8 +148,9 @@ namespace Xcianify.Services
                 // Create the item master
                 var item = _mapper.Map<ItemMaster>(createDto);
                 item.CreatedAt = DateTime.UtcNow;
-                item.CreatedBy = 1; // TODO: Get from current user context
-                item.UpdatedBy = 1; 
+                item.UpdatedAt = DateTime.UtcNow;
+                item.CreatedBy = userId; // TODO: Get from current user context
+                item.UpdatedBy = userId; 
 
                 var createdItem = await _itemMasterRepository.AddAsync(item);
 
@@ -158,8 +159,8 @@ namespace Xcianify.Services
                 {
                     var specification = _mapper.Map<ItemSpecification>(createDto.Specification);
                     specification.ItemId = createdItem.Id;
-                    specification.CreatedBy = 1; // TODO: Get from current user context
-                    specification.UpdatedBy = 1;
+                    specification.CreatedBy = userId; // TODO: Get from current user context
+                    specification.UpdatedBy = userId;
                     specification.CreatedAt = DateTime.UtcNow;
                     specification.UpdatedAt = DateTime.UtcNow;
                     
@@ -170,42 +171,42 @@ namespace Xcianify.Services
                 if (createDto.SalesDetail != null)
                 {
                     createDto.SalesDetail.ItemId = createdItem.Id;
-                    await _itemSalesDetailService.CreateAsync(createDto.SalesDetail, 1);
+                    await _itemSalesDetailService.CreateAsync(createDto.SalesDetail, userId);
                 }
 
                 // Create export details if provided
                 if (createDto.ExportDetails != null)
                 {
                     createDto.ExportDetails.ItemId = createdItem.Id;
-                    await _itemExportDetailsService.CreateAsync(createDto.ExportDetails, 1);
+                    await _itemExportDetailsService.CreateAsync(createDto.ExportDetails, userId);
                 }
 
                 // Create stock analysis if provided
                 if (createDto.StockAnalysis != null)
                 {
                     createDto.StockAnalysis.ItemId = createdItem.Id;
-                    await _itemStockAnalysisService.CreateAsync(createDto.StockAnalysis, 1);
+                    await _itemStockAnalysisService.CreateAsync(createDto.StockAnalysis, userId);
                 }
 
                 // Create bought out details if provided
                 if (createDto.BoughtOutDetails != null)
                 {
                     createDto.BoughtOutDetails.ItemId = createdItem.Id;
-                    await _itemBoughtOutDetailsService.CreateAsync(createDto.BoughtOutDetails, 1);
+                    await _itemBoughtOutDetailsService.CreateAsync(createDto.BoughtOutDetails, userId);
                 }
 
                 // Create other details if provided
                 if (createDto.OtherDetails != null)
                 {
                     createDto.OtherDetails.ItemId = createdItem.Id;
-                    await _itemOtherDetailsService.CreateAsync(createDto.OtherDetails, 1);
+                    await _itemOtherDetailsService.CreateAsync(createDto.OtherDetails, userId);
                 }
 
                 // Create media if provided
                 if (createDto.Media != null)
                 {
                     createDto.Media.ItemId = createdItem.Id;
-                    await _itemMediaService.CreateAsync(createDto.Media, 1);
+                    await _itemMediaService.CreateAsync(createDto.Media, userId);
                 }
                
                 // Get the created item without related data to avoid exceptions
@@ -222,7 +223,7 @@ namespace Xcianify.Services
             }
         }
 
-        public async Task<ItemMasterDto> UpdateItemAsync(int id, UpdateItemMasterDto updateDto)
+        public async Task<ItemMasterDto> UpdateItemAsync(int id, UpdateItemMasterDto updateDto, int userId)
         {
             var existingItem = await _itemMasterRepository.GetByIdAsync(id);
             if (existingItem == null)
@@ -231,10 +232,10 @@ namespace Xcianify.Services
             }
 
             // Check if item code already exists (excluding current item)
-            if (await _itemMasterRepository.ItemCodeExistsAsync(updateDto.ItemCode) && existingItem.ItemCode != updateDto.ItemCode)
-            {
-                throw new ValidationException("An item with this code already exists.");
-            }
+            //if (await _itemMasterRepository.ItemCodeExistsAsync(updateDto.ItemCode) && existingItem.ItemCode != updateDto.ItemCode)
+            //{
+            //    throw new ValidationException("An item with this code already exists.");
+            //}
 
             using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
             
@@ -244,7 +245,7 @@ namespace Xcianify.Services
                 var item = _mapper.Map<ItemMaster>(updateDto);
                 item.Id = id;
                 item.UpdatedAt = DateTime.UtcNow;
-                item.UpdatedBy = 1; // TODO: Get from current user context
+                item.UpdatedBy = userId; // TODO: Get from current user context
 
                 await _itemMasterRepository.UpdateAsync(item);
 
@@ -258,10 +259,10 @@ namespace Xcianify.Services
                         // Create new specification if it doesn't exist
                         var specification = _mapper.Map<ItemSpecification>(updateDto.Specification);
                         specification.ItemId = id;
-                        specification.CreatedBy = 1; // TODO: Get from current user context
-                        specification.UpdatedBy = 1;
-                        //specification.CreatedAt = DateTime.UtcNow;
-                        //specification.UpdatedAt = DateTime.UtcNow;
+                        specification.CreatedBy = userId; // TODO: Get from current user context
+                        specification.UpdatedBy = userId;
+                        specification.CreatedAt = DateTime.UtcNow;
+                        specification.UpdatedAt = DateTime.UtcNow;
                         
                         await _itemSpecificationRepository.CreateAsync(specification);
                     }
@@ -271,8 +272,8 @@ namespace Xcianify.Services
                         var specification = _mapper.Map<ItemSpecification>(updateDto.Specification);
                         specification.Id = existingSpecification.Id;
                         specification.ItemId = id;
-                        //specification.UpdatedBy = 1; // TODO: Get from current user context
-                        //specification.UpdatedAt = DateTime.UtcNow;
+                        specification.UpdatedBy = userId; // TODO: Get from current user context
+                        specification.UpdatedAt = DateTime.UtcNow;
                         
                         await _itemSpecificationRepository.UpdateAsync(specification);
                     }

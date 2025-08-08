@@ -122,13 +122,13 @@ namespace Xcianify.Repository
                 using var connection = _dbContext.GetConnection();
                 var query = @"
     INSERT INTO item_sales_details (
-        item_id, pack_size_applicable, default_pack_size, saleable_unit_contains,
+        item_id, pack_size_applicable, default_pack_size, saleable_unit_contains,   
         qty_per_box, boxes_per_case, case_packing_type, packing_rate,
         qty_per_case, net_weight_case, tare_weight_case, gross_weight_case,
         gross_weight_unit, case_dimensions_inches, case_volume_cft, case_dimensions_cm,
         case_volume_cbm, min_sale_rate, min_so_qty, tertiary_gtin,
-        secondary_gtin, primary_gtin, min_batch_qty_autoloading, consider_as_new_product_till,
-        interface_code, specs
+        secondary_gtin, primary_gtin, min_batch_qty_autoloading, consider_as_new_product_till, interface_code, specs,
+        created_at, updated_at, created_by, updated_by
     )
     VALUES (
         @ItemId, @PackSizeApplicable, @DefaultPackSize, @SaleableUnitContains,
@@ -137,7 +137,8 @@ namespace Xcianify.Repository
         @GrossWeightUnit, @CaseDimensionsInches, @CaseVolumeCft, @CaseDimensionsCm,
         @CaseVolumeCbm, @MinSaleRate, @MinSoQty, @TertiaryGtin,
         @SecondaryGtin, @PrimaryGtin, @MinBatchQtyAutoloading, @ConsiderAsNewProductTill,
-        @InterfaceCode, @Specs
+        @InterfaceCode, @Specs,
+        @CreatedAt, @UpdatedAt, @CreatedBy, @UpdatedBy
     )
     RETURNING id;";
 
@@ -184,7 +185,9 @@ namespace Xcianify.Repository
                         min_batch_qty_autoloading = @MinBatchQtyAutoloading,
                         consider_as_new_product_till = @ConsiderAsNewProductTill,
                         interface_code = @InterfaceCode,
-                        specs = @Specs
+                        specs = @Specs,
+                        updated_at = @UpdatedAt,
+                        updated_by = @UpdatedBy
                     WHERE id = @Id";
 
                 _logger.LogInformation($"Executing UPDATE for sales detail ID: {salesDetail.Id}");
@@ -204,8 +207,8 @@ namespace Xcianify.Repository
             try
             {
                 using var connection = _dbContext.GetConnection();
-                var query = @"DELETE FROM item_sales_details WHERE id = @Id";
-                var affectedRows = await connection.ExecuteAsync(query, new { Id = id });
+                var query = @"UPDATE item_sales_details SET is_deleted = true, updated_at = @UpdatedAt WHERE id = @Id";
+                var affectedRows = await connection.ExecuteAsync(query, new { Id = id, UpdatedAt = DateTime.UtcNow });
                 return affectedRows > 0;
             }
             catch (Exception ex)

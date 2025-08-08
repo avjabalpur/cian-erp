@@ -194,7 +194,7 @@ export function ItemMediaForm({ control, itemId, mediaData }: ItemMediaFormProps
               options={mediaTypeOptions}
             />
             <div className="space-y-3">
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
                 <div className="flex-1">
                   <label className="text-[12px] font-medium">File</label>
                   <input
@@ -207,7 +207,7 @@ export function ItemMediaForm({ control, itemId, mediaData }: ItemMediaFormProps
                 <Button
                   type="button"
                   disabled={!selectedFile || uploading}
-                  className="px-4 py-2 h-[42px] bg-blue-600 hover:bg-blue-700 text-white"
+                  className="px-4 py-4 h-[42px] bg-blue-600 hover:bg-blue-700 text-white mt-5"
                   title={!selectedFile ? "Please select a file first" : ""}
                   onClick={() => {
                     console.log('Button clicked - selectedFile:', selectedFile, 'itemId:', itemId, 'uploading:', uploading);
@@ -243,7 +243,7 @@ export function ItemMediaForm({ control, itemId, mediaData }: ItemMediaFormProps
                       </div>
           </CardContent>
         </Card>
-      ) 
+    
       
       {/* Media List */}
       <Card>

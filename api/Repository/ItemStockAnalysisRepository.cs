@@ -40,9 +40,10 @@ namespace Xcianify.Repository
                         updated_at as UpdatedAt,
                         created_by as CreatedBy,
                         updated_by as UpdatedBy,
-                        is_active as IsActive
+                        is_active as IsActive,
+                        is_deleted as IsDeleted
                     FROM item_stock_analysis 
-                    WHERE id = @Id";
+                    WHERE id = @Id AND (is_deleted = false OR is_deleted IS NULL)";
                 
                 return await connection.QueryFirstOrDefaultAsync<ItemStockAnalysis>(query, new { Id = id });
             }
@@ -70,9 +71,10 @@ namespace Xcianify.Repository
                         updated_at as UpdatedAt,
                         created_by as CreatedBy,
                         updated_by as UpdatedBy,
-                        is_active as IsActive
+                        is_active as IsActive,
+                        is_deleted as IsDeleted
                     FROM item_stock_analysis 
-                    WHERE item_id = @ItemId";
+                    WHERE item_id = @ItemId AND (is_deleted = false OR is_deleted IS NULL)";
                 
                 return await connection.QueryFirstOrDefaultAsync<ItemStockAnalysis>(query, new { ItemId = itemMasterId });
             }
@@ -92,11 +94,11 @@ namespace Xcianify.Repository
                     INSERT INTO item_stock_analysis
                    (item_id, abc_consumption_value, xyz_stock_value, 
                    fsn_movement, ved_analysis, created_at, updated_at, 
-                   created_by, updated_by, is_active)
+                   created_by, updated_by, is_active, is_deleted)
                  VALUES 
                 (@ItemId, @AbcConsumptionValue, @XyzStockValue, 
                 @FsnMovement, @VedAnalysis, @CreatedAt, @UpdatedAt, 
-                @CreatedBy, @UpdatedBy, @IsActive)
+                @CreatedBy, @UpdatedBy, @IsActive, @IsDeleted)
                  RETURNING id;";
 
                 var id = await connection.ExecuteScalarAsync<int>(query, stockAnalysis);
@@ -142,8 +144,8 @@ namespace Xcianify.Repository
             try
             {
                 using var connection = _dbContext.GetConnection();
-                var query = @"DELETE FROM ""item_stock_analysis"" WHERE id = @Id";
-                var affectedRows = await connection.ExecuteAsync(query, new { Id = id });
+                var query = @"UPDATE item_stock_analysis SET is_deleted = true, updated_at = @UpdatedAt WHERE id = @Id";
+                var affectedRows = await connection.ExecuteAsync(query, new { Id = id, UpdatedAt = DateTime.UtcNow });
                 return affectedRows > 0;
             }
             catch (Exception ex)
@@ -158,7 +160,7 @@ namespace Xcianify.Repository
             try
             {
                 using var connection = _dbContext.GetConnection();
-                var query = "SELECT COUNT(*) FROM item_stock_analysis WHERE item_id = @ItemId";
+                var query = "SELECT COUNT(*) FROM item_stock_analysis WHERE item_id = @ItemId AND (is_deleted = false OR is_deleted IS NULL)";
                 
                 if (excludeId.HasValue)
                 {

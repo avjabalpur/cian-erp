@@ -61,10 +61,12 @@ namespace Xcianify.Repository
             const string query = @"
                 INSERT INTO item_media (
                     item_id, media_type, file_name, file_extension, file_size_bytes, 
-                    mime_type, media_url, description
+                    mime_type, media_url, description,
+                    created_at, updated_at, created_by, updated_by
                 ) VALUES (
                     @ItemId, @MediaType, @FileName, @FileExtension, @FileSizeBytes, 
-                    @MimeType, @MediaUrl, @Description
+                    @MimeType, @MediaUrl, @Description,
+                    @CreatedAt, @UpdatedAt, @CreatedBy, @UpdatedBy
                 ) RETURNING id;";
             using var connection = _dbContext.GetConnection();
             return await connection.ExecuteScalarAsync<int>(query, entity);
@@ -81,7 +83,9 @@ namespace Xcianify.Repository
                     file_size_bytes = @FileSizeBytes,
                     mime_type = @MimeType,
                     media_url = @MediaUrl,
-                    description = @Description
+                    description = @Description,
+                    updated_at = @UpdatedAt,
+                    updated_by = @UpdatedBy
                 WHERE id = @Id;";
             using var connection = _dbContext.GetConnection();
             return await connection.ExecuteAsync(query, entity) > 0;
@@ -89,9 +93,9 @@ namespace Xcianify.Repository
 
         public async Task<bool> DeleteAsync(int id)
         {
-            const string query = @"DELETE FROM item_media WHERE id = @Id";
+            const string query = @"UPDATE item_media SET is_deleted = true, updated_at = @UpdatedAt WHERE id = @Id";
             using var connection = _dbContext.GetConnection();
-            return await connection.ExecuteAsync(query, new { Id = id }) > 0;
+            return await connection.ExecuteAsync(query, new { Id = id, UpdatedAt = DateTime.UtcNow }) > 0;
         }
     }
 }

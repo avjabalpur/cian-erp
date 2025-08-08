@@ -74,16 +74,18 @@ namespace Xcianify.Presentation.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateItemMasterDto request)
         {
+            var userId = CurrentUserId;
             if (request == null)
                 return BadRequest("Request body is required.");
-            var item = await _itemMasterService.CreateItemAsync(request);
+            var item = await _itemMasterService.CreateItemAsync(request,userId);
             return CreatedAtAction(nameof(GetById), new { itemId = item.Id }, item);
         }
 
         [HttpPut("{itemId}")]
         public async Task<IActionResult> Update(int itemId, [FromBody] UpdateItemMasterDto updateDto)
         {
-            var item = await _itemMasterService.UpdateItemAsync(itemId, updateDto);
+            var userId = CurrentUserId;
+            var item = await _itemMasterService.UpdateItemAsync(itemId, updateDto,userId);
             return Ok(item);
         }
 

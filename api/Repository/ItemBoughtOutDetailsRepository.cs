@@ -99,11 +99,13 @@ namespace Xcianify.Repository
                     INSERT INTO item_bought_out_details 
                     (item_id, purchase_based_on, excess_planning_percent, reorder_level, 
                      min_stock_level, max_stock_level, min_balance_shelf_life_days, 
-                     custom_duty_percent, igst_percent, sws_percent, max_purchase_rate, stop_procurement)
+                     custom_duty_percent, igst_percent, sws_percent, max_purchase_rate, stop_procurement,
+                     created_at, updated_at, created_by, updated_by)
                     VALUES 
                     (@ItemId, @PurchaseBasedOn, @ExcessPlanningPercent, @ReorderLevel, 
                      @MinStockLevel, @MaxStockLevel, @MinBalanceShelfLifeDays, 
-                     @CustomDutyPercent, @IgstPercent, @SwsPercent, @MaxPurchaseRate, @StopProcurement)
+                     @CustomDutyPercent, @IgstPercent, @SwsPercent, @MaxPurchaseRate, @StopProcurement,
+                     @CreatedAt, @UpdatedAt, @CreatedBy, @UpdatedBy)
                     RETURNING *";
 
                 return await connection.QueryFirstOrDefaultAsync<ItemBoughtOutDetails>(sql, details);
@@ -115,7 +117,7 @@ namespace Xcianify.Repository
             using (var connection = _dbContext.GetConnection())
             {
                 var sql = @"
-                    UPDATE item_bought_out_details 
+                      UPDATE item_bought_out_details    
                     SET item_id = @ItemId,
                         purchase_based_on = @PurchaseBasedOn,
                         excess_planning_percent = @ExcessPlanningPercent,
@@ -127,7 +129,9 @@ namespace Xcianify.Repository
                         igst_percent = @IgstPercent,
                         sws_percent = @SwsPercent,
                         max_purchase_rate = @MaxPurchaseRate,
-                        stop_procurement = @StopProcurement 
+                        stop_procurement = @StopProcurement,
+                        updated_at = @UpdatedAt,
+                        updated_by = @UpdatedBy
                     WHERE id = @Id";
 
                 var affectedRows = await connection.ExecuteAsync(sql, details);
@@ -139,8 +143,8 @@ namespace Xcianify.Repository
         {
             using (var connection = _dbContext.GetConnection())
             {
-                var sql = "DELETE FROM item_bought_out_details WHERE id = @Id";
-                var affectedRows = await connection.ExecuteAsync(sql, new { Id = id });
+                var sql = "UPDATE item_bought_out_details SET is_deleted = true, updated_at = @UpdatedAt WHERE id = @Id";
+                var affectedRows = await connection.ExecuteAsync(sql, new { Id = id, UpdatedAt = DateTime.UtcNow });
                 return affectedRows > 0;
             }
         }

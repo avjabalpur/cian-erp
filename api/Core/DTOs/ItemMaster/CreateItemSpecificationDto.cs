@@ -31,6 +31,5 @@ namespace Xcianify.Core.DTOs.ItemMaster
         
         [StringLength(50)]
         public string Specification { get; set; }
-
     }
 }
