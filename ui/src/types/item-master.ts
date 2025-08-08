@@ -1,4 +1,6 @@
 
+import { ItemMedia } from "@/hooks/items/use-item-media";
+
 export interface ItemMaster {
   id: number;
   itemCode: string;
@@ -65,6 +67,7 @@ export interface ItemMaster {
   stockAnalysis?: ItemStockAnalysis;
   exportDetails?: ItemExportDetails;
   otherDetails?: ItemOtherDetail;
+  media?: ItemMedia[];
 }
 
 export interface CreateItemMasterData {
@@ -334,57 +337,103 @@ export interface UpdateItemBoughtOutDetailsData {
 export interface ItemSalesDetail {
   id: number;
   itemId: number;
-  sellingPrice?: number;
-  currencyId?: number;
-  isTaxInclusive: boolean;
-  discountPercentage?: number;
-  minimumOrderQuantity?: number;
-  leadTimeDays?: number;
-  isActive: boolean;
-  notes?: string;
-  createdAt: string;
+  packSizeApplicable: boolean;
+  defaultPackSize?: string;
+  saleableUnitContains?: string;
+  qtyPerBox?: string;
+  boxesPerCase?: string;
+  casePackingType?: string;
+  packingRate?: string;
+  qtyPerCase?: string;
+  netWeightCase?: string;
+  tareWeightCase?: string;
+  grossWeightCase?: string;
+  grossWeightUnit?: string;
+  caseDimensionsInches?: string;
+  caseVolumeCft?: string;
+  caseDimensionsCm?: string;
+  caseVolumeCbm?: string;
+  minSaleRate?: string;
+  minSoQty?: string;
+  tertiaryGtin?: string;
+  secondaryGtin?: string;
+  primaryGtin?: string;
+  minBatchQtyAutoloading?: string;
+  considerAsNewProductTill?: string;
+  interfaceCode?: string;
+  specs?: string;
+  createdAt?: string;
   updatedAt?: string;
   createdBy?: number;
   updatedBy?: number;
 }
 
 export interface CreateItemSalesDetailData {
-  sellingPrice?: number;
-  currencyId?: number;
-  isTaxInclusive?: boolean;
-  discountPercentage?: number;
-  minimumOrderQuantity?: number;
-  leadTimeDays?: number;
-  isActive?: boolean;
-  notes?: string;
+  itemId: number;
+  packSizeApplicable: boolean;
+  defaultPackSize?: string;
+  saleableUnitContains?: string;
+  qtyPerBox?: string;
+  boxesPerCase?: string;
+  casePackingType?: string;
+  packingRate?: string;
+  qtyPerCase?: string;
+  netWeightCase?: string;
+  tareWeightCase?: string;
+  grossWeightCase?: string;
+  grossWeightUnit?: string;
+  caseDimensionsInches?: string;
+  caseVolumeCft?: string;
+  caseDimensionsCm?: string;
+  caseVolumeCbm?: string;
+  minSaleRate?: string;
+  minSoQty?: string;
+  tertiaryGtin?: string;
+  secondaryGtin?: string;
+  primaryGtin?: string;
+  minBatchQtyAutoloading?: string;
+  considerAsNewProductTill?: string;
+  interfaceCode?: string;
+  specs?: string;
 }
 
 export interface UpdateItemSalesDetailData {
-  sellingPrice?: number;
-  currencyId?: number;
-  isTaxInclusive?: boolean;
-  discountPercentage?: number;
-  minimumOrderQuantity?: number;
-  leadTimeDays?: number;
-  isActive?: boolean;
-  notes?: string;
+  itemId: number;
+  packSizeApplicable: boolean;
+  defaultPackSize?: string;
+  saleableUnitContains?: string;
+  qtyPerBox?: string;
+  boxesPerCase?: string;
+  casePackingType?: string;
+  packingRate?: string;
+  qtyPerCase?: string;
+  netWeightCase?: string;
+  tareWeightCase?: string;
+  grossWeightCase?: string;
+  grossWeightUnit?: string;
+  caseDimensionsInches?: string;
+  caseVolumeCft?: string;
+  caseDimensionsCm?: string;
+  caseVolumeCbm?: string;
+  minSaleRate?: string;
+  minSoQty?: string;
+  tertiaryGtin?: string;
+  secondaryGtin?: string;
+  primaryGtin?: string;
+  minBatchQtyAutoloading?: string;
+  considerAsNewProductTill?: string;
+  interfaceCode?: string;
+  specs?: string;
 }
 
 // Item Stock Analysis
 export interface ItemStockAnalysis {
   id: number;
   itemId: number;
-  minimumStockLevel?: number;
-  maximumStockLevel?: number;
-  reorderLevel?: number;
-  economicOrderQuantity?: number;
-  leadTimeDays?: number;
-  averageUsagePerDay?: number;
-  lastStockCheckDate?: string;
-  lastStockQuantity?: number;
-  nextStockCheckDate?: string;
-  isActive: boolean;
-  notes?: string;
+  abcConsumptionValue?: string;
+  xyzStockValue?: string;
+  fsnMovement?: string;
+  vedAnalysis?: string;
   createdAt: string;
   updatedAt?: string;
   createdBy?: number;
@@ -392,31 +441,19 @@ export interface ItemStockAnalysis {
 }
 
 export interface CreateItemStockAnalysisData {
-  minimumStockLevel?: number;
-  maximumStockLevel?: number;
-  reorderLevel?: number;
-  economicOrderQuantity?: number;
-  leadTimeDays?: number;
-  averageUsagePerDay?: number;
-  lastStockCheckDate?: string;
-  lastStockQuantity?: number;
-  nextStockCheckDate?: string;
-  isActive?: boolean;
-  notes?: string;
+  itemId: number;
+  abcConsumptionValue?: string;
+  xyzStockValue?: string;
+  fsnMovement?: string;
+  vedAnalysis?: string;
 }
 
 export interface UpdateItemStockAnalysisData {
-  minimumStockLevel?: number;
-  maximumStockLevel?: number;
-  reorderLevel?: number;
-  economicOrderQuantity?: number;
-  leadTimeDays?: number;
-  averageUsagePerDay?: number;
-  lastStockCheckDate?: string;
-  lastStockQuantity?: number;
-  nextStockCheckDate?: string;
-  isActive?: boolean;
-  notes?: string;
+  itemId: number;
+  abcConsumptionValue?: string;
+  xyzStockValue?: string;
+  fsnMovement?: string;
+  vedAnalysis?: string;
 }
 
 // Types
@@ -460,20 +497,19 @@ export interface UpdateItemOtherDetailData {
 export interface ItemExportDetails {
   id: number;
   itemId: number;
-  itemDescriptionForExports?: string;
-  exportProductGroupCode?: string;
-  exportProductGroupName?: string;
-  depbRateListSrlNo?: string;
-  depbRate?: number;
-  depbValueCap?: number;
-  depbRemarks?: string;
-  dutyDrawbackSrlNo?: string;
-  dutyDrawbackRateType?: string;
-  dutyDrawbackRatePercent?: number;
-  dutyDrawbackRateFixed?: number;
-  dutyDrawbackValueCap?: number;
-  dutyDrawbackRemarks?: string;
-  createdAt: string;
+  itemDescriptionForExports: string;
+  exportProductGroupCode: string;
+  exportProductGroupName: string;
+  depbRateListSrlNo: string;
+  depbRate?: string;
+  depbValueCap?: string;
+  depbRemarks: string;
+  dutyDrawbackSrlNo: string;
+  dutyDrawbackRate?: string;
+  dutyDrawbackRateType: string;
+  dutyDrawbackValueCap?: string;
+  dutyDrawbackRemarks: string;
+  createdAt?: string;
   updatedAt?: string;
   createdBy?: number;
   updatedBy?: number;
@@ -481,35 +517,34 @@ export interface ItemExportDetails {
 
 export interface CreateItemExportDetailsData {
   itemId: number;
-  itemDescriptionForExports?: string;
-  exportProductGroupCode?: string;
-  exportProductGroupName?: string;
-  depbRateListSrlNo?: string;
-  depbRate?: number;
-  depbValueCap?: number;
-  depbRemarks?: string;
-  dutyDrawbackSrlNo?: string;
-  dutyDrawbackRateType?: string;
-  dutyDrawbackRatePercent?: number;
-  dutyDrawbackRateFixed?: number;
-  dutyDrawbackValueCap?: number;
-  dutyDrawbackRemarks?: string;
+  itemDescriptionForExports: string;
+  exportProductGroupCode: string;
+  exportProductGroupName: string;
+  depbRateListSrlNo: string;
+  depbRate?: string;
+  depbValueCap?: string;
+  depbRemarks: string;
+  dutyDrawbackSrlNo: string;
+  dutyDrawbackRate?: string;
+  dutyDrawbackRateType: string;
+  dutyDrawbackValueCap?: string;
+  dutyDrawbackRemarks: string;
 }
 
 export interface UpdateItemExportDetailsData {
-  itemDescriptionForExports?: string;
-  exportProductGroupCode?: string;
-  exportProductGroupName?: string;
-  depbRateListSrlNo?: string;
-  depbRate?: number;
-  depbValueCap?: number;
-  depbRemarks?: string;
-  dutyDrawbackSrlNo?: string;
-  dutyDrawbackRateType?: string;
-  dutyDrawbackRatePercent?: number;
-  dutyDrawbackRateFixed?: number;
-  dutyDrawbackValueCap?: number;
-  dutyDrawbackRemarks?: string;
+  itemId: number;
+  itemDescriptionForExports: string;
+  exportProductGroupCode: string;
+  exportProductGroupName: string;
+  depbRateListSrlNo: string;
+  depbRate?: string;
+  depbValueCap?: string;
+  depbRemarks: string;
+  dutyDrawbackSrlNo: string;
+  dutyDrawbackRate?: string;
+  dutyDrawbackRateType: string;
+  dutyDrawbackValueCap?: string;
+  dutyDrawbackRemarks: string;
 }
 
 export interface PaginatedResponse<T> {

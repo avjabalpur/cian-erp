@@ -15,7 +15,7 @@ namespace Xcianify.Presentation.Controllers
 
         public ProductGroupController(IProductGroupService productGroupService)
         {
-            _productGroupService = productGroupService ?? throw new ArgumentNullException(nameof(productGroupService));
+            _productGroupService = productGroupService;
         }
 
         [HttpGet("{id}")]
@@ -42,26 +42,14 @@ namespace Xcianify.Presentation.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateProductGroupDto createDto)
         {
-            var userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
-            if (userId <= 0)
-            {
-                return Unauthorized(new { message = "Invalid user" });
-            }
-
-            var productGroup = await _productGroupService.CreateAsync(createDto, userId);
+            var productGroup = await _productGroupService.CreateAsync(createDto, CurrentUserId);
             return CreatedAtAction(nameof(GetById), new { id = productGroup.Id }, productGroup);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateProductGroupDto updateDto)
         {
-            var userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
-            if (userId <= 0)
-            {
-                return Unauthorized(new { message = "Invalid user" });
-            }
-
-            var productGroup = await _productGroupService.UpdateAsync(id, updateDto, userId);
+            var productGroup = await _productGroupService.UpdateAsync(id, updateDto, CurrentUserId);
             return Ok(productGroup);
         }
 

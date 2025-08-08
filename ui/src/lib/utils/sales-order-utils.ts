@@ -55,10 +55,10 @@ export const currentStatusOptions: StatusOption[] = [
 ];
 
 // Sales Order Status Options
-export const soStatusOptions: SelectOption[] = [
-  { label: "NEW", value: "NEW" },
-  { label: "REPEAT", value: "REPEAT" },
-  { label: "REVISED", value: "REVISED" },
+export const soStatusOptions: StatusOption[] = [
+  { label: "NEW", value: "new", color: "blue", variant: "default" },
+  { label: "REPEAT", value: "repeat", color: "orange", variant: "outline" },
+  { label: "REVISED", value: "revised", color: "purple", variant: "secondary" },
 ];
 
 // Product Shelf Life Options
@@ -69,17 +69,7 @@ export const pShelfLifeOptions: SelectOption[] = [
   { label: "36", value: "36" },
 ];
 
-// Dosage Name Options
-export const dosageNameOptions: SelectOption[] = [
-  { label: "TABLET", value: "TABLET" },
-  { label: "GEL", value: "GEL" },
-  { label: "CAPSULE", value: "CAPSULE" },
-  { label: "LIQUID", value: "LIQUID" },
-  { label: "OINTMENT", value: "OINTMENT" },
-  { label: "POWDER", value: "POWDER" },
-  { label: "CREAM", value: "CREAM" },
-  { label: "SOFTGEL", value: "SOFTGEL" },
-];
+
 
 // Product Domino Options
 export const pDominoOptions: SelectOption[] = [
@@ -87,72 +77,6 @@ export const pDominoOptions: SelectOption[] = [
   { label: "STEREO", value: "STEREO" },
 ];
 
-// Legacy Sales Order Status Options (keeping for backward compatibility)
-export const salesOrderStatusOptions: StatusOption[] = [
-  {
-    value: "new",
-    label: "New",
-    color: "text-blue-600",
-    bgColor: "bg-blue-100",
-    variant: "default"
-  },
-  {
-    value: "draft",
-    label: "Draft",
-    color: "text-gray-600",
-    bgColor: "bg-gray-100",
-    variant: "secondary"
-  },
-  {
-    value: "pending",
-    label: "Pending",
-    color: "text-yellow-600",
-    bgColor: "bg-yellow-100",
-    variant: "outline"
-  },
-  {
-    value: "approved",
-    label: "Approved",
-    color: "text-green-600",
-    bgColor: "bg-green-100",
-    variant: "default"
-  },
-  {
-    value: "rejected",
-    label: "Rejected",
-    color: "text-red-600",
-    bgColor: "bg-red-100",
-    variant: "destructive"
-  },
-  {
-    value: "in_progress",
-    label: "In Progress",
-    color: "text-purple-600",
-    bgColor: "bg-purple-100",
-    variant: "outline"
-  },
-  {
-    value: "completed",
-    label: "Completed",
-    color: "text-emerald-600",
-    bgColor: "bg-emerald-100",
-    variant: "default"
-  },
-  {
-    value: "cancelled",
-    label: "Cancelled",
-    color: "text-red-600",
-    bgColor: "bg-red-100",
-    variant: "destructive"
-  },
-  {
-    value: "repeat",
-    label: "Repeat",
-    color: "text-orange-600",
-    bgColor: "bg-orange-100",
-    variant: "outline"
-  }
-];
 
 // Payment Terms Options
 export const paymentTermOptions: SelectOption[] = [
@@ -215,44 +139,6 @@ export const drugApprovalOptions: SelectOption[] = [
   { value: "other", label: "Other" }
 ];
 
-// Legacy Current Status Options (keeping for backward compatibility)
-export const legacyCurrentStatusOptions: StatusOption[] = [
-  {
-    value: "pending",
-    label: "Pending",
-    color: "text-yellow-600",
-    bgColor: "bg-yellow-100",
-    variant: "outline"
-  },
-  {
-    value: "approved",
-    label: "Approved",
-    color: "text-green-600",
-    bgColor: "bg-green-100",
-    variant: "default"
-  },
-  {
-    value: "rejected",
-    label: "Rejected",
-    color: "text-red-600",
-    bgColor: "bg-red-100",
-    variant: "destructive"
-  },
-  {
-    value: "under_review",
-    label: "Under Review",
-    color: "text-blue-600",
-    bgColor: "bg-blue-100",
-    variant: "outline"
-  },
-  {
-    value: "completed",
-    label: "Completed",
-    color: "text-emerald-600",
-    bgColor: "bg-emerald-100",
-    variant: "default"
-  }
-];
 
 // Sort Options
 export const sortOptions: SelectOption[] = [
@@ -290,8 +176,8 @@ export const salesOrderParsers = {
 
 // Utility Functions
 export const getStatusColor = (status: string): StatusOption => {
-  return salesOrderStatusOptions.find(option => option.value === status) || 
-         salesOrderStatusOptions[0]; // Default to first option
+  return soStatusOptions.find(option => option.value === status) || 
+         soStatusOptions[0]; 
 };
 
 export const getCurrentStatusColor = (status: string): StatusOption => {
@@ -309,10 +195,7 @@ export const getSoStatusOption = (status: string): SelectOption => {
          soStatusOptions[0]; // Default to first option
 };
 
-export const getDosageNameOption = (dosage: string): SelectOption => {
-  return dosageNameOptions.find(option => option.value === dosage) || 
-         dosageNameOptions[0]; // Default to first option
-};
+
 
 export const getPDominoOption = (domino: string): SelectOption => {
   return pDominoOptions.find(option => option.value === domino) || 

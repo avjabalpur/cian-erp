@@ -55,7 +55,7 @@ export const hsnMasterSchema = z.object({
 // Comprehensive Item Master Schema
 export const itemMasterSchema = z.object({
   // Basic Info
-  itemCode: z.string().min(1, "Item Code is required"),
+  //itemCode: z.string().min(1, "Item Code is required"),
   revNo: z.string().optional(),
   itemTypeId: z.string()
     .min(1, "Item Type is required")
@@ -66,7 +66,7 @@ export const itemMasterSchema = z.object({
     }),
   subType: z.string().optional(),
   gsInd: z.string().optional(),
-  goodsType: z.boolean().default(false),
+  goodsType: z.string().optional(),
   itemName: z.string().min(1, "Item Name is required"),
   shortName: z.string().optional(),
   pharmacopoeiaName: z.string().optional(),
@@ -190,48 +190,127 @@ export const itemMasterSchema = z.object({
   manufactured: z.boolean().default(false),
   batchNotApplicable: z.boolean().default(false),
   qcRequired: z.boolean().default(false),
-  allergen: z.string().optional(),
+  allergen: z.boolean().default(false),
   mfgDateApplicable: z.boolean().default(false),
   expiryDateApplicable: z.boolean().default(false),
   trackSerialNos: z.boolean().default(false),
-  packingFreightInsuranceServices: z.string().optional(),
-  activeIngredient: z.string().optional(),
+  packingFreightInsuranceServices: z.boolean().default(false),
+  activeIngredient: z.boolean().default(false),
   mfgLocNameRequired: z.boolean().default(false),
   mfgMmYyyyApplicable: z.boolean().default(false),
   expiryMmYyyyApplicable: z.boolean().default(false),
   principalForStatutoryReporting: z.boolean().default(false),
 
   // Sales Details
-  sellingPrice: z.string()
+  packSizeApplicable: z.boolean().default(false),
+  defaultPackSize: z.string().optional(),
+  saleableUnitContains: z.string()
     .optional()
     .transform((val) => {
       if (!val || val === "") return undefined;
       const num = parseFloat(val);
       return isNaN(num) ? undefined : num;
     }),
-  currencyId: z.string()
-    .optional()
-    .transform((val) => {
-      if (!val || val === "") return undefined;
-      const num = parseInt(val);
-      return isNaN(num) ? undefined : num;
-    }),
-  isTaxInclusive: z.boolean().default(false),
-  discountPercentage: z.string()
+  qtyPerBox: z.string()
     .optional()
     .transform((val) => {
       if (!val || val === "") return undefined;
       const num = parseFloat(val);
       return isNaN(num) ? undefined : num;
     }),
-  minimumOrderQuantity: z.string()
+  boxesPerCase: z.string()
     .optional()
     .transform((val) => {
       if (!val || val === "") return undefined;
       const num = parseFloat(val);
       return isNaN(num) ? undefined : num;
     }),
-  notes: z.string().optional(),
+  casePackingType: z.string().optional(),
+  packingRate: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  qtyPerCase: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  netWeightCase: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  tareWeightCase: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  grossWeightCase: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  grossWeightUnit: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  caseDimensionsInches: z.string().optional(),
+  caseVolumeCft: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  caseDimensionsCm: z.string().optional(),
+  caseVolumeCbm: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  minSaleRate: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  minSoQty: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  tertiaryGtin: z.string().optional(),
+  secondaryGtin: z.string().optional(),
+  primaryGtin: z.string().optional(),
+  minBatchQtyAutoloading: z.string()
+    .optional()
+    .transform((val) => {
+      if (!val || val === "") return undefined;
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }),
+  considerAsNewProductTill: z.string().optional(),
+  interfaceCode: z.string().optional(),
+  specs: z.string().optional(),
 
   // Bought Out Details
   purchaseBasedOn: z.string().optional(),
@@ -242,7 +321,7 @@ export const itemMasterSchema = z.object({
       const num = parseFloat(val);
       return isNaN(num) ? undefined : num;
     }),
-  reorderLevel: z.string()
+  boughtOutReorderLevel: z.string()
     .optional()
     .transform((val) => {
       if (!val || val === "") return undefined;
@@ -305,43 +384,6 @@ export const itemMasterSchema = z.object({
   xyzStockValue: z.string().optional(),
   fsnMovement: z.string().optional(),
   vedAnalysis: z.string().optional(),
-  minimumStockLevel: z.string()
-    .optional()
-    .transform((val) => {
-      if (!val || val === "") return undefined;
-      const num = parseFloat(val);
-      return isNaN(num) ? undefined : num;
-    }),
-  maximumStockLevel: z.string()
-    .optional()
-    .transform((val) => {
-      if (!val || val === "") return undefined;
-      const num = parseFloat(val);
-      return isNaN(num) ? undefined : num;
-    }),
-  economicOrderQuantity: z.string()
-    .optional()
-    .transform((val) => {
-      if (!val || val === "") return undefined;
-      const num = parseFloat(val);
-      return isNaN(num) ? undefined : num;
-    }),
-  averageUsagePerDay: z.string()
-    .optional()
-    .transform((val) => {
-      if (!val || val === "") return undefined;
-      const num = parseFloat(val);
-      return isNaN(num) ? undefined : num;
-    }),
-  lastStockCheckDate: z.string().optional(),
-  lastStockQuantity: z.string()
-    .optional()
-    .transform((val) => {
-      if (!val || val === "") return undefined;
-      const num = parseFloat(val);
-      return isNaN(num) ? undefined : num;
-    }),
-  nextStockCheckDate: z.string().optional(),
 
   // Export Details
   itemDescriptionForExports: z.string().optional(),
@@ -365,14 +407,7 @@ export const itemMasterSchema = z.object({
   depbRemarks: z.string().optional(),
   dutyDrawbackSrlNo: z.string().optional(),
   dutyDrawbackRateType: z.string().optional(),
-  dutyDrawbackRatePercent: z.string()
-    .optional()
-    .transform((val) => {
-      if (!val || val === "") return undefined;
-      const num = parseFloat(val);
-      return isNaN(num) ? undefined : num;
-    }),
-  dutyDrawbackRateFixed: z.string()
+  dutyDrawbackRate: z.string()
     .optional()
     .transform((val) => {
       if (!val || val === "") return undefined;
@@ -390,7 +425,7 @@ export const itemMasterSchema = z.object({
 
   // Specifications
   itemSpecification: z.string().optional(),
-  substituteItemFor: z.string().optional(),
+  SubstituteForItemCode: z.string().optional(),
   customTariffNo: z.string().optional(),
   exciseTariffNo: z.string().optional(),
   vatCommCode: z.string().optional(),
@@ -457,58 +492,22 @@ export const itemMasterSchema = z.object({
   withMeasuringCap: z.boolean().default(false),
   withSpoon: z.boolean().default(false),
   packingNp: z.string().optional(),
-  packingNpQty: z.string()
-    .optional()
-    .transform((val) => {
-      if (!val || val === "") return undefined;
-      const num = parseInt(val);
-      return isNaN(num) ? undefined : num;
-    }),
+  packingNpQty: z.string().optional(),
   packingStylePtd: z.string().optional(),
-  packingStylePtdQty: z.string()
-    .optional()
-    .transform((val) => {
-      if (!val || val === "") return undefined;
-      const num = parseInt(val);
-      return isNaN(num) ? undefined : num;
-    }),
+  packingStylePtdQty: z.string().optional(),
   notePerStrip: z.string().optional(),
   packShortPtdSpec: z.string().optional(),
   packShortPtdSize: z.string().optional(),
-  packShortPtdQty: z.string()
-    .optional()
-    .transform((val) => {
-      if (!val || val === "") return undefined;
-      const num = parseInt(val);
-      return isNaN(num) ? undefined : num;
-    }),
+  packShortPtdQty: z.string().optional(),
   packingStyleNpSize: z.string().optional(),
-  packingStyleNpQty: z.string()
-    .optional()
-    .transform((val) => {
-      if (!val || val === "") return undefined;
-      const num = parseInt(val);
-      return isNaN(num) ? undefined : num;
-    }),
+  packingStyleNpQty: z.string().optional(),
   noteForCtn: z.string().optional(),
   outerSize: z.string().optional(),
-  outerQty: z.string()
-    .optional()
-    .transform((val) => {
-      if (!val || val === "") return undefined;
-      const num = parseInt(val);
-      return isNaN(num) ? undefined : num;
-    }),
+  outerQty: z.string().optional(),
   shrink: z.string().optional(),
   shrinkPacking: z.string().optional(),
   shipperSize: z.string().optional(),
-  qtyPerShipper: z.string()
-    .optional()
-    .transform((val) => {
-      if (!val || val === "") return undefined;
-      const num = parseInt(val);
-      return isNaN(num) ? undefined : num;
-    }),
+  qtyPerShipper: z.string().optional(),
   shipperNote: z.string().optional(),
 });
 

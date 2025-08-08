@@ -8,14 +8,26 @@ namespace Xcianify.Core.Mappers
     {
         public ItemMediaMapper()
         {
-            CreateMap<ItemMedia, ItemMediaDto>()
-                .ForMember(dest => dest.ItemId, opt => opt.MapFrom(src => src.Id));
+            CreateMap<ItemMedia, ItemMediaDto>();
 
             CreateMap<CreateItemMediaDto, ItemMedia>()
-                .ForMember(dest => dest.ItemCode, opt => opt.MapFrom(src => src.ItemId.ToString()));
+                .ForMember(dest => dest.File, opt => opt.Ignore())
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
+                .ForMember(dest => dest.IsActive, opt => opt.Ignore())
+                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore());
 
             CreateMap<UpdateItemMediaDto, ItemMedia>()
-                .ForMember(dest => dest.ItemCode, opt => opt.MapFrom(src => src.ItemId.ToString()));
+                .ForMember(dest => dest.File, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
+                .ForMember(dest => dest.IsActive, opt => opt.Ignore())
+                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore());
         }
     }
 } 

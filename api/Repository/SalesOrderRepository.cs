@@ -111,15 +111,23 @@ namespace Xcianify.Repository
 
             var query = $@"
                 SELECT 
-                    so.*,
-                    c.customer_name,
-                    im.item_name,
-                    d.name,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name,
-                    u3.first_name || ' ' || u3.last_name as assigned_designer_name
+                    so.id,
+                    so.so_number as soNumber,
+                    so.so_date as soDate,
+                    so.so_status as soStatus,
+                    so.organization_id as organizationId,
+                    so.customer_id as customerId,
+                    so.payment_term as paymentTerm,
+                    o.name as organizationName,
+                    c.customer_name as customerName,
+                    im.item_name as itemName,
+                    d.name as divisionName,
+                    u1.first_name || ' ' || u1.last_name as createdBy,
+                    u2.first_name || ' ' || u2.last_name as updatedBy,
+                    u3.first_name || ' ' || u3.last_name as assignedDesigner
                 FROM sales_orders so
                 LEFT JOIN customers c ON so.customer_id = c.id
+                LEFT JOIN organizations o ON so.organization_id = o.id
                 LEFT JOIN item_master im ON so.item_id = im.id
                 LEFT JOIN divisions d ON so.divisionid = d.id
                 LEFT JOIN users u1 ON so.created_by = u1.id
@@ -140,15 +148,23 @@ namespace Xcianify.Repository
             
             var query = @"
                 SELECT 
-                    so.*,
-                    c.customer_name,
-                    im.item_name,
-                    d.name,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name,
-                    u3.first_name || ' ' || u3.last_name as assigned_designer_name
+                   so.id,
+                    so.so_number as soNumber,
+                    so.so_date as soDate,
+                    so.so_status as soStatus,
+                    so.organization_id as organizationId,
+                    so.customer_id as customerId,
+                    so.payment_term as paymentTerm,
+                    o.name as organizationName,
+                    c.customer_name as customerName,
+                    im.item_name as itemName,
+                    d.name as divisionName,
+                    u1.first_name || ' ' || u1.last_name as createdBy,
+                    u2.first_name || ' ' || u2.last_name as updatedBy,
+                    u3.first_name || ' ' || u3.last_name as assignedDesigner
                 FROM sales_orders so
                 LEFT JOIN customers c ON so.customer_id = c.id
+                LEFT JOIN organizations o ON so.organization_id = o.id
                 LEFT JOIN item_master im ON so.item_id = im.id
                 LEFT JOIN divisions d ON so.divisionid = d.id
                 LEFT JOIN users u1 ON so.created_by = u1.id
@@ -165,15 +181,23 @@ namespace Xcianify.Repository
             
             var query = @"
                 SELECT 
-                    so.*,
-                    c.customer_name,
-                    im.item_name,
-                    d.name,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name,
-                    u3.first_name || ' ' || u3.last_name as assigned_designer_name
+                    so.id,
+                    so.so_number as soNumber,
+                    so.so_date as soDate,
+                    so.so_status as soStatus,
+                    so.organization_id as organizationId,
+                    so.customer_id as customerId,
+                    so.payment_term as paymentTerm,
+                    o.name as organizationName,
+                    c.customer_name as customerName,
+                    im.item_name as itemName,
+                    d.name as divisionName,
+                    u1.first_name || ' ' || u1.last_name as createdBy,
+                    u2.first_name || ' ' || u2.last_name as updatedBy,
+                    u3.first_name || ' ' || u3.last_name as assignedDesigner
                 FROM sales_orders so
                 LEFT JOIN customers c ON so.customer_id = c.id
+                LEFT JOIN organizations o ON so.organization_id = o.id
                 LEFT JOIN item_master im ON so.item_id = im.id
                 LEFT JOIN divisions d ON so.divisionid = d.id
                 LEFT JOIN users u1 ON so.created_by = u1.id
@@ -291,6 +315,46 @@ namespace Xcianify.Repository
                 WHERE so_number LIKE 'SO%' AND is_deleted = 0";
 
             return await connection.QuerySingleAsync<int>(query);
+        }
+
+        public async Task<int> CreateApprovalAsync(string soStatus, string dosageName, int createdBy)
+        {
+            using var connection = _context.GetConnection();
+            
+            var currentTime = DateTime.UtcNow;
+            
+            var query = @"
+                INSERT INTO sales_orders (
+                    so_status,
+                    dosage_name,
+                    created_by,
+                    created_at,
+                    updated_by,
+                    updated_at,
+                    current_status,
+                    is_deleted,
+                    is_submitted
+                ) VALUES (
+                    @SoStatus,
+                    @DosageName,
+                    @CreatedBy,
+                    @CreatedAt,
+                    @CreatedBy,
+                    @CreatedAt,
+                    'IN-PROGRESS',
+                    0,
+                    0
+                ) RETURNING id";
+
+            var parameters = new
+            {
+                SoStatus = soStatus,
+                DosageName = dosageName,
+                CreatedBy = createdBy,
+                CreatedAt = currentTime
+            };
+
+            return await connection.QuerySingleAsync<int>(query, parameters);
         }
     }
 } 

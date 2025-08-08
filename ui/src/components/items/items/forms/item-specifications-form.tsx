@@ -22,7 +22,7 @@ export function ItemSpecificationsForm({ control, itemId }: ItemSpecificationsFo
         <CardContent>
           <FormTextArea
             control={control}
-            name="specification"
+            name="itemSpecification"
             label="Item's Specification"
             placeholder="Enter detailed item specification..."
             rows={8}
@@ -40,7 +40,7 @@ export function ItemSpecificationsForm({ control, itemId }: ItemSpecificationsFo
             <div className="flex-1">
               <FormInput
                 control={control}
-                name="substituteItemFor"
+                name="SubstituteForItemCode"
                 label="Main Item"
                 placeholder="Enter substitute item"
               />

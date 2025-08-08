@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Xcianify.Core.DTOs.ItemMaster;
+using static Xcianify.Core.DTOs.ItemMaster.CreateItemSalesDetailDto;
 
 namespace Xcianify.Core.Domain.Services
 {

@@ -5,7 +5,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useCreateProductGroup, useUpdateProductGroup } from "@/hooks/use-product-groups";
+import { useCreateProductGroup, useUpdateProductGroup } from "@/hooks/items/use-product-groups";
 import { RightDrawer } from "@/components/shared/right-drawer";
 import { ProductGroupForm } from "./product-group-form";
 import { ProductGroup, CreateProductGroupData, UpdateProductGroupData } from "@/types/product-group";
@@ -134,7 +134,7 @@ export function ProductGroupDrawer({
           description: "Product group created successfully",
         });
       }
-
+      handleClose();
       onSuccess?.();
     } catch (error: any) {
       toast({
@@ -162,6 +162,7 @@ export function ProductGroupDrawer({
           ? "Update the product group information below."
           : "Fill in the information below to create a new product group."
       }
+      size="2xl"
     >
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

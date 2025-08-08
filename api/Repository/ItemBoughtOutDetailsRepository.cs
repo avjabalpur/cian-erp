@@ -1,4 +1,7 @@
-﻿using Dapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Dapper;
 using Xcianify.Core.Domain.Repositories;
 using Xcianify.Core.Model;
 using Xcianify.Repository.DbContext;
@@ -18,7 +21,23 @@ namespace Xcianify.Repository
         {
             using (var connection = _dbContext.GetConnection())
             {
-                var sql = "SELECT * FROM item_bought_out_details WHERE item_id = @ItemId";
+                var sql = @"
+                    SELECT 
+                        id as Id,
+                        item_id as ItemId,
+                        purchase_based_on as PurchaseBasedOn,
+                        excess_planning_percent as ExcessPlanningPercent,
+                        reorder_level as ReorderLevel,
+                        min_stock_level as MinStockLevel,
+                        max_stock_level as MaxStockLevel,
+                        min_balance_shelf_life_days as MinBalanceShelfLifeDays,
+                        custom_duty_percent as CustomDutyPercent,
+                        igst_percent as IgstPercent,
+                        sws_percent as SwsPercent,
+                        max_purchase_rate as MaxPurchaseRate,
+                        stop_procurement as StopProcurement
+                    FROM item_bought_out_details 
+                    WHERE item_id = @ItemId";
                 return await connection.QueryFirstOrDefaultAsync<ItemBoughtOutDetails>(sql, new { ItemId = itemId });
             }
         }
@@ -27,7 +46,23 @@ namespace Xcianify.Repository
         {
             using (var connection = _dbContext.GetConnection())
             {
-                var sql = "SELECT * FROM item_bought_out_details WHERE id = @Id";
+                var sql = @"
+                    SELECT 
+                        id as Id,
+                        item_id as ItemId,
+                        purchase_based_on as PurchaseBasedOn,
+                        excess_planning_percent as ExcessPlanningPercent,
+                        reorder_level as ReorderLevel,
+                        min_stock_level as MinStockLevel,
+                        max_stock_level as MaxStockLevel,
+                        min_balance_shelf_life_days as MinBalanceShelfLifeDays,
+                        custom_duty_percent as CustomDutyPercent,
+                        igst_percent as IgstPercent,
+                        sws_percent as SwsPercent,
+                        max_purchase_rate as MaxPurchaseRate,
+                        stop_procurement as StopProcurement
+                    FROM item_bought_out_details 
+                    WHERE id = @Id";
                 return await connection.QueryFirstOrDefaultAsync<ItemBoughtOutDetails>(sql, new { Id = id });
             }
         }
@@ -36,7 +71,22 @@ namespace Xcianify.Repository
         {
             using (var connection = _dbContext.GetConnection())
             {
-                var sql = "SELECT * FROM item_bought_out_details";
+                var sql = @"
+                    SELECT 
+                        id as Id,
+                        item_id as ItemId,
+                        purchase_based_on as PurchaseBasedOn,
+                        excess_planning_percent as ExcessPlanningPercent,
+                        reorder_level as ReorderLevel,
+                        min_stock_level as MinStockLevel,
+                        max_stock_level as MaxStockLevel,
+                        min_balance_shelf_life_days as MinBalanceShelfLifeDays,
+                        custom_duty_percent as CustomDutyPercent,
+                        igst_percent as IgstPercent,
+                        sws_percent as SwsPercent,
+                        max_purchase_rate as MaxPurchaseRate,
+                        stop_procurement as StopProcurement
+                    FROM item_bought_out_details";
                 return await connection.QueryAsync<ItemBoughtOutDetails>(sql);
             }
         }
@@ -49,11 +99,13 @@ namespace Xcianify.Repository
                     INSERT INTO item_bought_out_details 
                     (item_id, purchase_based_on, excess_planning_percent, reorder_level, 
                      min_stock_level, max_stock_level, min_balance_shelf_life_days, 
-                     custom_duty_percent, igst_percent, sws_percent, max_purchase_rate, stop_procurement)
+                     custom_duty_percent, igst_percent, sws_percent, max_purchase_rate, stop_procurement,
+                     created_at, updated_at, created_by, updated_by)
                     VALUES 
                     (@ItemId, @PurchaseBasedOn, @ExcessPlanningPercent, @ReorderLevel, 
                      @MinStockLevel, @MaxStockLevel, @MinBalanceShelfLifeDays, 
-                     @CustomDutyPercent, @IgstPercent, @SwsPercent, @MaxPurchaseRate, @StopProcurement)
+                     @CustomDutyPercent, @IgstPercent, @SwsPercent, @MaxPurchaseRate, @StopProcurement,
+                     @CreatedAt, @UpdatedAt, @CreatedBy, @UpdatedBy)
                     RETURNING *";
 
                 return await connection.QueryFirstOrDefaultAsync<ItemBoughtOutDetails>(sql, details);
@@ -65,7 +117,7 @@ namespace Xcianify.Repository
             using (var connection = _dbContext.GetConnection())
             {
                 var sql = @"
-                    UPDATE item_bought_out_details 
+                      UPDATE item_bought_out_details    
                     SET item_id = @ItemId,
                         purchase_based_on = @PurchaseBasedOn,
                         excess_planning_percent = @ExcessPlanningPercent,
@@ -77,7 +129,9 @@ namespace Xcianify.Repository
                         igst_percent = @IgstPercent,
                         sws_percent = @SwsPercent,
                         max_purchase_rate = @MaxPurchaseRate,
-                        stop_procurement = @StopProcurement
+                        stop_procurement = @StopProcurement,
+                        updated_at = @UpdatedAt,
+                        updated_by = @UpdatedBy
                     WHERE id = @Id";
 
                 var affectedRows = await connection.ExecuteAsync(sql, details);
@@ -89,8 +143,8 @@ namespace Xcianify.Repository
         {
             using (var connection = _dbContext.GetConnection())
             {
-                var sql = "DELETE FROM item_bought_out_details WHERE id = @Id";
-                var affectedRows = await connection.ExecuteAsync(sql, new { Id = id });
+                var sql = "UPDATE item_bought_out_details SET is_deleted = true, updated_at = @UpdatedAt WHERE id = @Id";
+                var affectedRows = await connection.ExecuteAsync(sql, new { Id = id, UpdatedAt = DateTime.UtcNow });
                 return affectedRows > 0;
             }
         }

@@ -6,13 +6,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useCreateItemType, useUpdateItemType } from "@/hooks/items/use-item-types";
+import { useCreateItemType, useItemTypes, useUpdateItemType } from "@/hooks/items/use-item-types";
 import { FormInput } from "@/components/shared/forms/form-input";
 import { RightDrawer } from "@/components/shared/right-drawer";
 import { ItemTypeFormData, itemTypeSchema } from "@/validations/item-master";
 import { ItemType } from "@/types/item";
 import { FormCheckbox } from "@/components/shared/forms/form-checkbox";
 import { FormTextArea } from "@/components/shared/forms/form-text-area";
+import { FormSelect } from "@/components/shared/forms/form-select";
+import { useItemTypeOptions } from "@/components/shared/options";
 
 interface ItemTypeDrawerProps {
   isOpen: boolean;
@@ -30,7 +32,6 @@ export default function ItemTypeDrawer({
   const { toast } = useToast();
   const createItemTypeMutation = useCreateItemType();
   const updateItemTypeMutation = useUpdateItemType();
-
   const form = useForm<ItemTypeFormData>({
     resolver: zodResolver(itemTypeSchema),
     defaultValues: {
@@ -63,6 +64,8 @@ export default function ItemTypeDrawer({
       });
     }
   }, [itemType, reset]);
+
+  const itemTypeOptions = useItemTypeOptions();
 
   const onSubmit = async (data: ItemTypeFormData) => {
     
@@ -129,7 +132,15 @@ export default function ItemTypeDrawer({
     >
       <FormProvider {...form}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {JSON.stringify(errors)}
+
+        <FormSelect
+          control={control}
+          name="parentTypeId"
+          label="Parent Item Type"
+          options={itemTypeOptions}
+          required
+        />
+
           <FormInput
             control={control}
             name="code"
@@ -153,17 +164,7 @@ export default function ItemTypeDrawer({
             placeholder="Enter item type description"
           />
 
-          <FormInput
-            control={control}
-            name="parentTypeId"
-            label="Parent Item Type ID"
-            placeholder="Enter parent item type ID (optional)"
-            inputProps={{ 
-              type: "number",
-              min: "1",
-              step: "1"
-            }}
-          />
+         
 
           <FormCheckbox
                   control={control}

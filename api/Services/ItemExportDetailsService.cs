@@ -39,14 +39,23 @@ namespace Xcianify.Services
 
         public async Task<ItemExportDetailsDto> CreateAsync(CreateItemExportDetailsDto createDto, int userId)
         {
-            var entity = _mapper.Map<ItemExportDetails>(createDto);
-            entity.CreatedBy = userId;
-            entity.UpdatedBy = userId;
-            entity.CreatedAt = DateTime.UtcNow;
-            entity.UpdatedAt = DateTime.UtcNow;
-            var id = await _repository.CreateAsync(entity);
-            entity.Id = id;
-            return _mapper.Map<ItemExportDetailsDto>(entity);
+            try
+            {
+                var entity = _mapper.Map<ItemExportDetails>(createDto);
+                entity.CreatedBy = userId;
+                entity.UpdatedBy = userId;
+                entity.CreatedAt = DateTime.UtcNow;
+                entity.UpdatedAt = DateTime.UtcNow;
+              
+               var id = await _repository.CreateAsync(entity);
+               entity.Id = id;
+                return _mapper.Map<ItemExportDetailsDto>(entity);
+            }
+            catch (Exception ex)
+            {
+                // Log the error and rethrow with more context
+                throw new Exception($"Error creating ItemExportDetails: {ex.Message}", ex);
+            }
         }
 
         public async Task<ItemExportDetailsDto> UpdateAsync(int id, UpdateItemExportDetailsDto updateDto, int userId)
@@ -66,6 +75,23 @@ namespace Xcianify.Services
             return await _repository.DeleteAsync(id);
         }
 
+        //   Method to check table structure for debugging
+        //public async Task<IEnumerable<dynamic>> GetTableStructureAsync()
+        //{
+        //    return ;
+        //  //  await _repository.GetTableStructureAsync();
+        //}
+        public async Task<IEnumerable<dynamic>> GetTableStructureAsync()
+        {
+            var tableStructure = new List<dynamic>
+    {
+        new { ColumnName = "Id", DataType = "int" },
+        new { ColumnName = "Name", DataType = "varchar(255)" },
+        new { ColumnName = "CreatedDate", DataType = "datetime" },
+        new { ColumnName = "IsActive", DataType = "bit" }
+    };
 
+            return await Task.FromResult(tableStructure);
+        }
     }
 }

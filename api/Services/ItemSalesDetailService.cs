@@ -1,12 +1,13 @@
-using System;
-using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 using Xcianify.Core.Domain.Repositories;
 using Xcianify.Core.Domain.Services;
 using Xcianify.Core.DTOs.ItemMaster;
 using Xcianify.Core.Exceptions;
 using Xcianify.Core.Model;
+using static Xcianify.Core.DTOs.ItemMaster.CreateItemSalesDetailDto;
 
 namespace Xcianify.Services
 {
@@ -35,7 +36,7 @@ namespace Xcianify.Services
             {
                 var salesDetail = await _salesDetailRepository.GetByItemMasterIdAsync(itemMasterId);
                 if (salesDetail == null)
-                    throw new NotFoundException("Sales detail not found for the specified item");
+                    return null; // Return null instead of throwing exception
 
                 return _mapper.Map<ItemSalesDetailDto>(salesDetail);
             }
@@ -84,14 +85,19 @@ namespace Xcianify.Services
                 if (existingDetail == null)
                     throw new NotFoundException("Sales detail not found");
 
-                // Update fields from DTO
+                // Update fields from DTO using AutoMapper
                 _mapper.Map(dto, existingDetail);
+                
                 existingDetail.UpdatedBy = userId;
                 existingDetail.UpdatedAt = DateTime.UtcNow;
 
+                _logger.LogInformation($"Updating sales detail ID: {id}, ItemId: {existingDetail.ItemId}");
                 var success = await _salesDetailRepository.UpdateAsync(existingDetail);
                 if (!success)
+                {
+                    _logger.LogError($"Failed to update sales detail ID: {id}. No rows affected.");
                     throw new ApplicationException("Failed to update sales detail");
+                }
 
                 return _mapper.Map<ItemSalesDetailDto>(existingDetail);
             }

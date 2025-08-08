@@ -54,9 +54,15 @@ namespace Xcianify.Services
             var existing = await _repository.GetByIdAsync(id);
             if (existing == null)
                 throw new NotFoundException("ItemOtherDetails not found");
-            var entity = _mapper.Map(updateDto, existing);
+            
+            var entity = _mapper.Map<ItemOtherDetails>(updateDto);
+            entity.Id = id;     
+            entity.ItemId = existing.ItemId; // Preserve the original ItemId
+            entity.CreatedBy = existing.CreatedBy; // Preserve original creator
+            entity.CreatedAt = existing.CreatedAt; // Preserve original creation date
             entity.UpdatedBy = userId;
             entity.UpdatedAt = DateTime.UtcNow;
+            
             await _repository.UpdateAsync(entity);
             return _mapper.Map<ItemOtherDetailsDto>(entity);
         }

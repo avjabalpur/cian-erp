@@ -6,7 +6,7 @@ export interface ItemSpecification {
   id: number;
   itemId: number;
   specification?: string;
-  substituteItemFor?: string;
+  SubstituteForItemCode?: string;
   customTariffNo?: string;
   exciseTariffNo?: string;
   vatCommCode?: string;
@@ -26,7 +26,7 @@ export interface ItemSpecification {
 export interface CreateItemSpecificationData {
   itemId: number;
   specification?: string;
-  substituteItemFor?: string;
+  SubstituteForItemCode?: string;
   customTariffNo?: string;
   exciseTariffNo?: string;
   vatCommCode?: string;
@@ -41,7 +41,7 @@ export interface CreateItemSpecificationData {
 
 export interface UpdateItemSpecificationData {
   specification?: string;
-  substituteItemFor?: string;
+  SubstituteForItemCode?: string;
   customTariffNo?: string;
   exciseTariffNo?: string;
   vatCommCode?: string;

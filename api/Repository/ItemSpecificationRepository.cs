@@ -32,11 +32,7 @@ namespace Xcianify.Repository
                     standard_conversion_cost_factor as StandardConversionCostFactor,
                     standard_packing_cost_factor as StandardPackingCostFactor,
                     markup_percentage as MarkupPercentage,
-                    markup_amount as MarkupAmount,
-                    created_by as CreatedBy,
-                    updated_by as UpdatedBy,
-                    created_at as CreatedAt,
-                    updated_at as UpdatedAt
+                    markup_amount as MarkupAmount
                 FROM item_specifications
                 WHERE item_id = @ItemId";
 
@@ -52,13 +48,15 @@ namespace Xcianify.Repository
                     custom_tariff_no, excise_tariff_no, vat_comm_code, 
                     conversion_factor, old_code, standard_weight, 
                     standard_conversion_cost_factor, standard_packing_cost_factor, 
-                    markup_percentage, markup_amount, created_by, updated_by
+                    markup_percentage, markup_amount,
+                    created_at, updated_at, created_by, updated_by
                 ) VALUES (
                     @ItemId, @Specification, @SubstituteForItemCode, 
                     @CustomTariffNo, @ExciseTariffNo, @VatCommCode, 
                     @ConversionFactor, @OldCode, @StandardWeight, 
                     @StandardConversionCostFactor, @StandardPackingCostFactor, 
-                    @MarkupPercentage, @MarkupAmount, @CreatedBy, @UpdatedBy
+                    @MarkupPercentage, @MarkupAmount,
+                    @CreatedAt, @UpdatedAt, @CreatedBy, @UpdatedBy
                 )";
 
             using var connection = _dbContext.GetConnection();
@@ -81,8 +79,8 @@ namespace Xcianify.Repository
                     standard_packing_cost_factor = @StandardPackingCostFactor,
                     markup_percentage = @MarkupPercentage,
                     markup_amount = @MarkupAmount,
-                    updated_by = @UpdatedBy,
-                    updated_at = @UpdatedAt
+                    updated_at = @UpdatedAt,
+                    updated_by = @UpdatedBy
                 WHERE item_id = @ItemId";
 
             using var connection = _dbContext.GetConnection();
@@ -91,10 +89,9 @@ namespace Xcianify.Repository
 
         public async Task DeleteAsync(int itemId)
         {
-            const string query = "DELETE FROM item_specifications WHERE item_id = @ItemId";
-
+            const string query = @"UPDATE item_specifications SET is_deleted = true, updated_at = @UpdatedAt WHERE item_id = @ItemId";
             using var connection = _dbContext.GetConnection();
-            await connection.ExecuteAsync(query, new { ItemId = itemId });
+            await connection.ExecuteAsync(query, new { ItemId = itemId, UpdatedAt = DateTime.UtcNow });
         }
     }
 }

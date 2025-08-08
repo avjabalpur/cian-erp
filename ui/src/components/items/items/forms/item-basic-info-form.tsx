@@ -3,35 +3,40 @@ import { FormInput } from "@/components/shared/forms/form-input"
 import { FormSelect } from "@/components/shared/forms/form-select"
 import { FormSwitch } from "@/components/shared/forms/form-switch"
 import { ConfigListSelect } from "@/components/shared/config-list-select"
-import { useItemTypes, useParentTypes } from "@/hooks/items/use-item-types"
-import { useProductGroups } from "@/hooks/use-product-groups"
-import { useController } from "react-hook-form"
+import { useProductGroupOptions } from "@/components/shared/options"
+import { useItemTypeOptions, useProductTypeOptions } from "@/components/shared/options"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { useItemTypes } from "@/hooks/items/use-item-types"
 import { Search } from "lucide-react"
+import { useController } from "react-hook-form"
 import { DivisionLookup } from "@/components/shared/lookups/division-lookup"
+import { ItemOtherDetailsForm } from "./item-other-details-form"
+import { useParentTypes } from "@/hooks/items/use-item-types"
 
 interface ItemBasicInfoFormProps {
   control: any;
+  itemId?: number;
 }
 
-export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
+export function ItemBasicInfoForm({ control, itemId }: ItemBasicInfoFormProps) {
   const [isDivisionLookupOpen, setIsDivisionLookupOpen] = useState(false);
+  
+  // Use controller for GS Ind field
+  const gsIndController = useController({
+    name: "gsInd",
+    control,
+  });
   
   // Fetch item types and parent types
   const { data: itemTypes = { items: [] } } = useItemTypes();
+  // Fetch parent types
   const { data: parentTypes = [] } = useParentTypes();
 
-  // Create options for item types
-  const itemTypeOptions = [
-    { label: "Select item type", value: "-1" },
-    ...itemTypes.items.map((itemType) => ({
-      label: `${itemType.code} - ${itemType.name}`,
-      value: itemType.id.toString(),
-    })),
-  ];
+  // Create options for item types using shared component
+  const itemTypeOptions = useItemTypeOptions();
 
   // Create options for sub types (parent types)
   const subTypeOptions = [
@@ -50,12 +55,7 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
     { label: "MTR - Meters", value: "MTR" },
   ];
 
-  const productTypeOptions = [
-    { label: "Select Product Type", value: "-1" },
-    { label: "Sale Pack", value: "Sale Pack" },
-    { label: "Bulk", value: "Bulk" },
-    { label: "Sample", value: "Sample" },
-  ];
+  const productTypeOptions = useProductTypeOptions();
 
   const salesDivisionOptions = [
     { label: "Select Sales Division", value: "-1" },
@@ -67,16 +67,8 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
     control.setValue("salesDivision", divisionId.toString());
   };
 
-  // Fetch product groups
-  const { data: productGroups = [] } = useProductGroups();
-
-  const productGroupOptions = [
-    { label: "Select Product Group", value: "-1" },
-    ...productGroups.map((productGroup) => ({
-      label: `${productGroup.code} - ${productGroup.productGroupName}`,
-      value: productGroup.id.toString(),
-    })),
-  ];
+  // Get product group options
+  const productGroupOptions = useProductGroupOptions();
 
   return (
     <div className="space-y-2">
@@ -100,16 +92,16 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
           <label className="text-[12px] font-medium">GS Ind.</label>
           <ConfigListSelect
             listCode="gs_id"
-            value={control._formValues?.gsInd}
+            value={gsIndController.field.value || ""}
             onChange={(value) => {
-              control.setValue("gsInd", value);
+              gsIndController.field.onChange(value);
             }}
             placeholder="Select GS Ind."
           />
         </div>
         <FormInput
           control={control}
-          name="hsn"
+          name="revNo"
           label="HSN"
           placeholder="Enter HSN code"
         />
@@ -117,7 +109,7 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
           <span className="text-sm font-medium">UQC:</span> <span className="text-sm font-medium">KGS</span>
         </div>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="space-y-4">
           <Card>
             <CardContent className="space-y-2">
@@ -506,6 +498,9 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
               />
             </CardContent>
           </Card>
+        </div>
+        <div className="space-y-4">
+        <ItemOtherDetailsForm control={control} itemId={itemId} />
         </div>
       </div>
 

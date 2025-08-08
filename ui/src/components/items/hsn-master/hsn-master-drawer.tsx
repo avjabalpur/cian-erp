@@ -13,6 +13,8 @@ import { RightDrawer } from "@/components/shared/right-drawer";
 import { HsnMasterFormData, hsnMasterSchema } from "@/validations/item-master";
 import { HsnMaster } from "@/types/hsn-master";
 import { FormTextArea } from "@/components/shared/forms/form-text-area";
+import { FormSwitch } from "@/components/shared/forms/form-switch";
+import { useHsnTypeOptions } from "@/components/shared/options";
 
 interface HsnMasterDrawerProps {
   isOpen: boolean;
@@ -176,17 +178,14 @@ export default function HsnMasterDrawer({
     isLoading
   });
 
-  const hsnTypeOptions = [
-    { value: "H", label: "H" },
-    { value: "S", label: "S" },
-  ];
+  const hsnTypeOptions = useHsnTypeOptions();
 
   return (
     <RightDrawer
       isOpen={isOpen}
       onClose={handleClose}
       title={hsnMaster ? "Edit HSN Master" : "Create New HSN Master"}
-      size="xl"
+      size="2xl"
       description={hsnMaster 
         ? "Update the HSN master information below." 
         : "Fill in the information below to create a new HSN master."
@@ -210,18 +209,8 @@ export default function HsnMasterDrawer({
               placeholder="Enter HSN name"
               required
             />
-          </div>
 
-          <FormTextArea
-            control={control}
-            name="description"
-            label="Description"
-            placeholder="Enter description"
-            required
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormSelect
+<FormSelect
               control={control}
               name="hsnType"
               label="HSN Type"
@@ -235,10 +224,8 @@ export default function HsnMasterDrawer({
               label="UQC"
               placeholder="Enter UQC"
             />
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInput
+<FormInput
               control={control}
               name="igstRate"
               label="IGST Rate (%)"
@@ -263,9 +250,6 @@ export default function HsnMasterDrawer({
                 step: "0.01"
               }}
             />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormInput
               control={control}
               name="sgstRate"
@@ -293,31 +277,25 @@ export default function HsnMasterDrawer({
             />
           </div>
 
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <label className="text-base font-medium">Reverse Charges</label>
-              <p className="text-sm text-muted-foreground">
-                Enable reverse charges for this HSN code
-              </p>
-            </div>
-            <Switch
-              checked={form.watch("isReverseCharges")}
-              onCheckedChange={(checked) => form.setValue("isReverseCharges", checked)}
-            />
-          </div>
+          <FormTextArea
+            control={control}
+            name="description"
+            label="Description"
+            placeholder="Enter description"
+            required
+          />
 
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <label className="text-base font-medium">Active Status</label>
-              <p className="text-sm text-muted-foreground">
-                Enable or disable this HSN master
-              </p>
-            </div>
-            <Switch
-              checked={form.watch("isActive")}
-              onCheckedChange={(checked) => form.setValue("isActive", checked)}
-            />
-          </div>
+        <FormSwitch
+          control={control}
+          name="isReverseCharges"
+          label="Reverse Charges" 
+        />
+
+        <FormSwitch
+          control={control}
+          name="isActive"
+          label="Active Status"
+        />
 
           <div className="flex justify-end gap-4 pt-4">
             <Button
