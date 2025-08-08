@@ -19,6 +19,6 @@ namespace Xcianify.Core.Model
         public decimal? DutyDrawbackValueCap { get; set; }
         public string DutyDrawbackRemarks { get; set; }
         public bool IsDeleted { get; set; }
-        public bool IsDeleted { get; set; }
+        
     }
 }
