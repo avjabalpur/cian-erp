@@ -80,6 +80,17 @@ export function SalesOrderApprovalContent({
     form.setValue("customerId", selectedCustomer.id);
     form.setValue("customerCode", selectedCustomer.customerCode);
     form.setValue("customerName", selectedCustomer.customerName);
+    form.setValue("customerGstNo", selectedCustomer.gstNo || "");
+    form.setValue("country", selectedCustomer.country || "");
+  };
+
+  // Handle item selection from lookup
+  const handleItemSelect = (selectedItem: any) => {
+    form.setValue("itemId", selectedItem.id);
+    form.setValue("productCode", selectedItem.itemCode);
+    form.setValue("productName", selectedItem.itemName);
+    form.setValue("composition", selectedItem.composition || "");
+    form.setValue("dosageName", selectedItem.dosageName || "TABLET");
   };
 
   React.useEffect(() => {
@@ -144,9 +155,9 @@ export function SalesOrderApprovalContent({
         // Set readonly field defaults
         manufacturerName: "CIAN HEALTHCARE",
         customerName: salesOrder.customerName || "",
-        customerCode: salesOrder.customerCode || "",
-        productName: salesOrder.productName || "",
-        productCast: salesOrder.productCast || "",
+        customerCode: "", // Will be populated from customer lookup
+        productName: "", // Will be populated from item lookup
+        productCast: "", // Will be populated from item lookup
       });
     }
   }, [salesOrder, form]);
@@ -348,23 +359,6 @@ export function SalesOrderApprovalContent({
                       </CardContent>
                     </Card>
 
-                    {/* Reference Documents */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg font-semibold">Reference Documents</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <ReferenceDocuments
-                          onUploadFile={handleUploadFile}
-                          onViewAttachedDocuments={handleViewAttachedDocuments}
-                          disabled={updateSalesOrderMutation.isPending}
-                          documents={documents}
-                          isLoading={documentsLoading}
-                        />
-                      </CardContent>
-                    </Card>
-
-                    {/* SO Info Form */}
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-lg font-semibold">SO Info</CardTitle>
@@ -374,11 +368,11 @@ export function SalesOrderApprovalContent({
                           control={form.control}
                           disabled={updateSalesOrderMutation.isPending}
                           onCustomerSelect={handleCustomerSelect}
+                          onItemSelect={handleItemSelect}
                         />
                       </CardContent>
                     </Card>
 
-                    {/* Product Info Form */}
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-lg font-semibold">Product Info</CardTitle>
@@ -399,6 +393,20 @@ export function SalesOrderApprovalContent({
                             />
                           </div>
                         </div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg font-semibold">Reference Documents</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ReferenceDocuments
+                          onUploadFile={handleUploadFile}
+                          onViewAttachedDocuments={handleViewAttachedDocuments}
+                          disabled={updateSalesOrderMutation.isPending}
+                          documents={documents}
+                          isLoading={documentsLoading}
+                        />
                       </CardContent>
                     </Card>
                   </TabsContent>

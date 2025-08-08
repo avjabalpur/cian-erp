@@ -1,526 +1,347 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Control, useWatch } from "react-hook-form";
 import { FormInput } from "@/components/shared/forms/form-input";
 import { FormSelect } from "@/components/shared/forms/form-select";
-import { FormTextarea } from "@/components/shared/forms/form-textarea";
 import { SalesOrderUpdateFormValues } from "@/validations/sales-order";
 import { SalesOrderOptionsMaster } from "@/lib/constants/sales-order-options";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { FormTextArea } from "@/components/shared/forms/form-text-area";
 
 interface ProductInfoFormProps {
   control: Control<SalesOrderUpdateFormValues>;
   disabled?: boolean;
-  permissions?: any;
-  currentStatus?: string;
 }
 
-export function ProductInfoForm({ control, disabled, permissions, currentStatus }: ProductInfoFormProps) {
-  // Watch form values for conditional logic
-  const dosageName = useWatch({ control, name: "dosageName" });
+export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
+  // Watch dosage name to conditionally show fields
+  const watchedValues = useWatch({ control });
+  const dosageName = watchedValues.dosageName;
 
-  // Check if field should be readonly based on permissions and status
-  const isFieldReadonly = (fieldName: string) => {
-    if (disabled) return true;
-    
-    // Check if status is ADDED-TO-PROGEN
-    if (currentStatus === "ADDED-TO-PROGEN") return true;
-    
-    // Check permissions
-    if (!permissions?.admin) {
-      // BD users can only edit certain fields
-      if (permissions?.bd) {
-        const bdBlockedFields = [
-          'pShipperSize', 'pQtyPerShipper', 'pNoOfShipper', 'pDomino', 
-          'pShipperDrawingRefCode', 'ctnOuterDrawingRefNo', 'ctnInnerDrawingRefNo', 
-          'foilDrawingRefNo', 'leafletDrawingRefNo', 'tubeDrawingRefNo', 
-          'labelDrawingRefNo', 'pmOuterCtnStock', 'pmInnerCtnStock', 
-          'pmFoilStock', 'pmLeafletStock', 'pmTubeStock', 'pmLabelStock'
-        ];
-        if (bdBlockedFields.includes(fieldName)) return true;
-      }
-      
-      // Costing admin can only edit certain fields
-      if (permissions?.costing_admin) {
-        const costingFields = [
-          'pColour', 'pShelfLife', 'pTabletSize', 'pCapsuleSize', 'pCosting'
-        ];
-        if (!costingFields.includes(fieldName)) return true;
-      }
-      
-      // Progen data entry can only edit certain fields
-      if (permissions?.progen_data_entry) {
-        const progenFields = [
-          'pShipperSize', 'pQtyPerShipper', 'pNoOfShipper', 'pDomino'
-        ];
-        if (!progenFields.includes(fieldName)) return true;
-      }
-      
-      // Design admin can only edit certain fields
-      if (permissions?.design_admin) {
-        const designFields = [
-          'division', 'designUnder', 'pShipperDrawingRefCode', 
-          'ctnOuterDrawingRefNo', 'ctnInnerDrawingRefNo', 'foilDrawingRefNo',
-          'leafletDrawingRefNo', 'tubeDrawingRefNo', 'labelDrawingRefNo'
-        ];
-        if (!designFields.includes(fieldName)) return true;
-      }
-      
-      // PM admin can only edit certain fields
-      if (permissions?.pm_admin) {
-        const pmFields = [
-          'pmOuterCtnStock', 'pmInnerCtnStock', 'pmFoilStock', 
-          'pmLeafletStock', 'pmTubeStock', 'pmLabelStock'
-        ];
-        if (!pmFields.includes(fieldName)) return true;
-      }
-    }
-    
-    return false;
-  };
-
-  // Check if field should be visible based on dosage
-  const isFieldVisible = (fieldName: string) => {
-    if (!dosageName) return true;
-    
-    const dosageVisibilityMap: Record<string, Record<string, boolean>> = {
-      pColour: {
-        TABLET: true, CAPSULE: true, LIQUID: true, OINTMENT: true, 
-        POWDER: true, SOFTGEL: true
-      },
-      pShelfLife: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      pPackShort: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      packingStyleDescription: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      pTabletType: { TABLET: true, SOFTGEL: true },
-      pTabletSize: { TABLET: true, SOFTGEL: true },
-      pCapsuleSize: { CAPSULE: true, SOFTGEL: true },
-      pChangePart: { TABLET: true, CAPSULE: true, SOFTGEL: true },
-      pShipperSize: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      pQtyPerShipper: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      pNoOfShipper: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      pFlavour: { TABLET: true, LIQUID: true, POWDER: true },
-      pFragrance: { TABLET: true, LIQUID: true, POWDER: true },
-      pQuantity: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      pFocQty: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      pMrp: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      pBillingRate: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      pCosting: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      pInventoryCharges: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      pCylinderCharge: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      pDomino: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      pShipperDrawingRefCode: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      ctnOuterDrawingRefNo: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      ctnInnerDrawingRefNo: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      foilDrawingRefNo: { TABLET: true, CAPSULE: true, SOFTGEL: true },
-      leafletDrawingRefNo: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      tubeDrawingRefNo: { GEL: true, OINTMENT: true, CREAM: true },
-      labelDrawingRefNo: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      pmOuterCtnStock: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      pmInnerCtnStock: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      pmFoilStock: { TABLET: true, CAPSULE: true, SOFTGEL: true },
-      pmLeafletStock: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      pmTubeStock: { GEL: true, OINTMENT: true, CREAM: true },
-      pmLabelStock: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      },
-      drugApprovalUnder: {
-        TABLET: true, GEL: true, CAPSULE: true, LIQUID: true, 
-        OINTMENT: true, POWDER: true, CREAM: true, SOFTGEL: true
-      }
-    };
-    
-    const fieldVisibility = dosageVisibilityMap[fieldName];
-    return fieldVisibility ? fieldVisibility[dosageName] || false : true;
-  };
+  // Determine which fields to show based on dosage form
+  const showTabletFields = dosageName === "TABLET";
+  const showCapsuleFields = dosageName === "CAPSULE";
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Product Information</CardTitle>
+        <CardTitle>Product Specifications</CardTitle>
         <CardDescription>
-          Product specifications and details
+          Detailed product specifications and manufacturing details
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Quantity and Pricing */}
-        {isFieldVisible('pQuantity') && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <FormInput
-              control={control}
-              name="pQuantity"
-              label="P Quantity"
-              placeholder="Enter quantity"
-              disabled={isFieldReadonly('pQuantity')}
-              type="number"
-            />
-            
-            <FormInput
-              control={control}
-              name="pFocQty"
-              label="P FOC Qty"
-              placeholder="Enter FOC quantity"
-              disabled={isFieldReadonly('pFocQty')}
-              type="number"
-            />
-            
-            <FormInput
-              control={control}
-              name="pBillingRate"
-              label="P Billing Rate"
-              placeholder="Enter billing rate"
-              disabled={isFieldReadonly('pBillingRate')}
-              type="number"
-            />
-            
-            <FormInput
-              control={control}
-              name="pMrp"
-              label="P MRP"
-              placeholder="Enter MRP"
-              disabled={isFieldReadonly('pMrp')}
-              type="number"
-            />
-          </div>
-        )}
-
-        {/* Costing */}
-        {isFieldVisible('pCosting') && (
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-            <FormInput
-              control={control}
-              name="pCosting"
-              label="P Costing"
-              placeholder="Enter costing"
-              disabled={isFieldReadonly('pCosting')}
-              type="number"
-            />
-          </div>
-        )}
-
-        {/* Product Specifications */}
-        {isFieldVisible('pColour') && (
+        {/* Basic Product Information */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Basic Product Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormTextArea
+              control={control}
+              name="composition"
+              label="Composition"
+              placeholder="Enter product composition"
+              disabled={disabled}
+              rows={3}
+            />
+            
             <FormInput
               control={control}
-              name="pColour"
-              label="P Colour"
-              placeholder="Enter colour"
-              disabled={isFieldReadonly('pColour')}
+              name="packShort"
+              label="Pack Short"
+              placeholder="Enter pack short description"
+              disabled={disabled}
             />
             
             <FormSelect
               control={control}
-              name="pShelfLife"
-              label="P Shelf Life"
+              name="shelfLife"
+              label="Shelf Life"
               options={SalesOrderOptionsMaster.shelfLife}
-              disabled={isFieldReadonly('pShelfLife')}
+              disabled={disabled}
             />
+            
+            <FormInput
+              control={control}
+              name="colour"
+              label="Colour"
+              placeholder="Enter product colour"
+              disabled={disabled}
+            />
+          </div>
+        </div>
+
+        {/* Tablet Specific Fields */}
+        {showTabletFields && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Tablet Specifications</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormSelect
+                control={control}
+                name="tabletType"
+                label="Tablet Type"
+                options={SalesOrderOptionsMaster.tabletTypes}
+                disabled={disabled}
+              />
+              
+              <FormSelect
+                control={control}
+                name="tabletSize"
+                label="Tablet Size"
+                options={SalesOrderOptionsMaster.tabletSizes}
+                disabled={disabled}
+              />
+              
+              <FormInput
+                control={control}
+                name="changePart"
+                label="Change Part"
+                placeholder="Enter change part details"
+                disabled={disabled}
+              />
+            </div>
           </div>
         )}
 
-        {/* Packing Information */}
-        {isFieldVisible('pPackShort') && (
+        {/* Capsule Specific Fields */}
+        {showCapsuleFields && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Capsule Specifications</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormSelect
+                control={control}
+                name="capsuleSize"
+                label="Capsule Size"
+                options={SalesOrderOptionsMaster.capsuleSizes}
+                disabled={disabled}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Packaging Information */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Packaging Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInput
-              control={control}
-              name="pPackShort"
-              label="P Pack Short"
-              placeholder="Enter pack short"
-              disabled={isFieldReadonly('pPackShort')}
-            />
-            
-            <FormInput
-              control={control}
-              name="packingStyleDescription"
-              label="Packing Style Description"
-              placeholder="Enter packing style"
-              disabled={isFieldReadonly('packingStyleDescription')}
-            />
-          </div>
-        )}
-
-        {/* Tablet/Capsule Specifications */}
-        {isFieldVisible('pTabletType') && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <FormSelect
               control={control}
-              name="pTabletType"
-              label="P Tablet Type"
-              options={SalesOrderOptionsMaster.tabletTypes}
-              disabled={isFieldReadonly('pTabletType')}
-            />
-            
-            <FormSelect
-              control={control}
-              name="pTabletSize"
-              label="P Tablet Size"
-              options={SalesOrderOptionsMaster.tabletSizes}
-              disabled={isFieldReadonly('pTabletSize')}
-            />
-            
-            <FormSelect
-              control={control}
-              name="pCapsuleSize"
-              label="P Capsule Size"
-              options={SalesOrderOptionsMaster.capsuleSizes}
-              disabled={isFieldReadonly('pCapsuleSize')}
-            />
-            
-            <FormInput
-              control={control}
-              name="pChangePart"
-              label="P Change Part"
-              placeholder="Enter change part"
-              disabled={isFieldReadonly('pChangePart')}
-            />
-          </div>
-        )}
-
-        {/* Shipper Information */}
-        {isFieldVisible('pShipperSize') && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <FormSelect
-              control={control}
-              name="pShipperSize"
-              label="P Shipper Size"
+              name="shipperSize"
+              label="Shipper Size"
               options={SalesOrderOptionsMaster.shipperSizes}
-              disabled={isFieldReadonly('pShipperSize')}
+              disabled={disabled}
             />
             
             <FormInput
               control={control}
-              name="pQtyPerShipper"
-              label="P Qty Per Shipper"
+              name="qtyPerShipper"
+              label="Quantity per Shipper"
               placeholder="Enter quantity per shipper"
-              disabled={isFieldReadonly('pQtyPerShipper')}
-              type="number"
+              disabled={disabled}
             />
             
             <FormInput
               control={control}
-              name="pNoOfShipper"
-              label="P No Of Shipper"
+              name="noOfShipper"
+              label="Number of Shippers"
               placeholder="Enter number of shippers"
-              disabled={isFieldReadonly('pNoOfShipper')}
-              type="number"
+              disabled={disabled}
             />
-          </div>
-        )}
-
-        {/* Flavour and Fragrance */}
-        {isFieldVisible('pFlavour') && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
             <FormSelect
               control={control}
-              name="pFlavour"
-              label="P Flavour"
+              name="flavour"
+              label="Flavour"
               options={SalesOrderOptionsMaster.flavours}
-              disabled={isFieldReadonly('pFlavour')}
+              disabled={disabled}
             />
             
             <FormSelect
               control={control}
-              name="pFragrance"
-              label="P Fragrance"
+              name="fragrance"
+              label="Fragrance"
               options={SalesOrderOptionsMaster.fragrances}
-              disabled={isFieldReadonly('pFragrance')}
+              disabled={disabled}
             />
           </div>
-        )}
+        </div>
 
-        {/* Charges */}
-        {isFieldVisible('pInventoryCharges') && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Quantity and Pricing */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Quantity & Pricing</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormInput
               control={control}
-              name="pInventoryCharges"
-              label="P Inventory Charges"
-              placeholder="Enter inventory charges"
-              disabled={isFieldReadonly('pInventoryCharges')}
-              type="number"
+              name="quantity"
+              label="Quantity"
+              placeholder="Enter quantity"
+              disabled={disabled}
             />
             
             <FormInput
               control={control}
-              name="pCylinderCharge"
+              name="focQty"
+              label="FOC Quantity"
+              placeholder="Enter FOC quantity"
+              disabled={disabled}
+            />
+            
+            <FormInput
+              control={control}
+              name="mrp"
+              label="MRP"
+              placeholder="Enter MRP"
+              disabled={disabled}
+            />
+            
+            <FormInput
+              control={control}
+              name="billingRate"
+              label="Billing Rate"
+              placeholder="Enter billing rate"
+              disabled={disabled}
+            />
+            
+            <FormInput
+              control={control}
+              name="costing"
+              label="Costing"
+              placeholder="Enter costing"
+              disabled={disabled}
+            />
+          </div>
+        </div>
+
+        {/* Manufacturing Charges */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Manufacturing Charges</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormInput
+              control={control}
+              name="inventoryCharges"
+              label="Inventory Charges"
+              placeholder="Enter inventory charges"
+              disabled={disabled}
+            />
+            
+            <FormInput
+              control={control}
+              name="cylinderCharge"
               label="Cylinder Charge"
               placeholder="Enter cylinder charge"
-              disabled={isFieldReadonly('pCylinderCharge')}
-              type="number"
+              disabled={disabled}
             />
             
             <FormInput
               control={control}
-              name="pPlateCharges"
+              name="plateCharges"
               label="Plate Charges"
               placeholder="Enter plate charges"
-              disabled={isFieldReadonly('pPlateCharges')}
-              type="number"
+              disabled={disabled}
             />
           </div>
-        )}
+        </div>
 
-        {/* Domino/Stereo */}
-        {isFieldVisible('pDomino') && (
+        {/* Manufacturing Options */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Manufacturing Options</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormSelect
               control={control}
-              name="pDomino"
-              label="Domino / Stereo"
+              name="domino"
+              label="Domino/Stereo"
               options={SalesOrderOptionsMaster.domino}
-              disabled={isFieldReadonly('pDomino')}
+              disabled={disabled}
             />
             
             <FormInput
               control={control}
-              name="pStereo"
+              name="stereo"
               label="Stereo"
-              placeholder="Enter stereo"
-              disabled={isFieldReadonly('pStereo')}
+              placeholder="Enter stereo details"
+              disabled={disabled}
             />
           </div>
-        )}
+        </div>
 
         {/* Drawing References */}
-        {isFieldVisible('pShipperDrawingRefCode') && (
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Drawing References</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormInput
               control={control}
-              name="pShipperDrawingRefCode"
-              label="P Shipper Drawing Ref Code"
-              placeholder="Enter drawing ref code"
-              disabled={isFieldReadonly('pShipperDrawingRefCode')}
+              name="shipperDrawingRefCode"
+              label="Shipper Drawing Ref Code"
+              placeholder="Enter shipper drawing reference"
+              disabled={disabled}
             />
             
-            <FormSelect
-              control={control}
-              name="drugApprovalUnder"
-              label="Drug Approval Under"
-              options={SalesOrderOptionsMaster.manufacturerName}
-              disabled={isFieldReadonly('drugApprovalUnder')}
-            />
-          </div>
-        )}
-
-        {/* CTN Drawing References */}
-        {isFieldVisible('ctnOuterDrawingRefNo') && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormInput
               control={control}
               name="ctnOuterDrawingRefNo"
               label="CTN Outer Drawing Ref No"
-              placeholder="Enter outer drawing ref"
-              disabled={isFieldReadonly('ctnOuterDrawingRefNo')}
+              placeholder="Enter outer carton drawing reference"
+              disabled={disabled}
             />
             
             <FormInput
               control={control}
-              name="pmOuterCtnStock"
-              label="PM Outer CTN Stock"
-              placeholder="Enter outer CTN stock"
-              disabled={isFieldReadonly('pmOuterCtnStock')}
-              type="number"
+              name="ctnInnerDrawingRefNo"
+              label="CTN Inner Drawing Ref No"
+              placeholder="Enter inner carton drawing reference"
+              disabled={disabled}
+            />
+            
+            <FormInput
+              control={control}
+              name="foilDrawingRefNo"
+              label="Foil Drawing Ref No"
+              placeholder="Enter foil drawing reference"
+              disabled={disabled}
+            />
+            
+            <FormInput
+              control={control}
+              name="leafletDrawingRefNo"
+              label="Leaflet Drawing Ref No"
+              placeholder="Enter leaflet drawing reference"
+              disabled={disabled}
+            />
+            
+            <FormInput
+              control={control}
+              name="tubeDrawingRefNo"
+              label="Tube Drawing Ref No"
+              placeholder="Enter tube drawing reference"
+              disabled={disabled}
+            />
+            
+            <FormInput
+              control={control}
+              name="labelDrawingRefNo"
+              label="Label Drawing Ref No"
+              placeholder="Enter label drawing reference"
+              disabled={disabled}
             />
           </div>
-        )}
+        </div>
 
-        {isFieldVisible('ctnInnerDrawingRefNo') && (
+        {/* Production Management Stock */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Production Management Stock</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormInput
               control={control}
-              name="ctnInnerDrawingRefNo"
-              label="CTN Inner Drawing Ref No"
-              placeholder="Enter inner drawing ref"
-              disabled={isFieldReadonly('ctnInnerDrawingRefNo')}
+              name="pmOuterCtnStock"
+              label="PM Outer CTN Stock"
+              placeholder="Enter outer carton stock"
+              disabled={disabled}
             />
             
             <FormInput
               control={control}
               name="pmInnerCtnStock"
               label="PM Inner CTN Stock"
-              placeholder="Enter inner CTN stock"
-              disabled={isFieldReadonly('pmInnerCtnStock')}
-              type="number"
-            />
-          </div>
-        )}
-
-        {/* Foil Drawing Reference */}
-        {isFieldVisible('foilDrawingRefNo') && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInput
-              control={control}
-              name="foilDrawingRefNo"
-              label="Foil Drawing Ref No"
-              placeholder="Enter foil drawing ref"
-              disabled={isFieldReadonly('foilDrawingRefNo')}
+              placeholder="Enter inner carton stock"
+              disabled={disabled}
             />
             
             <FormInput
@@ -528,21 +349,7 @@ export function ProductInfoForm({ control, disabled, permissions, currentStatus 
               name="pmFoilStock"
               label="PM Foil Stock"
               placeholder="Enter foil stock"
-              disabled={isFieldReadonly('pmFoilStock')}
-              type="number"
-            />
-          </div>
-        )}
-
-        {/* Leaflet Drawing Reference */}
-        {isFieldVisible('leafletDrawingRefNo') && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInput
-              control={control}
-              name="leafletDrawingRefNo"
-              label="Leaflet Drawing Ref No"
-              placeholder="Enter leaflet drawing ref"
-              disabled={isFieldReadonly('leafletDrawingRefNo')}
+              disabled={disabled}
             />
             
             <FormInput
@@ -550,21 +357,7 @@ export function ProductInfoForm({ control, disabled, permissions, currentStatus 
               name="pmLeafletStock"
               label="PM Leaflet Stock"
               placeholder="Enter leaflet stock"
-              disabled={isFieldReadonly('pmLeafletStock')}
-              type="number"
-            />
-          </div>
-        )}
-
-        {/* Tube Drawing Reference */}
-        {isFieldVisible('tubeDrawingRefNo') && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInput
-              control={control}
-              name="tubeDrawingRefNo"
-              label="Tube Drawing Ref No"
-              placeholder="Enter tube drawing ref"
-              disabled={isFieldReadonly('tubeDrawingRefNo')}
+              disabled={disabled}
             />
             
             <FormInput
@@ -572,21 +365,7 @@ export function ProductInfoForm({ control, disabled, permissions, currentStatus 
               name="pmTubeStock"
               label="PM Tube Stock"
               placeholder="Enter tube stock"
-              disabled={isFieldReadonly('pmTubeStock')}
-              type="number"
-            />
-          </div>
-        )}
-
-        {/* Label Drawing Reference */}
-        {isFieldVisible('labelDrawingRefNo') && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInput
-              control={control}
-              name="labelDrawingRefNo"
-              label="Label Drawing Ref No"
-              placeholder="Enter label drawing ref"
-              disabled={isFieldReadonly('labelDrawingRefNo')}
+              disabled={disabled}
             />
             
             <FormInput
@@ -594,12 +373,25 @@ export function ProductInfoForm({ control, disabled, permissions, currentStatus 
               name="pmLabelStock"
               label="PM Label Stock"
               placeholder="Enter label stock"
-              disabled={isFieldReadonly('pmLabelStock')}
-              type="number"
+              disabled={disabled}
             />
           </div>
-        )}
+        </div>
+
+        {/* Drug Approval */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Drug Approval</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormInput
+              control={control}
+              name="drugApprovalUnder"
+              label="Drug Approval Under"
+              placeholder="Enter drug approval details"
+              disabled={disabled}
+            />
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
-} 
+}

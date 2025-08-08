@@ -64,6 +64,9 @@ export const salesOrderSchema = z.object({
   customerCode: z.string().optional(),
   productName: z.string().optional(),
   productCast: z.string().optional(),
+  // Additional fields for product info form
+  shelfLife: z.string().optional(),
+  colour: z.string().optional(),
 });
 
 export type SalesOrderFormValues = z.infer<typeof salesOrderSchema>

@@ -19,8 +19,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Search, Package } from "lucide-react";
-import { useItems } from "@/hooks/items/use-items";
-import { ItemFilter } from "@/hooks/items/use-items";
+import { useItems, ItemFilter } from "@/hooks/items/use-items";
 
 interface ItemLookupProps {
   isOpen: boolean;
@@ -40,10 +39,10 @@ export function ItemLookup({ isOpen, onClose, onSelect, excludeId }: ItemLookupP
     status: "active",
   };
 
-  const { data: itemData, isLoading } = useItems(filter);
+  const { data: items, isLoading } = useItems(filter);
 
-  const filteredItems = itemData?.items?.filter(
-    item => !excludeId || item.id !== excludeId
+  const filteredItems = items?.items?.filter(
+    (item: any) => !excludeId || item.id !== excludeId
   ) || [];
 
   const handleSelect = (item: any) => {
@@ -67,7 +66,7 @@ export function ItemLookup({ isOpen, onClose, onSelect, excludeId }: ItemLookupP
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="Search items..."
+                placeholder="Search items/products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -81,8 +80,8 @@ export function ItemLookup({ isOpen, onClose, onSelect, excludeId }: ItemLookupP
                 <TableRow>
                   <TableHead>Item Code</TableHead>
                   <TableHead>Item Name</TableHead>
-                  <TableHead>Dosage</TableHead>
-                  <TableHead>Type</TableHead>
+                  <TableHead>Dosage Form</TableHead>
+                  <TableHead>Product Group</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Action</TableHead>
                 </TableRow>
@@ -101,14 +100,12 @@ export function ItemLookup({ isOpen, onClose, onSelect, excludeId }: ItemLookupP
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredItems.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell className="font-medium">
-                        {item.itemCode}
-                      </TableCell>
+                  filteredItems.map((item: any) => (
+                    <TableRow key={item.id} className="hover:bg-muted/50">
+                      <TableCell className="font-medium">{item.itemCode}</TableCell>
                       <TableCell>{item.itemName}</TableCell>
-                      <TableCell>{item.dosageName || "N/A"}</TableCell>
-                      <TableCell>{item.itemType || "N/A"}</TableCell>
+                      <TableCell>{item.dosageName}</TableCell>
+                      <TableCell>{item.itemType}</TableCell>
                       <TableCell>
                         <Badge variant={item.isActive ? "default" : "secondary"}>
                           {item.isActive ? "Active" : "Inactive"}
@@ -116,7 +113,6 @@ export function ItemLookup({ isOpen, onClose, onSelect, excludeId }: ItemLookupP
                       </TableCell>
                       <TableCell>
                         <Button
-                          variant="outline"
                           size="sm"
                           onClick={() => handleSelect(item)}
                         >

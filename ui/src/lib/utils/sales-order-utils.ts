@@ -13,7 +13,7 @@ export interface StatusOption extends SelectOption {
   bgColor?: string;
 }
 
-// Current Status Options
+// Current Status Options (Enhanced from original system)
 export const currentStatusOptions: StatusOption[] = [
   { 
     label: "IN-PROGRESS", 
@@ -54,11 +54,11 @@ export const currentStatusOptions: StatusOption[] = [
   },
 ];
 
-// Sales Order Status Options
+// Sales Order Status Options (From original system)
 export const soStatusOptions: StatusOption[] = [
-  { label: "NEW", value: "new", color: "blue", variant: "default" },
-  { label: "REPEAT", value: "repeat", color: "orange", variant: "outline" },
-  { label: "REVISED", value: "revised", color: "purple", variant: "secondary" },
+  { label: "NEW", value: "NEW", color: "blue", variant: "default" },
+  { label: "REPEAT", value: "REPEAT", color: "orange", variant: "outline" },
+  { label: "REVISED", value: "REVISED", color: "purple", variant: "secondary" },
 ];
 
 // Product Shelf Life Options
@@ -71,10 +71,36 @@ export const pShelfLifeOptions: SelectOption[] = [
 
 
 
-// Product Domino Options
+// Product Domino Options (From original system)
 export const pDominoOptions: SelectOption[] = [
   { label: "DOMINO", value: "DOMINO" },
   { label: "STEREO", value: "STEREO" },
+];
+
+// Manufacturer Options (From original system)
+export const manufacturerOptions: SelectOption[] = [
+  { label: "CIAN HEALTHCARE", value: "CIAN HEALTHCARE" },
+  { label: "DR. SMITH", value: "DR. SMITH" },
+  { label: "Bayberry", value: "Bayberry" },
+  { label: "SHEFIATRIC LIFE SCIENCES", value: "SHEFIATRIC LIFE SCIENCES" },
+  { label: "CELESTA HEALTHCARE PVT. LTD.", value: "CELESTA HEALTHCARE PVT. LTD." },
+  { label: "JM LIFESCIENCES PVT. LTD.", value: "JM LIFESCIENCES PVT. LTD." },
+];
+
+// Assigned Designer Options (From original system)
+export const assignedDesignerOptions: SelectOption[] = [
+  { label: "-", value: "0" },
+  { label: "amar", value: "103" },
+  { label: "dn", value: "155" },
+  { label: "masum", value: "106" },
+  { label: "omkar", value: "190" },
+];
+
+// Approval Status Options
+export const approvalStatusOptions: SelectOption[] = [
+  { label: "All", value: "-1" },
+  { label: "Pending", value: "0" },
+  { label: "Approved", value: "1" },
 ];
 
 
@@ -253,4 +279,90 @@ export const defaultSalesOrderFilter = {
   assignedDesigner: undefined as number | undefined,
   fromDate: undefined as Date | undefined,
   toDate: undefined as Date | undefined
+};
+
+// Company Details (From original system)
+export const CompanyDetails = {
+  CIAN: {
+    name: "Cian Healthcare Ltd.",
+    address: "Office No.301, Konark Icon, Mundhwa - Kharadi Rd, Kirtane Baugh, Magarpatta, Hadapsar, Pune - 411036",
+    phone: "020-4147 1234",
+    email: "enquiry@cian.co",
+    website: "www.cian.co",
+    account_details: {
+      account_number: "301102000000745",
+      ifsc_code: "IBKL0000301",
+      branch: "Koregaon Park, Pune",
+    },
+  },
+  "DR SMITH": {
+    name: "Dr. Smiths Biotech",
+    address: "Office No.301, Konark Icon, Mundhwa - Kharadi Rd, Kirtane Baugh, Magarpatta, Hadapsar, Pune - 411036",
+    phone: "020-4147 1234",
+    email: "enquiry@drsmiths.co",
+    website: "www.cian.co",
+    account_details: {
+      account_number: "0769102000003971",
+      ifsc_code: "IBKL0000769",
+      branch: "KONDHWA, PUNE",
+    },
+  },
+  "Bayberry": {
+    name: "Bayberry Pharmaceuticals Pvt Ltd.",
+    address: "Business Court, Office no.C-314, opposite brand factory, Mukund Nagar, Pune, Maharashtra 411037",
+    phone: "",
+    email: "",
+    website: "",
+    account_details: {
+      account_number: "003905030273",
+      ifsc_code: "ICIC0000039",
+      branch: "Shivaji Nagar, Pune",
+    },
+  },
+  "SHEFIATRIC LIFE SCIENCES": {
+    name: "SHEFIATRIC LIFE SCIENCES",
+    address: "B-214,1st&2nd FLOOR, VAISHALI MARG, OPP.BRIGHTLAND SCHOOL, VAISHALI NAGAR, JAIPUR-302021 Rajasthan | GST. No.: 08BDUPJ5634B2ZE",
+    phone: "",
+    email: "",
+    website: "",
+    account_details: {
+      account_number: "59209414043964",
+      ifsc_code: "HDFC0006418",
+      branch: "Chandpole Jaipur",
+    },
+  },
+  "CELESTA HEALTHCARE PVT. LTD.": {
+    name: "CELESTA HEALTHCARE PVT. LTD.",
+    address: "SHOP NO 6 GROUND FLOOR, MILKAT NO 5709/5, GAT NO 1363, SHIV RASTA, NEAR MEETHA GODOWN, WADKI, TAL HAVELI DIST PUNE 412308.",
+    phone: "",
+    email: "",
+    website: "",
+    account_details: {
+      account_number: "",
+      ifsc_code: "",
+      branch: "",
+    },
+  },
+  "JM LIFESCIENCES PVT. LTD.": {
+    name: "JM LIFESCIENCES PVT. LTD.",
+    address: "224, Bharat Industrial Premises Co.Op.Soc. Ltd., L.B.S Marg,Bhandup (West), Mumbai, Maharashtra, Pin code : 400078",
+    phone: "9878882715/9137047791",
+    email: "jmlife16@gmail.com",
+    website: "https://jmlifesciences.com/ ",
+    account_details: {
+      account_number: "50200001682942",
+      ifsc_code: "HDFC0002844",
+      branch: "Dhanukar Colony Branch",
+    },
+  }
+};
+
+// Table pagination properties (From original system)
+export const PaginationProps = {
+  position: ["bottomCenter"] as any,
+  showSizeChanger: true,
+  defaultPageSize: 50,
+  pageSizeOptions: ["10", "20", "50", "100"],
+  showTitle: true,
+  showTotal: (total: any, range: any) => `Showing ${range[0]}-${range[1]} of ${total} items`,
 }; 
