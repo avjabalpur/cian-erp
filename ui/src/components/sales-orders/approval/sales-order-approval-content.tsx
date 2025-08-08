@@ -77,20 +77,34 @@ export function SalesOrderApprovalContent({
 
   // Handle customer selection from lookup
   const handleCustomerSelect = (selectedCustomer: any) => {
+    console.log("Customer selected:", selectedCustomer);
+    
     form.setValue("customerId", selectedCustomer.id);
-    form.setValue("customerCode", selectedCustomer.customerCode);
-    form.setValue("customerName", selectedCustomer.customerName);
+    form.setValue("customerCode", selectedCustomer.customerCode || "");
+    form.setValue("customerName", selectedCustomer.customerName || "");
     form.setValue("customerGstNo", selectedCustomer.gstNo || "");
     form.setValue("country", selectedCustomer.country || "");
+    
+    // Trigger form validation
+    form.trigger(["customerId", "customerCode", "customerName"]);
+    
+    console.log("Form values after customer selection:", form.getValues());
   };
 
   // Handle item selection from lookup
   const handleItemSelect = (selectedItem: any) => {
+    console.log("Item selected:", selectedItem);
+    
     form.setValue("itemId", selectedItem.id);
-    form.setValue("productCode", selectedItem.itemCode);
-    form.setValue("productName", selectedItem.itemName);
+    form.setValue("productCode", selectedItem.itemCode || "");
+    form.setValue("productName", selectedItem.itemName || "");
     form.setValue("composition", selectedItem.composition || "");
     form.setValue("dosageName", selectedItem.dosageName || "TABLET");
+    
+    // Trigger form validation
+    form.trigger(["itemId", "productCode", "productName"]);
+    
+    console.log("Form values after item selection:", form.getValues());
   };
 
   React.useEffect(() => {
@@ -360,7 +374,7 @@ export function SalesOrderApprovalContent({
                     </Card>
 
                     <Card>
-                      <CardHeader>
+                      <CardHeader className="pb-2">
                         <CardTitle className="text-lg font-semibold">SO Info</CardTitle>
                       </CardHeader>
                       <CardContent>

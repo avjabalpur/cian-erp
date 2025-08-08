@@ -13,6 +13,7 @@ import { Control, useWatch } from "react-hook-form";
 import { SalesOrderUpdateFormValues } from "@/validations/sales-order";
 import { useState } from "react";
 import { SalesOrderOptionsMaster } from "@/lib/constants/sales-order-options";
+import { Separator } from "@/components/ui/separator";
 
 interface SOInfoFormProps {
   control: Control<SalesOrderUpdateFormValues>;
@@ -54,26 +55,35 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect }
   };
 
   const getCustomerDisplayValue = (value: string) => {
-    if (!customer) return value;
-    return `${customer.customerCode} - ${customer.customerName}`;
+    const customerId = watchedValues.customerId;
+    const customerName = watchedValues.customerName;
+    const customerCode = watchedValues.customerCode;
+    
+    console.log("Customer display value:", { customerId, customerName, customerCode, value });
+    
+    if (customerId && customerName && customerCode) {
+      return `${customerCode} - ${customerName}`;
+    }
+    return value || "Select customer";
   };
 
   const getItemDisplayValue = (value: string) => {
-    // This would be populated when item is selected
+    const itemId = watchedValues.itemId;
+    const productName = watchedValues.productName;
+    const productCode = watchedValues.productCode;
+    
+    console.log("Item display value:", { itemId, productName, productCode, value });
+    
+    if (itemId && productName && productCode) {
+      return `${productCode} - ${productName}`;
+    }
     return value || "Select item";
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Sales Order Information</CardTitle>
-        <CardDescription>
-          Basic information about the sales order
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+      <div className="space-y-6">
         {/* Basic SO Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormInput
             control={control}
             name="soNumber"
@@ -101,6 +111,11 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect }
             required
           />
           
+        </div>
+
+      <Separator />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+         
           <FormSelect
             control={control}
             name="manufacturerName"
@@ -109,12 +124,19 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect }
             disabled={disabled}
             required
           />
+          <FormInput
+              control={control}
+              name="country"
+              label="Country"
+              placeholder="Country"
+              disabled={disabled}
+            />
         </div>
 
+      <Separator />
         {/* Customer Information */}
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">Customer Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FormLookup
               control={control}
               name="customerId"
@@ -150,13 +172,6 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect }
               disabled={true} // Read-only, populated from lookup
             />
             
-            <FormInput
-              control={control}
-              name="country"
-              label="Country"
-              placeholder="Country"
-              disabled={disabled}
-            />
             
             <FormSelect
               control={control}
@@ -168,32 +183,10 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect }
           </div>
         </div>
 
-        {/* Quotation Information */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Quotation Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormDateInput
-              control={control}
-              name="quotationDate"
-              label="Quotation Date"
-              placeholder="Pick a date"
-              disabled={disabled}
-            />
-            
-            <FormInput
-              control={control}
-              name="quotationNo"
-              label="Quotation No"
-              placeholder="Enter quotation number"
-              disabled={disabled}
-            />
-          </div>
-        </div>
-
+        <Separator />
         {/* Product Information */}
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">Product Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FormLookup
               control={control}
               name="itemId"
@@ -247,11 +240,10 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect }
             />
           </div>
         </div>
-
+        <Separator />
         {/* Division and Design Information */}
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">Division & Design Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FormInput
               control={control}
               name="divisionId"
@@ -290,7 +282,6 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect }
           onClose={() => setIsItemLookupOpen(false)}
           onSelect={handleItemSelect}
         />
-      </CardContent>
-    </Card>
+      </div>
   );
 } 
