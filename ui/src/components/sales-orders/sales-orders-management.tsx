@@ -23,6 +23,7 @@ import {
 import { CreateApprovalFormModal } from "./approval/create-approval-form-modal"
 import { salesOrderParsers } from "@/lib/utils/sales-order-utils"
 import { SalesOrderDrawer } from "./approval/sales-order-drawer"
+import { Card, CardContent } from "../ui/card"
 
 export default function SalesOrdersManagement() {
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -108,15 +109,6 @@ export default function SalesOrdersManagement() {
     }
   }
 
-  const handleViewComments = (salesOrder: SalesOrder) => {
-  }
-
-  const handleViewQuotations = (salesOrder: SalesOrder) => {
-  }
-
-  const handleViewDocuments = (salesOrder: SalesOrder) => {
-  }
-
   const handleNewSalesOrder = () => {
     setApprovalFormOpen(true)
   }
@@ -159,7 +151,8 @@ export default function SalesOrdersManagement() {
           </Button>
         </div>
       </div>
-
+      <Card>
+      <CardContent className="space-y-4 pt-4">
       <SalesOrderFilter onFilterChange={() => {}} />
 
       <SalesOrderApprovalTable
@@ -186,6 +179,8 @@ export default function SalesOrdersManagement() {
         }}
         isLoading={isLoading}
       />
+        </CardContent>
+        </Card>
 
       {selectedSalesOrderId && (
         <SalesOrderDrawer

@@ -19,8 +19,13 @@ import {
 import { SalesOrder, UpdateSalesOrderData } from "@/types/sales-order";
 import { useSalesOrderById } from "@/hooks/sales-order/use-sales-orders";
 import { useUpdateSalesOrder } from "@/hooks/sales-order/use-sales-orders";
+import { useCommentsBySalesOrder } from "@/hooks/sales-order/use-sales-order-comments";
+import { useChatMessagesBySalesOrder } from "@/hooks/sales-order/use-sales-order-chat";
+import { useDocumentsBySalesOrder } from "@/hooks/sales-order/use-sales-order-documents";
+import { useSalesOrderSaveTransactions } from "@/hooks/sales-order/use-sales-order-transactions";
 import { useToast } from "@/hooks/use-toast";
 import { SalesOrderUpdateFormValues, salesOrderUpdateSchema } from "@/validations/sales-order";
+import { SalesOrderChat, SalesOrderComment, SalesOrderDocument, SalesOrderSaveTransaction } from "@/types/sales-order-extended";
 import { ApprovalButtons } from "./approval-buttons";
 import { ReferenceDocuments } from "./reference-documents";
 import { SOInfoForm } from "./so-info-form";
@@ -44,7 +49,16 @@ export function SalesOrderApprovalContent({
 }: SalesOrderApprovalContentProps) {
   const { toast } = useToast();
   const router = useRouter();
+  
+  // Fetch sales order data
   const { data: salesOrder, isLoading } = useSalesOrderById(salesOrderId.toString());
+  
+  // Fetch related data
+  const { data: comments = [], isLoading: commentsLoading } = useCommentsBySalesOrder(salesOrderId);
+  const { data: chatMessages = [], isLoading: chatLoading } = useChatMessagesBySalesOrder(salesOrderId);
+  const { data: documents = [], isLoading: documentsLoading } = useDocumentsBySalesOrder(salesOrderId);
+  const { data: saveTransactions = [], isLoading: transactionsLoading } = useSalesOrderSaveTransactions();
+  
   const updateSalesOrderMutation = useUpdateSalesOrder();
 
   const form = useForm<SalesOrderUpdateFormValues>({
@@ -52,20 +66,28 @@ export function SalesOrderApprovalContent({
     defaultValues: {
       soNumber: "",
       soDate: "",
-      soStatus: "",
+      soStatus: "REPEAT", // Default readonly value
       customerId: 0,
-      dosageName: "",
+      dosageName: "TABLET", // Default readonly value
       currentStatus: "",
       plantEmailSent: false,
+      manufacturerName: "CIAN HEALTHCARE", // Default readonly value
     },
   });
+
+  // Handle customer selection from lookup
+  const handleCustomerSelect = (selectedCustomer: any) => {
+    form.setValue("customerId", selectedCustomer.id);
+    form.setValue("customerCode", selectedCustomer.customerCode);
+    form.setValue("customerName", selectedCustomer.customerName);
+  };
 
   React.useEffect(() => {
     if (salesOrder) {
       form.reset({
         soNumber: salesOrder.soNumber || "",
         soDate: salesOrder.soDate || "",
-        soStatus: salesOrder.soStatus || "",
+        soStatus: salesOrder.soStatus || "REPEAT",
         organizationId: salesOrder.organizationId,
         customerId: salesOrder.customerId || 0,
         paymentTerm: salesOrder.paymentTerm || "",
@@ -73,7 +95,7 @@ export function SalesOrderApprovalContent({
         quotationNo: salesOrder.quotationNo || "",
         hsnCode: salesOrder.hsnCode || "",
         itemId: salesOrder.itemId,
-        dosageName: salesOrder.dosageName || "",
+        dosageName: salesOrder.dosageName || "TABLET",
         divisionId: salesOrder.divisionId,
         designUnder: salesOrder.designUnder || "",
         packingStyleDescription: salesOrder.packingStyleDescription || "",
@@ -119,9 +141,28 @@ export function SalesOrderApprovalContent({
         productCode: salesOrder.productCode || "",
         country: salesOrder.country || "",
         customerGstNo: salesOrder.customerGstNo || "",
+        // Set readonly field defaults
+        manufacturerName: "CIAN HEALTHCARE",
+        customerName: salesOrder.customerName || "",
+        customerCode: salesOrder.customerCode || "",
+        productName: salesOrder.productName || "",
+        productCast: salesOrder.productCast || "",
       });
     }
   }, [salesOrder, form]);
+
+  // Transform chat messages for the chat sidebar
+  const transformedChatMessages = chatMessages.map((chat: SalesOrderChat) => ({
+    id: chat.id.toString(),
+    message: chat.comment,
+    sender: chat.createdByName || "Unknown User",
+    timestamp: new Date(chat.createdAt),
+  }));
+
+  // Filter save transactions for this sales order
+  const salesOrderTransactions = saveTransactions.filter(
+    (transaction: SalesOrderSaveTransaction) => transaction.salesOrderId === salesOrderId
+  );
 
   const onSubmit = async (values: SalesOrderUpdateFormValues) => {
     try {
@@ -239,7 +280,6 @@ export function SalesOrderApprovalContent({
             {/* Header */}
             <div className="border-b p-3">
               <div className="flex items-center justify-between mb-3">
-
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">Current Status:</span>
@@ -318,6 +358,8 @@ export function SalesOrderApprovalContent({
                           onUploadFile={handleUploadFile}
                           onViewAttachedDocuments={handleViewAttachedDocuments}
                           disabled={updateSalesOrderMutation.isPending}
+                          documents={documents}
+                          isLoading={documentsLoading}
                         />
                       </CardContent>
                     </Card>
@@ -331,6 +373,7 @@ export function SalesOrderApprovalContent({
                         <SOInfoForm
                           control={form.control}
                           disabled={updateSalesOrderMutation.isPending}
+                          onCustomerSelect={handleCustomerSelect}
                         />
                       </CardContent>
                     </Card>
@@ -386,8 +429,39 @@ export function SalesOrderApprovalContent({
 
                   <TabsContent value="save-history">
                     <Card>
-                      <CardContent className="p-6">
-                        <p className="text-muted-foreground">Save History functionality will be implemented here.</p>
+                      <CardHeader>
+                        <CardTitle className="text-lg font-semibold">Save History</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {transactionsLoading ? (
+                          <div className="text-center py-4">Loading save history...</div>
+                        ) : salesOrderTransactions.length === 0 ? (
+                          <div className="text-center py-8 text-muted-foreground">
+                            No save history found for this sales order.
+                          </div>
+                        ) : (
+                          <div className="space-y-4">
+                            {salesOrderTransactions.map((transaction: SalesOrderSaveTransaction) => (
+                              <div key={transaction.id} className="border rounded-lg p-4">
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-sm font-medium">
+                                    {transaction.createdByName || "Unknown User"}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground">
+                                    {new Date(transaction.createdAt).toLocaleString()}
+                                  </span>
+                                </div>
+                                {transaction.diff && (
+                                  <div className="text-sm text-muted-foreground">
+                                    <pre className="whitespace-pre-wrap bg-muted p-2 rounded">
+                                      {transaction.diff}
+                                    </pre>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   </TabsContent>
@@ -400,6 +474,7 @@ export function SalesOrderApprovalContent({
 
       {/* Chat Sidebar */}
       <ChatSidebar
+        messages={transformedChatMessages}
         onSendMessage={handleSendMessage}
         onLastRead={handleLastRead}
         onSettings={handleChatSettings}

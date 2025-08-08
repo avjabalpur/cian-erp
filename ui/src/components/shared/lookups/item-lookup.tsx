@@ -18,37 +18,37 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Search, Building2 } from "lucide-react";
-import { useCustomers } from "@/hooks/customers/use-customers";
-import { CustomerFilter } from "@/types/customer";
+import { Search, Package } from "lucide-react";
+import { useItems } from "@/hooks/items/use-items";
+import { ItemFilter } from "@/hooks/items/use-items";
 
-interface CustomerLookupProps {
+interface ItemLookupProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (customer: any) => void;
+  onSelect: (item: any) => void;
   excludeId?: number;
 }
 
-export function CustomerLookup({ isOpen, onClose, onSelect, excludeId }: CustomerLookupProps) {
+export function ItemLookup({ isOpen, onClose, onSelect, excludeId }: ItemLookupProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
 
-  const filter: CustomerFilter = {
+  const filter: ItemFilter = {
     page: 1,
     pageSize: 50,
     search: searchTerm || undefined,
-    isActive: true,
+    status: "active",
   };
 
-  const { data: customersResponse, isLoading } = useCustomers(filter);
+  const { data: itemData, isLoading } = useItems(filter);
 
-  const customers = customersResponse?.items?.filter(
-    customer => !excludeId || customer.id !== excludeId
+  const filteredItems = itemData?.items?.filter(
+    item => !excludeId || item.id !== excludeId
   ) || [];
 
-  const handleSelect = (customer: any) => {
-    setSelectedCustomer(customer);
-    onSelect(customer);
+  const handleSelect = (item: any) => {
+    setSelectedItem(item);
+    onSelect(item);
     onClose();
   };
 
@@ -57,8 +57,8 @@ export function CustomerLookup({ isOpen, onClose, onSelect, excludeId }: Custome
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5" />
-            Customer Lookup
+            <Package className="h-5 w-5" />
+            Item/Product Lookup
           </DialogTitle>
         </DialogHeader>
 
@@ -67,7 +67,7 @@ export function CustomerLookup({ isOpen, onClose, onSelect, excludeId }: Custome
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="Search customers..."
+                placeholder="Search items..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -79,9 +79,10 @@ export function CustomerLookup({ isOpen, onClose, onSelect, excludeId }: Custome
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Customer Code</TableHead>
-                  <TableHead>Customer Name</TableHead>
-                  <TableHead>Location</TableHead>
+                  <TableHead>Item Code</TableHead>
+                  <TableHead>Item Name</TableHead>
+                  <TableHead>Dosage</TableHead>
+                  <TableHead>Type</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Action</TableHead>
                 </TableRow>
@@ -89,34 +90,35 @@ export function CustomerLookup({ isOpen, onClose, onSelect, excludeId }: Custome
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8">
-                      Loading customers...
+                    <TableCell colSpan={6} className="text-center py-8">
+                      Loading items...
                     </TableCell>
                   </TableRow>
-                ) : customers.length === 0 ? (
+                ) : filteredItems.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8">
-                      No customers found
+                    <TableCell colSpan={6} className="text-center py-8">
+                      No items found
                     </TableCell>
                   </TableRow>
                 ) : (
-                  customers.map((customer) => (
-                    <TableRow key={customer.id}>
+                  filteredItems.map((item) => (
+                    <TableRow key={item.id}>
                       <TableCell className="font-medium">
-                        {customer.customerCode}
+                        {item.itemCode}
                       </TableCell>
-                      <TableCell>{customer.customerName}</TableCell>
-                      <TableCell>{customer.locationCode}</TableCell>
+                      <TableCell>{item.itemName}</TableCell>
+                      <TableCell>{item.dosageName || "N/A"}</TableCell>
+                      <TableCell>{item.itemType || "N/A"}</TableCell>
                       <TableCell>
-                        <Badge variant={customer.isActive ? "default" : "secondary"}>
-                          {customer.isActive ? "Active" : "Inactive"}
+                        <Badge variant={item.isActive ? "default" : "secondary"}>
+                          {item.isActive ? "Active" : "Inactive"}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleSelect(customer)}
+                          onClick={() => handleSelect(item)}
                         >
                           Select
                         </Button>
@@ -131,4 +133,4 @@ export function CustomerLookup({ isOpen, onClose, onSelect, excludeId }: Custome
       </DialogContent>
     </Dialog>
   );
-} 
+}

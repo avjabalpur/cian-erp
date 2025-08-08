@@ -1,0 +1,31 @@
+@keyframes ColourChangingAnimation {
+  0% {
+    background-position: 0% 50%
+  }
+
+  50% {
+    background-position: 100% 50%
+  }
+
+  100% {
+    background-position: 0% 50%
+  }
+}
+
+.last-read-box {
+  margin-top: 20px;
+  width: 100%;
+  /* height: 10em; */
+  background: linear-gradient(270deg, #ce68d9, #45c6db, #45db79);
+  background-size: 800% 800%;
+  -webkit-animation: ColourChangingAnimation 3s ease infinite;
+  -moz-animation: ColourChangingAnimation 3s ease infinite;
+  animation: ColourChangingAnimation 3s ease infinite;
+  transition: .4s ease-in-out;
+  border-radius: 7px;
+  cursor: pointer;
+  text-align: center;
+  color: white;
+  font-size: 1.2em;
+  font-weight: 700;
+}
