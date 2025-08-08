@@ -4,6 +4,7 @@ export interface SalesOrder {
   soDate?: string;
   soStatus: string;
   organizationId?: number;
+  organizationName?: string;
   customerId?: number;
   customerName?: string;
   paymentTerm?: string;
@@ -65,6 +66,9 @@ export interface SalesOrder {
   createdByName?: string;
   updatedBy?: number;
   updatedByName?: string;
+  productCode?: string;
+  country?: string;
+  customerGstNo?: string;
 }
 
 export interface SalesOrderStage {

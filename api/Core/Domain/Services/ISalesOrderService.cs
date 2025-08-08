@@ -16,5 +16,6 @@ namespace Xcianify.Core.Domain.Services
         Task<bool> SubmitAsync(int id);
         Task<bool> ApproveAsync(int id);
         Task<bool> RejectAsync(int id);
+        Task<int> CreateApprovalAsync(CreateSalesOrderApprovalDto approvalDto, int currentUserId);
     }
 } 

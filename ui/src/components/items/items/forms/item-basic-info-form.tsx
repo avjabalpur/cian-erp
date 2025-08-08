@@ -3,9 +3,8 @@ import { FormInput } from "@/components/shared/forms/form-input"
 import { FormSelect } from "@/components/shared/forms/form-select"
 import { FormSwitch } from "@/components/shared/forms/form-switch"
 import { ConfigListSelect } from "@/components/shared/config-list-select"
-import { useItemTypes, useParentTypes } from "@/hooks/items/use-item-types"
-import { useProductGroups } from "@/hooks/use-product-groups"
-import { useController } from "react-hook-form"
+import { useProductGroupOptions } from "@/components/shared/options"
+import { useItemTypeOptions, useProductTypeOptions } from "@/components/shared/options"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
@@ -13,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Search } from "lucide-react"
 import { DivisionLookup } from "@/components/shared/lookups/division-lookup"
 import { ItemOtherDetailsForm } from "./item-other-details-form"
+import { useParentTypes } from "@/hooks/items/use-item-types"
 
 interface ItemBasicInfoFormProps {
   control: any;
@@ -30,16 +30,11 @@ export function ItemBasicInfoForm({ control, itemId }: ItemBasicInfoFormProps) {
   
   // Fetch item types and parent types
   const { data: itemTypes = { items: [] } } = useItemTypes();
+  // Fetch parent types
   const { data: parentTypes = [] } = useParentTypes();
 
-  // Create options for item types
-  const itemTypeOptions = [
-    { label: "Select item type", value: "-1" },
-    ...itemTypes.items.map((itemType) => ({
-      label: `${itemType.code} - ${itemType.name}`,
-      value: itemType.id.toString(),
-    })),
-  ];
+  // Create options for item types using shared component
+  const itemTypeOptions = useItemTypeOptions();
 
   // Create options for sub types (parent types)
   const subTypeOptions = [
@@ -58,12 +53,7 @@ export function ItemBasicInfoForm({ control, itemId }: ItemBasicInfoFormProps) {
     { label: "MTR - Meters", value: "MTR" },
   ];
 
-  const productTypeOptions = [
-    { label: "Select Product Type", value: "-1" },
-    { label: "Sale Pack", value: "Sale Pack" },
-    { label: "Bulk", value: "Bulk" },
-    { label: "Sample", value: "Sample" },
-  ];
+  const productTypeOptions = useProductTypeOptions();
 
   const salesDivisionOptions = [
     { label: "Select Sales Division", value: "-1" },
@@ -75,16 +65,8 @@ export function ItemBasicInfoForm({ control, itemId }: ItemBasicInfoFormProps) {
     control.setValue("salesDivision", divisionId.toString());
   };
 
-  // Fetch product groups
-  const { data: productGroups = [] } = useProductGroups();
-
-  const productGroupOptions = [
-    { label: "Select Product Group", value: "-1" },
-    ...productGroups.map((productGroup) => ({
-      label: `${productGroup.code} - ${productGroup.productGroupName}`,
-      value: productGroup.id.toString(),
-    })),
-  ];
+  // Get product group options
+  const productGroupOptions = useProductGroupOptions();
 
   return (
     <div className="space-y-2">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useQueryState } from "nuqs";
+import { useState } from "react";
 import {
   NuqsFormInput,
   NuqsFormSelect,
@@ -9,6 +10,8 @@ import {
 import { hsnMasterParsers } from "@/lib/utils/hsn-master-utils";
 
 export default function HsnMasterFilter() {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
   // URL state management with nuqs
   const [search, setSearch] = useQueryState("search", hsnMasterParsers.search);
   const [isActive, setIsActive] = useQueryState("isActive", hsnMasterParsers.isActive);
@@ -36,7 +39,8 @@ export default function HsnMasterFilter() {
       title="HSN Master Filters"
       activeFilterCount={activeFilterCount}
       onClearFilters={clearFilters}
-      showExpandCollapse={false}
+      isExpanded={isExpanded}
+      onToggleExpand={setIsExpanded}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <NuqsFormInput

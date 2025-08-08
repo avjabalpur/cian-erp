@@ -6,6 +6,7 @@ import { FilterWrapper } from "@/components/shared/filter/filter-wrapper";
 import { NuqsFormInput } from "@/components/shared/filter/nuqs-form-input";
 import { NuqsFormSelect } from "@/components/shared/filter/nuqs-form-select";
 import { useState } from "react";
+import { useItemTypeOptions } from "@/components/shared/options";
 
 export default function ItemsFilter() {
   const [search, setSearch] = useQueryState("search", parseAsString.withDefault(""));
@@ -15,14 +16,7 @@ export default function ItemsFilter() {
   const [qcRequired, setQcRequired] = useQueryState("qcRequired", parseAsString.withDefault(""));
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const itemTypeOptions = [
-    { label: "Tablet", value: "tablet" },
-    { label: "Capsule", value: "capsule" },
-    { label: "Syrup", value: "syrup" },
-    { label: "Injection", value: "injection" },
-    { label: "Cream", value: "cream" },
-    { label: "Ointment", value: "ointment" },
-  ];
+  const itemTypeOptions = useItemTypeOptions();
 
   const statusOptions = [
     { label: "Active", value: "active" },

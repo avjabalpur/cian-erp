@@ -140,7 +140,14 @@ builder.Services.AddAutoMapper(
     typeof(ItemOtherDetailsMapper),
     typeof(ConfigSettingMapper),
     typeof(ProductGroupMapper),
-    typeof(DivisionMapper)
+     typeof(ProductTypeMapper),
+    typeof(DivisionMapper),
+    typeof(CustomerMapper),
+    typeof(CustomerTypeMapper),
+    typeof(CustomerAddressMapper),
+    typeof(CustomerBankingDetailsMapper),
+    typeof(CustomerBusinessTermsMapper),
+    typeof(CustomerTaxComplianceMapper)
 );
 
 builder.Services.AddScoped<ILocationTypeRepository, LocationTypeRepository>();
@@ -161,9 +168,11 @@ builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IDivisionRepository, DivisionRepository>();
 builder.Services.AddScoped<IDivisionService, DivisionService>();
+
+builder.Services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
+builder.Services.AddScoped<IProductTypeService, ProductTypeService>();
 builder.Services.AddScoped<IProductGroupRepository, ProductGroupRepository>();
 builder.Services.AddScoped<IProductGroupService, ProductGroupService>();
-
 builder.Services.AddScoped<IItemMasterRepository, ItemMasterRepository>();
 builder.Services.AddScoped<IItemTypeRepository, ItemTypeRepository>();
 builder.Services.AddScoped<IItemTypeService, ItemTypeService>();
@@ -233,6 +242,20 @@ builder.Services.AddScoped<ISalesOrderStageService, SalesOrderStageService>();
 // Register Dosage services and repositories
 builder.Services.AddScoped<IDosageRepository, DosageRepository>();
 builder.Services.AddScoped<IDosageService, DosageService>();
+
+// Register Customer services and repositories
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<ICustomerAddressRepository, CustomerAddressRepository>();
+builder.Services.AddScoped<ICustomerAddressService, CustomerAddressService>();
+builder.Services.AddScoped<ICustomerBankingDetailsRepository, CustomerBankingDetailsRepository>();
+builder.Services.AddScoped<ICustomerBankingDetailsService, CustomerBankingDetailsService>();
+builder.Services.AddScoped<ICustomerBusinessTermsRepository, CustomerBusinessTermsRepository>();
+builder.Services.AddScoped<ICustomerBusinessTermsService, CustomerBusinessTermsService>();
+builder.Services.AddScoped<ICustomerTaxComplianceRepository, CustomerTaxComplianceRepository>();
+builder.Services.AddScoped<ICustomerTaxComplianceService, CustomerTaxComplianceService>();
+builder.Services.AddScoped<ICustomerTypeRepository, CustomerTypeRepository>();
+builder.Services.AddScoped<ICustomerTypeService, CustomerTypeService>();
 
 // Add Controllers
 builder.Services.AddControllers();

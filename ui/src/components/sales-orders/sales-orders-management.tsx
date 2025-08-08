@@ -3,12 +3,12 @@
 import { useState } from "react"
 import { useQueryState } from "nuqs"
 import { Button } from "@/components/ui/button"
-import SalesOrdersTable from "./sales-orders-table"
-import { SalesOrderFilter } from "./sales-order-filter"
+import SalesOrderApprovalTable from "./approval/sales-order-approval-table"
+import { SalesOrderFilter } from "./approval/sales-order-filter"
 import { useRouter } from "next/navigation"
 import { SalesOrder } from "@/types/sales-order"
-import { useSalesOrders, useDeleteSalesOrder } from "@/hooks/sales-order/use-sales-orders";
-import { useSalesOrderById } from "@/hooks/sales-order/use-sales-orders";
+import { useSalesOrdersWithApprovals } from "@/hooks/sales-order/use-sales-order-approvals";
+import { useDeleteSalesOrder } from "@/hooks/sales-order/use-sales-orders";
 import api from "@/lib/api";
 import { Plus, Download, Upload } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
@@ -20,13 +20,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import SalesOrderDrawer from "./sales-order-drawer"
-import { CreateApprovalFormModal } from "./create-approval-form-modal"
+import { CreateApprovalFormModal } from "./approval/create-approval-form-modal"
 import { salesOrderParsers } from "@/lib/utils/sales-order-utils"
+import { SalesOrderDrawer } from "./approval/sales-order-drawer"
 
 export default function SalesOrdersManagement() {
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [selectedSalesOrder, setSelectedSalesOrder] = useState<SalesOrder | null>(null)
+  const [selectedSalesOrderId, setSelectedSalesOrderId] = useState<number | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [salesOrderToDelete, setSalesOrderToDelete] = useState<SalesOrder | null>(null)
   const [approvalFormOpen, setApprovalFormOpen] = useState(false)
@@ -49,7 +49,7 @@ export default function SalesOrdersManagement() {
   const [fromDate] = useQueryState("fromDate", salesOrderParsers.fromDate);
   const [toDate] = useQueryState("toDate", salesOrderParsers.toDate);
 
-  const { data: salesOrdersData, isLoading } = useSalesOrders({
+  const { data: salesOrdersData, isLoading } = useSalesOrdersWithApprovals({
     search: search || "",
     pageNumber: page || 1,
     pageSize: pageSize || 10,
@@ -75,8 +75,12 @@ export default function SalesOrdersManagement() {
   }
 
   const handleEdit = (salesOrder: SalesOrder) => {
-    setSelectedSalesOrder(salesOrder)
+    setSelectedSalesOrderId(salesOrder.id)
     setDrawerOpen(true)
+  }
+
+  const handleOpenInPage = (salesOrder: SalesOrder) => {
+    router.push(`/sales-order-approval/${salesOrder.id}`)
   }
 
   const handleDelete = (salesOrder: SalesOrder) => {
@@ -118,28 +122,26 @@ export default function SalesOrdersManagement() {
   }
 
   const handleApprovalFormSuccess = async (salesOrderId: number) => {
-    try {
-      // Fetch the created sales order from the API
-      const { data: newSalesOrder } = await api.get(`/sales-order/${salesOrderId}`);
-      setSelectedSalesOrder(newSalesOrder);
-      setDrawerOpen(true);
-    } catch (error) {
-      console.error('Error fetching created sales order:', error);
-      toast({
-        title: "Warning",
-        description: "Sales order created but there was an issue loading it for editing. Please refresh the page.",
-        variant: "destructive",
-      });
-    }
+    setSelectedSalesOrderId(salesOrderId);
+    setDrawerOpen(true);
+  };
+
+  const handleCopyLink = (salesOrder: SalesOrder) => {
+    const url = `${window.location.origin}/sales/order-approval/${salesOrder.id}`;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: "Link copied",
+      description: "Sales order approval link copied to clipboard",
+    });
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Sales Orders</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Sales Order Approvals</h1>
           <p className="text-muted-foreground">
-            Manage and track all sales orders
+            Manage and track all sales order approvals with approval stages
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -160,21 +162,17 @@ export default function SalesOrdersManagement() {
 
       <SalesOrderFilter onFilterChange={() => {}} />
 
-      <SalesOrdersTable
+      <SalesOrderApprovalTable
         salesOrders={salesOrders}
         pageCount={Math.ceil(totalCount / (pageSize || 10))}
         pageSize={pageSize || 10}
         pageIndex={(page || 1) - 1}
         totalCount={totalCount}
-        onPaginationChange={(pageIndex, newPageSize) => {
+        onPaginationChange={(pageIndex: number, newPageSize: number) => {
           // This will be handled by the filter component's nuqs hooks
         }}
-        onView={handleView}
         onEdit={handleEdit}
-        onDelete={handleDelete}
-        onViewComments={handleViewComments}
-        onViewQuotations={handleViewQuotations}
-        onViewDocuments={handleViewDocuments}
+        onCopyLink={handleCopyLink}
         statusMap={{
           new: { label: "New", variant: "default" },
           draft: { label: "Draft", variant: "outline" },
@@ -189,11 +187,19 @@ export default function SalesOrdersManagement() {
         isLoading={isLoading}
       />
 
-      <SalesOrderDrawer
-        isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        salesOrder={selectedSalesOrder}
-      />
+      {selectedSalesOrderId && (
+        <SalesOrderDrawer
+          salesOrderId={selectedSalesOrderId}
+          isOpen={drawerOpen}
+          onClose={() => {
+            setDrawerOpen(false);
+            setSelectedSalesOrderId(null);
+          }}
+          onSuccess={() => {
+            // Refresh the data or show success message
+          }}
+        />
+      )}
 
       <CreateApprovalFormModal
         isOpen={approvalFormOpen}

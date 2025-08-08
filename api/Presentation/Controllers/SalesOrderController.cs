@@ -21,11 +21,11 @@ namespace Xcianify.Presentation.Controllers
             ISalesOrderDocumentService documentService,
             ISalesOrderStageService stageService)
         {
-            _salesOrderService = salesOrderService ?? throw new ArgumentNullException(nameof(salesOrderService));
-            _commentService = commentService ?? throw new ArgumentNullException(nameof(commentService));
-            _chatService = chatService ?? throw new ArgumentNullException(nameof(chatService));
-            _documentService = documentService ?? throw new ArgumentNullException(nameof(documentService));
-            _stageService = stageService ?? throw new ArgumentNullException(nameof(stageService));
+            _salesOrderService = salesOrderService;
+            _commentService = commentService;
+            _chatService = chatService;
+            _documentService = documentService;
+            _stageService = stageService;
         }
 
         [HttpGet]
@@ -54,6 +54,13 @@ namespace Xcianify.Presentation.Controllers
         {
             var createdSalesOrder = await _salesOrderService.CreateAsync(createSalesOrderDto);
             return CreatedAtAction(nameof(GetById), new { id = createdSalesOrder.Id }, createdSalesOrder);
+        }
+
+        [HttpPost("approval")]
+        public async Task<IActionResult> CreateApproval([FromBody] CreateSalesOrderApprovalDto approvalDto)
+        {
+            var approvalId = await _salesOrderService.CreateApprovalAsync(approvalDto, CurrentUserId);
+            return Ok(new { id = approvalId });
         }
 
         [HttpPut]

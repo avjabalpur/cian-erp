@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { useProductGroups, useDeleteProductGroup } from "@/hooks/use-product-groups";
+import { useProductGroups, useDeleteProductGroup } from "@/hooks/items/use-product-groups";
 import { useDivisions } from "@/hooks/use-divisions";
 import { ProductGroup } from "@/types/product-group";
 import { useToast } from "@/hooks/use-toast";

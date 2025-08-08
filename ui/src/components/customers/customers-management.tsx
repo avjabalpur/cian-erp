@@ -1,234 +1,163 @@
-"use client"
+"use client";
 
-import { useState, useMemo } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Plus } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
-import { useCustomers, type Customer, type CustomerFilters } from "@/hooks/use-customers"
-import CustomerFilter from "./customer-filter"
-import CustomerTable from "./customer-table"
-import CustomerForm from "./customer-form"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, ArrowLeft } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useCustomers, useDeleteCustomer } from "@/hooks/customers/use-customers";
+import { useQueryState } from "nuqs";
+import { customerFilterParsers } from "@/lib/utils/customer-utils";
+import { CustomerFilter, Customer } from "@/types/customer";
+import { useCustomerAddresses } from "@/hooks/customers/use-customer-addresses";
+import { useCustomerBankingDetails } from "@/hooks/customers/use-customer-banking-details";
+import { useCustomerBusinessTerms } from "@/hooks/customers/use-customer-business-terms";
+import { useCustomerTaxCompliance } from "@/hooks/customers/use-customer-tax-compliance";
+import CustomersFilter from "./customers-filter";
+import CustomersTable from "./customers-table";
+import CustomersDrawer from "./customers-drawer";
 
 export default function CustomersManagement() {
-  const { toast } = useToast()
-  const router = useRouter()
-  const { customers, loading, createCustomer, updateCustomer, deleteCustomer, toggleCustomerStatus } = useCustomers()
+  const router = useRouter();
+  const { toast } = useToast();
+  const deleteCustomerMutation = useDeleteCustomer();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [editingCustomerId, setEditingCustomerId] = useState<number | null>(null);
 
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
-  const [formLoading, setFormLoading] = useState(false)
+  // Hooks for fetching related data
+  const { data: addressesData } = useCustomerAddresses(editingCustomerId || 0);
+  const { data: bankingDetailsData } = useCustomerBankingDetails(editingCustomerId || 0);
+  const { data: businessTermsData } = useCustomerBusinessTerms(editingCustomerId || 0);
+  const { data: taxComplianceData } = useCustomerTaxCompliance(editingCustomerId || 0);
 
-  const [filters, setFilters] = useState<CustomerFilters>({
-    search: "",
-    customerType: "",
-    status: "",
-    city: "",
-  })
+  // URL state management with nuqs
+  const [page, setPage] = useQueryState("page", customerFilterParsers.pageNumber);
+  const [pageSize, setPageSize] = useQueryState("pageSize", customerFilterParsers.pageSize);
+  const [sortBy, setSortBy] = useQueryState("sortBy", customerFilterParsers.sortBy);
+  const [sortDescending, setSortDescending] = useQueryState("sortDescending", customerFilterParsers.sortDescending);
+  const [search] = useQueryState("search", customerFilterParsers.search);
+  const [customerCode] = useQueryState("customerCode", customerFilterParsers.customerCode);
+  const [customerName] = useQueryState("customerName", customerFilterParsers.customerName);
+  const [isActive] = useQueryState("isActive", customerFilterParsers.isActive);
 
-  // Filter customers based on current filters
-  const filteredCustomers = useMemo(() => {
-    return customers.filter((customer) => {
-      const matchesSearch =
-        !filters.search ||
-        customer.customerName.toLowerCase().includes(filters.search.toLowerCase()) ||
-        customer.customerNumber.toLowerCase().includes(filters.search.toLowerCase()) ||
-        customer.shortName.toLowerCase().includes(filters.search.toLowerCase()) ||
-        customer.email.toLowerCase().includes(filters.search.toLowerCase())
+  const { data: customersData, isLoading, refetch } = useCustomers({
+    page: (page as number) || 1,
+    pageSize: (pageSize as number) || 20,
+    search: search as string | undefined,
+    customerCode: customerCode as string | undefined,
+    customerName: customerName as string | undefined,
+    isActive: isActive === true ? true : isActive === false ? false : undefined,
+    sortBy: (sortBy as string) || "customerName",
+    sortDescending: (sortDescending as boolean) || false
+  });
+  const customers = customersData?.items || [];
+  const totalCount = customersData?.totalCount || 0;
 
-      const matchesType = !filters.customerType || customer.customerType === filters.customerType
+  const handlePaginationChange = (pageIndex: number, newPageSize: number) => {
+    setPage(pageIndex + 1); // Convert to 1-based indexing
+    setPageSize(newPageSize);
+  };
 
-      const matchesStatus =
-        !filters.status ||
-        (filters.status === "active" && customer.isActive) ||
-        (filters.status === "inactive" && !customer.isActive)
+  const handleCreateCustomer = () => {
+    setSelectedCustomer(null);
+    setDrawerOpen(true);
+  };
 
-      const matchesCity = !filters.city || customer.city === filters.city
-
-      return matchesSearch && matchesType && matchesStatus && matchesCity
-    })
-  }, [customers, filters])
-
-  const handleCreateCustomer = async (data: any) => {
-    try {
-      setFormLoading(true)
-      await createCustomer(data)
-      setIsAddDialogOpen(false)
-      toast({
-        title: "Success",
-        description: "Customer created successfully",
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create customer",
-        variant: "destructive",
-      })
-    } finally {
-      setFormLoading(false)
+  // Effect to update the selected customer when related data is loaded
+  useEffect(() => {
+    if (editingCustomerId && selectedCustomer && selectedCustomer.id === editingCustomerId) {
+      // Check if we already have the enhanced data to prevent infinite loops
+      const hasEnhancedData = (selectedCustomer as any).addresses || (selectedCustomer as any).bankingDetails || (selectedCustomer as any).businessTerms || (selectedCustomer as any).taxCompliance;
+      
+      if (!hasEnhancedData) {
+        const enhancedCustomer = {
+          ...selectedCustomer,
+          // Add addresses data
+          addresses: addressesData || [],
+          // Add banking details data
+          bankingDetails: bankingDetailsData || [],
+          // Add business terms data
+          businessTerms: businessTermsData || [],
+          // Add tax compliance data
+          taxCompliance: taxComplianceData || [],
+        } as Customer;
+        
+        setSelectedCustomer(enhancedCustomer);
+      }
     }
-  }
+  }, [editingCustomerId, selectedCustomer, addressesData, bankingDetailsData, businessTermsData, taxComplianceData]);
 
-  const handleUpdateCustomer = async (data: any) => {
-    if (!selectedCustomer) return
+  const handleEditCustomer = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setEditingCustomerId(customer.id);
+    setDrawerOpen(true);
+  };
 
+  const handleDeleteCustomer = async (customer: Customer) => {
     try {
-      setFormLoading(true)
-      await updateCustomer(selectedCustomer.id, data)
-      setIsEditDialogOpen(false)
-      setSelectedCustomer(null)
-      toast({
-        title: "Success",
-        description: "Customer updated successfully",
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update customer",
-        variant: "destructive",
-      })
-    } finally {
-      setFormLoading(false)
-    }
-  }
-
-  const handleDeleteCustomer = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this customer?")) return
-
-    try {
-      await deleteCustomer(id)
+      await deleteCustomerMutation.mutateAsync(customer.id.toString());
       toast({
         title: "Success",
         description: "Customer deleted successfully",
-      })
+      });
+      refetch();
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to delete customer",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
-  const handleToggleStatus = async (id: number) => {
-    try {
-      await toggleCustomerStatus(id)
-      toast({
-        title: "Success",
-        description: "Customer status updated successfully",
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update customer status",
-        variant: "destructive",
-      })
-    }
-  }
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+    setSelectedCustomer(null);
+    setEditingCustomerId(null);
+  };
 
-  const handleEditCustomer = (customer: Customer) => {
-    router.push(`/admin/customers/${customer.id}/edit`)
-  }
-
-  const handleViewCustomer = (customer: Customer) => {
-    // TODO: Implement view customer details
-    console.log("View customer:", customer)
-  }
-
-  const clearFilters = () => {
-    setFilters({
-      search: "",
-      customerType: "",
-      status: "",
-      city: "",
-    })
-  }
+  const handleDrawerSuccess = () => {
+    refetch();
+    handleDrawerClose();
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Customer Management</h1>
-          <p className="mt-2 text-gray-600">Manage customers, hospitals, pharmacies and distributors</p>
-        </div>
-        <Button onClick={() => setIsAddDialogOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add Customer
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold tracking-tight">Customers</h1>
+        <Button onClick={handleCreateCustomer} className="flex items-center space-x-2">
+          <Plus className="h-4 w-4" />
+          <span>Add Customer</span>
         </Button>
       </div>
 
-      {/* Filters */}
       <Card>
-        <CardHeader>
-          <CardTitle>Search & Filter</CardTitle>
-          <CardDescription>Find customers using various criteria</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <CustomerFilter filters={filters} onFiltersChange={setFilters} onClearFilters={clearFilters} />
-        </CardContent>
-      </Card>
-
-      {/* Results Summary */}
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-gray-600">
-          Showing {filteredCustomers.length} of {customers.length} customers
-        </div>
-      </div>
-
-      {/* Customer Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Customers</CardTitle>
-          <CardDescription>A list of all customers with their details and status</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <CustomerTable
-            customers={filteredCustomers}
-            loading={loading}
+        <CardContent className="space-y-4 pt-4">
+          <CustomersFilter />
+          <CustomersTable
+            customers={customers}
+            isLoading={isLoading}
             onEdit={handleEditCustomer}
             onDelete={handleDeleteCustomer}
-            onToggleStatus={handleToggleStatus}
-            onView={handleViewCustomer}
+            pagination={{
+              pageIndex: ((page as number) || 1) - 1,
+              pageSize: (pageSize as number) || 20,
+              pageCount: Math.ceil(totalCount / ((pageSize as number) || 20)),
+              totalCount,
+            }}
+            onPaginationChange={handlePaginationChange}
           />
         </CardContent>
       </Card>
 
-      {/* Add Customer Dialog */}
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Add New Customer</DialogTitle>
-            <DialogDescription>Create a new customer record with complete details.</DialogDescription>
-          </DialogHeader>
-          <CustomerForm
-            onSubmit={handleCreateCustomer}
-            onCancel={() => setIsAddDialogOpen(false)}
-            loading={formLoading}
-          />
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Customer Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit Customer</DialogTitle>
-            <DialogDescription>Update customer information and details.</DialogDescription>
-          </DialogHeader>
-          <CustomerForm
-            customer={selectedCustomer}
-            onSubmit={handleUpdateCustomer}
-            onCancel={() => {
-              setIsEditDialogOpen(false)
-              setSelectedCustomer(null)
-            }}
-            loading={formLoading}
-          />
-        </DialogContent>
-      </Dialog>
+      <CustomersDrawer
+        isOpen={drawerOpen}
+        onClose={handleDrawerClose}
+        customer={selectedCustomer}
+        onSuccess={handleDrawerSuccess}
+      />
     </div>
-  )
+  );
 }

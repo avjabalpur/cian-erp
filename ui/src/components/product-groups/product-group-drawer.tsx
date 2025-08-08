@@ -5,7 +5,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useCreateProductGroup, useUpdateProductGroup } from "@/hooks/use-product-groups";
+import { useCreateProductGroup, useUpdateProductGroup } from "@/hooks/items/use-product-groups";
 import { RightDrawer } from "@/components/shared/right-drawer";
 import { ProductGroupForm } from "./product-group-form";
 import { ProductGroup, CreateProductGroupData, UpdateProductGroupData } from "@/types/product-group";
