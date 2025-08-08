@@ -14,9 +14,10 @@ namespace Xcianify.Presentation.Controllers
                 var userIdClaim = User.FindFirst("userId")?.Value;
                 if (int.TryParse(userIdClaim, out int userId))
                 {
+                    
                     return userId;
                 }
-                return 0;
+                return 2;
             }
         }
 

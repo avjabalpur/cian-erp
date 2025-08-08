@@ -1,4 +1,7 @@
-﻿using Dapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Dapper;
 using Xcianify.Core.Domain.Repositories;
 using Xcianify.Core.Model;
 using Xcianify.Repository.DbContext;
@@ -18,7 +21,23 @@ namespace Xcianify.Repository
         {
             using (var connection = _dbContext.GetConnection())
             {
-                var sql = "SELECT * FROM item_bought_out_details WHERE item_id = @ItemId";
+                var sql = @"
+                    SELECT 
+                        id as Id,
+                        item_id as ItemId,
+                        purchase_based_on as PurchaseBasedOn,
+                        excess_planning_percent as ExcessPlanningPercent,
+                        reorder_level as ReorderLevel,
+                        min_stock_level as MinStockLevel,
+                        max_stock_level as MaxStockLevel,
+                        min_balance_shelf_life_days as MinBalanceShelfLifeDays,
+                        custom_duty_percent as CustomDutyPercent,
+                        igst_percent as IgstPercent,
+                        sws_percent as SwsPercent,
+                        max_purchase_rate as MaxPurchaseRate,
+                        stop_procurement as StopProcurement
+                    FROM item_bought_out_details 
+                    WHERE item_id = @ItemId";
                 return await connection.QueryFirstOrDefaultAsync<ItemBoughtOutDetails>(sql, new { ItemId = itemId });
             }
         }
@@ -27,7 +46,23 @@ namespace Xcianify.Repository
         {
             using (var connection = _dbContext.GetConnection())
             {
-                var sql = "SELECT * FROM item_bought_out_details WHERE id = @Id";
+                var sql = @"
+                    SELECT 
+                        id as Id,
+                        item_id as ItemId,
+                        purchase_based_on as PurchaseBasedOn,
+                        excess_planning_percent as ExcessPlanningPercent,
+                        reorder_level as ReorderLevel,
+                        min_stock_level as MinStockLevel,
+                        max_stock_level as MaxStockLevel,
+                        min_balance_shelf_life_days as MinBalanceShelfLifeDays,
+                        custom_duty_percent as CustomDutyPercent,
+                        igst_percent as IgstPercent,
+                        sws_percent as SwsPercent,
+                        max_purchase_rate as MaxPurchaseRate,
+                        stop_procurement as StopProcurement
+                    FROM item_bought_out_details 
+                    WHERE id = @Id";
                 return await connection.QueryFirstOrDefaultAsync<ItemBoughtOutDetails>(sql, new { Id = id });
             }
         }
@@ -36,7 +71,22 @@ namespace Xcianify.Repository
         {
             using (var connection = _dbContext.GetConnection())
             {
-                var sql = "SELECT * FROM item_bought_out_details";
+                var sql = @"
+                    SELECT 
+                        id as Id,
+                        item_id as ItemId,
+                        purchase_based_on as PurchaseBasedOn,
+                        excess_planning_percent as ExcessPlanningPercent,
+                        reorder_level as ReorderLevel,
+                        min_stock_level as MinStockLevel,
+                        max_stock_level as MaxStockLevel,
+                        min_balance_shelf_life_days as MinBalanceShelfLifeDays,
+                        custom_duty_percent as CustomDutyPercent,
+                        igst_percent as IgstPercent,
+                        sws_percent as SwsPercent,
+                        max_purchase_rate as MaxPurchaseRate,
+                        stop_procurement as StopProcurement
+                    FROM item_bought_out_details";
                 return await connection.QueryAsync<ItemBoughtOutDetails>(sql);
             }
         }
@@ -77,7 +127,7 @@ namespace Xcianify.Repository
                         igst_percent = @IgstPercent,
                         sws_percent = @SwsPercent,
                         max_purchase_rate = @MaxPurchaseRate,
-                        stop_procurement = @StopProcurement
+                        stop_procurement = @StopProcurement 
                     WHERE id = @Id";
 
                 var affectedRows = await connection.ExecuteAsync(sql, details);

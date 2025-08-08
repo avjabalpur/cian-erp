@@ -168,8 +168,8 @@ const allMenuItems: MenuItem[] = [
     
       {
         id: "sales-orders",
-        label: "Sales Orders",
-        href: "/sales/orders",
+        label: "Sales Orders Approval",
+        href: "/sales/order-approval",
         icon: ShoppingCart,
         roles: ["SUPER_ADMIN", "SALES_MANAGER", "SALES_EXECUTIVE"],
       },

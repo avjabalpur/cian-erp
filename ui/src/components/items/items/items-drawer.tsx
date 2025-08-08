@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { useCreateItemMaster, useUpdateItemMaster } from "@/hooks/items/use-item-master";
+import { useCreateItemMaster, useUpdateItemMaster, useItemMasterById } from "@/hooks/items/use-item-master";
 import { useCreateItemSpecification, useUpdateItemSpecification } from "@/hooks/items/use-item-specifications";
 import { useCreateItemSalesDetail, useUpdateItemSalesDetail } from "@/hooks/items/use-item-sales-details";
 import { useCreateItemBoughtOutDetails, useUpdateItemBoughtOutDetails } from "@/hooks/items/use-item-bought-out-details";
@@ -42,6 +42,9 @@ export default function ItemsDrawer({
 }: ItemsDrawerProps) {
   const { toast } = useToast();
   
+  // Fetch complete item data when editing
+  const { data: completeItemData, isLoading: isLoadingItem } = useItemMasterById(item?.id || 0);
+  
   // Main item mutations
   const createItemMutation = useCreateItemMaster();
   const updateItemMutation = useUpdateItemMaster();
@@ -72,20 +75,34 @@ export default function ItemsDrawer({
     resolver: zodResolver(itemMasterSchema),
     defaultValues: getItemMasterDefaultValues(),
   });
-
+ const onError = (errors: typeof form.formState.errors) => {
+  const currentValues = form.getValues();
+  console.log("❌ Errors:", errors);
+  console.log("⚠️ Data at time of error:", currentValues);
+};
+  
   useEffect(() => {
     if (isOpen) {
       if (item) {
-        console.log('Loading item data:', item);
+        // If we have a complete item data from the API, use it
+        if (completeItemData) {
+          console.log('Loading complete item data:', completeItemData);
+          const formData = mapItemToFormData(completeItemData);
+          console.log('Mapped form data:', formData);
+          form.reset(formData);
+        } else if (!isLoadingItem) {
+          // Fallback to the item passed as prop if API data is not available
+          console.log('Loading item data from prop:', item);
         const formData = mapItemToFormData(item);
         console.log('Mapped form data:', formData);
         form.reset(formData);
+        }
       } else {
         console.log('Resetting to default values');
         form.reset(getItemMasterDefaultValues());
       }
     }
-  }, [item, form, isOpen]);
+  }, [item, completeItemData, isLoadingItem, form, isOpen]);
 
   // Force re-render of child components when item changes
   const [currentItemId, setCurrentItemId] = useState<number | undefined>(undefined);
@@ -106,7 +123,7 @@ export default function ItemsDrawer({
         customTariffNo: formData.customTariffNo,
         exciseTariffNo: formData.exciseTariffNo,
         vatCommCode: formData.vatCommCode,
-        convFactor: formData.convFactor ? formData.convFactor : undefined,
+        conversionFactor: formData.convFactor ? formData.convFactor : undefined,
         oldCode: formData.oldCode,
         standardWeight: formData.standardWeight ? formData.standardWeight : undefined,
         standardConversionCostFactor: formData.standardConversionCostFactor ? formData.standardConversionCostFactor : undefined,
@@ -114,7 +131,7 @@ export default function ItemsDrawer({
         costFactorPercent: formData.costFactorPercent ? formData.costFactorPercent : undefined,
         packingCostRs: formData.packingCostRs ? formData.packingCostRs : undefined,
       };
-      if (item?.specification) {
+      if (completeItemData?.specification) {
         promises.push(updateSpecificationMutation.mutateAsync({ itemId, data: specData }));
       } else {
         promises.push(createSpecificationMutation.mutateAsync({ itemId, data: specData }));
@@ -122,22 +139,40 @@ export default function ItemsDrawer({
     }
 
     // Save sales details
-    if (formData.sellingPrice || formData.currencyId || formData.isTaxInclusive !== undefined) {
+    if (formData.packSizeApplicable !== undefined || formData.defaultPackSize || formData.saleableUnitContains || formData.qtyPerBox || formData.boxesPerCase || formData.casePackingType || formData.packingRate || formData.qtyPerCase || formData.netWeightCase || formData.tareWeightCase || formData.grossWeightCase || formData.grossWeightUnit || formData.caseDimensionsInches || formData.caseVolumeCft || formData.caseDimensionsCm || formData.caseVolumeCbm || formData.minSaleRate || formData.minSoQty || formData.tertiaryGtin || formData.secondaryGtin || formData.primaryGtin || formData.minBatchQtyAutoloading || formData.considerAsNewProductTill || formData.interfaceCode || formData.specs) {
       const salesData = {
         itemId,
-        sellingPrice: formData.sellingPrice ? formData.sellingPrice : undefined,
-        currencyId: formData.currencyId ? formData.currencyId : undefined,
-        isTaxInclusive: formData.isTaxInclusive || false,
-        discountPercentage: formData.discountPercentage ? formData.discountPercentage : undefined,
-        minimumOrderQuantity: formData.minimumOrderQuantity ? formData.minimumOrderQuantity : undefined,
-        isActive: true,
-        notes: formData.notes,
+        packSizeApplicable: formData.packSizeApplicable || false,
+        defaultPackSize: formData.defaultPackSize,
+        saleableUnitContains: formData.saleableUnitContains ? formData.saleableUnitContains : undefined,
+        qtyPerBox: formData.qtyPerBox ? formData.qtyPerBox : undefined,
+        boxesPerCase: formData.boxesPerCase ? formData.boxesPerCase : undefined,
+        casePackingType: formData.casePackingType,
+        packingRate: formData.packingRate ? formData.packingRate : undefined,
+        qtyPerCase: formData.qtyPerCase ? formData.qtyPerCase : undefined,
+        netWeightCase: formData.netWeightCase ? formData.netWeightCase : undefined,
+        tareWeightCase: formData.tareWeightCase ? formData.tareWeightCase : undefined,
+        grossWeightCase: formData.grossWeightCase ? formData.grossWeightCase : undefined,
+        grossWeightUnit: formData.grossWeightUnit ? formData.grossWeightUnit : undefined,
+        caseDimensionsInches: formData.caseDimensionsInches,
+        caseVolumeCft: formData.caseVolumeCft ? formData.caseVolumeCft : undefined,
+        caseDimensionsCm: formData.caseDimensionsCm,
+        caseVolumeCbm: formData.caseVolumeCbm ? formData.caseVolumeCbm : undefined,
+        minSaleRate: formData.minSaleRate ? formData.minSaleRate : undefined,
+        minSoQty: formData.minSoQty ? formData.minSoQty : undefined,
+        tertiaryGtin: formData.tertiaryGtin,
+        secondaryGtin: formData.secondaryGtin,
+        primaryGtin: formData.primaryGtin,
+        minBatchQtyAutoloading: formData.minBatchQtyAutoloading ? formData.minBatchQtyAutoloading : undefined,
+        considerAsNewProductTill: formData.considerAsNewProductTill,
+        interfaceCode: formData.interfaceCode,
+        specs: formData.specs,
       };
       
-      if (item?.salesDetail) {
+      if (completeItemData?.salesDetail) {
         promises.push(updateSalesDetailMutation.mutateAsync({ 
           itemId, 
-          id: item.salesDetail.id, 
+          id: completeItemData.salesDetail.id, 
           data: salesData  as any
         }));
       } else {
@@ -146,12 +181,12 @@ export default function ItemsDrawer({
     }
 
     // Save bought out details
-    if (formData.purchaseBasedOn || formData.excessPlanningPercent !== undefined) {
+    if (formData.purchaseBasedOn || formData.excessPlanningPercent !== undefined || formData.boughtOutReorderLevel !== undefined) {
       const boughtOutData = {
         itemId,
         purchaseBasedOn: formData.purchaseBasedOn,
         excessPlanningPercent: formData.excessPlanningPercent ? formData.excessPlanningPercent : undefined,
-        reorderLevel: formData.reorderLevel ? formData.reorderLevel : undefined,
+        reorderLevel: formData.boughtOutReorderLevel ? formData.boughtOutReorderLevel : undefined,
         minStockLevel: formData.minStockLevel ? formData.minStockLevel : undefined,
         maxStockLevel: formData.maxStockLevel ? formData.maxStockLevel : undefined,
         minBalanceShelfLifeDays: formData.minBalanceShelfLifeDays ? formData.minBalanceShelfLifeDays : undefined,
@@ -162,10 +197,10 @@ export default function ItemsDrawer({
         stopProcurement: formData.stopProcurement || false,
       };
       
-      if (item?.boughtOutDetails) {
+      if (completeItemData?.boughtOutDetails) {
         promises.push(updateBoughtOutDetailsMutation.mutateAsync({ 
           itemId, 
-          id: item.boughtOutDetails.id, 
+          id: completeItemData.boughtOutDetails.id, 
           data: boughtOutData as any
         }));
       } else {
@@ -177,23 +212,16 @@ export default function ItemsDrawer({
     if (formData.abcConsumptionValue || formData.xyzStockValue || formData.fsnMovement || formData.vedAnalysis) {
       const stockAnalysisData = {
         itemId,
-        minimumStockLevel: formData.minimumStockLevel ? formData.minimumStockLevel : undefined,
-        maximumStockLevel: formData.maximumStockLevel ? formData.maximumStockLevel : undefined,
-        reorderLevel: formData.reorderLevel ? formData.reorderLevel : undefined,
-        economicOrderQuantity: formData.economicOrderQuantity ? formData.economicOrderQuantity : undefined,
-        leadTimeDays: formData.leadTimeDays ? formData.leadTimeDays : undefined,
-        averageUsagePerDay: formData.averageUsagePerDay ? formData.averageUsagePerDay : undefined,
-        lastStockCheckDate: formData.lastStockCheckDate,
-        lastStockQuantity: formData.lastStockQuantity ? formData.lastStockQuantity : undefined,
-        nextStockCheckDate: formData.nextStockCheckDate,
-        isActive: true,
-        notes: formData.notes,
+        abcConsumptionValue: formData.abcConsumptionValue,
+        xyzStockValue: formData.xyzStockValue,
+        fsnMovement: formData.fsnMovement,
+        vedAnalysis: formData.vedAnalysis,
       };
       
-      if (item?.stockAnalysis) {
+      if (completeItemData?.stockAnalysis) {
         promises.push(updateStockAnalysisMutation.mutateAsync({ 
           itemId, 
-          id: item.stockAnalysis.id, 
+          id: completeItemData.stockAnalysis.id, 
           data: stockAnalysisData as any
         }));
       } else {
@@ -205,29 +233,27 @@ export default function ItemsDrawer({
     if (formData.itemDescriptionForExports || formData.exportProductGroupCode) {
       const exportData = {
         itemId,
-        itemDescriptionForExports: formData.itemDescriptionForExports,
-        exportProductGroupCode: formData.exportProductGroupCode,
-        exportProductGroupName: formData.exportProductGroupName,
-        depbRateListSrlNo: formData.depbRateListSrlNo,
+        itemDescriptionForExports: formData.itemDescriptionForExports || "",
+        exportProductGroupCode: formData.exportProductGroupCode || "",
+        exportProductGroupName: formData.exportProductGroupName || "",
+        depbRateListSrlNo: formData.depbRateListSrlNo || "",
         depbRate: formData.depbRate ? formData.depbRate : undefined,
         depbValueCap: formData.depbValueCap ? formData.depbValueCap : undefined,
-        depbRemarks: formData.depbRemarks,
-        dutyDrawbackSrlNo: formData.dutyDrawbackSrlNo,
-        dutyDrawbackRateType: formData.dutyDrawbackRateType,
-        dutyDrawbackRatePercent: formData.dutyDrawbackRatePercent ? formData.dutyDrawbackRatePercent : undefined,
-        dutyDrawbackRateFixed: formData.dutyDrawbackRateFixed ? formData.dutyDrawbackRateFixed : undefined,
+        depbRemarks: formData.depbRemarks || "",
+        dutyDrawbackSrlNo: formData.dutyDrawbackSrlNo || "",
+        dutyDrawbackRateType: formData.dutyDrawbackRateType || "",
         dutyDrawbackValueCap: formData.dutyDrawbackValueCap ? formData.dutyDrawbackValueCap : undefined,
-        dutyDrawbackRemarks: formData.dutyDrawbackRemarks,
+        dutyDrawbackRemarks: formData.dutyDrawbackRemarks || "",
       };
       
-      if (item?.exportDetails) {
+      if (completeItemData?.exportDetails) {
         promises.push(updateExportDetailsMutation.mutateAsync({ 
           itemId, 
-          id: item.exportDetails.id, 
-          data: exportData 
+          id: completeItemData.exportDetails.id, 
+          data: exportData as any
         }));
       } else {
-        promises.push(createExportDetailsMutation.mutateAsync({ itemId, data: exportData }));
+        promises.push(createExportDetailsMutation.mutateAsync({ itemId, data: exportData as any }));
       }
     }
 
@@ -272,10 +298,10 @@ export default function ItemsDrawer({
         shipperNote: formData.shipperNote,
       };
       
-      if (item?.otherDetails) {
+      if (completeItemData?.otherDetails) {
         promises.push(updateOtherDetailsMutation.mutateAsync({ 
           itemId, 
-          id: item.otherDetails.id, 
+          id: completeItemData.otherDetails.id, 
           data: otherDetailsData as any
         }));
       } else {
@@ -300,7 +326,7 @@ export default function ItemsDrawer({
       if (item) {
         const result = await updateItemMutation.mutateAsync({
           id: item.id,
-          data: transformedData as unknown as UpdateItemMasterData,
+          data: {...transformedData,itemCode: "CH202"}as unknown as UpdateItemMasterData,
         });
         if (result) {
           createdItemId = item.id;
@@ -310,9 +336,10 @@ export default function ItemsDrawer({
           });
         }
       } else {
-        const result = await createItemMutation.mutateAsync(transformedData as unknown as CreateItemMasterData);
+        const result = await createItemMutation.mutateAsync({...transformedData,itemCode: "A2AP"}as unknown as CreateItemMasterData);
         if (result) {
           createdItemId = result.id;
+          setCurrentItemId(result.id); // Set the currentItemId for new items
           toast({
             title: "Success",
             description: "Item created successfully",
@@ -354,7 +381,7 @@ export default function ItemsDrawer({
     onClose();
   };
 
-  const isLoading = createItemMutation.isPending || updateItemMutation.isPending;
+  const isLoading = createItemMutation.isPending || updateItemMutation.isPending || isLoadingItem;
 
   return (
     <RightDrawer 
@@ -365,11 +392,11 @@ export default function ItemsDrawer({
         ? "Update the item information below." 
         : "Fill in the information below to create a new item."
       }
-      size="5xl"
+      size="full"
     >
       <div className="mx-auto w-full">
         <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit,onError)} className="space-y-4">
             <Tabs defaultValue="basic" className="w-full">
               <TabsList className="grid w-full grid-cols-8">
                 <TabsTrigger value="basic">Basic Info</TabsTrigger>
@@ -378,12 +405,12 @@ export default function ItemsDrawer({
                 <TabsTrigger value="stock">Stock Analysis</TabsTrigger>
                 <TabsTrigger value="export">Export</TabsTrigger>
                 <TabsTrigger value="specifications">Specifications</TabsTrigger>
-                <TabsTrigger value="other">Other Details</TabsTrigger>
+                {/* <TabsTrigger value="other">Other Details</TabsTrigger> */}
                 <TabsTrigger value="media">Media</TabsTrigger>
               </TabsList>
 
               <TabsContent value="basic" className="space-y-3">
-                <ItemBasicInfoForm control={form.control} />
+                <ItemBasicInfoForm control={form.control} itemId={currentItemId} />
               </TabsContent>
 
               <TabsContent value="sales" className="space-y-3">
@@ -406,12 +433,16 @@ export default function ItemsDrawer({
                 <ItemSpecificationsForm control={form.control} itemId={currentItemId} />
               </TabsContent>
 
-              <TabsContent value="other" className="space-y-3">
+              {/* <TabsContent value="other" className="space-y-3">
                 <ItemOtherDetailsForm control={form.control} itemId={currentItemId} />
-              </TabsContent>
+              </TabsContent> */}
 
               <TabsContent value="media" className="space-y-3">
-                <ItemMediaForm control={form.control} itemId={currentItemId} />
+                <ItemMediaForm 
+                  control={form.control} 
+                  itemId={currentItemId} 
+                  mediaData={completeItemData?.media}
+                />
               </TabsContent>
             </Tabs>
 

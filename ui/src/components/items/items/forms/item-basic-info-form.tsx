@@ -12,13 +12,21 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Search } from "lucide-react"
 import { DivisionLookup } from "@/components/shared/lookups/division-lookup"
+import { ItemOtherDetailsForm } from "./item-other-details-form"
 
 interface ItemBasicInfoFormProps {
   control: any;
+  itemId?: number;
 }
 
-export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
+export function ItemBasicInfoForm({ control, itemId }: ItemBasicInfoFormProps) {
   const [isDivisionLookupOpen, setIsDivisionLookupOpen] = useState(false);
+  
+  // Use controller for GS Ind field
+  const gsIndController = useController({
+    name: "gsInd",
+    control,
+  });
   
   // Fetch item types and parent types
   const { data: itemTypes = { items: [] } } = useItemTypes();
@@ -100,16 +108,16 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
           <label className="text-[12px] font-medium">GS Ind.</label>
           <ConfigListSelect
             listCode="gs_id"
-            value={control._formValues?.gsInd}
+            value={gsIndController.field.value || ""}
             onChange={(value) => {
-              control.setValue("gsInd", value);
+              gsIndController.field.onChange(value);
             }}
             placeholder="Select GS Ind."
           />
         </div>
         <FormInput
           control={control}
-          name="hsn"
+          name="revNo"
           label="HSN"
           placeholder="Enter HSN code"
         />
@@ -117,7 +125,7 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
           <span className="text-sm font-medium">UQC:</span> <span className="text-sm font-medium">KGS</span>
         </div>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="space-y-4">
           <Card>
             <CardContent className="space-y-2">
@@ -506,6 +514,9 @@ export function ItemBasicInfoForm({ control }: ItemBasicInfoFormProps) {
               />
             </CardContent>
           </Card>
+        </div>
+        <div className="space-y-4">
+        <ItemOtherDetailsForm control={control} itemId={itemId} />
         </div>
       </div>
 

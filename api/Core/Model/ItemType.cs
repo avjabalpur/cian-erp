@@ -34,5 +34,6 @@ namespace Xcianify.Core.Model
         public int? CreatedBy { get; set; }
 
         public int? UpdatedBy { get; set; }
+
     }
 }

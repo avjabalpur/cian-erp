@@ -55,7 +55,7 @@ export function RightDrawer({
                 )}>
                 <ScrollArea className="h-full rounded-md border">
                     {(title || description) && (
-                        <SheetHeader className="p-2 border-b bg-muted/30">
+                        <SheetHeader className="p-2 px-4 border-b bg-[#d1f2ff]">
                             {title && <SheetTitle className="text-lg font-semibold">{title}</SheetTitle>}
                             {description && (
                                 <SheetDescription className="text-sm text-muted-foreground">

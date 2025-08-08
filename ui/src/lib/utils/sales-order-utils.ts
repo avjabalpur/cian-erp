@@ -71,6 +71,7 @@ export const pShelfLifeOptions: SelectOption[] = [
 
 // Dosage Name Options
 export const dosageNameOptions: SelectOption[] = [
+  { label: "SELECT", value: "SELECT" },
   { label: "TABLET", value: "TABLET" },
   { label: "GEL", value: "GEL" },
   { label: "CAPSULE", value: "CAPSULE" },

@@ -10,15 +10,25 @@ import { useToast } from "@/hooks/use-toast"
 interface ItemMediaFormProps {
   control: any;
   itemId?: number;
+  mediaData?: ItemMedia[];
 }
 
-export function ItemMediaForm({ control, itemId }: ItemMediaFormProps) {
+export function ItemMediaForm({ control, itemId, mediaData }: ItemMediaFormProps) {
   const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
-  // API hooks
-  const { data: mediaFiles = [], isLoading, refetch } = useItemMediaByItemId(itemId || 0);
+  // Debug log to show current state
+  console.log('ItemMediaForm state - selectedFile:', selectedFile, 'itemId:', itemId, 'uploading:', uploading);
+
+  // API hooks - use mediaData if provided, otherwise fetch
+  const { data: fetchedMediaFiles = [], isLoading, refetch } = useItemMediaByItemId(itemId || 0);
+  const mediaFiles = mediaData || fetchedMediaFiles;
+  const isMediaLoading = isLoading && !mediaData; // Only show loading if we're fetching and no mediaData provided
+  
+  // Debug logs for media data
+  console.log('Media debugging - itemId:', itemId, 'mediaData:', mediaData, 'fetchedMediaFiles:', fetchedMediaFiles, 'mediaFiles:', mediaFiles, 'isLoading:', isLoading);
   const createMediaMutation = useCreateItemMedia();
   const updateMediaMutation = useUpdateItemMedia();
   const deleteMediaMutation = useDeleteItemMedia();
@@ -49,43 +59,76 @@ export function ItemMediaForm({ control, itemId }: ItemMediaFormProps) {
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    console.log('File selected:', file); // Debug log
     if (file) {
       setSelectedFile(file);
+      console.log('Selected file set:', file.name); // Debug log
+    }
+  };
+
+  const getMediaTypeFromFile = (file: File): string => {
+    const extension = file.name.split('.').pop()?.toLowerCase() || '';
+    switch (extension) {
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+      case 'bmp':
+      case 'webp':
+        return 'image';
+      case 'mp4':
+      case 'avi':
+      case 'mov':
+      case 'wmv':
+      case 'webm':
+        return 'video';
+      case 'mp3':
+      case 'wav':
+      case 'aac':
+      case 'ogg':
+        return 'audio';
+      case 'pdf':
+      case 'doc':
+      case 'docx':
+      case 'txt':
+        return 'document';
+      default:
+        return 'other';
     }
   };
 
   const handleUpload = async () => {
-    if (!selectedFile || !itemId) return;
+    if (!selectedFile) return;
+
+    if (!itemId) {
+      // If no itemId, add to pending files
+      setPendingFiles(prev => [...prev, selectedFile]);
+      toast({
+        title: "File Queued",
+        description: "File will be uploaded after the item is saved",
+      });
+      setSelectedFile(null);
+      return;
+    }
 
     setUploading(true);
     try {
-      // Convert file to base64 for API
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const base64 = reader.result as string;
-        const fileExtension = selectedFile.name.split('.').pop() || '';
-        
-        const mediaData = {
-          itemId: itemId,
-          fileName: selectedFile.name,
-          filePath: base64, // This should be handled by backend file upload
-          fileSize: selectedFile.size,
-          mediaType: "image", // Default, can be enhanced
-          description: "",
-          isActive: true,
-        };
-
-        await createMediaMutation.mutateAsync({ itemId, data: mediaData });
-        
-        toast({
-          title: "Success",
-          description: "Media uploaded successfully",
-        });
-        
-        setSelectedFile(null);
-        refetch();
-      };
-      reader.readAsDataURL(selectedFile);
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('File', selectedFile);
+      formData.append('ItemId', itemId.toString());
+      formData.append('Description', '');
+      formData.append('MediaType', getMediaTypeFromFile(selectedFile));
+      
+      await createMediaMutation.mutateAsync({ itemId, formData });
+      
+      toast({
+        title: "Success",
+        description: "Media uploaded successfully",
+      });
+      
+      setSelectedFile(null);
+      refetch();
     } catch (error: any) {
       toast({
         title: "Error",
@@ -118,8 +161,8 @@ export function ItemMediaForm({ control, itemId }: ItemMediaFormProps) {
 
   const handleViewMedia = (media: ItemMedia) => {
     // Open media in new tab or modal
-    if (media.filePath) {
-      window.open(media.filePath, '_blank');
+    if (media.mediaUrl) {
+      window.open(media.mediaUrl, '_blank');
     }
   };
 
@@ -136,6 +179,13 @@ export function ItemMediaForm({ control, itemId }: ItemMediaFormProps) {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {!itemId && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+              <p className="text-sm text-yellow-800">
+                💡 Save the item first to upload media files. You can select files now and they will be uploaded after saving.
+              </p>
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormSelect
               control={control}
@@ -143,37 +193,70 @@ export function ItemMediaForm({ control, itemId }: ItemMediaFormProps) {
               label="Media Type"
               options={mediaTypeOptions}
             />
-            <div className="flex items-end space-x-2">
-              <div className="flex-1">
-                <label className="text-[12px] font-medium">File</label>
-                <input
-                  type="file"
-                  onChange={handleFileSelect}
-                  className="w-full p-2 border border-gray-300 rounded text-[12px]"
-                  accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
-                />
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <div className="flex-1">
+                  <label className="text-[12px] font-medium">File</label>
+                  <input
+                    type="file"
+                    onChange={handleFileSelect}
+                    className="w-full p-2 border border-gray-300 rounded text-[12px]"
+                    accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  disabled={!selectedFile || uploading}
+                  className="px-4 py-2 h-[42px] bg-blue-600 hover:bg-blue-700 text-white"
+                  title={!selectedFile ? "Please select a file first" : ""}
+                  onClick={() => {
+                    console.log('Button clicked - selectedFile:', selectedFile, 'itemId:', itemId, 'uploading:', uploading);
+                    handleUpload();
+                  }}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  {uploading ? "Uploading..." : !itemId ? "Queue File" : "Upload"}
+                </Button>
               </div>
-              <Button
-                type="button"
-                onClick={handleUpload}
-                disabled={!selectedFile || uploading || !itemId}
-                className="px-4 py-2"
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                {uploading ? "Uploading..." : "Upload"}
-              </Button>
+              {selectedFile && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <p className="text-sm text-green-800 flex items-center">
+                    <span className="mr-2">✓</span>
+                    Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
+                  </p>
+                </div>
+              )}
+              {pendingFiles.length > 0 && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                  <p className="text-sm text-yellow-800 font-medium mb-2">Pending Files (will upload after saving item):</p>
+                  <div className="space-y-1">
+                    {pendingFiles.map((file, index) => (
+                      <p key={index} className="text-xs text-yellow-700 flex items-center">
+                        <span className="mr-2">⏳</span>
+                        {file.name} ({(file.size / 1024).toFixed(1)} KB)
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
+                      </div>
+          </CardContent>
+        </Card>
+      ) 
+      
       {/* Media List */}
       <Card>
         <CardHeader className="pb-1">
           <CardTitle className="text-lg">Media Files</CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
+          {!itemId ? (
+            <div className="text-center py-8 text-gray-500">
+              <File className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <p>Save the item first to view and manage media files</p>
+            </div>
+          ) : isMediaLoading ? (
             <div className="text-center py-8 text-gray-500">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
               <p className="mt-2">Loading media files...</p>
@@ -193,7 +276,7 @@ export function ItemMediaForm({ control, itemId }: ItemMediaFormProps) {
                       <div>
                         <h4 className="font-medium text-sm">{media.fileName}</h4>
                         <p className="text-xs text-gray-500">
-                          {media.fileSize ? `${(media.fileSize / 1024).toFixed(1)} KB` : 'Unknown size'}
+                          {media.fileSizeBytes ? `${(media.fileSizeBytes / 1024).toFixed(1)} KB` : 'Unknown size'}
                         </p>
                       </div>
                     </div>
@@ -233,34 +316,37 @@ export function ItemMediaForm({ control, itemId }: ItemMediaFormProps) {
       </Card>
 
       {/* Media Statistics */}
-      <Card>
-        <CardHeader className="pb-1">
-          <CardTitle className="text-lg">Media Statistics</CardTitle>
-        </CardHeader>
-        <CardContent>
+      {itemId && (
+        <Card>
+          <CardHeader className="pb-1">
+            <CardTitle className="text-lg">Media Statistics</CardTitle>
+          </CardHeader>
+          <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">{mediaFiles.length}</div>
+              <div className="text-2xl font-bold text-blue-600">{itemId ? mediaFiles.length : 0}</div>
               <div className="text-sm text-gray-600">Total Files</div>
             </div>
             <div className="text-center p-4 bg-green-50 rounded-lg">
               <div className="text-2xl font-bold text-green-600">
-                {mediaFiles.reduce((acc, file) => acc + (file.fileSize || 0), 0) / 1024 / 1024 > 1 
-                  ? `${(mediaFiles.reduce((acc, file) => acc + (file.fileSize || 0), 0) / 1024 / 1024).toFixed(2)} MB`
-                  : `${(mediaFiles.reduce((acc, file) => acc + (file.fileSize || 0), 0) / 1024).toFixed(1)} KB`
-                }
+                {itemId ? (
+                  mediaFiles.reduce((acc, file) => acc + (file.fileSizeBytes || 0), 0) / 1024 / 1024 > 1 
+                    ? `${(mediaFiles.reduce((acc, file) => acc + (file.fileSizeBytes || 0), 0) / 1024 / 1024).toFixed(2)} MB`
+                    : `${(mediaFiles.reduce((acc, file) => acc + (file.fileSizeBytes || 0), 0) / 1024).toFixed(1)} KB`
+                ) : "0 KB"}
               </div>
               <div className="text-sm text-gray-600">Total Size</div>
             </div>
             <div className="text-center p-4 bg-purple-50 rounded-lg">
               <div className="text-2xl font-bold text-purple-600">
-                {mediaFiles.filter(f => f.mediaType === 'image').length}
+                {itemId ? mediaFiles.filter(f => f.mediaType === 'image').length : 0}
               </div>
               <div className="text-sm text-gray-600">Images</div>
-            </div>
+                        </div>
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      )}
     </div>
   )
 } 

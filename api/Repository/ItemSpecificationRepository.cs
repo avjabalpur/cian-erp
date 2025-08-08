@@ -32,11 +32,7 @@ namespace Xcianify.Repository
                     standard_conversion_cost_factor as StandardConversionCostFactor,
                     standard_packing_cost_factor as StandardPackingCostFactor,
                     markup_percentage as MarkupPercentage,
-                    markup_amount as MarkupAmount,
-                    created_by as CreatedBy,
-                    updated_by as UpdatedBy,
-                    created_at as CreatedAt,
-                    updated_at as UpdatedAt
+                    markup_amount as MarkupAmount
                 FROM item_specifications
                 WHERE item_id = @ItemId";
 
@@ -52,13 +48,13 @@ namespace Xcianify.Repository
                     custom_tariff_no, excise_tariff_no, vat_comm_code, 
                     conversion_factor, old_code, standard_weight, 
                     standard_conversion_cost_factor, standard_packing_cost_factor, 
-                    markup_percentage, markup_amount, created_by, updated_by
+                    markup_percentage, markup_amount
                 ) VALUES (
                     @ItemId, @Specification, @SubstituteForItemCode, 
                     @CustomTariffNo, @ExciseTariffNo, @VatCommCode, 
                     @ConversionFactor, @OldCode, @StandardWeight, 
                     @StandardConversionCostFactor, @StandardPackingCostFactor, 
-                    @MarkupPercentage, @MarkupAmount, @CreatedBy, @UpdatedBy
+                    @MarkupPercentage, @MarkupAmount
                 )";
 
             using var connection = _dbContext.GetConnection();
@@ -80,9 +76,7 @@ namespace Xcianify.Repository
                     standard_conversion_cost_factor = @StandardConversionCostFactor,
                     standard_packing_cost_factor = @StandardPackingCostFactor,
                     markup_percentage = @MarkupPercentage,
-                    markup_amount = @MarkupAmount,
-                    updated_by = @UpdatedBy,
-                    updated_at = @UpdatedAt
+                    markup_amount = @MarkupAmount
                 WHERE item_id = @ItemId";
 
             using var connection = _dbContext.GetConnection();

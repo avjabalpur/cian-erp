@@ -11,5 +11,6 @@ namespace Xcianify.Core.Domain.Services
         Task<ItemExportDetailsDto> CreateAsync(CreateItemExportDetailsDto createDto, int userId);
         Task<ItemExportDetailsDto> UpdateAsync(int id, UpdateItemExportDetailsDto updateDto, int userId);
         Task<bool> DeleteAsync(int id);
+        Task<IEnumerable<dynamic>> GetTableStructureAsync();
     }
 }

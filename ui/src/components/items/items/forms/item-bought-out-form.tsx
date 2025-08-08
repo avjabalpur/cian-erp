@@ -14,9 +14,9 @@ interface ItemBoughtOutFormProps {
 export function ItemBoughtOutForm({ control, itemId }: ItemBoughtOutFormProps) {
 
   const purchaseBasedOnOptions = [
-    { label: "Re-order Level", value: "reorder_level" },
-    { label: "M.R.P. Plan", value: "mrp_plan" },
-    { label: "Indents", value: "indents" },
+    { label: "Re-order Level", value: "Re-order Level" },
+    { label: "M.R.P. Plan", value: "M.R.P. Plan" },
+    { label: "Indents", value: "Indents" },
   ];
 
   return (
@@ -63,7 +63,7 @@ export function ItemBoughtOutForm({ control, itemId }: ItemBoughtOutFormProps) {
                 <div className="flex-1 flex items-center space-x-2">
                   <FormInput
                     control={control}
-                    name="reorderLevel"
+                    name="boughtOutReorderLevel"
                     label=""
                     placeholder="0.000"
                     inputProps={{ type: "number", step: "0.001" }}
