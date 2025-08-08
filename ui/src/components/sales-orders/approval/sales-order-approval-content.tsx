@@ -66,12 +66,12 @@ export function SalesOrderApprovalContent({
     defaultValues: {
       soNumber: "",
       soDate: "",
-      soStatus: "REPEAT", // Default readonly value
-      customerId: 0,
-      dosageName: "TABLET", // Default readonly value
-      currentStatus: "",
-      plantEmailSent: false,
-      manufacturerName: "CIAN HEALTHCARE", // Default readonly value
+             soStatus: "REPEAT", // Default readonly value
+       customerId: 0,
+       dosageName: "-1", // Default value - will be populated from item lookup
+       currentStatus: "",
+       plantEmailSent: false,
+       manufacturerName: "CIAN HEALTHCARE", // Default readonly value
     },
   });
 
@@ -99,7 +99,7 @@ export function SalesOrderApprovalContent({
     form.setValue("productCode", selectedItem.itemCode || "");
     form.setValue("productName", selectedItem.itemName || "");
     form.setValue("composition", selectedItem.composition || "");
-    form.setValue("dosageName", selectedItem.dosageName || "TABLET");
+         form.setValue("dosageName", selectedItem.dosageName || "-1");
     
     // Trigger form validation
     form.trigger(["itemId", "productCode", "productName"]);
@@ -120,7 +120,7 @@ export function SalesOrderApprovalContent({
         quotationNo: salesOrder.quotationNo || "",
         hsnCode: salesOrder.hsnCode || "",
         itemId: salesOrder.itemId,
-        dosageName: salesOrder.dosageName || "TABLET",
+                 dosageName: salesOrder.dosageName || "-1",
         divisionId: salesOrder.divisionId,
         designUnder: salesOrder.designUnder || "",
         packingStyleDescription: salesOrder.packingStyleDescription || "",
@@ -166,8 +166,8 @@ export function SalesOrderApprovalContent({
         productCode: salesOrder.productCode || "",
         country: salesOrder.country || "",
         customerGstNo: salesOrder.customerGstNo || "",
-        // Set readonly field defaults
-        manufacturerName: "CIAN HEALTHCARE",
+                 // Set readonly field defaults
+         manufacturerName: "CIAN HEALTHCARE",
         customerName: salesOrder.customerName || "",
         customerCode: "", // Will be populated from customer lookup
         productName: "", // Will be populated from item lookup
@@ -248,12 +248,6 @@ export function SalesOrderApprovalContent({
     pm: null,
   };
 
-  // Mock metrics data - in real app, this would be calculated
-  const metricsData = {
-    marginPercentage: 0.00,
-    value: 0.00,
-    profit: 0.00,
-  };
 
   const handleApprovalClick = (type: string) => {
     console.log(`Approval clicked: ${type}`);
@@ -399,13 +393,7 @@ export function SalesOrderApprovalContent({
                               disabled={updateSalesOrderMutation.isPending}
                             />
                           </div>
-                          <div className="w-40">
-                            <MetricsDisplay
-                              marginPercentage={metricsData.marginPercentage}
-                              value={metricsData.value}
-                              profit={metricsData.profit}
-                            />
-                          </div>
+                          
                         </div>
                       </CardContent>
                     </Card>
