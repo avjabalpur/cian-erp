@@ -5,7 +5,8 @@ namespace Xcianify.Core.Model
     public class ItemOtherDetails : BaseModel
     {
         public int Id { get; set; }
-        public string ItemCode { get; set; }
+        public int ItemId { get; set; }
+    
         public string PackShort { get; set; }
         public string ProductCast { get; set; }
         public string PvcColor { get; set; }
@@ -41,5 +42,6 @@ namespace Xcianify.Core.Model
         public string ShipperSize { get; set; }
         public int? QtyPerShipper { get; set; }
         public string ShipperNote { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

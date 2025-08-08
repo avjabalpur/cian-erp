@@ -107,18 +107,11 @@ export function ItemExportForm({ control, itemId }: ItemExportFormProps) {
               placeholder="Enter rate type"
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <FormInput
               control={control}
-              name="dutyDrawbackRatePercent"
-              label="Rate Percent"
-              placeholder="0.00"
-              inputProps={{ type: "number", step: "0.01" }}
-            />
-            <FormInput
-              control={control}
-              name="dutyDrawbackRateFixed"
-              label="Rate Fixed"
+              name="dutyDrawbackRate"
+              label="Duty Drawback Rate"
               placeholder="0.00"
               inputProps={{ type: "number", step: "0.01" }}
             />

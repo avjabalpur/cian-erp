@@ -5,6 +5,7 @@ namespace Xcianify.Core.DTOs.ItemOtherDetails
 {
     public class CreateItemOtherDetailsDto
     {
+        [Required]
         public int ItemId { get; set; }
         public string PackShort { get; set; }
         public string ProductCast { get; set; }

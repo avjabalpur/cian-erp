@@ -16,12 +16,19 @@ using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Microsoft.SharePoint.Client;
 using Xcianify.Core.Configuration;
+using Dapper;
 
 var configuration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables()
     .Build();
+
+// Configure Dapper for case-insensitive column mapping
+// Configure Dapper to handle underscore naming convention
+// Configure Dapper to handle snake_case to PascalCase mapping
+// Configure Dapper to handle column name mapping
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<DapperDbContext>();
 

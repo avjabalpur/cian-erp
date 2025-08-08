@@ -28,8 +28,9 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public decimal? StandardPackingCostFactor { get; set; }
         public decimal? MarkupPercentage { get; set; }
         public decimal? MarkupAmount { get; set; }
+        
         [StringLength(50)]
-        public string specification { get; set; }
+        public string Specification { get; set; }
 
     }
 }

@@ -1,52 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
-
-// Types
-export interface ItemSalesDetail {
-  id: number;
-  itemId: number;
-  itemName?: string;
-  salesPrice: number;
-  costPrice: number;
-  margin: number;
-  currency: string;
-  effectiveDate: string;
-  expiryDate?: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt?: string;
-  createdBy?: number;
-  createdByName?: string;
-  updatedBy?: number;
-  updatedByName?: string;
-}
-
-export interface CreateItemSalesDetailData {
-  itemId: number;
-  salesPrice: number;
-  costPrice: number;
-  margin: number;
-  currency: string;
-  effectiveDate: string;
-  expiryDate?: string;
-  isActive?: boolean;
-}
-
-export interface UpdateItemSalesDetailData {
-  itemId: number;
-  salesPrice: number;
-  costPrice: number;
-  margin: number;
-  currency: string;
-  effectiveDate: string;
-  expiryDate?: string;
-  isActive?: boolean;
-}
+import { ItemSalesDetail, CreateItemSalesDetailData, UpdateItemSalesDetailData } from '../../types/item-sales-detail';
 
 export interface ItemSalesDetailFilter {
   search?: string;
   itemId?: string;
-  currency?: string;
   isActive?: boolean;
   page?: number;
   pageSize?: number;
@@ -57,7 +15,6 @@ const getItemSalesDetails = async (filter?: ItemSalesDetailFilter): Promise<Item
   const params = new URLSearchParams();
   if (filter?.search) params.append('search', filter.search);
   if (filter?.itemId) params.append('itemId', filter.itemId);
-  if (filter?.currency) params.append('currency', filter.currency);
   if (filter?.isActive !== undefined) params.append('isActive', filter.isActive.toString());
   if (filter?.page) params.append('page', filter.page.toString());
   if (filter?.pageSize) params.append('pageSize', filter.pageSize.toString());

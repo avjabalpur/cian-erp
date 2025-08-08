@@ -1,5 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Xcianify.Core.DTOs.ItemExportDetails;
+using Xcianify.Core.DTOs.ItemOtherDetails;
+using Xcianify.Core.DTOs.ItemMedia;
 
 namespace Xcianify.Core.DTOs.ItemMaster
 {
@@ -135,6 +138,13 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public bool ExpiryMmYyyyApplicable { get; set; }
         public bool PrincipalForStatutoryReporting { get; set; }
 
+        // Related data properties
         public CreateItemSpecificationDto? Specification { get; set; }
+        public CreateItemSalesDetailDto? SalesDetail { get; set; }
+        public CreateItemExportDetailsDto? ExportDetails { get; set; }
+        public CreateItemStockAnalysisDto? StockAnalysis { get; set; }
+        public CreateItemBoughtOutDetailsDto? BoughtOutDetails { get; set; }
+        public CreateItemOtherDetailsDto? OtherDetails { get; set; }
+        public CreateItemMediaDto? Media { get; set; }
     }
 }

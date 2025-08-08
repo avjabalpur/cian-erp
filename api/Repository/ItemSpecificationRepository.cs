@@ -32,11 +32,7 @@ namespace Xcianify.Repository
                     standard_conversion_cost_factor as StandardConversionCostFactor,
                     standard_packing_cost_factor as StandardPackingCostFactor,
                     markup_percentage as MarkupPercentage,
-                    markup_amount as MarkupAmount,
-                    created_by as CreatedBy,
-                    updated_by as UpdatedBy,
-                    created_at as CreatedAt,
-                    updated_at as UpdatedAt
+                    markup_amount as MarkupAmount
                 FROM item_specifications
                 WHERE item_id = @ItemId";
 
@@ -80,9 +76,7 @@ namespace Xcianify.Repository
                     standard_conversion_cost_factor = @StandardConversionCostFactor,
                     standard_packing_cost_factor = @StandardPackingCostFactor,
                     markup_percentage = @MarkupPercentage,
-                    markup_amount = @MarkupAmount,
-                    updated_by = @UpdatedBy,
-                    updated_at = @UpdatedAt
+                    markup_amount = @MarkupAmount
                 WHERE item_id = @ItemId";
 
             using var connection = _dbContext.GetConnection();

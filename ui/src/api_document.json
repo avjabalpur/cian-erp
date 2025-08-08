@@ -4616,42 +4616,121 @@
         "CreateItemSalesDetailDto": {
           "type": "object",
           "properties": {
-            "itemMasterId": {
+            "itemId": {
               "type": "integer",
               "format": "int32"
             },
-            "sellingPrice": {
-              "type": "number",
-              "format": "double",
-              "nullable": true
-            },
-            "currencyId": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "isTaxInclusive": {
+            "packSizeApplicable": {
               "type": "boolean"
             },
-            "discountPercentage": {
+            "defaultPackSize": {
+              "type": "string",
+              "nullable": true
+            },
+            "saleableUnitContains": {
               "type": "number",
               "format": "double",
               "nullable": true
             },
-            "minimumOrderQuantity": {
+            "qtyPerBox": {
               "type": "number",
               "format": "double",
               "nullable": true
             },
-            "leadTimeDays": {
-              "type": "integer",
-              "format": "int32",
+            "boxesPerCase": {
+              "type": "number",
+              "format": "double",
               "nullable": true
             },
-            "isActive": {
-              "type": "boolean"
+            "casePackingType": {
+              "type": "string",
+              "nullable": true
             },
-            "notes": {
+            "packingRate": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "qtyPerCase": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "netWeightCase": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "tareWeightCase": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "grossWeightCase": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "grossWeightUnit": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "caseDimensionsInches": {
+              "type": "string",
+              "nullable": true
+            },
+            "caseVolumeCft": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "caseDimensionsCm": {
+              "type": "string",
+              "nullable": true
+            },
+            "caseVolumeCbm": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "minSaleRate": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "minSoQty": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "tertiaryGtin": {
+              "type": "string",
+              "nullable": true
+            },
+            "secondaryGtin": {
+              "type": "string",
+              "nullable": true
+            },
+            "primaryGtin": {
+              "type": "string",
+              "nullable": true
+            },
+            "minBatchQtyAutoloading": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "considerAsNewProductTill": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "interfaceCode": {
+              "type": "string",
+              "nullable": true
+            },
+            "specs": {
               "type": "string",
               "nullable": true
             }
@@ -6131,40 +6210,118 @@
         "UpdateItemSalesDetailDto": {
           "type": "object",
           "properties": {
-            "sellingPrice": {
-              "type": "number",
-              "format": "double",
-              "nullable": true
-            },
-            "currencyId": {
-              "type": "integer",
-              "format": "int32",
-              "nullable": true
-            },
-            "isTaxInclusive": {
+            "packSizeApplicable": {
               "type": "boolean",
               "nullable": true
             },
-            "discountPercentage": {
+            "defaultPackSize": {
+              "type": "string",
+              "nullable": true
+            },
+            "saleableUnitContains": {
               "type": "number",
               "format": "double",
               "nullable": true
             },
-            "minimumOrderQuantity": {
+            "qtyPerBox": {
               "type": "number",
               "format": "double",
               "nullable": true
             },
-            "leadTimeDays": {
-              "type": "integer",
-              "format": "int32",
+            "boxesPerCase": {
+              "type": "number",
+              "format": "double",
               "nullable": true
             },
-            "isActive": {
-              "type": "boolean",
+            "casePackingType": {
+              "type": "string",
               "nullable": true
             },
-            "notes": {
+            "packingRate": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "qtyPerCase": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "netWeightCase": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "tareWeightCase": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "grossWeightCase": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "grossWeightUnit": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "caseDimensionsInches": {
+              "type": "string",
+              "nullable": true
+            },
+            "caseVolumeCft": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "caseDimensionsCm": {
+              "type": "string",
+              "nullable": true
+            },
+            "caseVolumeCbm": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "minSaleRate": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "minSoQty": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "tertiaryGtin": {
+              "type": "string",
+              "nullable": true
+            },
+            "secondaryGtin": {
+              "type": "string",
+              "nullable": true
+            },
+            "primaryGtin": {
+              "type": "string",
+              "nullable": true
+            },
+            "minBatchQtyAutoloading": {
+              "type": "number",
+              "format": "double",
+              "nullable": true
+            },
+            "considerAsNewProductTill": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": true
+            },
+            "interfaceCode": {
+              "type": "string",
+              "nullable": true
+            },
+            "specs": {
               "type": "string",
               "nullable": true
             }

@@ -7,10 +7,12 @@ namespace Xcianify.Core.DTOs.ItemMaster
     {
         public int Id { get; set; }
         
-        [Required]
         public int ItemId { get; set; }
+        
+        [StringLength(50)]
+        public string Specification { get; set; }
       
-       [StringLength(50)]
+        [StringLength(50)]
         public string SubstituteForItemCode { get; set; }
         
         [StringLength(50)]
@@ -33,9 +35,5 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public decimal? MarkupPercentage { get; set; }
         public decimal? MarkupAmount { get; set; }
         
-        public int CreatedBy { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public int? UpdatedBy { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 }

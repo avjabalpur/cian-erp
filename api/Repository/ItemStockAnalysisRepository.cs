@@ -29,7 +29,19 @@ namespace Xcianify.Repository
             {
                 using var connection = _dbContext.GetConnection();
                 var query = @"
-                    SELECT * FROM ""item_stock_analysis"" 
+                    SELECT 
+                        id as Id,
+                        item_id as ItemId,
+                        abc_consumption_value as AbcConsumptionValue,
+                        xyz_stock_value as XyzStockValue,
+                        fsn_movement as FsnMovement,
+                        ved_analysis as VedAnalysis,
+                        created_at as CreatedAt,
+                        updated_at as UpdatedAt,
+                        created_by as CreatedBy,
+                        updated_by as UpdatedBy,
+                        is_active as IsActive
+                    FROM item_stock_analysis 
                     WHERE id = @Id";
                 
                 return await connection.QueryFirstOrDefaultAsync<ItemStockAnalysis>(query, new { Id = id });
@@ -47,10 +59,22 @@ namespace Xcianify.Repository
             {
                 using var connection = _dbContext.GetConnection();
                 var query = @"
-                    SELECT * FROM ""item_stock_analysis"" 
-                    WHERE item_master_id = @ItemMasterId";
+                    SELECT 
+                        id as Id,
+                        item_id as ItemId,
+                        abc_consumption_value as AbcConsumptionValue,
+                        xyz_stock_value as XyzStockValue,
+                        fsn_movement as FsnMovement,
+                        ved_analysis as VedAnalysis,
+                        created_at as CreatedAt,
+                        updated_at as UpdatedAt,
+                        created_by as CreatedBy,
+                        updated_by as UpdatedBy,
+                        is_active as IsActive
+                    FROM item_stock_analysis 
+                    WHERE item_id = @ItemId";
                 
-                return await connection.QueryFirstOrDefaultAsync<ItemStockAnalysis>(query, new { ItemMasterId = itemMasterId });
+                return await connection.QueryFirstOrDefaultAsync<ItemStockAnalysis>(query, new { ItemId = itemMasterId });
             }
             catch (Exception ex)
             {
@@ -65,17 +89,15 @@ namespace Xcianify.Repository
             {
                 using var connection = _dbContext.GetConnection();
                 var query = @"
-                    INSERT INTO ""item_stock_analysis""
-                        (item_master_id, minimum_stock_level, maximum_stock_level, 
-                         reorder_level, economic_order_quantity, lead_time_days, 
-                         average_usage_per_day, last_stock_check_date, last_stock_quantity, 
-                         next_stock_check_date, is_active, notes, created_by, updated_by)
-                    VALUES 
-                        (@ItemMasterId, @MinimumStockLevel, @MaximumStockLevel, 
-                         @ReorderLevel, @EconomicOrderQuantity, @LeadTimeDays, 
-                         @AverageUsagePerDay, @LastStockCheckDate, @LastStockQuantity, 
-                         @NextStockCheckDate, @IsActive, @Notes, @CreatedBy, @UpdatedBy)
-                    RETURNING id;";
+                    INSERT INTO item_stock_analysis
+                   (item_id, abc_consumption_value, xyz_stock_value, 
+                   fsn_movement, ved_analysis, created_at, updated_at, 
+                   created_by, updated_by, is_active)
+                 VALUES 
+                (@ItemId, @AbcConsumptionValue, @XyzStockValue, 
+                @FsnMovement, @VedAnalysis, @CreatedAt, @UpdatedAt, 
+                @CreatedBy, @UpdatedBy, @IsActive)
+                 RETURNING id;";
 
                 var id = await connection.ExecuteScalarAsync<int>(query, stockAnalysis);
                 stockAnalysis.Id = id;
@@ -94,19 +116,13 @@ namespace Xcianify.Repository
             {
                 using var connection = _dbContext.GetConnection();
                 var query = @"
-                    UPDATE ""item_stock_analysis""
+                    UPDATE item_stock_analysis
                     SET 
-                        minimum_stock_level = @MinimumStockLevel,
-                        maximum_stock_level = @MaximumStockLevel,
-                        reorder_level = @ReorderLevel,
-                        economic_order_quantity = @EconomicOrderQuantity,
-                        lead_time_days = @LeadTimeDays,
-                        average_usage_per_day = @AverageUsagePerDay,
-                        last_stock_check_date = @LastStockCheckDate,
-                        last_stock_quantity = @LastStockQuantity,
-                        next_stock_check_date = @NextStockCheckDate,
+                        abc_consumption_value = @AbcConsumptionValue,
+                        xyz_stock_value = @XyzStockValue,
+                        fsn_movement = @FsnMovement,
+                        ved_analysis = @VedAnalysis,
                         is_active = @IsActive,
-                        notes = @Notes,
                         updated_by = @UpdatedBy,
                         updated_at = @UpdatedAt
                     WHERE id = @Id";
@@ -142,7 +158,7 @@ namespace Xcianify.Repository
             try
             {
                 using var connection = _dbContext.GetConnection();
-                var query = "SELECT COUNT(*) FROM \"item_stock_analysis\" WHERE item_master_id = @ItemMasterId";
+                var query = "SELECT COUNT(*) FROM item_stock_analysis WHERE item_id = @ItemId";
                 
                 if (excludeId.HasValue)
                 {
@@ -151,7 +167,7 @@ namespace Xcianify.Repository
                 
                 var count = await connection.ExecuteScalarAsync<int>(
                     query, 
-                    new { ItemMasterId = itemMasterId, ExcludeId = excludeId });
+                    new { ItemId = itemMasterId, ExcludeId = excludeId });
                     
                 return count > 0;
             }

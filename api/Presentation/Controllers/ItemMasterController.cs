@@ -1,14 +1,15 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Xcianify.Core.DTOs.ItemMaster;
+using System;
+using System.Threading.Tasks;
 using Xcianify.Core.Domain.Services;
-using Xcianify.Core.Exceptions;
+using Xcianify.Core.DTOs.ItemExportDetails;
+using Xcianify.Core.DTOs.ItemMaster;
 using Xcianify.Core.DTOs.ItemMedia;
 using Xcianify.Core.DTOs.ItemOtherDetails;
-using Xcianify.Core.DTOs.ItemExportDetails;
+using Xcianify.Core.Exceptions;
+using static Xcianify.Core.DTOs.ItemMaster.CreateItemSalesDetailDto;
 
 namespace Xcianify.Presentation.Controllers
 {
@@ -73,8 +74,10 @@ namespace Xcianify.Presentation.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateItemMasterDto request)
         {
+            if (request == null)
+                return BadRequest("Request body is required.");
             var item = await _itemMasterService.CreateItemAsync(request);
-            return CreatedAtAction(nameof(GetById), new { id = item.Id }, item);
+            return CreatedAtAction(nameof(GetById), new { itemId = item.Id }, item);
         }
 
         [HttpPut("{itemId}")]
@@ -110,7 +113,7 @@ namespace Xcianify.Presentation.Controllers
         }
 
         [HttpPost("{itemId}/media")]
-        public async Task<IActionResult> CreateMedia(int itemId, [FromBody] CreateItemMediaDto createDto)
+        public async Task<IActionResult> CreateMedia(int itemId, [FromForm] CreateItemMediaDto createDto)
         {
             var userId = CurrentUserId;
             if (userId <= 0)
@@ -122,7 +125,7 @@ namespace Xcianify.Presentation.Controllers
         }
 
         [HttpPut("{itemId}/media/{id}")]
-        public async Task<IActionResult> UpdateMedia(int itemId, int id, [FromBody] UpdateItemMediaDto updateDto)
+        public async Task<IActionResult> UpdateMedia(int itemId, int id, [FromForm] UpdateItemMediaDto updateDto)
         {
             var userId = CurrentUserId;
             if (userId <= 0)
@@ -236,8 +239,30 @@ namespace Xcianify.Presentation.Controllers
             if (userId <= 0)
                 return Unauthorized(new { message = "Invalid user" });
 
-            var result = await _itemSalesDetailService.UpdateAsync(id, dto, userId);
-            return Ok(result);
+            // Verify the sales detail belongs to the correct item
+            var existingDetail = await _itemSalesDetailService.GetByItemIdAsync(itemId);
+            if (existingDetail == null || existingDetail.Id != id)
+                return NotFound(new { message = "Sales detail not found for this item" });
+
+            try
+            {
+                var result = await _itemSalesDetailService.UpdateAsync(id, dto, userId);
+                return Ok(result);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ApplicationException ex)
+            {
+                _logger.LogError(ex, $"Error updating sales detail ID: {id}");
+                return StatusCode(500, new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Unexpected error updating sales detail ID: {id}");
+                return StatusCode(500, new { message = "An error occurred while updating sales detail" });
+            }
         }
 
         [HttpDelete("{itemId}/sales-details/{id}")]

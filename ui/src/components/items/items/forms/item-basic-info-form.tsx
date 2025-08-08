@@ -22,6 +22,12 @@ interface ItemBasicInfoFormProps {
 export function ItemBasicInfoForm({ control, itemId }: ItemBasicInfoFormProps) {
   const [isDivisionLookupOpen, setIsDivisionLookupOpen] = useState(false);
   
+  // Use controller for GS Ind field
+  const gsIndController = useController({
+    name: "gsInd",
+    control,
+  });
+  
   // Fetch item types and parent types
   const { data: itemTypes = { items: [] } } = useItemTypes();
   const { data: parentTypes = [] } = useParentTypes();
@@ -102,16 +108,16 @@ export function ItemBasicInfoForm({ control, itemId }: ItemBasicInfoFormProps) {
           <label className="text-[12px] font-medium">GS Ind.</label>
           <ConfigListSelect
             listCode="gs_id"
-            value={control._formValues?.gsInd}
+            value={gsIndController.field.value || ""}
             onChange={(value) => {
-              control.setValue("gsInd", value);
+              gsIndController.field.onChange(value);
             }}
             placeholder="Select GS Ind."
           />
         </div>
         <FormInput
           control={control}
-          name="hsn"
+          name="revNo"
           label="HSN"
           placeholder="Enter HSN code"
         />

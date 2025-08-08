@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace Xcianify.Core.DTOs.ItemMedia
 {
@@ -14,7 +15,6 @@ namespace Xcianify.Core.DTOs.ItemMedia
         public string MimeType { get; set; }
         public string MediaUrl { get; set; }
         public string Description { get; set; }
-        public string UploadedBy { get; set; }
-        public DateTime? UploadedAt { get; set; }
+        public IFormFile File { get; set; }
     }
 }

@@ -32,5 +32,6 @@ namespace Xcianify.Core.Model
         public DateTime? ConsiderAsNewProductTill { get; set; }
         public string InterfaceCode { get; set; }
         public string Specs { get; set; }
+        public bool IsDeleted { get; set; } = false;
     }
 } 

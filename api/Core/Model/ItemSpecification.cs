@@ -35,6 +35,7 @@ namespace Xcianify.Core.Model
         public decimal? MarkupPercentage { get; set; }
 
         public decimal? MarkupAmount { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
     }
 }
