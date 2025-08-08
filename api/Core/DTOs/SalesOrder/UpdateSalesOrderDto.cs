@@ -8,17 +8,14 @@ namespace Xcianify.Core.DTOs.SalesOrder
         [Required]
         public int Id { get; set; }
         
-        [Required]
         public string SoNumber { get; set; }
         
         public DateTime? SoDate { get; set; }
         
-        [Required]
         public string SoStatus { get; set; }
         
         public int? OrganizationId { get; set; }
         
-        [Required]
         public int? CustomerId { get; set; }
         
         public string PaymentTerm { get; set; }
@@ -70,5 +67,9 @@ namespace Xcianify.Core.DTOs.SalesOrder
         public bool IsSubmitted { get; set; }
         public int? AssignedDesigner { get; set; }
         public bool? PlantEmailSent { get; set; }
+        
+        // Additional fields for product info form
+        public string ShelfLife { get; set; }
+        public string Colour { get; set; }
     }
 } 

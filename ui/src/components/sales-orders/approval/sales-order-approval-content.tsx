@@ -30,9 +30,11 @@ import { ApprovalButtons } from "./approval-buttons";
 import { ReferenceDocuments } from "./reference-documents";
 import { SOInfoForm } from "./so-info-form";
 import { ProductInfoForm } from "./product-info-form";
-import { MetricsDisplay } from "./metrics-display";
 import { ChatSidebar } from "./chat-sidebar";
 import { useRouter } from "next/navigation";
+import { currentStatusOptions } from "@/lib/utils/sales-order-utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { UserLookup } from "@/components/shared/lookups/user-lookup";
 
 interface SalesOrderApprovalContentProps {
   salesOrderId: number;
@@ -50,6 +52,9 @@ export function SalesOrderApprovalContent({
   const { toast } = useToast();
   const router = useRouter();
   
+  // State for user lookup
+  const [userLookupOpen, setUserLookupOpen] = useState(false);
+  
   // Fetch sales order data
   const { data: salesOrder, isLoading } = useSalesOrderById(salesOrderId.toString());
   
@@ -66,12 +71,13 @@ export function SalesOrderApprovalContent({
     defaultValues: {
       soNumber: "",
       soDate: "",
-             soStatus: "REPEAT", // Default readonly value
-       customerId: 0,
-       dosageName: "-1", // Default value - will be populated from item lookup
-       currentStatus: "",
-       plantEmailSent: false,
-       manufacturerName: "CIAN HEALTHCARE", // Default readonly value
+      soStatus: "REPEAT", // Default readonly value
+      customerId: 0,
+      dosageName: "-1", // Default value - will be populated from item lookup
+      currentStatus: "IN-PROGRESS", // Default status
+      assignedDesigner: 0, // Default assigned designer
+      plantEmailSent: false,
+      manufacturerName: "CIAN HEALTHCARE", // Default readonly value
     },
   });
 
@@ -105,6 +111,23 @@ export function SalesOrderApprovalContent({
     form.trigger(["itemId", "productCode", "productName"]);
     
     console.log("Form values after item selection:", form.getValues());
+  };
+
+  // Handle user selection from lookup
+  const handleUserSelect = (userId: number) => {
+    console.log("User selected:", userId);
+    
+    form.setValue("assignedDesigner", userId);
+    
+    // Update the sales order data immediately for UI feedback
+    if (salesOrder) {
+      salesOrder.assignedDesigner = userId;
+    }
+    
+    // Trigger form validation
+    form.trigger(["assignedDesigner"]);
+    
+    console.log("Form values after user selection:", form.getValues());
   };
 
   React.useEffect(() => {
@@ -159,9 +182,9 @@ export function SalesOrderApprovalContent({
         pmTubeStock: salesOrder.pmTubeStock || "",
         pmLabelStock: salesOrder.pmLabelStock || "",
         drugApprovalUnder: salesOrder.drugApprovalUnder || "",
-        currentStatus: salesOrder.currentStatus || "",
+        currentStatus: salesOrder.currentStatus || "IN-PROGRESS",
         comments: salesOrder.comments || "",
-        assignedDesigner: salesOrder.assignedDesigner,
+        assignedDesigner: salesOrder.assignedDesigner || 0,
         plantEmailSent: salesOrder.plantEmailSent || false,
         productCode: salesOrder.productCode || "",
         country: salesOrder.country || "",
@@ -299,43 +322,105 @@ export function SalesOrderApprovalContent({
             {/* Header */}
             <div className="border-b p-3">
               <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4">
+                  {/* Current Status Dropdown */}
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">Current Status:</span>
-                    <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200">
-                      IN-PROGRESS
-                    </Badge>
+                    <Select
+                      value={form.watch("currentStatus") || salesOrder?.currentStatus || "IN-PROGRESS"}
+                      onValueChange={(value) => {
+                        form.setValue("currentStatus", value);
+                        // Update the sales order data immediately for UI feedback
+                        if (salesOrder) {
+                          salesOrder.currentStatus = value;
+                        }
+                      }}
+                      disabled={updateSalesOrderMutation.isPending}
+                    >
+                      <SelectTrigger className="w-48">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {currentStatusOptions.map((option) => (
+                          <SelectItem 
+                            key={option.value} 
+                            value={option.value}
+                            disabled={option.disabled}
+                          >
+                            <div className="flex items-center gap-2">
+                              <Badge 
+                                variant={option.variant as any} 
+                                className={`text-xs ${
+                                  option.color === "orange" ? "bg-orange-100 text-orange-800 border-orange-200" :
+                                  option.color === "green" ? "bg-green-100 text-green-800 border-green-200" :
+                                  option.color === "blue" ? "bg-blue-100 text-blue-800 border-blue-200" :
+                                  option.color === "purple" ? "bg-purple-100 text-purple-800 border-purple-200" :
+                                  option.color === "grey" ? "bg-gray-100 text-gray-800 border-gray-200" :
+                                  "bg-gray-100 text-gray-800 border-gray-200"
+                                }`}
+                              >
+                                {option.shortName || option.label}
+                              </Badge>
+                              <span className="text-sm">{option.label}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
-                  <Button variant="outline" size="sm" onClick={handleCopyLink}>
-                    <Copy className="h-4 w-4 mr-2" />
-                    Copy Link
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <User className="h-4 w-4 mr-2" />
-                    Assigned Designer
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <User className="h-4 w-4 mr-2" />
-                    Created By {salesOrder?.createdByName}
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Tools
-                  </Button>
+                  {/* Assigned Designer Lookup */}
                   <div className="flex items-center gap-2">
-                    <span className="text-sm">Email Sent</span>
-                    <Switch />
+                    <span className="text-sm font-medium">Assigned Designer:</span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setUserLookupOpen(true)}
+                      disabled={updateSalesOrderMutation.isPending}
+                      className="w-48 justify-start"
+                    >
+                      <User className="h-4 w-4 mr-2" />
+                      {form.watch("assignedDesigner") && form.watch("assignedDesigner") !== 0 
+                        ? `User ID: ${form.watch("assignedDesigner")}` 
+                        : "Select Designer"}
+                    </Button>
                   </div>
-                  <Button
-                    size="sm"
-                    type="submit"
-                    disabled={updateSalesOrderMutation.isPending}
-                  >
-                    <Save className="h-4 w-4 mr-2" />
-                    {updateSalesOrderMutation.isPending ? "Saving..." : "Save"}
-                  </Button>
+
+                  {/* Created By Info */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Created By:</span>
+                    <span className="text-sm text-muted-foreground">
+                      {salesOrder?.createdByName || "Unknown"}
+                    </span>
+                  </div>
+
+                  {/* Email Sent Toggle */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Email Sent:</span>
+                    <Switch 
+                      checked={form.watch("plantEmailSent") || salesOrder?.plantEmailSent || false}
+                      onCheckedChange={(checked) => {
+                        form.setValue("plantEmailSent", checked);
+                        // Update the sales order data immediately for UI feedback
+                        if (salesOrder) {
+                          salesOrder.plantEmailSent = checked;
+                        }
+                      }}
+                      disabled={updateSalesOrderMutation.isPending}
+                    />
+                  </div>
                 </div>
+
+                {/* Save Button */}
+                <Button
+                  size="sm"
+                  type="submit"
+                  disabled={updateSalesOrderMutation.isPending}
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {updateSalesOrderMutation.isPending ? "Saving..." : "Save"}
+                </Button>
               </div>
             </div>
 
@@ -482,14 +567,22 @@ export function SalesOrderApprovalContent({
         </FormProvider>
       </div>
 
-      {/* Chat Sidebar */}
-      <ChatSidebar
-        messages={transformedChatMessages}
-        onSendMessage={handleSendMessage}
-        onLastRead={handleLastRead}
-        onSettings={handleChatSettings}
-        disabled={updateSalesOrderMutation.isPending}
-      />
-    </div>
-  );
-} 
+             {/* Chat Sidebar */}
+       <ChatSidebar
+         messages={transformedChatMessages}
+         onSendMessage={handleSendMessage}
+         onLastRead={handleLastRead}
+         onSettings={handleChatSettings}
+         disabled={updateSalesOrderMutation.isPending}
+       />
+
+       {/* User Lookup Modal */}
+       <UserLookup
+         isOpen={userLookupOpen}
+         onClose={() => setUserLookupOpen(false)}
+         onSelect={handleUserSelect}
+         title="Select Assigned Designer"
+       />
+     </div>
+   );
+ } 

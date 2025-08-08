@@ -64,5 +64,9 @@ namespace Xcianify.Core.Model
         public int? AssignedDesigner { get; set; }
         public string AssignedDesignerName { get; set; }
         public bool? PlantEmailSent { get; set; }
+        
+        // Additional fields for product info form
+        public string ShelfLife { get; set; }
+        public string Colour { get; set; }
     }
 } 

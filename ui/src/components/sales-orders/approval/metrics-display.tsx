@@ -34,7 +34,7 @@ export function MetricsDisplay({ marginPercentage, value, profit, className }: M
                 <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
               </TooltipTrigger>
               <TooltipContent>
-                <p>Profit margin percentage</p>
+                <p>Profit Margin % = ((Profit / Value) * 100)</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -49,7 +49,7 @@ export function MetricsDisplay({ marginPercentage, value, profit, className }: M
                 <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
               </TooltipTrigger>
               <TooltipContent>
-                <p>Total order value</p>
+                <p>Value = Billing Rate * Quantity</p>
               </TooltipContent>
             </Tooltip>
           </div>
@@ -64,7 +64,7 @@ export function MetricsDisplay({ marginPercentage, value, profit, className }: M
                 <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
               </TooltipTrigger>
               <TooltipContent>
-                <p>Total profit amount</p>
+                <p>Profit = Value - (Costing * (Quantity + FOC Quantity))</p>
               </TooltipContent>
             </Tooltip>
           </div>

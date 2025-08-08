@@ -125,7 +125,7 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect }
           name="soNumber"
           label="SO Number"
           placeholder="Enter SO number"
-          disabled={disabled}
+          disabled={true} // Read-only
           required
         />
 
@@ -134,18 +134,18 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect }
           name="soDate"
           label="SO Date"
           placeholder="Pick a date"
-          disabled={disabled}
+          disabled={true} // Read-only
           required
         />
 
-                 <FormSelect
-           control={control}
-           name="soStatus"
-           label="SO Status"
-           options={salesOrderStatusOptions}
-           disabled={disabled}
-           required
-         />
+        <FormSelect
+          control={control}
+          name="soStatus"
+          label="SO Status"
+          options={salesOrderStatusOptions}
+          disabled={true} // Read-only
+          required
+        />
 
       </div>
 
@@ -277,6 +277,28 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect }
         </div>
       </div>
       <Separator />
+      {/* Quotation Information */}
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormDateInput
+            control={control}
+            name="quotationDate"
+            label="Quotation Date"
+            placeholder="Pick quotation date"
+            disabled={disabled}
+          />
+
+          <FormInput
+            control={control}
+            name="quotationNo"
+            label="Quotation No"
+            placeholder="Enter quotation number"
+            disabled={disabled}
+          />
+        </div>
+      </div>
+
+      <Separator />
       {/* Division and Design Information */}
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -285,7 +307,7 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect }
             name="divisionId"
             label="Division"
             placeholder="Division"
-            disabled={true} // Read-only, populated from lookup
+            disabled={true} // Read-only
           />
 
           <FormInput

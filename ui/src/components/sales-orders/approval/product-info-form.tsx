@@ -27,6 +27,20 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
     filterActive: true,
   });
 
+  // Determine which fields to show based on dosage form
+  const showTabletFields = dosageName === "TABLET";
+  const showCapsuleFields = dosageName === "CAPSULE";
+
+  // Calculate margin metrics based on form values
+  const quantity = parseFloat(watchedValues.quantity || "0") || 0;
+  const focQty = parseFloat(watchedValues.focQty || "0") || 0;
+  const billingRate = parseFloat(watchedValues.billingRate || "0") || 0;
+  const costing = parseFloat(watchedValues.costing || "0") || 0;
+  
+  const value = billingRate * quantity;
+  const cost = costing * (quantity + focQty);
+  const profit = value - cost;
+  const marginPercentage = value > 0 ? ((profit / value) * 100) : 0;
 
   return (
     <div className="space-y-4">
@@ -69,8 +83,8 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
       </div>
       {/* Quantity and Pricing */}
       <div className="space-y-2">
-      <h3 className="text-lg font-medium">Quantity and Pricing</h3>
-        <div className="flex flex-row flex-end gap-4">
+        <h3 className="text-lg font-medium">Quantity and Pricing</h3>
+        <div className="flex flex-row gap-4">
           <div className="w-2/3">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormInput
@@ -118,9 +132,9 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
           </div>
           <div className="w-1/4">
             <MetricsDisplay
-              marginPercentage={0}
-              value={0}
-              profit={0}
+              marginPercentage={marginPercentage}
+              value={value}
+              profit={profit}
             />
           </div>
         </div>
