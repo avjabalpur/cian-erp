@@ -294,12 +294,13 @@ namespace Xcianify.Services
         public async Task DeleteItemAsync(int id)
         {
             var item = await _itemMasterRepository.GetByIdAsync(id);
+           
             if (item == null)
             {
                 throw new NotFoundException("Item not found");
             }
+            
 
-            await _itemMasterRepository.DeleteAsync(id);
         }
     }
 }

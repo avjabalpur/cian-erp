@@ -71,23 +71,7 @@ namespace Xcianify.Services
             return await _repository.DeleteAsync(id);
         }
 
-        //   Method to check table structure for debugging
-        //public async Task<IEnumerable<dynamic>> GetTableStructureAsync()
-        //{
-        //    return ;
-        //  //  await _repository.GetTableStructureAsync();
-        //}
-        public async Task<IEnumerable<dynamic>> GetTableStructureAsync()
-        {
-            var tableStructure = new List<dynamic>
-    {
-        new { ColumnName = "Id", DataType = "int" },
-        new { ColumnName = "Name", DataType = "varchar(255)" },
-        new { ColumnName = "CreatedDate", DataType = "datetime" },
-        new { ColumnName = "IsActive", DataType = "bit" }
-    };
-
-            return await Task.FromResult(tableStructure);
-        }
+        //  
+      
     }
 }

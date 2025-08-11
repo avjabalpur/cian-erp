@@ -115,16 +115,6 @@ WHERE id = @Id;";
         }
 
         // Method to check table structure
-        public async Task<IEnumerable<dynamic>> GetTableStructureAsync()
-        {
-            const string query = @"
-                SELECT column_name, data_type, is_nullable 
-                FROM information_schema.columns 
-                WHERE table_name = 'item_export_details' 
-                ORDER BY ordinal_position";
-            
-            using var connection = _dbContext.GetConnection();
-            return await connection.QueryAsync(query);
-        }
+       
     }
 }
