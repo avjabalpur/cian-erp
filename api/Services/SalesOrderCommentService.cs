@@ -7,6 +7,8 @@ using Xcianify.Core.Domain.Services;
 using Xcianify.Core.DTOs.SalesOrder;
 using Xcianify.Core.Model;
 using Xcianify.Core.Exceptions;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace Xcianify.Services
 {
@@ -14,13 +16,16 @@ namespace Xcianify.Services
     {
         private readonly ISalesOrderCommentRepository _commentRepository;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public SalesOrderCommentService(
             ISalesOrderCommentRepository commentRepository,
-            IMapper mapper)
+            IMapper mapper,
+            IHttpContextAccessor httpContextAccessor)
         {
             _commentRepository = commentRepository ?? throw new ArgumentNullException(nameof(commentRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         public async Task<IEnumerable<SalesOrderCommentDto>> GetAllCommentsAsync()
@@ -44,6 +49,13 @@ namespace Xcianify.Services
             comment.CreatedAt = DateTime.UtcNow;
             comment.UpdatedAt = DateTime.UtcNow;
             comment.IsDeleted = false;
+            
+            // Get current user ID from claims
+            var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            {
+                comment.CreatedBy = userId;
+            }
 
             var createdComment = await _commentRepository.AddAsync(comment);
             return _mapper.Map<SalesOrderCommentDto>(createdComment);
@@ -57,6 +69,13 @@ namespace Xcianify.Services
 
             _mapper.Map(commentDto, existingComment);
             existingComment.UpdatedAt = DateTime.UtcNow;
+            
+            // Get current user ID from claims
+            var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            {
+                existingComment.UpdatedBy = userId;
+            }
 
             await _commentRepository.UpdateAsync(existingComment);
         }

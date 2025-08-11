@@ -14,7 +14,8 @@ import {
   User,
   Settings,
   ArrowLeft,
-  X
+  X,
+  MessageCircle
 } from "lucide-react";
 import { SalesOrder, UpdateSalesOrderData } from "@/types/sales-order";
 import { useSalesOrderById } from "@/hooks/sales-order/use-sales-orders";
@@ -22,7 +23,7 @@ import { useUpdateSalesOrder } from "@/hooks/sales-order/use-sales-orders";
 import { useCommentsBySalesOrder } from "@/hooks/sales-order/use-sales-order-comments";
 import { useChatMessagesBySalesOrder } from "@/hooks/sales-order/use-sales-order-chat";
 import { useDocumentsBySalesOrder } from "@/hooks/sales-order/use-sales-order-documents";
-import { useSalesOrderSaveTransactions } from "@/hooks/sales-order/use-sales-order-transactions";
+import { useSaveTransactionsBySalesOrder } from "@/hooks/sales-order/use-sales-order-transactions";
 import { useToast } from "@/hooks/use-toast";
 import { SalesOrderUpdateFormValues, salesOrderUpdateSchema } from "@/validations/sales-order";
 import { SalesOrderChat, SalesOrderComment, SalesOrderDocument, SalesOrderSaveTransaction } from "@/types/sales-order-extended";
@@ -39,6 +40,9 @@ import { FormLookup } from "@/components/shared/forms/form-lookup";
 import { useUserById } from "@/hooks/use-users";
 import { useCustomerById } from "@/hooks/customers/use-customers";
 import { useItemById } from "@/hooks/items/use-items";
+import { useCreateSalesOrderChatMessage } from "@/hooks/sales-order/use-sales-order-chat";
+import { Input } from "@/components/ui/input";
+import { useCreateSalesOrderComment } from "@/hooks/sales-order/use-sales-order-comments";
 
 interface SalesOrderApprovalContentProps {
   salesOrderId: number;
@@ -62,11 +66,15 @@ export function SalesOrderApprovalContent({
   // Fetch sales order data
   const { data: salesOrder, isLoading } = useSalesOrderById(salesOrderId.toString());
   
-  // Fetch related data
+  // Get chat messages for this sales order
+  const { data: chatMessages = [], isLoading: chatMessagesLoading } = useChatMessagesBySalesOrder(salesOrderId);
+
+  // Get comments for this sales order
   const { data: comments = [], isLoading: commentsLoading } = useCommentsBySalesOrder(salesOrderId);
-  const { data: chatMessages = [], isLoading: chatLoading } = useChatMessagesBySalesOrder(salesOrderId);
+
+  // Get documents for this sales order
   const { data: documents = [], isLoading: documentsLoading } = useDocumentsBySalesOrder(salesOrderId);
-  const { data: saveTransactions = [], isLoading: transactionsLoading } = useSalesOrderSaveTransactions();
+  const { data: saveTransactions = [], isLoading: transactionsLoading } = useSaveTransactionsBySalesOrder(salesOrderId);
   
   const updateSalesOrderMutation = useUpdateSalesOrder();
 
@@ -344,11 +352,60 @@ export function SalesOrderApprovalContent({
     // Handle approval logic here
   };
 
+  // Get the create chat message mutation
+  const createChatMessageMutation = useCreateSalesOrderChatMessage();
+  const createCommentMutation = useCreateSalesOrderComment();
 
+  const [newComment, setNewComment] = useState("");
 
-  const handleSendMessage = (message: string) => {
-    console.log("Send message:", message);
-    // Handle send message logic here
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
+
+    try {
+      await createCommentMutation.mutateAsync({
+        salesOrderId,
+        data: {
+          salesOrderId,
+          comments: newComment,
+          type: "comment",
+          status: "pending",
+        },
+      });
+      setNewComment("");
+      toast({
+        title: "Success",
+        description: "Comment added successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to add comment",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSendMessage = async (message: string) => {
+    try {
+      await createChatMessageMutation.mutateAsync({
+        salesOrderId,
+        data: {
+          salesOrderId,
+          comment: message
+        }
+      });
+      
+      toast({
+        title: "Success",
+        description: "Message sent successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to send message",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleLastRead = () => {
@@ -379,12 +436,12 @@ export function SalesOrderApprovalContent({
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="h-full flex flex-col">
             {/* Header */}
-            <div className="border-b p-3">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-4">
+            <div className="border-b bg-gradient-to-r from-slate-50 to-gray-50 p-4 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-6">
                   {/* Current Status Dropdown */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">Current Status:</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-gray-700">Current Status:</span>
                     <Select
                       value={form.watch("currentStatus") || salesOrder?.currentStatus || "IN-PROGRESS"}
                       onValueChange={(value) => {
@@ -396,7 +453,7 @@ export function SalesOrderApprovalContent({
                       }}
                       disabled={updateSalesOrderMutation.isPending}
                     >
-                      <SelectTrigger className="w-48">
+                      <SelectTrigger className="w-48 border-gray-300 focus:border-blue-500 focus:ring-blue-500 bg-white shadow-sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -414,8 +471,8 @@ export function SalesOrderApprovalContent({
                   </div>
 
                   {/* Assigned Designer Lookup */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">Assigned Designer:</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-gray-700">Assigned Designer:</span>
                     <div className="w-48">
                       <FormLookup
                         control={form.control}
@@ -427,23 +484,25 @@ export function SalesOrderApprovalContent({
                         displayValue={(value) => getUserDisplayValue(value)}
                         className="space-y-0"
                         inputProps={{
-                          className: "cursor-pointer hover:bg-muted/50 transition-colors"
+                          className: "cursor-pointer hover:bg-blue-50 transition-colors border-gray-300 focus:border-blue-500 focus:ring-blue-500 bg-white shadow-sm"
                         }}
                       />
                     </div>
                   </div>
+                </div>
 
+                <div className="flex items-center gap-6">
                   {/* Created By Info */}
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">Created By:</span>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm font-semibold text-gray-700">Created By:</span>
+                    <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
                       {salesOrder?.createdByName || "Unknown"}
                     </span>
                   </div>
 
                   {/* Email Sent Toggle */}
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">Email Sent:</span>
+                    <span className="text-sm font-semibold text-gray-700">Email Sent:</span>
                     <Switch 
                       checked={form.watch("plantEmailSent") || salesOrder?.plantEmailSent || false}
                       onCheckedChange={(checked) => {
@@ -454,19 +513,21 @@ export function SalesOrderApprovalContent({
                         }
                       }}
                       disabled={updateSalesOrderMutation.isPending}
+                      className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-300"
                     />
                   </div>
-                </div>
 
-                {/* Save Button */}
-                <Button
-                  size="sm"
-                  type="submit"
-                  disabled={updateSalesOrderMutation.isPending}
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  {updateSalesOrderMutation.isPending ? "Saving..." : "Save"}
-                </Button>
+                  {/* Save Button */}
+                  <Button
+                    size="sm"
+                    type="submit"
+                    disabled={updateSalesOrderMutation.isPending}
+                    className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white shadow-md hover:shadow-lg transition-all duration-200"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    {updateSalesOrderMutation.isPending ? "Saving..." : "Save"}
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -474,8 +535,9 @@ export function SalesOrderApprovalContent({
             <div className="flex-1 flex flex-col">
               <Tabs defaultValue="basic-info" className="border-0 flex-1 flex flex-col">
                 <div className="px-3">
-                  <TabsList className="grid w-full grid-cols-5">
+                  <TabsList className="grid w-full grid-cols-6">
                     <TabsTrigger value="basic-info">Basic Info</TabsTrigger>
+                    <TabsTrigger value="comments">Comments</TabsTrigger>
                     <TabsTrigger value="compare-progen">Compare With Progen</TabsTrigger>
                     <TabsTrigger value="quotations">Quotations</TabsTrigger>
                     <TabsTrigger value="performa-invoice">Performa Invoice</TabsTrigger>
@@ -484,12 +546,14 @@ export function SalesOrderApprovalContent({
                 </div>
 
                 <div className="flex-1 p-3">
-                  <TabsContent value="basic-info" className="space-y-2 h-full">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg font-semibold">Approval Stages</CardTitle>
+                  <TabsContent value="basic-info" className="space-y-3 h-full">
+                    <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+                      <CardHeader className="p-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
+                        <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                          Approval Stages
+                        </CardTitle>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="pt-4">
                         <ApprovalButtons
                           approvals={approvalData}
                           onApprovalClick={handleApprovalClick}
@@ -498,26 +562,30 @@ export function SalesOrderApprovalContent({
                       </CardContent>
                     </Card>
 
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-lg font-semibold">SO Info</CardTitle>
+                    <Card className="border-0 shadow-md bg-gradient-to-br from-slate-50 to-gray-50">
+                      <CardHeader className="p-2 bg-gradient-to-r from-slate-600 to-gray-600 text-white rounded-t-lg">
+                        <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                          SO Info
+                        </CardTitle>
                       </CardHeader>
-                      <CardContent>
-                                                 <SOInfoForm
-                           control={form.control}
-                           disabled={updateSalesOrderMutation.isPending}
-                           onCustomerSelect={handleCustomerSelect}
-                           onItemSelect={handleItemSelect}
-                           onManufacturerSelect={handleManufacturerSelect}
-                         />
+                      <CardContent className="pt-4">
+                        <SOInfoForm
+                          control={form.control}
+                          disabled={updateSalesOrderMutation.isPending}
+                          onCustomerSelect={handleCustomerSelect}
+                          onItemSelect={handleItemSelect}
+                          onManufacturerSelect={handleManufacturerSelect}
+                        />
                       </CardContent>
                     </Card>
 
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg font-semibold">Product Info</CardTitle>
+                    <Card className="border-0 shadow-md bg-gradient-to-br from-emerald-50 to-green-50">
+                      <CardHeader className="p-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-t-lg">
+                        <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                          Product Info
+                        </CardTitle>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="pt-4">
                         <div className="flex gap-4">
                           <div className="flex-1">
                             <ProductInfoForm
@@ -529,17 +597,100 @@ export function SalesOrderApprovalContent({
                         </div>
                       </CardContent>
                     </Card>
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg font-semibold">Reference Documents</CardTitle>
+                    <Card className="border-0 shadow-md bg-gradient-to-br from-amber-50 to-orange-50">
+                      <CardHeader className="p-2 bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-t-lg">
+                        <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                          Reference Documents
+                        </CardTitle>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="pt-4">
                         <ReferenceDocuments
                           salesOrderId={salesOrderId}
                           disabled={updateSalesOrderMutation.isPending}
                           documents={documents}
                           isLoading={documentsLoading}
                         />
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="comments">
+                    <Card className="border-0 shadow-lg bg-gradient-to-br from-rose-50 to-pink-50">
+                        <CardHeader className="p-2 bg-gradient-to-r from-rose-600 to-pink-600 text-white rounded-t-lg">
+                        <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                          Comments
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-4 space-y-4">
+                        {/* Add Comment Form */}
+                        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                          <h4 className="font-medium mb-3 text-gray-800 flex items-center gap-2">
+                            <div className="w-2 h-2 bg-rose-500 rounded-full"></div>
+                            Add New Comment
+                          </h4>
+                          <div className="flex gap-2">
+                            <Input
+                              placeholder="Type your comment here..."
+                              value={newComment}
+                              onChange={(e) => setNewComment(e.target.value)}
+                              className="flex-1 border-gray-300 focus:border-rose-500 focus:ring-rose-500 rounded-lg"
+                            />
+                            <Button
+                              size="sm"
+                              onClick={handleAddComment}
+                              disabled={!newComment.trim() || createCommentMutation.isPending}
+                              className="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white shadow-sm"
+                            >
+                              {createCommentMutation.isPending ? "Adding..." : "Add Comment"}
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Comments List */}
+                        {commentsLoading ? (
+                          <div className="text-center py-8">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto mb-3"></div>
+                            <p className="text-gray-600">Loading comments...</p>
+                          </div>
+                        ) : comments.length === 0 ? (
+                          <div className="text-center py-12 text-muted-foreground bg-white rounded-lg border border-gray-200">
+                            <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-3 flex items-center justify-center">
+                              <MessageCircle className="h-8 w-8 text-gray-400" />
+                            </div>
+                            <p className="text-lg font-medium text-gray-500">No comments yet</p>
+                            <p className="text-sm text-gray-400">Be the first to add a comment</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            {comments.map((comment: SalesOrderComment) => (
+                              <div key={comment.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                                <div className="flex items-center justify-between mb-3">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-semibold text-gray-800 bg-gray-100 px-3 py-1 rounded-full">
+                                      {comment.createdByName || "Unknown User"}
+                                    </span>
+                                    {comment.status && (
+                                      <Badge variant={comment.status === "approved" ? "default" : "secondary"} className="text-xs">
+                                        {comment.status}
+                                      </Badge>
+                                    )}
+                                    {comment.type && (
+                                      <Badge variant="outline" className="text-xs">
+                                        {comment.type}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
+                                    {new Date(comment.createdAt).toLocaleString()}
+                                  </span>
+                                </div>
+                                <div className="text-sm text-gray-700 leading-relaxed bg-gray-50 p-3 rounded border-l-4 border-rose-200">
+                                  {comment.comments}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   </TabsContent>
@@ -569,32 +720,43 @@ export function SalesOrderApprovalContent({
                   </TabsContent>
 
                   <TabsContent value="save-history">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg font-semibold">Save History</CardTitle>
+                    <Card className="border-0 shadow-lg bg-gradient-to-br from-violet-50 to-purple-50">
+                      <CardHeader className="p-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-t-lg">
+                        <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                          Save History
+                        </CardTitle>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="pt-4">
                         {transactionsLoading ? (
-                          <div className="text-center py-4">Loading save history...</div>
+                          <div className="text-center py-8">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-500 mx-auto mb-3"></div>
+                            <p className="text-gray-600">Loading save history...</p>
+                          </div>
                         ) : salesOrderTransactions.length === 0 ? (
-                          <div className="text-center py-8 text-muted-foreground">
-                            No save history found for this sales order.
+                          <div className="text-center py-12 text-muted-foreground bg-white rounded-lg border border-gray-200">
+                            <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-3 flex items-center justify-center">
+                              <div className="w-8 h-8 bg-violet-200 rounded-full flex items-center justify-center">
+                                <div className="w-4 h-4 bg-violet-400 rounded-full"></div>
+                              </div>
+                            </div>
+                            <p className="text-lg font-medium text-gray-500">No save history found</p>
+                            <p className="text-sm text-gray-400">Changes will appear here when you save</p>
                           </div>
                         ) : (
-                          <div className="space-y-4">
+                          <div className="space-y-3">
                             {salesOrderTransactions.map((transaction: SalesOrderSaveTransaction) => (
-                              <div key={transaction.id} className="border rounded-lg p-4">
-                                <div className="flex items-center justify-between mb-2">
-                                  <span className="text-sm font-medium">
+                              <div key={transaction.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                                <div className="flex items-center justify-between mb-3">
+                                  <span className="text-sm font-semibold text-gray-800 bg-violet-100 px-3 py-1 rounded-full">
                                     {transaction.createdByName || "Unknown User"}
                                   </span>
-                                  <span className="text-xs text-muted-foreground">
+                                  <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
                                     {new Date(transaction.createdAt).toLocaleString()}
                                   </span>
                                 </div>
                                 {transaction.diff && (
-                                  <div className="text-sm text-muted-foreground">
-                                    <pre className="whitespace-pre-wrap bg-muted p-2 rounded">
+                                  <div className="text-sm text-gray-700 bg-gray-50 p-3 rounded border-l-4 border-violet-200">
+                                    <pre className="whitespace-pre-wrap font-mono text-xs">
                                       {transaction.diff}
                                     </pre>
                                   </div>
