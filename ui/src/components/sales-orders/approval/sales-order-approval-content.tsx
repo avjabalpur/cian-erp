@@ -81,7 +81,7 @@ export function SalesOrderApprovalContent({
       currentStatus: "IN-PROGRESS", // Default status
       assignedDesigner: 0, // Default assigned designer
       plantEmailSent: false,
-      manufacturerName: "CIAN HEALTHCARE", // Default readonly value
+      organizationId: "-1", // Default readonly value
     },
   });
 
@@ -128,6 +128,20 @@ export function SalesOrderApprovalContent({
     console.log("Form values after item selection:", form.getValues());
   };
 
+  // Handle manufacturer selection from dropdown
+  const handleManufacturerSelect = (selectedManufacturer: any) => {
+    console.log("Manufacturer selected:", selectedManufacturer);
+    
+    if (selectedManufacturer && selectedManufacturer.country) {
+      form.setValue("country", selectedManufacturer.country);
+      console.log("Country auto-populated:", selectedManufacturer.country);
+    }
+    
+    // Debug: Log the current form values
+    console.log("Current form values after manufacturer selection:", form.getValues());
+    console.log("Organization ID in form:", form.getValues("organizationId"));
+  };
+
   // Handle user selection from lookup
   const handleUserSelect = (userId: number) => {
     console.log("User selected:", userId);
@@ -164,7 +178,7 @@ export function SalesOrderApprovalContent({
         soNumber: salesOrder.soNumber || "",
         soDate: salesOrder.soDate || "",
         soStatus: salesOrder.soStatus || "REPEAT",
-        organizationId: salesOrder.organizationId,
+        organizationId: salesOrder.organizationId?.toString() || "-1",
         customerId: salesOrder.customerId || 0,
         paymentTerm: salesOrder.paymentTerm || "",
         quotationDate: salesOrder.quotationDate || "",
@@ -218,7 +232,6 @@ export function SalesOrderApprovalContent({
         country: salesOrder.country || "",
         customerGstNo: salesOrder.customerGstNo || "",
         // Set readonly field defaults
-        manufacturerName: "CIAN HEALTHCARE",
         customerName: salesOrder.customerName || "",
         customerCode: "", // Will be populated from customer lookup
         productName: "", // Will be populated from item lookup
@@ -260,6 +273,10 @@ export function SalesOrderApprovalContent({
 
   const onSubmit = async (values: SalesOrderUpdateFormValues) => {
     try {
+      console.log("Form values before conversion:", values);
+      console.log("Organization ID before conversion:", values.organizationId);
+      console.log("Dosage Name before conversion:", values.dosageName);
+      
       // Convert string values to numbers where needed
       const updateData = {
         ...values,
@@ -269,6 +286,10 @@ export function SalesOrderApprovalContent({
         divisionId: values.divisionId ? Number(values.divisionId) : undefined,
         assignedDesigner: values.assignedDesigner ? Number(values.assignedDesigner) : undefined,
       };
+      
+      console.log("Update data after conversion:", updateData);
+      console.log("Organization ID after conversion:", updateData.organizationId);
+      console.log("Dosage Name after conversion:", updateData.dosageName);
 
       await updateSalesOrderMutation.mutateAsync({
         id: salesOrderId.toString(),
@@ -490,12 +511,13 @@ export function SalesOrderApprovalContent({
                         <CardTitle className="text-lg font-semibold">SO Info</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <SOInfoForm
-                          control={form.control}
-                          disabled={updateSalesOrderMutation.isPending}
-                          onCustomerSelect={handleCustomerSelect}
-                          onItemSelect={handleItemSelect}
-                        />
+                                                 <SOInfoForm
+                           control={form.control}
+                           disabled={updateSalesOrderMutation.isPending}
+                           onCustomerSelect={handleCustomerSelect}
+                           onItemSelect={handleItemSelect}
+                           onManufacturerSelect={handleManufacturerSelect}
+                         />
                       </CardContent>
                     </Card>
 

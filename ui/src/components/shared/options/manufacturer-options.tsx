@@ -5,6 +5,8 @@ import { useOrganizations } from "@/hooks/use-organizations";
 interface ManufacturerOption {
   label: string;
   value: string;
+  id?: number;
+  country?: string;
 }
 
 interface UseManufacturerOptionsProps {
@@ -57,7 +59,9 @@ export function useManufacturerOptions({
   // Add manufacturer options
   const manufacturerOptions = items.map((org) => ({
     label: org.name,
-    value: org.name,
+    value: org.id.toString(), // Use ID as value instead of name
+    id: org.id,
+    country: org.country,
   }));
 
   return [...options, ...manufacturerOptions];
@@ -67,7 +71,7 @@ export function useManufacturerOptions({
 export const getManufacturerOptions = (): ManufacturerOption[] => {
   return [
     { label: "Select manufacturer", value: "-1" },
-    { label: "CIAN HEALTHCARE", value: "CIAN HEALTHCARE" },
+    { label: "CIAN HEALTHCARE", value: "1" }, // Use actual organization ID
   ];
 };
 

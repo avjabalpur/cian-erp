@@ -73,35 +73,10 @@ export const pShelfLifeOptions: SelectOption[] = [
 
 // Product Domino Options (From original system)
 export const pDominoOptions: SelectOption[] = [
-  { label: "DOMINO", value: "DOMINO" },
-  { label: "STEREO", value: "STEREO" },
+  { label: "DOMINO", value: "domino" },
+  { label: "STEREO", value: "stereo" },
 ];
 
-// Manufacturer Options (From original system)
-export const manufacturerOptions: SelectOption[] = [
-  { label: "CIAN HEALTHCARE", value: "CIAN HEALTHCARE" },
-  { label: "DR. SMITH", value: "DR. SMITH" },
-  { label: "Bayberry", value: "Bayberry" },
-  { label: "SHEFIATRIC LIFE SCIENCES", value: "SHEFIATRIC LIFE SCIENCES" },
-  { label: "CELESTA HEALTHCARE PVT. LTD.", value: "CELESTA HEALTHCARE PVT. LTD." },
-  { label: "JM LIFESCIENCES PVT. LTD.", value: "JM LIFESCIENCES PVT. LTD." },
-];
-
-// Assigned Designer Options (From original system)
-export const assignedDesignerOptions: SelectOption[] = [
-  { label: "-", value: "0" },
-  { label: "amar", value: "103" },
-  { label: "dn", value: "155" },
-  { label: "masum", value: "106" },
-  { label: "omkar", value: "190" },
-];
-
-// Approval Status Options
-export const approvalStatusOptions: SelectOption[] = [
-  { label: "All", value: "-1" },
-  { label: "Pending", value: "0" },
-  { label: "Approved", value: "1" },
-];
 
 
 // Payment Terms Options

@@ -11,7 +11,7 @@ import { useCustomers } from "@/hooks/customers/use-customers";
 import { CustomerFilter } from "@/types/customer";
 import { Control, useWatch } from "react-hook-form";
 import { SalesOrderUpdateFormValues } from "@/validations/sales-order";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Separator } from "@/components/ui/separator";
 import { 
   useManufacturerOptions, 
@@ -25,17 +25,20 @@ interface SOInfoFormProps {
   disabled?: boolean;
   onCustomerSelect?: (customer: any) => void;
   onItemSelect?: (item: any) => void;
+  onManufacturerSelect?: (manufacturer: any) => void;
 }
 
-export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect }: SOInfoFormProps) {
+export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect, onManufacturerSelect }: SOInfoFormProps) {
   const [isCustomerLookupOpen, setIsCustomerLookupOpen] = useState(false);
   const [isItemLookupOpen, setIsItemLookupOpen] = useState(false);
+  const lastProcessedManufacturer = useRef<string>("");
 
   // Watch form values for conditional rendering
   const watchedValues = useWatch({ control });
   const customerId = watchedValues.customerId;
   const itemId = watchedValues.itemId;
   const dosageName = watchedValues.dosageName;
+  const organizationId = watchedValues.organizationId;
 
   // Get manufacturer options
   const manufacturerOptions = useManufacturerOptions({
@@ -52,6 +55,9 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect }
     defaultValue: "-1",
     filterActive: true,
   });
+
+  // Debug: Log dosage options
+  console.log("Dosage options loaded:", dosageOptions);
 
   // Get payment terms options
   const paymentTermsOptions = usePaymentTermsOptions({
@@ -88,6 +94,28 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect }
       onItemSelect(selectedItem);
     }
   };
+
+  const handleManufacturerSelect = (selectedManufacturer: any) => {
+    if (onManufacturerSelect) {
+      onManufacturerSelect(selectedManufacturer);
+    }
+  };
+
+  // Watch for manufacturer changes and auto-populate country
+  useEffect(() => {
+    if (organizationId && organizationId !== "-1" && organizationId !== "0") {
+      const selectedManufacturer = manufacturerOptions.find(option => option.value === organizationId);
+      if (selectedManufacturer?.country && onManufacturerSelect && organizationId !== lastProcessedManufacturer.current) {
+        lastProcessedManufacturer.current = organizationId;
+        onManufacturerSelect(selectedManufacturer);
+      }
+    }
+  }, [organizationId, manufacturerOptions, onManufacturerSelect]);
+
+  // Debug: Log dosage field changes
+  useEffect(() => {
+    console.log("Dosage field changed:", dosageName);
+  }, [dosageName]);
 
   const getCustomerDisplayValue = (value: string) => {
     const customerId = watchedValues.customerId;
@@ -152,7 +180,7 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect }
 
         <FormSelect
           control={control}
-          name="manufacturerName"
+          name="organizationId"
           label="Manufacturer Name"
           options={manufacturerOptions}
           disabled={disabled}
