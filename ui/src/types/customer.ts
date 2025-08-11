@@ -54,6 +54,7 @@ export interface CustomerFilter {
   pageSize?: number;
   sortBy?: string;
   sortDescending?: boolean;
+  id?: number;
 }
 
 export type CreateCustomerData = Omit<Customer, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy' | 'isDeleted' | 'addresses' | 'bankingDetails' | 'businessTerms' | 'taxCompliance'>;

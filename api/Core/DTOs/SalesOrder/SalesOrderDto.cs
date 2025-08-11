@@ -70,5 +70,9 @@ namespace Xcianify.Core.DTOs.SalesOrder
         public string CreatedByName { get; set; }
         public int? UpdatedBy { get; set; }
         public string UpdatedByName { get; set; }
+        
+        // Additional fields for product info form
+        public string ShelfLife { get; set; }
+        public string Colour { get; set; }
     }
 } 

@@ -8,17 +8,14 @@ namespace Xcianify.Core.DTOs.SalesOrder
         [Required]
         public int Id { get; set; }
         
-        [Required]
         public string SoNumber { get; set; }
         
         public DateTime? SoDate { get; set; }
         
-        [Required]
         public string SoStatus { get; set; }
         
         public int? OrganizationId { get; set; }
         
-        [Required]
         public int? CustomerId { get; set; }
         
         public string PaymentTerm { get; set; }

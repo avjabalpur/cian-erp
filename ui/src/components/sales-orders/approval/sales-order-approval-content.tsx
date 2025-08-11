@@ -19,15 +19,24 @@ import {
 import { SalesOrder, UpdateSalesOrderData } from "@/types/sales-order";
 import { useSalesOrderById } from "@/hooks/sales-order/use-sales-orders";
 import { useUpdateSalesOrder } from "@/hooks/sales-order/use-sales-orders";
+import { useCommentsBySalesOrder } from "@/hooks/sales-order/use-sales-order-comments";
+import { useChatMessagesBySalesOrder } from "@/hooks/sales-order/use-sales-order-chat";
+import { useDocumentsBySalesOrder } from "@/hooks/sales-order/use-sales-order-documents";
+import { useSalesOrderSaveTransactions } from "@/hooks/sales-order/use-sales-order-transactions";
 import { useToast } from "@/hooks/use-toast";
 import { SalesOrderUpdateFormValues, salesOrderUpdateSchema } from "@/validations/sales-order";
+import { SalesOrderChat, SalesOrderComment, SalesOrderDocument, SalesOrderSaveTransaction } from "@/types/sales-order-extended";
 import { ApprovalButtons } from "./approval-buttons";
 import { ReferenceDocuments } from "./reference-documents";
 import { SOInfoForm } from "./so-info-form";
 import { ProductInfoForm } from "./product-info-form";
-import { MetricsDisplay } from "./metrics-display";
 import { ChatSidebar } from "./chat-sidebar";
 import { useRouter } from "next/navigation";
+import { currentStatusOptions } from "@/lib/utils/sales-order-utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { UserLookup } from "@/components/shared/lookups/user-lookup";
+import { FormLookup } from "@/components/shared/forms/form-lookup";
+import { useUserById } from "@/hooks/use-users";
 
 interface SalesOrderApprovalContentProps {
   salesOrderId: number;
@@ -44,7 +53,19 @@ export function SalesOrderApprovalContent({
 }: SalesOrderApprovalContentProps) {
   const { toast } = useToast();
   const router = useRouter();
+  
+  // State for user lookup
+  const [userLookupOpen, setUserLookupOpen] = useState(false);
+  
+  // Fetch sales order data
   const { data: salesOrder, isLoading } = useSalesOrderById(salesOrderId.toString());
+  
+  // Fetch related data
+  const { data: comments = [], isLoading: commentsLoading } = useCommentsBySalesOrder(salesOrderId);
+  const { data: chatMessages = [], isLoading: chatLoading } = useChatMessagesBySalesOrder(salesOrderId);
+  const { data: documents = [], isLoading: documentsLoading } = useDocumentsBySalesOrder(salesOrderId);
+  const { data: saveTransactions = [], isLoading: transactionsLoading } = useSalesOrderSaveTransactions();
+  
   const updateSalesOrderMutation = useUpdateSalesOrder();
 
   const form = useForm<SalesOrderUpdateFormValues>({
@@ -52,20 +73,88 @@ export function SalesOrderApprovalContent({
     defaultValues: {
       soNumber: "",
       soDate: "",
-      soStatus: "",
+      soStatus: "REPEAT", // Default readonly value
       customerId: 0,
-      dosageName: "",
-      currentStatus: "",
+      dosageName: "-1", // Default value - will be populated from item lookup
+      currentStatus: "IN-PROGRESS", // Default status
+      assignedDesigner: 0, // Default assigned designer
       plantEmailSent: false,
+      manufacturerName: "CIAN HEALTHCARE", // Default readonly value
     },
   });
+
+  // Fetch assigned designer user data
+  const assignedDesignerId = form.watch("assignedDesigner") || salesOrder?.assignedDesigner;
+  const { data: assignedDesignerUser } = useUserById(assignedDesignerId?.toString() || "");
+
+  // Handle customer selection from lookup
+  const handleCustomerSelect = (selectedCustomer: any) => {
+    console.log("Customer selected:", selectedCustomer);
+    
+    form.setValue("customerId", selectedCustomer.id);
+    form.setValue("customerCode", selectedCustomer.customerCode || "");
+    form.setValue("customerName", selectedCustomer.customerName || "");
+    form.setValue("customerGstNo", selectedCustomer.gstNo || "");
+    form.setValue("country", selectedCustomer.country || "");
+    
+    // Trigger form validation
+    form.trigger(["customerId", "customerCode", "customerName"]);
+    
+    console.log("Form values after customer selection:", form.getValues());
+  };
+
+  // Handle item selection from lookup
+  const handleItemSelect = (selectedItem: any) => {
+    console.log("Item selected:", selectedItem);
+    
+    form.setValue("itemId", selectedItem.id);
+    form.setValue("productCode", selectedItem.itemCode || "");
+    form.setValue("productName", selectedItem.itemName || "");
+    form.setValue("composition", selectedItem.composition || "");
+         form.setValue("dosageName", selectedItem.dosageName || "-1");
+    
+    // Trigger form validation
+    form.trigger(["itemId", "productCode", "productName"]);
+    
+    console.log("Form values after item selection:", form.getValues());
+  };
+
+  // Handle user selection from lookup
+  const handleUserSelect = (userId: number) => {
+    console.log("User selected:", userId);
+    
+    form.setValue("assignedDesigner", userId);
+    
+    // Update the sales order data immediately for UI feedback
+    if (salesOrder) {
+      salesOrder.assignedDesigner = userId;
+    }
+    
+    // Trigger form validation
+    form.trigger(["assignedDesigner"]);
+    
+    console.log("Form values after user selection:", form.getValues());
+  };
+
+  // Get user display value for FormLookup
+  const getUserDisplayValue = (userId: number | string) => {
+    if (!userId || userId === 0) return "";
+    
+    // Use the fetched user data if available
+    if (assignedDesignerUser && assignedDesignerUser.id === Number(userId)) {
+      return `${assignedDesignerUser.firstName} ${assignedDesignerUser.lastName}`;
+    }
+    
+    // Fallback to showing the user ID
+    return `User ID: ${userId}`;
+  };
 
   React.useEffect(() => {
     if (salesOrder) {
       form.reset({
         soNumber: salesOrder.soNumber || "",
         soDate: salesOrder.soDate || "",
-        soStatus: salesOrder.soStatus || "",
+        soStatus: salesOrder.soStatus || "REPEAT",
         organizationId: salesOrder.organizationId,
         customerId: salesOrder.customerId || 0,
         paymentTerm: salesOrder.paymentTerm || "",
@@ -73,7 +162,7 @@ export function SalesOrderApprovalContent({
         quotationNo: salesOrder.quotationNo || "",
         hsnCode: salesOrder.hsnCode || "",
         itemId: salesOrder.itemId,
-        dosageName: salesOrder.dosageName || "",
+                 dosageName: salesOrder.dosageName || "-1",
         divisionId: salesOrder.divisionId,
         designUnder: salesOrder.designUnder || "",
         packingStyleDescription: salesOrder.packingStyleDescription || "",
@@ -112,16 +201,35 @@ export function SalesOrderApprovalContent({
         pmTubeStock: salesOrder.pmTubeStock || "",
         pmLabelStock: salesOrder.pmLabelStock || "",
         drugApprovalUnder: salesOrder.drugApprovalUnder || "",
-        currentStatus: salesOrder.currentStatus || "",
+        currentStatus: salesOrder.currentStatus || "IN-PROGRESS",
         comments: salesOrder.comments || "",
-        assignedDesigner: salesOrder.assignedDesigner,
+        assignedDesigner: salesOrder.assignedDesigner || 0,
         plantEmailSent: salesOrder.plantEmailSent || false,
         productCode: salesOrder.productCode || "",
         country: salesOrder.country || "",
         customerGstNo: salesOrder.customerGstNo || "",
+                 // Set readonly field defaults
+         manufacturerName: "CIAN HEALTHCARE",
+        customerName: salesOrder.customerName || "",
+        customerCode: "", // Will be populated from customer lookup
+        productName: "", // Will be populated from item lookup
+        productCast: "", // Will be populated from item lookup
       });
     }
   }, [salesOrder, form]);
+
+  // Transform chat messages for the chat sidebar
+  const transformedChatMessages = chatMessages.map((chat: SalesOrderChat) => ({
+    id: chat.id.toString(),
+    message: chat.comment,
+    sender: chat.createdByName || "Unknown User",
+    timestamp: new Date(chat.createdAt),
+  }));
+
+  // Filter save transactions for this sales order
+  const salesOrderTransactions = saveTransactions.filter(
+    (transaction: SalesOrderSaveTransaction) => transaction.salesOrderId === salesOrderId
+  );
 
   const onSubmit = async (values: SalesOrderUpdateFormValues) => {
     try {
@@ -182,12 +290,6 @@ export function SalesOrderApprovalContent({
     pm: null,
   };
 
-  // Mock metrics data - in real app, this would be calculated
-  const metricsData = {
-    marginPercentage: 0.00,
-    value: 0.00,
-    profit: 0.00,
-  };
 
   const handleApprovalClick = (type: string) => {
     console.log(`Approval clicked: ${type}`);
@@ -239,44 +341,92 @@ export function SalesOrderApprovalContent({
             {/* Header */}
             <div className="border-b p-3">
               <div className="flex items-center justify-between mb-3">
-
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4">
+                  {/* Current Status Dropdown */}
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">Current Status:</span>
-                    <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200">
-                      IN-PROGRESS
-                    </Badge>
+                    <Select
+                      value={form.watch("currentStatus") || salesOrder?.currentStatus || "IN-PROGRESS"}
+                      onValueChange={(value) => {
+                        form.setValue("currentStatus", value);
+                        // Update the sales order data immediately for UI feedback
+                        if (salesOrder) {
+                          salesOrder.currentStatus = value;
+                        }
+                      }}
+                      disabled={updateSalesOrderMutation.isPending}
+                    >
+                      <SelectTrigger className="w-48">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {currentStatusOptions.map((option) => (
+                          <SelectItem 
+                            key={option.value} 
+                            value={option.value}
+                            disabled={option.disabled}
+                          >
+                              {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
-                  <Button variant="outline" size="sm" onClick={handleCopyLink}>
-                    <Copy className="h-4 w-4 mr-2" />
-                    Copy Link
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <User className="h-4 w-4 mr-2" />
-                    Assigned Designer
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <User className="h-4 w-4 mr-2" />
-                    Created By {salesOrder?.createdByName}
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Tools
-                  </Button>
+                  {/* Assigned Designer Lookup */}
                   <div className="flex items-center gap-2">
-                    <span className="text-sm">Email Sent</span>
-                    <Switch />
+                    <span className="text-sm font-medium">Assigned Designer:</span>
+                    <div className="w-48">
+                      <FormLookup
+                        control={form.control}
+                        name="assignedDesigner"
+                        label=""
+                        placeholder="Select Designer"
+                        disabled={updateSalesOrderMutation.isPending}
+                        onLookupClick={() => setUserLookupOpen(true)}
+                        displayValue={(value) => getUserDisplayValue(value)}
+                        className="space-y-0"
+                        inputProps={{
+                          className: "cursor-pointer hover:bg-muted/50 transition-colors"
+                        }}
+                      />
+                    </div>
                   </div>
-                  <Button
-                    size="sm"
-                    type="submit"
-                    disabled={updateSalesOrderMutation.isPending}
-                  >
-                    <Save className="h-4 w-4 mr-2" />
-                    {updateSalesOrderMutation.isPending ? "Saving..." : "Save"}
-                  </Button>
+
+                  {/* Created By Info */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Created By:</span>
+                    <span className="text-sm text-muted-foreground">
+                      {salesOrder?.createdByName || "Unknown"}
+                    </span>
+                  </div>
+
+                  {/* Email Sent Toggle */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Email Sent:</span>
+                    <Switch 
+                      checked={form.watch("plantEmailSent") || salesOrder?.plantEmailSent || false}
+                      onCheckedChange={(checked) => {
+                        form.setValue("plantEmailSent", checked);
+                        // Update the sales order data immediately for UI feedback
+                        if (salesOrder) {
+                          salesOrder.plantEmailSent = checked;
+                        }
+                      }}
+                      disabled={updateSalesOrderMutation.isPending}
+                    />
+                  </div>
                 </div>
+
+                {/* Save Button */}
+                <Button
+                  size="sm"
+                  type="submit"
+                  disabled={updateSalesOrderMutation.isPending}
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {updateSalesOrderMutation.isPending ? "Saving..." : "Save"}
+                </Button>
               </div>
             </div>
 
@@ -308,34 +458,20 @@ export function SalesOrderApprovalContent({
                       </CardContent>
                     </Card>
 
-                    {/* Reference Documents */}
                     <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg font-semibold">Reference Documents</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <ReferenceDocuments
-                          onUploadFile={handleUploadFile}
-                          onViewAttachedDocuments={handleViewAttachedDocuments}
-                          disabled={updateSalesOrderMutation.isPending}
-                        />
-                      </CardContent>
-                    </Card>
-
-                    {/* SO Info Form */}
-                    <Card>
-                      <CardHeader>
+                      <CardHeader className="pb-2">
                         <CardTitle className="text-lg font-semibold">SO Info</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <SOInfoForm
                           control={form.control}
                           disabled={updateSalesOrderMutation.isPending}
+                          onCustomerSelect={handleCustomerSelect}
+                          onItemSelect={handleItemSelect}
                         />
                       </CardContent>
                     </Card>
 
-                    {/* Product Info Form */}
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-lg font-semibold">Product Info</CardTitle>
@@ -348,14 +484,22 @@ export function SalesOrderApprovalContent({
                               disabled={updateSalesOrderMutation.isPending}
                             />
                           </div>
-                          <div className="w-40">
-                            <MetricsDisplay
-                              marginPercentage={metricsData.marginPercentage}
-                              value={metricsData.value}
-                              profit={metricsData.profit}
-                            />
-                          </div>
+                          
                         </div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg font-semibold">Reference Documents</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ReferenceDocuments
+                          onUploadFile={handleUploadFile}
+                          onViewAttachedDocuments={handleViewAttachedDocuments}
+                          disabled={updateSalesOrderMutation.isPending}
+                          documents={documents}
+                          isLoading={documentsLoading}
+                        />
                       </CardContent>
                     </Card>
                   </TabsContent>
@@ -386,8 +530,39 @@ export function SalesOrderApprovalContent({
 
                   <TabsContent value="save-history">
                     <Card>
-                      <CardContent className="p-6">
-                        <p className="text-muted-foreground">Save History functionality will be implemented here.</p>
+                      <CardHeader>
+                        <CardTitle className="text-lg font-semibold">Save History</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {transactionsLoading ? (
+                          <div className="text-center py-4">Loading save history...</div>
+                        ) : salesOrderTransactions.length === 0 ? (
+                          <div className="text-center py-8 text-muted-foreground">
+                            No save history found for this sales order.
+                          </div>
+                        ) : (
+                          <div className="space-y-4">
+                            {salesOrderTransactions.map((transaction: SalesOrderSaveTransaction) => (
+                              <div key={transaction.id} className="border rounded-lg p-4">
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-sm font-medium">
+                                    {transaction.createdByName || "Unknown User"}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground">
+                                    {new Date(transaction.createdAt).toLocaleString()}
+                                  </span>
+                                </div>
+                                {transaction.diff && (
+                                  <div className="text-sm text-muted-foreground">
+                                    <pre className="whitespace-pre-wrap bg-muted p-2 rounded">
+                                      {transaction.diff}
+                                    </pre>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   </TabsContent>
@@ -398,13 +573,22 @@ export function SalesOrderApprovalContent({
         </FormProvider>
       </div>
 
-      {/* Chat Sidebar */}
-      <ChatSidebar
-        onSendMessage={handleSendMessage}
-        onLastRead={handleLastRead}
-        onSettings={handleChatSettings}
-        disabled={updateSalesOrderMutation.isPending}
-      />
-    </div>
-  );
-} 
+             {/* Chat Sidebar */}
+       <ChatSidebar
+         messages={transformedChatMessages}
+         onSendMessage={handleSendMessage}
+         onLastRead={handleLastRead}
+         onSettings={handleChatSettings}
+         disabled={updateSalesOrderMutation.isPending}
+       />
+
+       {/* User Lookup Modal */}
+       <UserLookup
+         isOpen={userLookupOpen}
+         onClose={() => setUserLookupOpen(false)}
+         onSelect={handleUserSelect}
+         title="Select Assigned Designer"
+       />
+     </div>
+   );
+ } 
