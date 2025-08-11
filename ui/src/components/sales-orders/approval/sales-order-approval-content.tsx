@@ -39,6 +39,7 @@ import { SalesOrderUpdateFormValues, salesOrderUpdateSchema } from "@/validation
 import { SalesOrderChat, SalesOrderComment, SalesOrderDocument, SalesOrderSaveTransaction } from "@/types/sales-order-extended";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { SalesOrderQuotationsTable } from "./sales-order-quotations-table";
 
 interface SalesOrderApprovalContentProps {
   salesOrderId: number;
@@ -602,11 +603,21 @@ export function SalesOrderApprovalContent({
                   </TabsContent>
 
                   <TabsContent value="quotations">
-                    <Card>
-                      <CardContent className="p-6">
-                        <p className="text-muted-foreground">Quotations functionality will be implemented here.</p>
-                      </CardContent>
-                    </Card>
+                    <SalesOrderQuotationsTable
+                      salesOrderId={salesOrderId}
+                      onCreateQuotation={() => {
+                        // TODO: Implement create quotation modal/drawer
+                        console.log("Create quotation for sales order:", salesOrderId);
+                      }}
+                      onViewQuotation={(quotation) => {
+                        // TODO: Implement view quotation modal/drawer
+                        console.log("View quotation:", quotation);
+                      }}
+                      onEditQuotation={(quotation) => {
+                        // TODO: Implement edit quotation modal/drawer
+                        console.log("Edit quotation:", quotation);
+                      }}
+                    />
                   </TabsContent>
 
                   <TabsContent value="performa-invoice">

@@ -17,9 +17,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuotationById, useCreateQuotation } from "@/hooks/quotation/use-quotations";
 import { FormInput } from "@/components/shared/forms/form-input";
 import { FormSelect } from "@/components/shared/forms/form-select";
-import { FormTextarea } from "@/components/shared/forms/form-textarea";
 import { manufacturerOptions, CompanyDetails } from "@/lib/utils/sales-order-utils";
 import { useRouter } from "next/navigation";
+import { FormTextArea } from "@/components/shared/forms/form-text-area";
 
 // Product line item schema
 const quotationItemSchema = z.object({
@@ -638,7 +638,7 @@ We Will calculate our manufacturing plan day with the following facts.
                 <CardTitle>Final Comment</CardTitle>
               </CardHeader>
               <CardContent>
-                <FormTextarea
+                <FormTextArea
                   control={form.control}
                   name="finalComment"
                   rows={8}

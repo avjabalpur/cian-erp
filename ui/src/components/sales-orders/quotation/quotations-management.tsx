@@ -7,14 +7,14 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Plus, Download, Upload, Search } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { Input } from "@/components/ui/input"
-import { DateRangePicker } from "@/components/shared/forms/date-range-picker"
+import { DatePickerWithRange } from "@/components/shared/forms/date-range-picker"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { useQuotations } from "@/hooks/quotation/use-quotations"
 import { QuotationsTable } from "./quotations-table"
-import { QuotationFormModal } from "./quotation-form-modal"
 import { SalesOrderQuotation } from "@/types/sales-order-extended"
 import { useRouter } from "next/navigation"
+import { QuotationDrawer } from "./quotation-drawer"
 
 interface QuotationFilters {
   dateRange?: [Date, Date];
@@ -154,9 +154,9 @@ export default function QuotationsManagement() {
             <div className="space-y-2">
               <Label htmlFor="date-range">Date Range</Label>
               <DatePickerWithRange
-                value={filters.dateRange}
-                onChange={(range) => setFilters(prev => ({ ...prev, dateRange: range }))}
+                onDateChange={(range) => setFilters(prev => ({ ...prev, dateRange: range }))}
                 placeholder="Select date range"
+               value={filters.dateRange}
               />
             </div>
 
@@ -237,11 +237,11 @@ export default function QuotationsManagement() {
       </Card>
 
       {/* Quotation Form Modal */}
-      <QuotationFormModal
+      <QuotationDrawer
+        quotationId={selectedQuotationId}
         isOpen={quotationFormOpen}
         onClose={() => setQuotationFormOpen(false)}
         onSuccess={handleQuotationFormSuccess}
-        quotationId={selectedQuotationId}
       />
     </div>
   )

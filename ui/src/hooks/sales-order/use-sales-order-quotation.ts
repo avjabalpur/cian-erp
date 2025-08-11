@@ -12,67 +12,62 @@ import type {
 // --- Sales Order Quotations API Functions ---
 
 const getSalesOrderQuotations = async (): Promise<SalesOrderQuotation[]> => {
-  const { data } = await api.get('/salesorderquotation');
+  const { data } = await api.get('/api/sales-order-quotation');
   return data;
 };
 
 const getSalesOrderQuotationById = async (id: number): Promise<SalesOrderQuotation | null> => {
   if (!id) return null;
-  const { data } = await api.get(`/salesorderquotation/${id}`);
+  const { data } = await api.get(`/api/sales-order-quotation/${id}`);
   return data;
 };
 
 const createSalesOrderQuotation = async (quotationData: CreateSalesOrderQuotationData): Promise<SalesOrderQuotation> => {
-  const { data } = await api.post('/salesorderquotation', quotationData);
+  const { data } = await api.post('/api/sales-order-quotation', quotationData);
   return data;
 };
 
 const updateSalesOrderQuotation = async ({ id, ...quotationData }: { id: number; data: CreateSalesOrderQuotationData }): Promise<void> => {
-  await api.put(`/salesorderquotation/${id}`, quotationData.data);
+  await api.put(`/api/sales-order-quotation/${id}`, quotationData.data);
 };
 
 const deleteSalesOrderQuotation = async (id: number): Promise<void> => {
-  await api.delete(`/salesorderquotation/${id}`);
+  await api.delete(`/api/sales-order-quotation/${id}`);
 };
 
 const getQuotationByNumber = async (quotationNumber: string): Promise<SalesOrderQuotation | null> => {
-  const { data } = await api.get(`/salesorderquotation/number/${quotationNumber}`);
+  const { data } = await api.get(`/api/sales-order-quotation/number/${quotationNumber}`);
   return data;
 };
 
-const getQuotationsByCustomer = async (customerId: number): Promise<SalesOrderQuotation[]> => {
-  const { data } = await api.get(`/salesorderquotation/customer/${customerId}`);
-  return data;
-};
-
-const getQuotationsByOrganization = async (organizationId: number): Promise<SalesOrderQuotation[]> => {
-  const { data } = await api.get(`/salesorderquotation/organization/${organizationId}`);
+const getQuotationsBySalesOrder = async (salesOrderId: number): Promise<SalesOrderQuotation[]> => {
+  const { data } = await api.get(`/api/sales-order-quotation/sales-order/${salesOrderId}`);
   return data;
 };
 
 const getQuotationsByDateRange = async (startDate: string, endDate: string): Promise<SalesOrderQuotation[]> => {
-  const { data } = await api.get(`/salesorderquotation/date-range?startDate=${startDate}&endDate=${endDate}`);
+  const { data } = await api.get(`/api/sales-order-quotation?startDate=${startDate}&endDate=${endDate}`);
   return data;
 };
 
 // --- Sales Order Quotation Items API Functions ---
 
 const getQuotationItemsByQuotation = async (quotationId: number): Promise<SalesOrderQuotationItem[]> => {
-  const { data } = await api.get(`/salesorderquotation/${quotationId}/items`);
+  const { data } = await api.get(`/api/sales-order-quotation/${quotationId}/items`);
   return data;
 };
 
 const createSalesOrderQuotationItem = async (quotationId: number, itemData: CreateSalesOrderQuotationItemData): Promise<SalesOrderQuotationItem> => {
-  const { data } = await api.post(`/salesorderquotation/${quotationId}/items`, itemData);
+  const { data } = await api.post(`/api/sales-order-quotation/${quotationId}/items`, itemData);
   return data;
 };
 
 const updateSalesOrderQuotationItem = async (quotationId: number, itemId: number, itemData: CreateSalesOrderQuotationItemData): Promise<void> => {
-  await api.put(`/salesorderquotation/${quotationId}/items/${itemId}`, itemData);
+  await api.put(`/api/sales-order-quotation/${quotationId}/items/${itemId}`, itemData);
 };
 
 const deleteSalesOrderQuotationItem = async (quotationId: number, itemId: number): Promise<void> => {
-  await api.delete(`/salesorderquotation/${quotationId}/items/${itemId}`);
+  await api.delete(`/api/sales-order-quotation/${quotationId}/items/${itemId}`);
 };
 
 // --- Sales Order Quotations Hooks ---
@@ -131,19 +126,11 @@ export const useQuotationByNumber = (quotationNumber: string) => {
   });
 };
 
-export const useQuotationsByCustomer = (customerId: number) => {
+export const useQuotationsBySalesOrder = (salesOrderId: number) => {
   return useQuery<SalesOrderQuotation[], Error>({
-    queryKey: ['sales-order-quotations-by-customer', customerId],
-    queryFn: () => getQuotationsByCustomer(customerId),
-    enabled: !!customerId,
-  });
-};
-
-export const useQuotationsByOrganization = (organizationId: number) => {
-  return useQuery<SalesOrderQuotation[], Error>({
-    queryKey: ['sales-order-quotations-by-organization', organizationId],
-    queryFn: () => getQuotationsByOrganization(organizationId),
-    enabled: !!organizationId,
+    queryKey: ['sales-order-quotations-by-sales-order', salesOrderId],
+    queryFn: () => getQuotationsBySalesOrder(salesOrderId),
+    enabled: !!salesOrderId,
   });
 };
 
