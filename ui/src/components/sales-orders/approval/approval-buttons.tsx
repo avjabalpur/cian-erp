@@ -8,10 +8,11 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { CheckCircle, XCircle, Clock, Lock, Unlock, AlertCircle, User, Calendar } from "lucide-react";
+import { CheckCircle, XCircle, Clock, User, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useApproveStage, useRejectStage } from "@/hooks/sales-order/use-sales-order-stages";
 import { useCreateSalesOrderComment } from "@/hooks/sales-order/use-sales-order-comments";
+import { SalesOrderStage } from "@/types/sales-order-extended";
 
 interface ApprovalStage {
   key: string;
@@ -21,8 +22,6 @@ interface ApprovalStage {
   order: number;
   isApproved: boolean | null;
   isRejected: boolean;
-  isBlocked: boolean;
-  isCurrent: boolean;
   approvedBy?: string;
   approvedAt?: string;
   rejectedBy?: string;
@@ -32,11 +31,57 @@ interface ApprovalStage {
 
 interface ApprovalButtonsProps {
   salesOrderId: number;
-  stages: ApprovalStage[];
+  stages: SalesOrderStage[];
   onStageUpdate: () => void;
   disabled?: boolean;
   userRole?: string;
 }
+
+// Define all approval stages (6 stages) - moved here from parent component
+const ALL_APPROVAL_STAGES = [
+  {
+    key: "costing",
+    name: "Costing Approval",
+    title: "Costing Approval",
+    description: "Approve product costing and pricing",
+    order: 1,
+  },
+  {
+    key: "qa",
+    name: "QA Approval",
+    title: "QA Approval", 
+    description: "Quality assurance approval",
+    order: 2,
+  },
+  {
+    key: "designer",
+    name: "Designer Approval",
+    title: "Designer Approval",
+    description: "Design and artwork approval",
+    order: 3,
+  },
+  {
+    key: "final_qa",
+    name: "Final QA Approval",
+    title: "Final QA Approval",
+    description: "Final quality check approval",
+    order: 4,
+  },
+  {
+    key: "pm",
+    name: "PM Approval",
+    title: "PM Approval",
+    description: "Project manager approval",
+    order: 5,
+  },
+  {
+    key: "final_authorization",
+    name: "Final Authorization",
+    title: "Final Authorization",
+    description: "Final authorization for production",
+    order: 6,
+  }
+];
 
 export function ApprovalButtons({ 
   salesOrderId, 
@@ -55,9 +100,42 @@ export function ApprovalButtons({
   const rejectStageMutation = useRejectStage();
   const createCommentMutation = useCreateSalesOrderComment();
 
+  // Map database stages to default stages and calculate workflow logic
+  const approvalStages: ApprovalStage[] = ALL_APPROVAL_STAGES.map(defaultStage => {
+    const dbStage = stages.find(stage => 
+      stage.stageName.toLowerCase().includes(defaultStage.key.toLowerCase()) ||
+      defaultStage.name.toLowerCase().includes(stage.stageName.toLowerCase())
+    );
+    
+    if (dbStage) {
+      return {
+        ...defaultStage,
+        isApproved: dbStage.isApproved,
+        isRejected: dbStage.isApproved === false,
+        approvedBy: dbStage.updatedByName,
+        approvedAt: dbStage.updatedAt,
+        rejectedBy: dbStage.updatedByName,
+        rejectedAt: dbStage.updatedAt,
+      };
+    }
+    
+    return {
+      ...defaultStage,
+      isApproved: null,
+      isRejected: false,
+      approvedBy: undefined,
+      approvedAt: undefined,
+      rejectedBy: undefined,
+      rejectedAt: undefined,
+    };
+  });
+
+  // No need for complex workflow calculations - all stages are independent
+  const updatedApprovalStages = approvalStages;
+
   // Calculate progress
-  const completedStages = stages.filter(stage => stage.isApproved === true).length;
-  const totalStages = stages.length;
+  const completedStages = updatedApprovalStages.filter(stage => stage.isApproved === true).length;
+  const totalStages = updatedApprovalStages.length;
   const progressPercentage = totalStages > 0 ? (completedStages / totalStages) * 100 : 0;
 
   const handleStageAction = (stage: ApprovalStage, action: "approve" | "reject") => {
@@ -115,8 +193,6 @@ export function ApprovalButtons({
   const getStageStatus = (stage: ApprovalStage) => {
     if (stage.isApproved === true) return "approved";
     if (stage.isApproved === false) return "rejected";
-    if (stage.isBlocked) return "blocked";
-    if (stage.isCurrent) return "current";
     return "pending";
   };
 
@@ -127,10 +203,6 @@ export function ApprovalButtons({
         return <CheckCircle className="h-5 w-5 text-green-600" />;
       case "rejected":
         return <XCircle className="h-5 w-5 text-red-600" />;
-      case "blocked":
-        return <Lock className="h-5 w-5 text-gray-500" />;
-      case "current":
-        return <AlertCircle className="h-5 w-5 text-blue-600" />;
       default:
         return <Clock className="h-5 w-5 text-gray-400" />;
     }
@@ -143,10 +215,6 @@ export function ApprovalButtons({
         return "default";
       case "rejected":
         return "destructive";
-      case "blocked":
-        return "secondary";
-      case "current":
-        return "default";
       default:
         return "outline";
     }
@@ -159,10 +227,6 @@ export function ApprovalButtons({
         return "Approved";
       case "rejected":
         return "Rejected";
-      case "blocked":
-        return "Blocked";
-      case "current":
-        return "Current";
       default:
         return "Pending";
     }
@@ -172,14 +236,13 @@ export function ApprovalButtons({
     // This is a simplified check - in real app, you'd check user permissions
     if (disabled) return false;
     if (stage.isApproved === true || stage.isApproved === false) return false;
-    if (stage.isBlocked) return false;
     return true;
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2">
       {/* Progress Overview */}
-      <div className="bg-white rounded-lg p-4 border border-gray-200">
+      <div className="bg-white rounded-lg p-2 border border-gray-200">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold text-gray-800">Approval Progress</h3>
           <Badge variant="outline" className="text-sm">
@@ -196,7 +259,7 @@ export function ApprovalButtons({
 
       {/* Approval Stages Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {stages.map((stage) => (
+        {updatedApprovalStages.map((stage) => (
           <Card 
             key={stage.key} 
             className={`border-2 transition-all duration-200 hover:shadow-md ${
@@ -204,10 +267,6 @@ export function ApprovalButtons({
                 ? 'border-green-200 bg-green-50' 
                 : stage.isApproved === false
                 ? 'border-red-200 bg-red-50'
-                : stage.isCurrent 
-                ? 'border-blue-200 bg-blue-50'
-                : stage.isBlocked 
-                ? 'border-gray-200 bg-gray-50'
                 : 'border-gray-200 bg-white hover:border-blue-300'
             }`}
           >

@@ -10,11 +10,6 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import {
   Save,
-  Copy,
-  User,
-  Settings,
-  ArrowLeft,
-  X,
   MessageCircle
 } from "lucide-react";
 import { SalesOrder, UpdateSalesOrderData } from "@/types/sales-order";
@@ -45,7 +40,7 @@ import { useCreateSalesOrderChatMessage } from "@/hooks/sales-order/use-sales-or
 import { Input } from "@/components/ui/input";
 import { useCreateSalesOrderComment } from "@/hooks/sales-order/use-sales-order-comments";
 import { SalesOrderUpdateFormValues, salesOrderUpdateSchema } from "@/validations/sales-order";
-import { SalesOrderChat, SalesOrderComment, SalesOrderDocument, SalesOrderSaveTransaction, SalesOrderStage } from "@/types/sales-order-extended";
+import { SalesOrderChat, SalesOrderComment, SalesOrderDocument, SalesOrderSaveTransaction } from "@/types/sales-order-extended";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -65,164 +60,20 @@ export function SalesOrderApprovalContent({
   const { toast } = useToast();
   const router = useRouter();
   
-  // State for user lookup
   const [userLookupOpen, setUserLookupOpen] = useState(false);
-  
-  // State for quotation modal
   const [quotationFormOpen, setQuotationFormOpen] = useState(false);
   const [selectedQuotationId, setSelectedQuotationId] = useState<number | null>(null);
-  
-  // Fetch sales order data
   const { data: salesOrder, isLoading } = useSalesOrderById(salesOrderId.toString());
-  
-  // Get chat messages for this sales order
   const { data: chatMessages = [], isLoading: chatMessagesLoading } = useChatMessagesBySalesOrder(salesOrderId);
-
-  // Get comments for this sales order
   const { data: comments = [], isLoading: commentsLoading } = useCommentsBySalesOrder(salesOrderId);
-
-  // Get documents for this sales order
   const { data: documents = [], isLoading: documentsLoading } = useDocumentsBySalesOrder(salesOrderId);
   const { data: saveTransactions = [], isLoading: transactionsLoading } = useSaveTransactionsBySalesOrder(salesOrderId);
-  
-  // Get quotations for this sales order
   const { data: quotations = [], isLoading: quotationsLoading } = useQuotationsBySalesOrder(salesOrderId);
-  
   // Get approval stages for this sales order
   const { data: stages = [], isLoading: stagesLoading } = useSalesOrderStages(salesOrderId);
   
   const updateSalesOrderMutation = useUpdateSalesOrder();
   const queryClient = useQueryClient();
-
-  // Define all approval stages (6 stages)
-  const allApprovalStages = [
-    {
-      key: "costing",
-      name: "Costing Approval",
-      title: "Costing Approval",
-      description: "Approve product costing and pricing",
-      order: 1,
-      isApproved: null,
-      isRejected: false,
-      isBlocked: false,
-      isCurrent: false,
-      approvedBy: undefined,
-      approvedAt: undefined,
-      rejectedBy: undefined,
-      rejectedAt: undefined
-    },
-    {
-      key: "qa",
-      name: "QA Approval",
-      title: "QA Approval", 
-      description: "Quality assurance approval",
-      order: 2,
-      isApproved: null,
-      isRejected: false,
-      isBlocked: false,
-      isCurrent: false,
-      approvedBy: undefined,
-      approvedAt: undefined,
-      rejectedBy: undefined,
-      rejectedAt: undefined
-    },
-    {
-      key: "designer",
-      name: "Designer Approval",
-      title: "Designer Approval",
-      description: "Design and artwork approval",
-      order: 3,
-      isApproved: null,
-      isRejected: false,
-      isBlocked: false,
-      isCurrent: false,
-      approvedBy: undefined,
-      approvedAt: undefined,
-      rejectedBy: undefined,
-      rejectedAt: undefined
-    },
-    {
-      key: "final_qa",
-      name: "Final QA Approval",
-      title: "Final QA Approval",
-      description: "Final quality check approval",
-      order: 4,
-      isApproved: null,
-      isRejected: false,
-      isBlocked: false,
-      isCurrent: false,
-      approvedBy: undefined,
-      approvedAt: undefined,
-      rejectedBy: undefined,
-      rejectedAt: undefined
-    },
-    {
-      key: "pm",
-      name: "PM Approval",
-      title: "PM Approval",
-      description: "Project manager approval",
-      order: 5,
-      isApproved: null,
-      isRejected: false,
-      isBlocked: false,
-      isCurrent: false,
-      approvedBy: undefined,
-      approvedAt: undefined,
-      rejectedBy: undefined,
-      rejectedAt: undefined
-    },
-    {
-      key: "final_authorization",
-      name: "Final Authorization",
-      title: "Final Authorization",
-      description: "Final authorization for production",
-      order: 6,
-      isApproved: null,
-      isRejected: false,
-      isBlocked: false,
-      isCurrent: false,
-      approvedBy: undefined,
-      approvedAt: undefined,
-      rejectedBy: undefined,
-      rejectedAt: undefined
-    }
-  ];
-
-  // Map database stages to default stages
-  const approvalStages = allApprovalStages.map(defaultStage => {
-    const dbStage = stages.find(stage => 
-      stage.stageName.toLowerCase().includes(defaultStage.key.toLowerCase()) ||
-      defaultStage.name.toLowerCase().includes(stage.stageName.toLowerCase())
-    );
-    
-    if (dbStage) {
-      return {
-        ...defaultStage,
-        isApproved: dbStage.isApproved,
-        isRejected: dbStage.isApproved === false,
-        approvedBy: dbStage.updatedByName,
-        approvedAt: dbStage.updatedAt,
-        rejectedBy: dbStage.updatedByName,
-        rejectedAt: dbStage.updatedAt
-      };
-    }
-    
-    return defaultStage;
-  });
-
-  // Calculate blocked stages based on workflow
-  const updatedApprovalStages = approvalStages.map((stage, index) => {
-    if (index === 0) return { ...stage, isBlocked: false };
-    
-    const previousStage = approvalStages[index - 1];
-    const isBlocked = !previousStage.isApproved;
-    
-    // Mark as current if it's the first unapproved stage
-    const isCurrent = !stage.isApproved && !stage.isRejected && !isBlocked && 
-                     approvalStages.slice(0, index).every(s => s.isApproved);
-    
-    return { ...stage, isBlocked, isCurrent };
-  });
 
   const handleStageUpdate = () => {
     // Invalidate and refetch stages data
@@ -594,7 +445,7 @@ export function SalesOrderApprovalContent({
       <div className="flex-1 flex flex-col">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="h-full flex flex-col">
-            <div className="border-b bg-gradient-to-r from-slate-50 to-gray-50 p-4 shadow-sm">
+            <div className="border-b bg-gradient-to-r from-slate-50 to-gray-50 p-2 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="flex items-center">
@@ -688,9 +539,8 @@ export function SalesOrderApprovalContent({
             <div className="flex-1 flex flex-col">
               <Tabs defaultValue="basic-info" className="border-0 flex-1 flex flex-col">
                 <div className="px-3">
-                  <TabsList className="grid w-full grid-cols-6">
+                  <TabsList className="grid w-full grid-cols-5">
                     <TabsTrigger value="basic-info">Basic Info</TabsTrigger>
-                    <TabsTrigger value="comments">Comments</TabsTrigger>
                     <TabsTrigger value="compare-progen">Compare With Progen</TabsTrigger>
                     <TabsTrigger value="quotations">Quotations</TabsTrigger>
                     <TabsTrigger value="performa-invoice">Performa Invoice</TabsTrigger>
@@ -706,16 +556,16 @@ export function SalesOrderApprovalContent({
                           Approval Stages
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="pt-4">
+                      <CardContent className="pt-2">
                         {stagesLoading ? (
-                          <div className="text-center py-8">
+                          <div className="text-center">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-3"></div>
                             <p className="text-gray-600">Loading approval stages...</p>
                           </div>
                         ) : (
                           <ApprovalButtons
                             salesOrderId={salesOrderId}
-                            stages={updatedApprovalStages}
+                            stages={stages}
                             onStageUpdate={handleStageUpdate}
                             disabled={updateSalesOrderMutation.isPending}
                           />
@@ -774,88 +624,7 @@ export function SalesOrderApprovalContent({
                       </CardContent>
                     </Card>
                   </TabsContent>
-
-                  <TabsContent value="comments">
-                    <Card className="border-0 shadow-lg bg-gradient-to-br from-rose-50 to-pink-50">
-                        <CardHeader className="p-2 bg-gradient-to-r from-rose-600 to-pink-600 text-white rounded-t-lg">
-                        <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                          Comments
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-4 space-y-4">
-                        {/* Add Comment Form */}
-                        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                          <h4 className="font-medium mb-3 text-gray-800 flex items-center gap-2">
-                            <div className="w-2 h-2 bg-rose-500 rounded-full"></div>
-                            Add New Comment
-                          </h4>
-                          <div className="flex gap-2">
-                            <Input
-                              placeholder="Type your comment here..."
-                              value={newComment}
-                              onChange={(e) => setNewComment(e.target.value)}
-                              className="flex-1 border-gray-300 focus:border-rose-500 focus:ring-rose-500 rounded-lg"
-                            />
-                            <Button
-                              size="sm"
-                              onClick={handleAddComment}
-                              disabled={!newComment.trim() || createCommentMutation.isPending}
-                              className="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white shadow-sm"
-                            >
-                              {createCommentMutation.isPending ? "Adding..." : "Add Comment"}
-                            </Button>
-                          </div>
-                        </div>
-
-                        {/* Comments List */}
-                        {commentsLoading ? (
-                          <div className="text-center py-8">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mx-auto mb-3"></div>
-                            <p className="text-gray-600">Loading comments...</p>
-                          </div>
-                        ) : comments.length === 0 ? (
-                          <div className="text-center py-12 text-muted-foreground bg-white rounded-lg border border-gray-200">
-                            <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-3 flex items-center justify-center">
-                              <MessageCircle className="h-8 w-8 text-gray-400" />
-                            </div>
-                            <p className="text-lg font-medium text-gray-500">No comments yet</p>
-                            <p className="text-sm text-gray-400">Be the first to add a comment</p>
-                          </div>
-                        ) : (
-                          <div className="space-y-3">
-                            {comments.map((comment: SalesOrderComment) => (
-                              <div key={comment.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
-                                <div className="flex items-center justify-between mb-3">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-sm font-semibold text-gray-800 bg-gray-100 px-3 py-1 rounded-full">
-                                      {comment.createdByName || "Unknown User"}
-                                    </span>
-                                    {comment.status && (
-                                      <Badge variant={comment.status === "approved" ? "default" : "secondary"} className="text-xs">
-                                        {comment.status}
-                                      </Badge>
-                                    )}
-                                    {comment.type && (
-                                      <Badge variant="outline" className="text-xs">
-                                        {comment.type}
-                                      </Badge>
-                                    )}
-                                  </div>
-                                  <span className="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
-                                    {new Date(comment.createdAt).toLocaleString()}
-                                  </span>
-                                </div>
-                                <div className="text-sm text-gray-700 leading-relaxed bg-gray-50 p-3 rounded border-l-4 border-rose-200">
-                                  {comment.comments}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
-
+                
                   <TabsContent value="compare-progen">
                     <Card>
                       <CardContent className="p-6">
