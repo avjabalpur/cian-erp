@@ -24,9 +24,10 @@ import { useCommentsBySalesOrder } from "@/hooks/sales-order/use-sales-order-com
 import { useChatMessagesBySalesOrder } from "@/hooks/sales-order/use-sales-order-chat";
 import { useDocumentsBySalesOrder } from "@/hooks/sales-order/use-sales-order-documents";
 import { useSaveTransactionsBySalesOrder } from "@/hooks/sales-order/use-sales-order-transactions";
-import { useToast } from "@/hooks/use-toast";
-import { SalesOrderUpdateFormValues, salesOrderUpdateSchema } from "@/validations/sales-order";
-import { SalesOrderChat, SalesOrderComment, SalesOrderDocument, SalesOrderSaveTransaction } from "@/types/sales-order-extended";
+import { useSalesOrderStages } from "@/hooks/sales-order/use-sales-order-stages";
+import { useQuotationsBySalesOrder } from "@/hooks/quotation/use-quotations";
+import SalesOrderQuotationsTable from "../quotation/sales-order-quotations-table";
+import { QuotationFormModal } from "../quotation/quotation-form-modal";
 import { ApprovalButtons } from "./approval-buttons";
 import { ReferenceDocuments } from "./reference-documents";
 import { SOInfoForm } from "./so-info-form";
@@ -43,6 +44,10 @@ import { useItemById } from "@/hooks/items/use-items";
 import { useCreateSalesOrderChatMessage } from "@/hooks/sales-order/use-sales-order-chat";
 import { Input } from "@/components/ui/input";
 import { useCreateSalesOrderComment } from "@/hooks/sales-order/use-sales-order-comments";
+import { SalesOrderUpdateFormValues, salesOrderUpdateSchema } from "@/validations/sales-order";
+import { SalesOrderChat, SalesOrderComment, SalesOrderDocument, SalesOrderSaveTransaction, SalesOrderStage } from "@/types/sales-order-extended";
+import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface SalesOrderApprovalContentProps {
   salesOrderId: number;
@@ -63,6 +68,10 @@ export function SalesOrderApprovalContent({
   // State for user lookup
   const [userLookupOpen, setUserLookupOpen] = useState(false);
   
+  // State for quotation modal
+  const [quotationFormOpen, setQuotationFormOpen] = useState(false);
+  const [selectedQuotationId, setSelectedQuotationId] = useState<number | null>(null);
+  
   // Fetch sales order data
   const { data: salesOrder, isLoading } = useSalesOrderById(salesOrderId.toString());
   
@@ -76,7 +85,150 @@ export function SalesOrderApprovalContent({
   const { data: documents = [], isLoading: documentsLoading } = useDocumentsBySalesOrder(salesOrderId);
   const { data: saveTransactions = [], isLoading: transactionsLoading } = useSaveTransactionsBySalesOrder(salesOrderId);
   
+  // Get quotations for this sales order
+  const { data: quotations = [], isLoading: quotationsLoading } = useQuotationsBySalesOrder(salesOrderId);
+  
+  // Get approval stages for this sales order
+  const { data: stages = [], isLoading: stagesLoading } = useSalesOrderStages(salesOrderId);
+  
   const updateSalesOrderMutation = useUpdateSalesOrder();
+  const queryClient = useQueryClient();
+
+  // Define all approval stages (6 stages)
+  const allApprovalStages = [
+    {
+      key: "costing",
+      name: "Costing Approval",
+      title: "Costing Approval",
+      description: "Approve product costing and pricing",
+      order: 1,
+      isApproved: null,
+      isRejected: false,
+      isBlocked: false,
+      isCurrent: false,
+      approvedBy: undefined,
+      approvedAt: undefined,
+      rejectedBy: undefined,
+      rejectedAt: undefined
+    },
+    {
+      key: "qa",
+      name: "QA Approval",
+      title: "QA Approval", 
+      description: "Quality assurance approval",
+      order: 2,
+      isApproved: null,
+      isRejected: false,
+      isBlocked: false,
+      isCurrent: false,
+      approvedBy: undefined,
+      approvedAt: undefined,
+      rejectedBy: undefined,
+      rejectedAt: undefined
+    },
+    {
+      key: "designer",
+      name: "Designer Approval",
+      title: "Designer Approval",
+      description: "Design and artwork approval",
+      order: 3,
+      isApproved: null,
+      isRejected: false,
+      isBlocked: false,
+      isCurrent: false,
+      approvedBy: undefined,
+      approvedAt: undefined,
+      rejectedBy: undefined,
+      rejectedAt: undefined
+    },
+    {
+      key: "final_qa",
+      name: "Final QA Approval",
+      title: "Final QA Approval",
+      description: "Final quality check approval",
+      order: 4,
+      isApproved: null,
+      isRejected: false,
+      isBlocked: false,
+      isCurrent: false,
+      approvedBy: undefined,
+      approvedAt: undefined,
+      rejectedBy: undefined,
+      rejectedAt: undefined
+    },
+    {
+      key: "pm",
+      name: "PM Approval",
+      title: "PM Approval",
+      description: "Project manager approval",
+      order: 5,
+      isApproved: null,
+      isRejected: false,
+      isBlocked: false,
+      isCurrent: false,
+      approvedBy: undefined,
+      approvedAt: undefined,
+      rejectedBy: undefined,
+      rejectedAt: undefined
+    },
+    {
+      key: "final_authorization",
+      name: "Final Authorization",
+      title: "Final Authorization",
+      description: "Final authorization for production",
+      order: 6,
+      isApproved: null,
+      isRejected: false,
+      isBlocked: false,
+      isCurrent: false,
+      approvedBy: undefined,
+      approvedAt: undefined,
+      rejectedBy: undefined,
+      rejectedAt: undefined
+    }
+  ];
+
+  // Map database stages to default stages
+  const approvalStages = allApprovalStages.map(defaultStage => {
+    const dbStage = stages.find(stage => 
+      stage.stageName.toLowerCase().includes(defaultStage.key.toLowerCase()) ||
+      defaultStage.name.toLowerCase().includes(stage.stageName.toLowerCase())
+    );
+    
+    if (dbStage) {
+      return {
+        ...defaultStage,
+        isApproved: dbStage.isApproved,
+        isRejected: dbStage.isApproved === false,
+        approvedBy: dbStage.updatedByName,
+        approvedAt: dbStage.updatedAt,
+        rejectedBy: dbStage.updatedByName,
+        rejectedAt: dbStage.updatedAt
+      };
+    }
+    
+    return defaultStage;
+  });
+
+  // Calculate blocked stages based on workflow
+  const updatedApprovalStages = approvalStages.map((stage, index) => {
+    if (index === 0) return { ...stage, isBlocked: false };
+    
+    const previousStage = approvalStages[index - 1];
+    const isBlocked = !previousStage.isApproved;
+    
+    // Mark as current if it's the first unapproved stage
+    const isCurrent = !stage.isApproved && !stage.isRejected && !isBlocked && 
+                     approvalStages.slice(0, index).every(s => s.isApproved);
+    
+    return { ...stage, isBlocked, isCurrent };
+  });
+
+  const handleStageUpdate = () => {
+    // Invalidate and refetch stages data
+    queryClient.invalidateQueries({ queryKey: ['sales-order-stages', salesOrderId] });
+    queryClient.invalidateQueries({ queryKey: ['sales-order-by-id', salesOrderId.toString()] });
+  };
 
   const form = useForm<SalesOrderUpdateFormValues>({
     resolver: zodResolver(salesOrderUpdateSchema),
@@ -336,22 +488,6 @@ export function SalesOrderApprovalContent({
     }
   };
 
-  // Mock approval data - in real app, this would come from API
-  const approvalData = {
-    costing: null as "approved" | "rejected" | "pending" | null,
-    qa: null,
-    finalAuthorization: null,
-    designer: null,
-    finalQa: null,
-    pm: null,
-  };
-
-
-  const handleApprovalClick = (type: string) => {
-    console.log(`Approval clicked: ${type}`);
-    // Handle approval logic here
-  };
-
   // Get the create chat message mutation
   const createChatMessageMutation = useCreateSalesOrderChatMessage();
   const createCommentMutation = useCreateSalesOrderComment();
@@ -418,6 +554,30 @@ export function SalesOrderApprovalContent({
     // Handle chat settings logic here
   };
 
+  // Quotation handlers
+  const handleCreateQuotation = () => {
+    setSelectedQuotationId(null);
+    setQuotationFormOpen(true);
+  };
+
+  const handleEditQuotation = (quotationId: number) => {
+    setSelectedQuotationId(quotationId);
+    setQuotationFormOpen(true);
+  };
+
+  const handleViewQuotation = (quotationId: number) => {
+    window.open(`/quotations/${quotationId}`, '_blank');
+  };
+
+  const handleQuotationFormSuccess = (quotationId: number) => {
+    setQuotationFormOpen(false);
+    setSelectedQuotationId(null);
+    toast({
+      title: "Success",
+      description: selectedQuotationId ? "Quotation updated successfully" : "Quotation created successfully",
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -431,16 +591,13 @@ export function SalesOrderApprovalContent({
 
   return (
     <div className="flex h-full">
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="h-full flex flex-col">
-            {/* Header */}
             <div className="border-b bg-gradient-to-r from-slate-50 to-gray-50 p-4 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-6">
-                  {/* Current Status Dropdown */}
-                  <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center">
                     <span className="text-sm font-semibold text-gray-700">Current Status:</span>
                     <Select
                       value={form.watch("currentStatus") || salesOrder?.currentStatus || "IN-PROGRESS"}
@@ -470,7 +627,6 @@ export function SalesOrderApprovalContent({
                     </Select>
                   </div>
 
-                  {/* Assigned Designer Lookup */}
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-gray-700">Assigned Designer:</span>
                     <div className="w-48">
@@ -492,7 +648,6 @@ export function SalesOrderApprovalContent({
                 </div>
 
                 <div className="flex items-center gap-6">
-                  {/* Created By Info */}
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold text-gray-700">Created By:</span>
                     <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
@@ -500,7 +655,6 @@ export function SalesOrderApprovalContent({
                     </span>
                   </div>
 
-                  {/* Email Sent Toggle */}
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold text-gray-700">Email Sent:</span>
                     <Switch 
@@ -517,7 +671,6 @@ export function SalesOrderApprovalContent({
                     />
                   </div>
 
-                  {/* Save Button */}
                   <Button
                     size="sm"
                     type="submit"
@@ -554,11 +707,19 @@ export function SalesOrderApprovalContent({
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="pt-4">
-                        <ApprovalButtons
-                          approvals={approvalData}
-                          onApprovalClick={handleApprovalClick}
-                          disabled={updateSalesOrderMutation.isPending}
-                        />
+                        {stagesLoading ? (
+                          <div className="text-center py-8">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-3"></div>
+                            <p className="text-gray-600">Loading approval stages...</p>
+                          </div>
+                        ) : (
+                          <ApprovalButtons
+                            salesOrderId={salesOrderId}
+                            stages={updatedApprovalStages}
+                            onStageUpdate={handleStageUpdate}
+                            disabled={updateSalesOrderMutation.isPending}
+                          />
+                        )}
                       </CardContent>
                     </Card>
 
@@ -704,11 +865,13 @@ export function SalesOrderApprovalContent({
                   </TabsContent>
 
                   <TabsContent value="quotations">
-                    <Card>
-                      <CardContent className="p-6">
-                        <p className="text-muted-foreground">Quotations functionality will be implemented here.</p>
-                      </CardContent>
-                    </Card>
+                    <SalesOrderQuotationsTable
+                      quotations={quotations}
+                      salesOrderId={salesOrderId}
+                      onView={(quotation) => handleViewQuotation(quotation.id)}
+                      onEdit={(quotation) => handleEditQuotation(quotation.id)}
+                      onCreate={handleCreateQuotation}
+                    />
                   </TabsContent>
 
                   <TabsContent value="performa-invoice">
@@ -790,6 +953,14 @@ export function SalesOrderApprovalContent({
          onClose={() => setUserLookupOpen(false)}
          onSelect={handleUserSelect}
          title="Select Assigned Designer"
+       />
+
+       {/* Quotation Form Modal */}
+       <QuotationFormModal
+         isOpen={quotationFormOpen}
+         onClose={() => setQuotationFormOpen(false)}
+         onSuccess={handleQuotationFormSuccess}
+         quotationId={selectedQuotationId}
        />
      </div>
    );

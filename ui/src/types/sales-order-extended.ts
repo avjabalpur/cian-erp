@@ -201,6 +201,8 @@ export interface SalesOrderQuotation {
   createdByName?: string;
   updatedBy?: number;
   updatedByName?: string;
+  finalComment?: string;
+  products?: any;
 }
 
 export interface CreateSalesOrderQuotationData {
