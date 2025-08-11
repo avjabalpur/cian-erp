@@ -37,6 +37,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { UserLookup } from "@/components/shared/lookups/user-lookup";
 import { FormLookup } from "@/components/shared/forms/form-lookup";
 import { useUserById } from "@/hooks/use-users";
+import { useCustomerById } from "@/hooks/customers/use-customers";
+import { useItemById } from "@/hooks/items/use-items";
 
 interface SalesOrderApprovalContentProps {
   salesOrderId: number;
@@ -83,10 +85,17 @@ export function SalesOrderApprovalContent({
     },
   });
 
-  // Fetch assigned designer user data
+    // Fetch assigned designer user data
   const assignedDesignerId = form.watch("assignedDesigner") || salesOrder?.assignedDesigner;
   const { data: assignedDesignerUser } = useUserById(assignedDesignerId?.toString() || "");
-
+  
+  // Fetch customer and item details when form is loaded with existing data
+  const customerId = form.watch("customerId") || salesOrder?.customerId;
+  const itemId = form.watch("itemId") || salesOrder?.itemId;
+  
+  const { data: customerDetails } = useCustomerById(customerId?.toString() || "");
+  const { data: itemDetails } = useItemById(itemId || 0);
+  
   // Handle customer selection from lookup
   const handleCustomerSelect = (selectedCustomer: any) => {
     console.log("Customer selected:", selectedCustomer);
@@ -149,7 +158,7 @@ export function SalesOrderApprovalContent({
     return `User ID: ${userId}`;
   };
 
-  React.useEffect(() => {
+    React.useEffect(() => {
     if (salesOrder) {
       form.reset({
         soNumber: salesOrder.soNumber || "",
@@ -162,7 +171,7 @@ export function SalesOrderApprovalContent({
         quotationNo: salesOrder.quotationNo || "",
         hsnCode: salesOrder.hsnCode || "",
         itemId: salesOrder.itemId,
-                 dosageName: salesOrder.dosageName || "-1",
+        dosageName: salesOrder.dosageName || "-1",
         divisionId: salesOrder.divisionId,
         designUnder: salesOrder.designUnder || "",
         packingStyleDescription: salesOrder.packingStyleDescription || "",
@@ -208,8 +217,8 @@ export function SalesOrderApprovalContent({
         productCode: salesOrder.productCode || "",
         country: salesOrder.country || "",
         customerGstNo: salesOrder.customerGstNo || "",
-                 // Set readonly field defaults
-         manufacturerName: "CIAN HEALTHCARE",
+        // Set readonly field defaults
+        manufacturerName: "CIAN HEALTHCARE",
         customerName: salesOrder.customerName || "",
         customerCode: "", // Will be populated from customer lookup
         productName: "", // Will be populated from item lookup
@@ -217,6 +226,24 @@ export function SalesOrderApprovalContent({
       });
     }
   }, [salesOrder, form]);
+  
+  // Populate customer and item details when they are fetched
+  React.useEffect(() => {
+    if (customerDetails && salesOrder?.customerId) {
+      form.setValue("customerName", customerDetails.customerName || "");
+      form.setValue("customerCode", customerDetails.customerCode || "");
+      form.setValue("customerGstNo", customerDetails.gstin || "");
+    }
+  }, [customerDetails, salesOrder?.customerId, form]);
+  
+  React.useEffect(() => {
+    if (itemDetails && salesOrder?.itemId) {
+      form.setValue("productName", itemDetails.itemName || "");
+      form.setValue("productCode", itemDetails.itemCode || "");
+      form.setValue("composition", itemDetails.composition || "");
+      form.setValue("dosageName", itemDetails.dosageName || "-1");
+    }
+  }, [itemDetails, salesOrder?.itemId, form]);
 
   // Transform chat messages for the chat sidebar
   const transformedChatMessages = chatMessages.map((chat: SalesOrderChat) => ({

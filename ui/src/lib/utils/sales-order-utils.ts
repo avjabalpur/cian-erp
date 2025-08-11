@@ -17,21 +17,21 @@ export interface StatusOption extends SelectOption {
 export const currentStatusOptions: StatusOption[] = [
   { 
     label: "IN-PROGRESS", 
-    value: "IN-PROGRESS", 
+    value: "in-progress", 
     color: "orange", 
     shortName: "IN-PROG",
     variant: "outline"
   },
   { 
     label: "SO-CONFIRMED", 
-    value: "SO-CONFIRMED", 
+    value: "so-confirmed", 
     color: "green", 
     shortName: "SO-CONF",
     variant: "default"
   },
   { 
     label: "ADDED-TO-PROGEN", 
-    value: "ADDED-TO-PROGEN", 
+    value: "added-to-progen", 
     color: "blue", 
     disabled: true, 
     shortName: "PROGEN",
@@ -39,7 +39,7 @@ export const currentStatusOptions: StatusOption[] = [
   },
   { 
     label: "REQUEST-CHANGES", 
-    value: "REQUEST-CHANGES", 
+    value: "request-changes", 
     color: "purple", 
     disabled: true, 
     shortName: "REQ-CHA",
@@ -47,7 +47,7 @@ export const currentStatusOptions: StatusOption[] = [
   },
   { 
     label: "CANCEL", 
-    value: "CANCEL", 
+    value: "cancel", 
     color: "grey", 
     shortName: "CANCEL",
     variant: "destructive"
@@ -56,9 +56,9 @@ export const currentStatusOptions: StatusOption[] = [
 
 // Sales Order Status Options (From original system)
 export const soStatusOptions: StatusOption[] = [
-  { label: "NEW", value: "NEW", color: "blue", variant: "default" },
-  { label: "REPEAT", value: "REPEAT", color: "orange", variant: "outline" },
-  { label: "REVISED", value: "REVISED", color: "purple", variant: "secondary" },
+  { label: "NEW", value: "new", color: "blue", variant: "default" },
+  { label: "REPEAT", value: "repeat", color: "orange", variant: "outline" },
+  { label: "REVISED", value: "revised", color: "purple", variant: "secondary" },
 ];
 
 // Product Shelf Life Options
