@@ -94,7 +94,7 @@ const deleteItem = async (id: number): Promise<void> => {
 
 // React Query Hooks
 export const useItems = (filter?: ItemFilter) => {
-  return useQuery<Item[], Error>({
+  return useQuery<any, Error>({
     queryKey: ['items', filter],
     queryFn: () => getItems(filter),
   });

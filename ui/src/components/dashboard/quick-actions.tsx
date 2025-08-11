@@ -5,12 +5,9 @@ import { Button } from "@/components/ui/button"
 import { 
   Package, 
   Users, 
-  ShoppingCart, 
   Plus,
   ArrowRight,
   FileText,
-  Settings,
-  BarChart3
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
@@ -19,35 +16,8 @@ export function QuickActions() {
 
   const actions = [
     {
-      title: "Add Customer",
-      description: "Create a new customer",
-      icon: Users,
-      color: "text-blue-600",
-      bgColor: "bg-blue-100",
-      href: "/customers",
-      action: "add"
-    },
-    {
-      title: "Add Item",
-      description: "Add new item to inventory",
-      icon: Package,
-      color: "text-green-600",
-      bgColor: "bg-green-100",
-      href: "/items",
-      action: "add"
-    },
-    {
-      title: "Create Sales Order",
-      description: "Create a new sales order",
-      icon: ShoppingCart,
-      color: "text-purple-600",
-      bgColor: "bg-purple-100",
-      href: "/sales-orders",
-      action: "add"
-    },
-    {
       title: "View Customers",
-      description: "Browse all customers",
+      description: "Browse all customers and manage their details",
       icon: Users,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
@@ -56,7 +26,7 @@ export function QuickActions() {
     },
     {
       title: "View Items",
-      description: "Browse inventory items",
+      description: "Browse inventory items and manage their details",
       icon: Package,
       color: "text-green-600",
       bgColor: "bg-green-50",
@@ -65,7 +35,7 @@ export function QuickActions() {
     },
     {
       title: "View Sales Orders",
-      description: "Browse all sales orders",
+      description: "Browse all sales orders and manage their details",
       icon: FileText,
       color: "text-purple-600",
       bgColor: "bg-purple-50",

@@ -17,5 +17,6 @@ namespace Xcianify.Core.Domain.Repositories
         Task<bool> ExistsAsync(int id);
         Task<bool> SoNumberExistsAsync(string soNumber, int? excludeId = null);
         Task<int> GetNextSoNumberAsync();
+        Task<int> CreateApprovalAsync(string soStatus, string dosageName, int createdBy);
     }
 } 

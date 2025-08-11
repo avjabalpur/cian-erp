@@ -14,6 +14,7 @@ import { HsnMasterFormData, hsnMasterSchema } from "@/validations/item-master";
 import { HsnMaster } from "@/types/hsn-master";
 import { FormTextArea } from "@/components/shared/forms/form-text-area";
 import { FormSwitch } from "@/components/shared/forms/form-switch";
+import { useHsnTypeOptions } from "@/components/shared/options";
 
 interface HsnMasterDrawerProps {
   isOpen: boolean;
@@ -177,10 +178,7 @@ export default function HsnMasterDrawer({
     isLoading
   });
 
-  const hsnTypeOptions = [
-    { value: "H", label: "H" },
-    { value: "S", label: "S" },
-  ];
+  const hsnTypeOptions = useHsnTypeOptions();
 
   return (
     <RightDrawer

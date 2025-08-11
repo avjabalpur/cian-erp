@@ -1,100 +1,39 @@
-namespace Xcianify.Core.DTOs
+using System;
+
+namespace Xcianify.Core.DTOs.Customer
 {
     public class CustomerDto
     {
-        public Guid Id { get; set; }
-        public string? LocCd { get; set; }
-        public string? CustNo { get; set; }
-        public string? CustCd { get; set; }
-        public string? CustCrtDt { get; set; }
-        public string? StopInv { get; set; }
-        public string? CustName { get; set; }
+        public int Id { get; set; }
+        public string LocationCode { get; set; } = string.Empty;
+        public string CustomerNumber { get; set; } = string.Empty;
+        public string CustomerCode { get; set; } = string.Empty;
+        public string CustomerName { get; set; } = string.Empty;
         public string? ShortName { get; set; }
         public string? PayeeName { get; set; }
-        public string? CustTpCd { get; set; }
-        public string? SegmCd { get; set; }
-        public string? ItaxPanNo { get; set; }
-        public string? CustSlTp { get; set; }
+        public string? CustomerTypeCode { get; set; }
+        public string? SegmentCode { get; set; }
+        public string? IncomeTaxPanNumber { get; set; }
+        public string? CustomerSaleType { get; set; }
         public string? ExportType { get; set; }
         public string? Gstin { get; set; }
-        public string? AddLine1 { get; set; }
-        public string? AddLine2 { get; set; }
-        public string? AddLine3 { get; set; }
-        public string? City { get; set; }
-        public string? ZipCode { get; set; }
-        public string? Country { get; set; }
-        public string? Continent { get; set; }
-        public string? StateCd { get; set; }
-        public string? GstStateCd { get; set; }
-        public string? Contact { get; set; }
-        public string? TelNo { get; set; }
-        public string? MobileNo { get; set; }
-        public string? FaxNo { get; set; }
-        public string? EmailId { get; set; }
-        public string? Website { get; set; }
-        public string? DestnCd { get; set; }
-        public string? TrMdCd { get; set; }
-        public string? TrnspCd { get; set; }
-        public string? LeadDays { get; set; }
-        public string? CustDist { get; set; }
-        public string? FrtInd { get; set; }
-        public string? BnkIfscCd { get; set; }
-        public string? BnkAcNo { get; set; }
-        public string? BnkName { get; set; }
-        public string? CustBnkr { get; set; }
-        public string? CustVpa { get; set; }
-        public string? BacTpCd { get; set; }
-        public string? BnkBranch { get; set; }
-        public string? BankLoc { get; set; }
-        public double? CustIntfCd { get; set; }
-        public string? IntfFlFrmt { get; set; }
-        public string? ProjRatio { get; set; }
-        public string? NoOfDsp { get; set; }
-        public string? AlwCnsgObk { get; set; }
-        public string? LblLyt { get; set; }
-        public string? NoOfCopies { get; set; }
+        public string? DrugLicenseNumber { get; set; }
+        public DateTime? DrugLicenseExpiryDate { get; set; }
+        public string? OtherLicenseNumber { get; set; }
         public string? OldCode { get; set; }
-        public string? CustLotNo { get; set; }
-        public string? IsElgTcs { get; set; }
-        public string? TcsType { get; set; }
-        public string? IsAplHgrRt { get; set; }
-        public string? IsDdNnRes { get; set; }
-        public string? IsDdPrmEst { get; set; }
-        public string? DrugLicNo { get; set; }
-        public string? DlicExpDt { get; set; }
-        public string? OthLicNo { get; set; }
-        public string? IsBlDisc { get; set; }
-        public string? IsRevEoyr { get; set; }
-        public string? SupStkLoc { get; set; }
-        public string? CacCd { get; set; }
-        public string? CcrdLimit { get; set; }
-        public string? MinInvAmt { get; set; }
-        public string? CschmCd { get; set; }
-        public string? CbrokerCd { get; set; }
-        public string? CbrokerRt { get; set; }
-        public string? CcashDisc { get; set; }
-        public string? CmiscChgPc { get; set; }
-        public string? CmiscDisPc { get; set; }
-        public string? CvatFormCd { get; set; }
-        public string? CcenFormCd { get; set; }
-        public string? CapSplTerm { get; set; }
-        public string? CpayTermCd { get; set; }
-        public string? CdocsThru { get; set; }
-        public string? CcrdPrd { get; set; }
-        public string? CnwPcrdPrd { get; set; }
-        public string? CisOvDuChk { get; set; }
-        public string? CnoOfBills { get; set; }
-        public string? CosBlPrd { get; set; }
-        public string? CosBlAcInd { get; set; }
-        public string? ExtInfo { get; set; }
-        public string? IsRecClsd { get; set; }
-        public string? MstUpdBy { get; set; }
-        public string? MstUpdDtTm { get; set; }
-        public double? TxRevNo { get; set; }
-        public string? IsExpCust { get; set; }
-        public string? IsRegDlr { get; set; }
-        public string? Rdbts { get; set; }
+        public string? CustomerLotNumber { get; set; }
+        public bool StopInvoice { get; set; }
+        public bool IsExportCustomer { get; set; }
+        public bool IsRegisteredDealer { get; set; }
+        public bool IsRecordClosed { get; set; }
+        public bool IsActive { get; set; } = true;
+        public string? Continent { get; set; }
+        public string? Rebates { get; set; }
+        public string? ExternalInformation { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public int? CreatedBy { get; set; }
+        public int? UpdatedBy { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

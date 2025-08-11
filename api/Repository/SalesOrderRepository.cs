@@ -111,15 +111,69 @@ namespace Xcianify.Repository
 
             var query = $@"
                 SELECT 
-                    so.*,
-                    c.customer_name,
-                    im.item_name,
-                    d.name,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name,
-                    u3.first_name || ' ' || u3.last_name as assigned_designer_name
+                    so.id,
+                    so.so_number as soNumber,
+                    so.so_date as soDate,
+                    so.so_status as soStatus,
+                    so.organization_id as organizationId,
+                    so.customer_id as customerId,
+                    so.payment_term as paymentTerm,
+                    so.quotation_date as quotationDate,
+                    so.quotation_no as quotationNo,
+                    so.hsn_code as hsnCode,
+                    so.item_id as itemId,
+                    so.dosage_name as dosageName,
+                    so.divisionid as divisionId,
+                    so.design_under as designUnder,
+                    so.packing_style_description as packingStyleDescription,
+                    so.composition,
+                    so.pack_short as packShort,
+                    so.tablet_type as tabletType,
+                    so.tablet_size as tabletSize,
+                    so.change_part as changePart,
+                    so.capsule_size as capsuleSize,
+                    so.shipper_size as shipperSize,
+                    so.qty_per_shipper as qtyPerShipper,
+                    so.no_of_shipper as noOfShipper,
+                    so.flavour,
+                    so.fragrance,
+                    so.quantity,
+                    so.foc_qty as focQty,
+                    so.mrp,
+                    so.billing_rate as billingRate,
+                    so.costing,
+                    so.inventory_charges as inventoryCharges,
+                    so.cylinder_charge as cylinderCharge,
+                    so.plate_charges as plateCharges,
+                    so.domino,
+                    so.stereo,
+                    so.shipper_drawing_ref_code as shipperDrawingRefCode,
+                    so.ctn_outer_drawing_ref_no as ctnOuterDrawingRefNo,
+                    so.ctn_inner_drawing_ref_no as ctnInnerDrawingRefNo,
+                    so.foil_drawing_ref_no as foilDrawingRefNo,
+                    so.leaflet_drawing_ref_no as leafletDrawingRefNo,
+                    so.tube_drawing_ref_no as tubeDrawingRefNo,
+                    so.label_drawing_ref_no as labelDrawingRefNo,
+                    so.pm_outer_ctn_stock as pmOuterCtnStock,
+                    so.pm_inner_ctn_stock as pmInnerCtnStock,
+                    so.pm_foil_stock as pmFoilStock,
+                    so.pm_leaflet_stock as pmLeafletStock,
+                    so.pm_tube_stock as pmTubeStock,
+                    so.pm_label_stock as pmLabelStock,
+                    so.drug_approval_under as drugApprovalUnder,
+                    so.current_status as currentStatus,
+                    so.comments,
+                    so.is_submitted = 1 as isSubmitted,
+                    so.is_deleted = 1 as isDeleted,
+                    so.assigned_designer as assignedDesigner,
+                    so.plant_email_sent = 1 as plantEmailSent,
+                    so.created_at as createdAt,
+                    so.updated_at as updatedAt,
+                    so.created_by as createdBy,
+                    so.updated_by as updatedBy
                 FROM sales_orders so
                 LEFT JOIN customers c ON so.customer_id = c.id
+                LEFT JOIN organizations o ON so.organization_id = o.id
                 LEFT JOIN item_master im ON so.item_id = im.id
                 LEFT JOIN divisions d ON so.divisionid = d.id
                 LEFT JOIN users u1 ON so.created_by = u1.id
@@ -140,15 +194,70 @@ namespace Xcianify.Repository
             
             var query = @"
                 SELECT 
-                    so.*,
-                    c.customer_name,
-                    im.item_name,
-                    d.name,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name,
-                    u3.first_name || ' ' || u3.last_name as assigned_designer_name
+                    so.id,
+                    so.so_number as soNumber,
+                    so.so_date as soDate,
+                    so.so_status as soStatus,
+                    so.organization_id as organizationId,
+                    so.customer_id as customerId,
+                    so.payment_term as paymentTerm,
+                    so.quotation_date as quotationDate,
+                    so.quotation_no as quotationNo,
+                    so.hsn_code as hsnCode,
+                    so.item_id as itemId,
+                    so.dosage_name as dosageName,
+                    so.divisionid as divisionId,
+                    so.design_under as designUnder,
+                    so.packing_style_description as packingStyleDescription,
+                    so.composition,
+                    so.pack_short as packShort,
+                    so.tablet_type as tabletType,
+                    so.tablet_size as tabletSize,
+                    so.change_part as changePart,
+                    so.capsule_size as capsuleSize,
+                    so.shipper_size as shipperSize,
+                    so.qty_per_shipper as qtyPerShipper,
+                    so.no_of_shipper as noOfShipper,
+                    so.flavour,
+                    so.fragrance,
+                    so.quantity,
+                    so.foc_qty as focQty,
+                    so.mrp,
+                    so.billing_rate as billingRate,
+                    so.costing,
+                    so.inventory_charges as inventoryCharges,
+                    so.cylinder_charge as cylinderCharge,
+                    so.plate_charges as plateCharges,
+                    so.domino,
+                    so.stereo,
+                    so.shipper_drawing_ref_code as shipperDrawingRefCode,
+                    so.ctn_outer_drawing_ref_no as ctnOuterDrawingRefNo,
+                    so.ctn_inner_drawing_ref_no as ctnInnerDrawingRefNo,
+                    so.foil_drawing_ref_no as foilDrawingRefNo,
+                    so.leaflet_drawing_ref_no as leafletDrawingRefNo,
+                    so.tube_drawing_ref_no as tubeDrawingRefNo,
+                    so.label_drawing_ref_no as labelDrawingRefNo,
+                    so.pm_outer_ctn_stock as pmOuterCtnStock,
+                    so.pm_inner_ctn_stock as pmInnerCtnStock,
+                    so.pm_foil_stock as pmFoilStock,
+                    so.pm_leaflet_stock as pmLeafletStock,
+                    so.pm_tube_stock as pmTubeStock,
+                    so.pm_label_stock as pmLabelStock,
+                    so.drug_approval_under as drugApprovalUnder,
+                    so.current_status as currentStatus,
+                    so.comments,
+                    so.is_submitted = 1 as isSubmitted,
+                    so.is_deleted = 1 as isDeleted,
+                    so.assigned_designer as assignedDesigner,
+                    so.plant_email_sent = 1 as plantEmailSent,
+                    so.created_at as createdAt,
+                    so.updated_at as updatedAt,
+                    so.created_by as createdBy,
+                    so.updated_by as updatedBy
+                   
                 FROM sales_orders so
                 LEFT JOIN customers c ON so.customer_id = c.id
+                LEFT JOIN organizations o ON so.organization_id = o.id
                 LEFT JOIN item_master im ON so.item_id = im.id
                 LEFT JOIN divisions d ON so.divisionid = d.id
                 LEFT JOIN users u1 ON so.created_by = u1.id
@@ -165,15 +274,70 @@ namespace Xcianify.Repository
             
             var query = @"
                 SELECT 
-                    so.*,
-                    c.customer_name,
-                    im.item_name,
-                    d.name,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name,
-                    u3.first_name || ' ' || u3.last_name as assigned_designer_name
+                    so.id,
+                    so.so_number as soNumber,
+                    so.so_date as soDate,
+                    so.so_status as soStatus,
+                    so.organization_id as organizationId,
+                    so.customer_id as customerId,
+                    so.payment_term as paymentTerm,
+                    so.quotation_date as quotationDate,
+                    so.quotation_no as quotationNo,
+                    so.hsn_code as hsnCode,
+                    so.item_id as itemId,
+                    so.dosage_name as dosageName,
+                    so.divisionid as divisionId,
+                    so.design_under as designUnder,
+                    so.packing_style_description as packingStyleDescription,
+                    so.composition,
+                    so.pack_short as packShort,
+                    so.tablet_type as tabletType,
+                    so.tablet_size as tabletSize,
+                    so.change_part as changePart,
+                    so.capsule_size as capsuleSize,
+                    so.shipper_size as shipperSize,
+                    so.qty_per_shipper as qtyPerShipper,
+                    so.no_of_shipper as noOfShipper,
+                    so.flavour,
+                    so.fragrance,
+                    so.quantity,
+                    so.foc_qty as focQty,
+                    so.mrp,
+                    so.billing_rate as billingRate,
+                    so.costing,
+                    so.inventory_charges as inventoryCharges,
+                    so.cylinder_charge as cylinderCharge,
+                    so.plate_charges as plateCharges,
+                    so.domino,
+                    so.stereo,
+                    so.shipper_drawing_ref_code as shipperDrawingRefCode,
+                    so.ctn_outer_drawing_ref_no as ctnOuterDrawingRefNo,
+                    so.ctn_inner_drawing_ref_no as ctnInnerDrawingRefNo,
+                    so.foil_drawing_ref_no as foilDrawingRefNo,
+                    so.leaflet_drawing_ref_no as leafletDrawingRefNo,
+                    so.tube_drawing_ref_no as tubeDrawingRefNo,
+                    so.label_drawing_ref_no as labelDrawingRefNo,
+                    so.pm_outer_ctn_stock as pmOuterCtnStock,
+                    so.pm_inner_ctn_stock as pmInnerCtnStock,
+                    so.pm_foil_stock as pmFoilStock,
+                    so.pm_leaflet_stock as pmLeafletStock,
+                    so.pm_tube_stock as pmTubeStock,
+                    so.pm_label_stock as pmLabelStock,
+                    so.drug_approval_under as drugApprovalUnder,
+                    so.current_status as currentStatus,
+                    so.comments,
+                    so.is_submitted = 1 as isSubmitted,
+                    so.is_deleted = 1 as isDeleted,
+                    so.assigned_designer as assignedDesigner,
+                    so.plant_email_sent = 1 as plantEmailSent,
+                    so.created_at as createdAt,
+                    so.updated_at as updatedAt,
+                    so.created_by as createdBy,
+                    so.updated_by as updatedBy
+                   
                 FROM sales_orders so
                 LEFT JOIN customers c ON so.customer_id = c.id
+                LEFT JOIN organizations o ON so.organization_id = o.id
                 LEFT JOIN item_master im ON so.item_id = im.id
                 LEFT JOIN divisions d ON so.divisionid = d.id
                 LEFT JOIN users u1 ON so.created_by = u1.id
@@ -187,6 +351,70 @@ namespace Xcianify.Repository
         public async Task<SalesOrder> AddAsync(SalesOrder salesOrder)
         {
             using var connection = _context.GetConnection();
+            
+            // Convert boolean values to integers for database compatibility
+            var parameters = new
+            {
+                salesOrder.SoNumber,
+                salesOrder.SoDate,
+                salesOrder.SoStatus,
+                salesOrder.OrganizationId,
+                salesOrder.CustomerId,
+                salesOrder.PaymentTerm,
+                salesOrder.QuotationDate,
+                salesOrder.QuotationNo,
+                salesOrder.HsnCode,
+                salesOrder.ItemId,
+                salesOrder.DosageName,
+                salesOrder.DivisionId,
+                salesOrder.DesignUnder,
+                salesOrder.PackingStyleDescription,
+                salesOrder.Composition,
+                salesOrder.PackShort,
+                salesOrder.TabletType,
+                salesOrder.TabletSize,
+                salesOrder.ChangePart,
+                salesOrder.CapsuleSize,
+                salesOrder.ShipperSize,
+                salesOrder.QtyPerShipper,
+                salesOrder.NoOfShipper,
+                salesOrder.Flavour,
+                salesOrder.Fragrance,
+                salesOrder.Quantity,
+                salesOrder.FocQty,
+                salesOrder.Mrp,
+                salesOrder.BillingRate,
+                salesOrder.Costing,
+                salesOrder.InventoryCharges,
+                salesOrder.CylinderCharge,
+                salesOrder.PlateCharges,
+                salesOrder.Domino,
+                salesOrder.Stereo,
+                salesOrder.ShipperDrawingRefCode,
+                salesOrder.CtnOuterDrawingRefNo,
+                salesOrder.CtnInnerDrawingRefNo,
+                salesOrder.FoilDrawingRefNo,
+                salesOrder.LeafletDrawingRefNo,
+                salesOrder.TubeDrawingRefNo,
+                salesOrder.LabelDrawingRefNo,
+                salesOrder.PmOuterCtnStock,
+                salesOrder.PmInnerCtnStock,
+                salesOrder.PmFoilStock,
+                salesOrder.PmLeafletStock,
+                salesOrder.PmTubeStock,
+                salesOrder.PmLabelStock,
+                salesOrder.DrugApprovalUnder,
+                salesOrder.CurrentStatus,
+                salesOrder.Comments,
+                IsSubmitted = salesOrder.IsSubmitted ? 1 : 0,
+                IsDeleted = salesOrder.IsDeleted ? 1 : 0,
+                salesOrder.AssignedDesigner,
+                PlantEmailSent = salesOrder.PlantEmailSent.HasValue ? (salesOrder.PlantEmailSent.Value ? 1 : 0) : (int?)null,
+                salesOrder.CreatedBy,
+                CreatedTime = salesOrder.CreatedAt,
+                salesOrder.UpdatedBy,
+                UpdatedTime = salesOrder.UpdatedAt
+            };
             
             var query = @"
                 INSERT INTO sales_orders (
@@ -217,12 +445,74 @@ namespace Xcianify.Repository
                     @PlantEmailSent, @CreatedBy, @CreatedTime, @UpdatedBy, @UpdatedTime
                 ) RETURNING *";
 
-            return await connection.QuerySingleAsync<SalesOrder>(query, salesOrder);
+            return await connection.QuerySingleAsync<SalesOrder>(query, parameters);
         }
 
         public async Task<SalesOrder> UpdateAsync(SalesOrder salesOrder)
         {
             using var connection = _context.GetConnection();
+            
+            // Convert boolean values to integers for database compatibility
+            var parameters = new
+            {
+                salesOrder.Id,
+                salesOrder.SoNumber,
+                salesOrder.SoDate,
+                salesOrder.SoStatus,
+                salesOrder.OrganizationId,
+                salesOrder.CustomerId,
+                salesOrder.PaymentTerm,
+                salesOrder.QuotationDate,
+                salesOrder.QuotationNo,
+                salesOrder.HsnCode,
+                salesOrder.ItemId,
+                salesOrder.DosageName,
+                salesOrder.DivisionId,
+                salesOrder.DesignUnder,
+                salesOrder.PackingStyleDescription,
+                salesOrder.Composition,
+                salesOrder.PackShort,
+                salesOrder.TabletType,
+                salesOrder.TabletSize,
+                salesOrder.ChangePart,
+                salesOrder.CapsuleSize,
+                salesOrder.ShipperSize,
+                salesOrder.QtyPerShipper,
+                salesOrder.NoOfShipper,
+                salesOrder.Flavour,
+                salesOrder.Fragrance,
+                salesOrder.Quantity,
+                salesOrder.FocQty,
+                salesOrder.Mrp,
+                salesOrder.BillingRate,
+                salesOrder.Costing,
+                salesOrder.InventoryCharges,
+                salesOrder.CylinderCharge,
+                salesOrder.PlateCharges,
+                salesOrder.Domino,
+                salesOrder.Stereo,
+                salesOrder.ShipperDrawingRefCode,
+                salesOrder.CtnOuterDrawingRefNo,
+                salesOrder.CtnInnerDrawingRefNo,
+                salesOrder.FoilDrawingRefNo,
+                salesOrder.LeafletDrawingRefNo,
+                salesOrder.TubeDrawingRefNo,
+                salesOrder.LabelDrawingRefNo,
+                salesOrder.PmOuterCtnStock,
+                salesOrder.PmInnerCtnStock,
+                salesOrder.PmFoilStock,
+                salesOrder.PmLeafletStock,
+                salesOrder.PmTubeStock,
+                salesOrder.PmLabelStock,
+                salesOrder.DrugApprovalUnder,
+                salesOrder.CurrentStatus,
+                salesOrder.Comments,
+                IsSubmitted = salesOrder.IsSubmitted ? 1 : 0,
+                salesOrder.AssignedDesigner,
+                PlantEmailSent = salesOrder.PlantEmailSent.HasValue ? (salesOrder.PlantEmailSent.Value ? 1 : 0) : (int?)null,
+                salesOrder.UpdatedBy,
+                salesOrder.UpdatedAt
+            };
             
             var query = @"
                 UPDATE sales_orders SET
@@ -250,7 +540,7 @@ namespace Xcianify.Repository
                 WHERE id = @Id AND is_deleted = 0
                 RETURNING *";
 
-            return await connection.QuerySingleAsync<SalesOrder>(query, salesOrder);
+            return await connection.QuerySingleAsync<SalesOrder>(query, parameters);
         }
 
         public async Task DeleteAsync(int id)
@@ -291,6 +581,42 @@ namespace Xcianify.Repository
                 WHERE so_number LIKE 'SO%' AND is_deleted = 0";
 
             return await connection.QuerySingleAsync<int>(query);
+        }
+
+        public async Task<int> CreateApprovalAsync(string soStatus, string dosageName, int createdBy)
+        {
+            using var connection = _context.GetConnection();
+            
+            var currentTime = DateTime.UtcNow;
+            
+            var query = @"
+                INSERT INTO sales_orders (
+                    so_status,
+                    dosage_name,
+                    created_by,
+                    created_at,
+                    current_status,
+                    is_deleted,
+                    is_submitted
+                ) VALUES (
+                    @SoStatus,
+                    @DosageName,
+                    @CreatedBy,
+                    @CreatedAt,
+                    'IN-PROGRESS',
+                    0,
+                    0
+                ) RETURNING id";
+
+            var parameters = new
+            {
+                SoStatus = soStatus,
+                DosageName = dosageName,
+                CreatedBy = createdBy,
+                CreatedAt = currentTime
+            };
+
+            return await connection.QuerySingleAsync<int>(query, parameters);
         }
     }
 } 

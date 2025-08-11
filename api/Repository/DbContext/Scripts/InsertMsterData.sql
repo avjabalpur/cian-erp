@@ -48,3 +48,8 @@ WHERE NOT EXISTS (SELECT 1 FROM item_type WHERE code = 'AD');
 INSERT INTO item_type (code, name, description, parent_type_id, is_active, created_by, updated_by) 
 SELECT 'SC', 'SCRAP ITEMS', 'SCRAP ITEMS', NULL, TRUE, 1, 1
 WHERE NOT EXISTS (SELECT 1 FROM item_type WHERE code = 'SC');
+
+
+INSERT INTO product_type (code, name, description, parent_type_id, is_active, created_by, updated_by) 
+SELECT 'SP', 'Sale Pack', 'Sale Pack - Final packaged product for sale', NULL, TRUE, 1, 1
+WHERE NOT EXISTS (SELECT 1 FROM product_type WHERE code = 'SP');

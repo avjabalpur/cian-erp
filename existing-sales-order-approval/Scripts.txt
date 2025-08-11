@@ -1,0 +1,205 @@
+CREATE TABLE sales_order_approval (
+    id INT PRIMARY KEY,
+    created_by VARCHAR(200),
+    created_time TIMESTAMP,
+    updated_by VARCHAR(200),
+    updated_time TIMESTAMP,
+    comments VARCHAR(200),
+    is_submitted INT,
+    is_deleted INT,
+    designer_approved INT,
+    pm_approved INT,
+    qa_approved INT,
+    is_final_authorized INT,
+    sono VARCHAR(200),
+    so_date VARCHAR(200),
+    so_status VARCHAR(200),
+    manufacturer_name VARCHAR(200),
+    country VARCHAR(200),
+    customer_name VARCHAR(200),
+    customer_gst_no VARCHAR(200),
+    payment_term VARCHAR(200),
+    quotation_date DATE,
+    quotation_no VARCHAR(200),
+    hsn_code VARCHAR(200),
+    product_code VARCHAR(200),
+    product_cast VARCHAR(200),
+    product_name VARCHAR(200),
+    dosage_name VARCHAR(200),
+    division VARCHAR(200),
+    design_under VARCHAR(200),
+    packing_style_description VARCHAR(200),
+    composition VARCHAR(200),
+    p_colour VARCHAR(200),
+    p_shelf_life VARCHAR(200),
+    p_pack_short VARCHAR(200),
+    p_tablet_type VARCHAR(200),
+    p_tablet_size VARCHAR(200),
+    p_change_part VARCHAR(200),
+    p_capsule_size VARCHAR(200),
+    p_shipper_size VARCHAR(200),
+    p_qty_per_shipper VARCHAR(200),
+    p_no_of_shipper VARCHAR(200),
+    p_flavour VARCHAR(200),
+    p_fragrance VARCHAR(200),
+    p_quantity VARCHAR(200),
+    p_mrp VARCHAR(200),
+    p_billing_rate VARCHAR(200),
+    p_inventory_charges VARCHAR(200),
+    p_cylinder_charge VARCHAR(200),
+    p_palte_charges VARCHAR(200),
+    p_domino VARCHAR(200),
+    p_stereo VARCHAR(200),
+    p_shipper_drawing_ref_code VARCHAR(200),
+    ctn_outer_drawing_ref_no VARCHAR(200),
+    ctn_inner_drawing_ref_no VARCHAR(200),
+    foil_drawing_ref_no VARCHAR(200),
+    leaflet_drawing_ref_no VARCHAR(200),
+    tube_drawing_ref_no VARCHAR(200),
+    label_drawing_ref_no VARCHAR(200),
+    pm_outer_ctn_stock VARCHAR(200),
+    pm_inner_ctn_stock VARCHAR(200),
+    pm_foil_stock VARCHAR(200),
+    pm_leaflet_stock VARCHAR(200),
+    pm_tube_stock VARCHAR(200),
+    pm_label_stock VARCHAR(200),
+    drug_approval_under VARCHAR(200)
+);
+
+
+interface SalesOrderApproval {
+    id?: number;
+    created_by?: string;
+    created_time?: Date;
+    updated_by?: string;
+    updated_time?: Date;
+    comments?: string;
+    is_submitted?: number;
+    is_deleted?: number;
+    designer_approved?: number;
+    pm_approved?: number;
+    qa_approved?: number;
+    is_final_authorized?: number;
+    sono?: string;
+    so_date?: string;
+    so_status?: string;
+    manufacturer_name?: string;
+    country?: string;
+    customer_name?: string;
+    customer_gst_no?: string;
+    payment_term?: string;
+    quotation_date?: Date;
+    quotation_no?: string;
+    hsn_code?: string;
+    product_code?: string;
+    product_cast?: string;
+    product_name?: string;
+    dosage_name?: string;
+    division?: string;
+    design_under?: string;
+    packing_style_description?: string;
+    composition?: string;
+    p_colour?: string;
+    p_shelf_life?: string;
+    p_pack_short?: string;
+    p_tablet_type?: string;
+    p_tablet_size?: string;
+    p_change_part?: string;
+    p_capsule_size?: string;
+    p_shipper_size?: string;
+    p_qty_per_shipper?: string;
+    p_no_of_shipper?: string;
+    p_flavour?: string;
+    p_fragrance?: string;
+    p_quantity?: string;
+    p_mrp?: string;
+    p_billing_rate?: string;
+    p_inventory_charges?: string;
+    p_cylinder_charge?: string;
+    p_palte_charges?: string;
+    p_domino?: string;
+    p_stereo?: string;
+    p_shipper_drawing_ref_code?: string;
+    ctn_outer_drawing_ref_no?: string;
+    ctn_inner_drawing_ref_no?: string;
+    foil_drawing_ref_no?: string;
+    leaflet_drawing_ref_no?: string;
+    tube_drawing_ref_no?: string;
+    label_drawing_ref_no?: string;
+    pm_outer_ctn_stock?: string;
+    pm_inner_ctn_stock?: string;
+    pm_foil_stock?: string;
+    pm_leaflet_stock?: string;
+    pm_tube_stock?: string;
+    pm_label_stock?: string;
+    drug_approval_under?: string;
+}
+
+
+const key_to_details = {
+    id: { title: "ID", key: "id" },
+    created_by: { title: "Created By", key: "created_by" },
+    created_time: { title: "Created Time", key: "created_time" },
+    updated_by: { title: "Updated By", key: "updated_by" },
+    updated_time: { title: "Updated Time", key: "updated_time" },
+    comments: { title: "Comments", key: "comments" },
+    is_submitted: { title: "Is Submitted", key: "is_submitted" },
+    is_deleted: { title: "Is Deleted", key: "is_deleted" },
+    designer_approved: { title: "Designer Approved", key: "designer_approved" },
+    pm_approved: { title: "PM Approved", key: "pm_approved" },
+    qa_approved: { title: "QA Approved", key: "qa_approved" },
+    is_final_authorized: { title: "Is Final Authorized", key: "is_final_authorized" },
+    sono: { title: "SONO", key: "sono" },
+    so_date: { title: "SO Date", key: "so_date" },
+    so_status: { title: "SO Status", key: "so_status" },
+    manufacturer_name: { title: "Manufacturer Name", key: "manufacturer_name" },
+    country: { title: "Country", key: "country" },
+    customer_name: { title: "Customer Name", key: "customer_name" },
+    customer_gst_no: { title: "Customer GST No", key: "customer_gst_no" },
+    payment_term: { title: "Payment Term", key: "payment_term" },
+    quotation_date: { title: "Quotation Date", key: "quotation_date" },
+    quotation_no: { title: "Quotation No", key: "quotation_no" },
+    hsn_code: { title: "HSN Code", key: "hsn_code" },
+    product_code: { title: "Product Code", key: "product_code" },
+    product_cast: { title: "Product Cast", key: "product_cast" },
+    product_name: { title: "Product Name", key: "product_name" },
+    dosage_name: { title: "Dosage Name", key: "dosage_name" },
+    division: { title: "Division", key: "division" },
+    design_under: { title: "Design Under", key: "design_under" },
+    packing_style_description: { title: "Packing Style Description", key: "packing_style_description" },
+    composition: { title: "Composition", key: "composition" },
+    p_colour: { title: "P Colour", key: "p_colour" },
+    p_shelf_life: { title: "P Shelf Life", key: "p_shelf_life" },
+    p_pack_short: { title: "P Pack Short", key: "p_pack_short" },
+    p_tablet_type: { title: "P Tablet Type", key: "p_tablet_type" },
+    p_tablet_size: { title: "P Tablet Size", key: "p_tablet_size" },
+    p_change_part: { title: "P Change Part", key: "p_change_part" },
+    p_capsule_size: { title: "P Capsule Size", key: "p_capsule_size" },
+    p_shipper_size: { title: "P Shipper Size", key: "p_shipper_size" },
+    p_qty_per_shipper: { title: "P Qty Per Shipper", key: "p_qty_per_shipper" },
+    p_no_of_shipper: { title: "P No Of Shipper", key: "p_no_of_shipper" },
+    p_flavour: { title: "P Flavour", key: "p_flavour" },
+    p_fragrance: { title: "P Fragrance", key: "p_fragrance" },
+    p_quantity: { title: "P Quantity", key: "p_quantity" },
+    p_mrp: { title: "P MRP", key: "p_mrp" },
+    p_billing_rate: { title: "P Billing Rate", key: "p_billing_rate" },
+    p_inventory_charges: { title: "P Inventory Charges", key: "p_inventory_charges" },
+    p_cylinder_charge: { title: "P Cylinder Charge", key: "p_cylinder_charge" },
+    p_palte_charges: { title: "P Palte Charges", key: "p_palte_charges" },
+    p_domino: { title: "P Domino", key: "p_domino" },
+    p_stereo: { title: "P Stereo", key: "p_stereo" },
+    p_shipper_drawing_ref_code: { title: "P Shipper Drawing Ref Code", key: "p_shipper_drawing_ref_code" },
+    ctn_outer_drawing_ref_no: { title: "CTN Outer Drawing Ref No", key: "ctn_outer_drawing_ref_no" },
+    ctn_inner_drawing_ref_no: { title: "CTN Inner Drawing Ref No", key: "ctn_inner_drawing_ref_no" },
+    foil_drawing_ref_no: { title: "Foil Drawing Ref No", key: "foil_drawing_ref_no" },
+    leaflet_drawing_ref_no: { title: "Leaflet Drawing Ref No", key: "leaflet_drawing_ref_no" },
+    tube_drawing_ref_no: { title: "Tube Drawing Ref No", key: "tube_drawing_ref_no" },
+    label_drawing_ref_no: { title: "Label Drawing Ref No", key: "label_drawing_ref_no" },
+    pm_outer_ctn_stock: { title: "PM Outer CTN Stock", key: "pm_outer_ctn_stock" },
+    pm_inner_ctn_stock: { title: "PM Inner CTN Stock", key: "pm_inner_ctn_stock" },
+    pm_foil_stock: { title: "PM Foil Stock", key: "pm_foil_stock" },
+    pm_leaflet_stock: { title: "PM Leaflet Stock", key: "pm_leaflet_stock" },
+    pm_tube_stock: { title: "PM Tube Stock", key: "pm_tube_stock" },
+    pm_label_stock: { title: "PM Label Stock", key: "pm_label_stock" },
+    drug_approval_under: { title: "Drug Approval Under", key: "drug_approval_under" },
+};

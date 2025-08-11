@@ -13,7 +13,7 @@ export interface StatusOption extends SelectOption {
   bgColor?: string;
 }
 
-// Current Status Options
+// Current Status Options (Enhanced from original system)
 export const currentStatusOptions: StatusOption[] = [
   { 
     label: "IN-PROGRESS", 
@@ -54,11 +54,11 @@ export const currentStatusOptions: StatusOption[] = [
   },
 ];
 
-// Sales Order Status Options
-export const soStatusOptions: SelectOption[] = [
-  { label: "NEW", value: "NEW" },
-  { label: "REPEAT", value: "REPEAT" },
-  { label: "REVISED", value: "REVISED" },
+// Sales Order Status Options (From original system)
+export const soStatusOptions: StatusOption[] = [
+  { label: "NEW", value: "NEW", color: "blue", variant: "default" },
+  { label: "REPEAT", value: "REPEAT", color: "orange", variant: "outline" },
+  { label: "REVISED", value: "REVISED", color: "purple", variant: "secondary" },
 ];
 
 // Product Shelf Life Options
@@ -69,91 +69,40 @@ export const pShelfLifeOptions: SelectOption[] = [
   { label: "36", value: "36" },
 ];
 
-// Dosage Name Options
-export const dosageNameOptions: SelectOption[] = [
-  { label: "SELECT", value: "SELECT" },
-  { label: "TABLET", value: "TABLET" },
-  { label: "GEL", value: "GEL" },
-  { label: "CAPSULE", value: "CAPSULE" },
-  { label: "LIQUID", value: "LIQUID" },
-  { label: "OINTMENT", value: "OINTMENT" },
-  { label: "POWDER", value: "POWDER" },
-  { label: "CREAM", value: "CREAM" },
-  { label: "SOFTGEL", value: "SOFTGEL" },
-];
 
-// Product Domino Options
+
+// Product Domino Options (From original system)
 export const pDominoOptions: SelectOption[] = [
   { label: "DOMINO", value: "DOMINO" },
   { label: "STEREO", value: "STEREO" },
 ];
 
-// Legacy Sales Order Status Options (keeping for backward compatibility)
-export const salesOrderStatusOptions: StatusOption[] = [
-  {
-    value: "new",
-    label: "New",
-    color: "text-blue-600",
-    bgColor: "bg-blue-100",
-    variant: "default"
-  },
-  {
-    value: "draft",
-    label: "Draft",
-    color: "text-gray-600",
-    bgColor: "bg-gray-100",
-    variant: "secondary"
-  },
-  {
-    value: "pending",
-    label: "Pending",
-    color: "text-yellow-600",
-    bgColor: "bg-yellow-100",
-    variant: "outline"
-  },
-  {
-    value: "approved",
-    label: "Approved",
-    color: "text-green-600",
-    bgColor: "bg-green-100",
-    variant: "default"
-  },
-  {
-    value: "rejected",
-    label: "Rejected",
-    color: "text-red-600",
-    bgColor: "bg-red-100",
-    variant: "destructive"
-  },
-  {
-    value: "in_progress",
-    label: "In Progress",
-    color: "text-purple-600",
-    bgColor: "bg-purple-100",
-    variant: "outline"
-  },
-  {
-    value: "completed",
-    label: "Completed",
-    color: "text-emerald-600",
-    bgColor: "bg-emerald-100",
-    variant: "default"
-  },
-  {
-    value: "cancelled",
-    label: "Cancelled",
-    color: "text-red-600",
-    bgColor: "bg-red-100",
-    variant: "destructive"
-  },
-  {
-    value: "repeat",
-    label: "Repeat",
-    color: "text-orange-600",
-    bgColor: "bg-orange-100",
-    variant: "outline"
-  }
+// Manufacturer Options (From original system)
+export const manufacturerOptions: SelectOption[] = [
+  { label: "CIAN HEALTHCARE", value: "CIAN HEALTHCARE" },
+  { label: "DR. SMITH", value: "DR. SMITH" },
+  { label: "Bayberry", value: "Bayberry" },
+  { label: "SHEFIATRIC LIFE SCIENCES", value: "SHEFIATRIC LIFE SCIENCES" },
+  { label: "CELESTA HEALTHCARE PVT. LTD.", value: "CELESTA HEALTHCARE PVT. LTD." },
+  { label: "JM LIFESCIENCES PVT. LTD.", value: "JM LIFESCIENCES PVT. LTD." },
 ];
+
+// Assigned Designer Options (From original system)
+export const assignedDesignerOptions: SelectOption[] = [
+  { label: "-", value: "0" },
+  { label: "amar", value: "103" },
+  { label: "dn", value: "155" },
+  { label: "masum", value: "106" },
+  { label: "omkar", value: "190" },
+];
+
+// Approval Status Options
+export const approvalStatusOptions: SelectOption[] = [
+  { label: "All", value: "-1" },
+  { label: "Pending", value: "0" },
+  { label: "Approved", value: "1" },
+];
+
 
 // Payment Terms Options
 export const paymentTermOptions: SelectOption[] = [
@@ -216,44 +165,6 @@ export const drugApprovalOptions: SelectOption[] = [
   { value: "other", label: "Other" }
 ];
 
-// Legacy Current Status Options (keeping for backward compatibility)
-export const legacyCurrentStatusOptions: StatusOption[] = [
-  {
-    value: "pending",
-    label: "Pending",
-    color: "text-yellow-600",
-    bgColor: "bg-yellow-100",
-    variant: "outline"
-  },
-  {
-    value: "approved",
-    label: "Approved",
-    color: "text-green-600",
-    bgColor: "bg-green-100",
-    variant: "default"
-  },
-  {
-    value: "rejected",
-    label: "Rejected",
-    color: "text-red-600",
-    bgColor: "bg-red-100",
-    variant: "destructive"
-  },
-  {
-    value: "under_review",
-    label: "Under Review",
-    color: "text-blue-600",
-    bgColor: "bg-blue-100",
-    variant: "outline"
-  },
-  {
-    value: "completed",
-    label: "Completed",
-    color: "text-emerald-600",
-    bgColor: "bg-emerald-100",
-    variant: "default"
-  }
-];
 
 // Sort Options
 export const sortOptions: SelectOption[] = [
@@ -266,11 +177,86 @@ export const sortOptions: SelectOption[] = [
   { value: "item_name", label: "Item" }
 ];
 
-// Sort Order Options
-export const sortOrderOptions: SelectOption[] = [
-  { value: "desc", label: "Descending" },
-  { value: "asc", label: "Ascending" }
-];
+  // Sort Order Options
+  export const sortOrderOptions: SelectOption[] = [
+    { value: "desc", label: "Descending" },
+    { value: "asc", label: "Ascending" }
+  ];
+
+  // Shelf Life Options
+  export const shelfLifeOptions: SelectOption[] = [
+    { label: "NA", value: "NA" },
+    { label: "18 Months", value: "18" },
+    { label: "24 Months", value: "24" },
+    { label: "36 Months", value: "36" },
+  ];
+
+  // Payment Terms
+  export const paymentTerms: SelectOption[] = [
+    { label: "Advance 100%", value: "ADVANCE_100" },
+    { label: "Advance 50%", value: "ADVANCE_50" },
+    { label: "Advance 30%", value: "ADVANCE_30" },
+    { label: "Net 30 Days", value: "NET_30" },
+    { label: "Net 45 Days", value: "NET_45" },
+    { label: "Net 60 Days", value: "NET_60" },
+    { label: "Net 90 Days", value: "NET_90" },
+  ];
+
+  // Tablet Types
+  export const tabletTypes: SelectOption[] = [
+    { label: "Round", value: "ROUND" },
+    { label: "Oval", value: "OVAL" },
+    { label: "Rectangle", value: "RECTANGLE" },
+    { label: "Triangle", value: "TRIANGLE" },
+    { label: "Diamond", value: "DIAMOND" },
+    { label: "Custom", value: "CUSTOM" },
+  ];
+
+  // Tablet Sizes
+  export const tabletSizes: SelectOption[] = [
+    { label: "6mm", value: "6mm" },
+    { label: "8mm", value: "8mm" },
+    { label: "10mm", value: "10mm" },
+    { label: "12mm", value: "12mm" },
+    { label: "14mm", value: "14mm" },
+    { label: "16mm", value: "16mm" },
+    { label: "18mm", value: "18mm" },
+    { label: "20mm", value: "20mm" },
+  ];
+
+    // Shipper Sizes
+    export const shipperSizes: SelectOption[] = [
+      { label: "Small", value: "SMALL" },
+      { label: "Medium", value: "MEDIUM" },
+      { label: "Large", value: "LARGE" },
+      { label: "Extra Large", value: "EXTRA_LARGE" },
+    ];
+
+      // Flavour Options
+  export const flavours: SelectOption[] = [
+    { label: "None", value: "NONE" },
+    { label: "Mint", value: "MINT" },
+    { label: "Orange", value: "ORANGE" },
+    { label: "Strawberry", value: "STRAWBERRY" },
+    { label: "Vanilla", value: "VANILLA" },
+    { label: "Chocolate", value: "CHOCOLATE" },
+    { label: "Lemon", value: "LEMON" },
+    { label: "Custom", value: "CUSTOM" },
+  ];
+
+  // Fragrance Options
+  export const fragrances: SelectOption[] = [
+    { label: "None", value: "NONE" },
+    { label: "Lavender", value: "LAVENDER" },
+    { label: "Rose", value: "ROSE" },
+    { label: "Jasmine", value: "JASMINE" },
+    { label: "Citrus", value: "CITRUS" },
+    { label: "Custom", value: "CUSTOM" },
+  ];
+  export const domino: SelectOption[] = [
+    { label: "DOMINO", value: "DOMINO" },
+    { label: "STEREO", value: "STEREO" },
+  ];
 
 // nuqs Parsers
 export const salesOrderParsers = {
@@ -291,8 +277,8 @@ export const salesOrderParsers = {
 
 // Utility Functions
 export const getStatusColor = (status: string): StatusOption => {
-  return salesOrderStatusOptions.find(option => option.value === status) || 
-         salesOrderStatusOptions[0]; // Default to first option
+  return soStatusOptions.find(option => option.value === status) || 
+         soStatusOptions[0]; 
 };
 
 export const getCurrentStatusColor = (status: string): StatusOption => {
@@ -310,10 +296,7 @@ export const getSoStatusOption = (status: string): SelectOption => {
          soStatusOptions[0]; // Default to first option
 };
 
-export const getDosageNameOption = (dosage: string): SelectOption => {
-  return dosageNameOptions.find(option => option.value === dosage) || 
-         dosageNameOptions[0]; // Default to first option
-};
+
 
 export const getPDominoOption = (domino: string): SelectOption => {
   return pDominoOptions.find(option => option.value === domino) || 
@@ -371,4 +354,90 @@ export const defaultSalesOrderFilter = {
   assignedDesigner: undefined as number | undefined,
   fromDate: undefined as Date | undefined,
   toDate: undefined as Date | undefined
+};
+
+// Company Details (From original system)
+export const CompanyDetails = {
+  CIAN: {
+    name: "Cian Healthcare Ltd.",
+    address: "Office No.301, Konark Icon, Mundhwa - Kharadi Rd, Kirtane Baugh, Magarpatta, Hadapsar, Pune - 411036",
+    phone: "020-4147 1234",
+    email: "enquiry@cian.co",
+    website: "www.cian.co",
+    account_details: {
+      account_number: "301102000000745",
+      ifsc_code: "IBKL0000301",
+      branch: "Koregaon Park, Pune",
+    },
+  },
+  "DR SMITH": {
+    name: "Dr. Smiths Biotech",
+    address: "Office No.301, Konark Icon, Mundhwa - Kharadi Rd, Kirtane Baugh, Magarpatta, Hadapsar, Pune - 411036",
+    phone: "020-4147 1234",
+    email: "enquiry@drsmiths.co",
+    website: "www.cian.co",
+    account_details: {
+      account_number: "0769102000003971",
+      ifsc_code: "IBKL0000769",
+      branch: "KONDHWA, PUNE",
+    },
+  },
+  "Bayberry": {
+    name: "Bayberry Pharmaceuticals Pvt Ltd.",
+    address: "Business Court, Office no.C-314, opposite brand factory, Mukund Nagar, Pune, Maharashtra 411037",
+    phone: "",
+    email: "",
+    website: "",
+    account_details: {
+      account_number: "003905030273",
+      ifsc_code: "ICIC0000039",
+      branch: "Shivaji Nagar, Pune",
+    },
+  },
+  "SHEFIATRIC LIFE SCIENCES": {
+    name: "SHEFIATRIC LIFE SCIENCES",
+    address: "B-214,1st&2nd FLOOR, VAISHALI MARG, OPP.BRIGHTLAND SCHOOL, VAISHALI NAGAR, JAIPUR-302021 Rajasthan | GST. No.: 08BDUPJ5634B2ZE",
+    phone: "",
+    email: "",
+    website: "",
+    account_details: {
+      account_number: "59209414043964",
+      ifsc_code: "HDFC0006418",
+      branch: "Chandpole Jaipur",
+    },
+  },
+  "CELESTA HEALTHCARE PVT. LTD.": {
+    name: "CELESTA HEALTHCARE PVT. LTD.",
+    address: "SHOP NO 6 GROUND FLOOR, MILKAT NO 5709/5, GAT NO 1363, SHIV RASTA, NEAR MEETHA GODOWN, WADKI, TAL HAVELI DIST PUNE 412308.",
+    phone: "",
+    email: "",
+    website: "",
+    account_details: {
+      account_number: "",
+      ifsc_code: "",
+      branch: "",
+    },
+  },
+  "JM LIFESCIENCES PVT. LTD.": {
+    name: "JM LIFESCIENCES PVT. LTD.",
+    address: "224, Bharat Industrial Premises Co.Op.Soc. Ltd., L.B.S Marg,Bhandup (West), Mumbai, Maharashtra, Pin code : 400078",
+    phone: "9878882715/9137047791",
+    email: "jmlife16@gmail.com",
+    website: "https://jmlifesciences.com/ ",
+    account_details: {
+      account_number: "50200001682942",
+      ifsc_code: "HDFC0002844",
+      branch: "Dhanukar Colony Branch",
+    },
+  }
+};
+
+// Table pagination properties (From original system)
+export const PaginationProps = {
+  position: ["bottomCenter"] as any,
+  showSizeChanger: true,
+  defaultPageSize: 50,
+  pageSizeOptions: ["10", "20", "50", "100"],
+  showTitle: true,
+  showTotal: (total: any, range: any) => `Showing ${range[0]}-${range[1]} of ${total} items`,
 }; 
