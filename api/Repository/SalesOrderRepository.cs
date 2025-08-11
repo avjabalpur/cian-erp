@@ -452,6 +452,10 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
+            // Debug: Log the values being sent to database
+            Console.WriteLine($"Repository UpdateAsync - DosageName: '{salesOrder.DosageName}'");
+            Console.WriteLine($"Repository UpdateAsync - OrganizationId: {salesOrder.OrganizationId}");
+            
             // Convert boolean values to integers for database compatibility
             var parameters = new
             {
@@ -539,6 +543,10 @@ namespace Xcianify.Repository
                     updated_by = @UpdatedBy, updated_at = @UpdatedAt
                 WHERE id = @Id AND is_deleted = 0
                 RETURNING *";
+
+            // Debug: Log the SQL query and parameters
+            Console.WriteLine($"SQL Query: {query}");
+            Console.WriteLine($"Parameters - DosageName: '{parameters.DosageName}', OrganizationId: {parameters.OrganizationId}");
 
             return await connection.QuerySingleAsync<SalesOrder>(query, parameters);
         }

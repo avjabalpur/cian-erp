@@ -16,6 +16,19 @@ const createSalesOrderDocument = async (salesOrderId: number, documentData: Crea
   return data;
 };
 
+const uploadSalesOrderDocument = async (salesOrderId: number, file: File, tag: string): Promise<SalesOrderDocument> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('tag', tag);
+  
+  const { data } = await api.post(`/sales-order/${salesOrderId}/documents/upload`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return data;
+};
+
 const updateSalesOrderDocument = async (salesOrderId: number, documentId: number, documentData: CreateSalesOrderDocumentData): Promise<void> => {
   await api.put(`/sales-order/${salesOrderId}/documents/${documentId}`, documentData);
 };
@@ -37,6 +50,16 @@ export const useCreateSalesOrderDocument = () => {
   const queryClient = useQueryClient();
   return useMutation<SalesOrderDocument, Error, { salesOrderId: number; data: CreateSalesOrderDocumentData }>({
     mutationFn: ({ salesOrderId, data }) => createSalesOrderDocument(salesOrderId, data),
+    onSuccess: (_, { salesOrderId }) => {
+      queryClient.invalidateQueries({ queryKey: ['sales-order-documents-by-sales-order', salesOrderId] });
+    },
+  });
+};
+
+export const useUploadSalesOrderDocument = () => {
+  const queryClient = useQueryClient();
+  return useMutation<SalesOrderDocument, Error, { salesOrderId: number; file: File; tag: string }>({
+    mutationFn: ({ salesOrderId, file, tag }) => uploadSalesOrderDocument(salesOrderId, file, tag),
     onSuccess: (_, { salesOrderId }) => {
       queryClient.invalidateQueries({ queryKey: ['sales-order-documents-by-sales-order', salesOrderId] });
     },

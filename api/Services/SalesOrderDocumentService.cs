@@ -2,6 +2,7 @@ using AutoMapper;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.IO;
 using Xcianify.Core.Domain.Repositories;
 using Xcianify.Core.Domain.Services;
 using Xcianify.Core.DTOs.SalesOrder;
@@ -85,6 +86,47 @@ namespace Xcianify.Services
         {
             var documents = await _documentRepository.GetByFileTypeAsync(fileType);
             return _mapper.Map<IEnumerable<SalesOrderDocumentDto>>(documents);
+        }
+
+        public async Task<SalesOrderDocumentDto> UploadDocumentAsync(UploadSalesOrderDocumentDto uploadDto)
+        {
+            // Generate unique filename
+            var fileName = $"{DateTime.UtcNow:yyyyMMddHHmmss}_{Guid.NewGuid()}_{uploadDto.File.FileName}";
+            var filePath = Path.Combine("uploads", "sales-orders", uploadDto.SalesOrderId.ToString(), fileName);
+            
+            // Ensure directory exists
+            var directoryPath = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+            
+            // Save file to disk
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await uploadDto.File.CopyToAsync(stream);
+            }
+            
+            // Create document record
+            var document = new SalesOrderDocument
+            {
+                SalesOrderId = uploadDto.SalesOrderId,
+                Tag = uploadDto.Tag,
+                FileName = uploadDto.File.FileName,
+                FilePath = filePath,
+                FileType = uploadDto.File.ContentType,
+                Metadata = System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    size = uploadDto.File.Length,
+                    uploadedAt = DateTime.UtcNow
+                }),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                IsDeleted = false
+            };
+
+            var createdDocument = await _documentRepository.AddAsync(document);
+            return _mapper.Map<SalesOrderDocumentDto>(createdDocument);
         }
     }
 } 

@@ -344,15 +344,7 @@ export function SalesOrderApprovalContent({
     // Handle approval logic here
   };
 
-  const handleUploadFile = () => {
-    console.log("Upload file clicked");
-    // Handle file upload logic here
-  };
 
-  const handleViewAttachedDocuments = () => {
-    console.log("View attached documents clicked");
-    // Handle view documents logic here
-  };
 
   const handleSendMessage = (message: string) => {
     console.log("Send message:", message);
@@ -543,8 +535,7 @@ export function SalesOrderApprovalContent({
                       </CardHeader>
                       <CardContent>
                         <ReferenceDocuments
-                          onUploadFile={handleUploadFile}
-                          onViewAttachedDocuments={handleViewAttachedDocuments}
+                          salesOrderId={salesOrderId}
                           disabled={updateSalesOrderMutation.isPending}
                           documents={documents}
                           isLoading={documentsLoading}

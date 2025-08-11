@@ -187,6 +187,14 @@ namespace Xcianify.Presentation.Controllers
             return CreatedAtAction(nameof(GetDocuments), new { salesOrderId }, createdDocument);
         }
 
+        [HttpPost("{salesOrderId}/documents/upload")]
+        public async Task<IActionResult> UploadDocument(int salesOrderId, [FromForm] UploadSalesOrderDocumentDto uploadDto)
+        {
+            uploadDto.SalesOrderId = salesOrderId;
+            var uploadedDocument = await _documentService.UploadDocumentAsync(uploadDto);
+            return CreatedAtAction(nameof(GetDocuments), new { salesOrderId }, uploadedDocument);
+        }
+
         [HttpPut("{salesOrderId}/documents/{documentId}")]
         public async Task<IActionResult> UpdateDocument(int salesOrderId, int documentId, [FromBody] CreateSalesOrderDocumentDto updateDocumentDto)
         {
@@ -200,6 +208,23 @@ namespace Xcianify.Presentation.Controllers
         {
             await _documentService.DeleteDocumentAsync(documentId);
             return NoContent();
+        }
+
+        [HttpGet("{salesOrderId}/documents/{documentId}/download")]
+        public async Task<IActionResult> DownloadDocument(int salesOrderId, int documentId)
+        {
+            var document = await _documentService.GetDocumentByIdAsync(documentId);
+            if (document == null || document.SalesOrderId != salesOrderId)
+                return NotFound();
+
+            var filePath = document.FilePath;
+            if (!System.IO.File.Exists(filePath))
+                return NotFound("File not found on disk");
+
+            var fileName = document.FileName;
+            var contentType = document.FileType ?? "application/octet-stream";
+            
+            return PhysicalFile(filePath, contentType, fileName);
         }
 
         // --- Sales Order Stages Endpoints ---
