@@ -35,6 +35,8 @@ import { useRouter } from "next/navigation";
 import { currentStatusOptions } from "@/lib/utils/sales-order-utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UserLookup } from "@/components/shared/lookups/user-lookup";
+import { FormLookup } from "@/components/shared/forms/form-lookup";
+import { useUserById } from "@/hooks/use-users";
 
 interface SalesOrderApprovalContentProps {
   salesOrderId: number;
@@ -80,6 +82,10 @@ export function SalesOrderApprovalContent({
       manufacturerName: "CIAN HEALTHCARE", // Default readonly value
     },
   });
+
+  // Fetch assigned designer user data
+  const assignedDesignerId = form.watch("assignedDesigner") || salesOrder?.assignedDesigner;
+  const { data: assignedDesignerUser } = useUserById(assignedDesignerId?.toString() || "");
 
   // Handle customer selection from lookup
   const handleCustomerSelect = (selectedCustomer: any) => {
@@ -128,6 +134,19 @@ export function SalesOrderApprovalContent({
     form.trigger(["assignedDesigner"]);
     
     console.log("Form values after user selection:", form.getValues());
+  };
+
+  // Get user display value for FormLookup
+  const getUserDisplayValue = (userId: number | string) => {
+    if (!userId || userId === 0) return "";
+    
+    // Use the fetched user data if available
+    if (assignedDesignerUser && assignedDesignerUser.id === Number(userId)) {
+      return `${assignedDesignerUser.firstName} ${assignedDesignerUser.lastName}`;
+    }
+    
+    // Fallback to showing the user ID
+    return `User ID: ${userId}`;
   };
 
   React.useEffect(() => {
@@ -347,22 +366,7 @@ export function SalesOrderApprovalContent({
                             value={option.value}
                             disabled={option.disabled}
                           >
-                            <div className="flex items-center gap-2">
-                              <Badge 
-                                variant={option.variant as any} 
-                                className={`text-xs ${
-                                  option.color === "orange" ? "bg-orange-100 text-orange-800 border-orange-200" :
-                                  option.color === "green" ? "bg-green-100 text-green-800 border-green-200" :
-                                  option.color === "blue" ? "bg-blue-100 text-blue-800 border-blue-200" :
-                                  option.color === "purple" ? "bg-purple-100 text-purple-800 border-purple-200" :
-                                  option.color === "grey" ? "bg-gray-100 text-gray-800 border-gray-200" :
-                                  "bg-gray-100 text-gray-800 border-gray-200"
-                                }`}
-                              >
-                                {option.shortName || option.label}
-                              </Badge>
-                              <span className="text-sm">{option.label}</span>
-                            </div>
+                              {option.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -372,19 +376,21 @@ export function SalesOrderApprovalContent({
                   {/* Assigned Designer Lookup */}
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">Assigned Designer:</span>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setUserLookupOpen(true)}
-                      disabled={updateSalesOrderMutation.isPending}
-                      className="w-48 justify-start"
-                    >
-                      <User className="h-4 w-4 mr-2" />
-                      {form.watch("assignedDesigner") && form.watch("assignedDesigner") !== 0 
-                        ? `User ID: ${form.watch("assignedDesigner")}` 
-                        : "Select Designer"}
-                    </Button>
+                    <div className="w-48">
+                      <FormLookup
+                        control={form.control}
+                        name="assignedDesigner"
+                        label=""
+                        placeholder="Select Designer"
+                        disabled={updateSalesOrderMutation.isPending}
+                        onLookupClick={() => setUserLookupOpen(true)}
+                        displayValue={(value) => getUserDisplayValue(value)}
+                        className="space-y-0"
+                        inputProps={{
+                          className: "cursor-pointer hover:bg-muted/50 transition-colors"
+                        }}
+                      />
+                    </div>
                   </div>
 
                   {/* Created By Info */}

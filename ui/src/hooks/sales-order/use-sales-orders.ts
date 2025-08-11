@@ -44,7 +44,16 @@ const createSalesOrderApproval = async (approvalData: { soStatus: string; dosage
 };
 
 const updateSalesOrder = async ({ id, data }: { id: string; data: UpdateSalesOrderData }): Promise<SalesOrder> => {
-  const { data: responseData } = await api.put(`/sales-order`, { ...data, id: parseInt(id) });
+  // Include the id in the data and handle date formatting
+  const updateData = {
+    ...data,
+    id: parseInt(id),
+    // Convert date strings to proper format for backend
+    soDate: data.soDate ? new Date(data.soDate).toISOString() : null,
+    quotationDate: data.quotationDate ? new Date(data.quotationDate).toISOString() : null,
+  };
+  
+  const { data: responseData } = await api.put(`/sales-order`, updateData);
   return responseData;
 };
 

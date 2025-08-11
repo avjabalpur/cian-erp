@@ -163,10 +163,10 @@ namespace Xcianify.Repository
                     so.drug_approval_under as drugApprovalUnder,
                     so.current_status as currentStatus,
                     so.comments,
-                    so.is_submitted as isSubmitted,
-                    so.is_deleted as isDeleted,
+                    so.is_submitted = 1 as isSubmitted,
+                    so.is_deleted = 1 as isDeleted,
                     so.assigned_designer as assignedDesigner,
-                    so.plant_email_sent as plantEmailSent,
+                    so.plant_email_sent = 1 as plantEmailSent,
                     so.created_at as createdAt,
                     so.updated_at as updatedAt,
                     so.created_by as createdBy,
@@ -246,10 +246,10 @@ namespace Xcianify.Repository
                     so.drug_approval_under as drugApprovalUnder,
                     so.current_status as currentStatus,
                     so.comments,
-                    so.is_submitted as isSubmitted,
-                    so.is_deleted as isDeleted,
+                    so.is_submitted = 1 as isSubmitted,
+                    so.is_deleted = 1 as isDeleted,
                     so.assigned_designer as assignedDesigner,
-                    so.plant_email_sent as plantEmailSent,
+                    so.plant_email_sent = 1 as plantEmailSent,
                     so.created_at as createdAt,
                     so.updated_at as updatedAt,
                     so.created_by as createdBy,
@@ -326,10 +326,10 @@ namespace Xcianify.Repository
                     so.drug_approval_under as drugApprovalUnder,
                     so.current_status as currentStatus,
                     so.comments,
-                    so.is_submitted as isSubmitted,
-                    so.is_deleted as isDeleted,
+                    so.is_submitted = 1 as isSubmitted,
+                    so.is_deleted = 1 as isDeleted,
                     so.assigned_designer as assignedDesigner,
-                    so.plant_email_sent as plantEmailSent,
+                    so.plant_email_sent = 1 as plantEmailSent,
                     so.created_at as createdAt,
                     so.updated_at as updatedAt,
                     so.created_by as createdBy,
@@ -352,6 +352,70 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
+            // Convert boolean values to integers for database compatibility
+            var parameters = new
+            {
+                salesOrder.SoNumber,
+                salesOrder.SoDate,
+                salesOrder.SoStatus,
+                salesOrder.OrganizationId,
+                salesOrder.CustomerId,
+                salesOrder.PaymentTerm,
+                salesOrder.QuotationDate,
+                salesOrder.QuotationNo,
+                salesOrder.HsnCode,
+                salesOrder.ItemId,
+                salesOrder.DosageName,
+                salesOrder.DivisionId,
+                salesOrder.DesignUnder,
+                salesOrder.PackingStyleDescription,
+                salesOrder.Composition,
+                salesOrder.PackShort,
+                salesOrder.TabletType,
+                salesOrder.TabletSize,
+                salesOrder.ChangePart,
+                salesOrder.CapsuleSize,
+                salesOrder.ShipperSize,
+                salesOrder.QtyPerShipper,
+                salesOrder.NoOfShipper,
+                salesOrder.Flavour,
+                salesOrder.Fragrance,
+                salesOrder.Quantity,
+                salesOrder.FocQty,
+                salesOrder.Mrp,
+                salesOrder.BillingRate,
+                salesOrder.Costing,
+                salesOrder.InventoryCharges,
+                salesOrder.CylinderCharge,
+                salesOrder.PlateCharges,
+                salesOrder.Domino,
+                salesOrder.Stereo,
+                salesOrder.ShipperDrawingRefCode,
+                salesOrder.CtnOuterDrawingRefNo,
+                salesOrder.CtnInnerDrawingRefNo,
+                salesOrder.FoilDrawingRefNo,
+                salesOrder.LeafletDrawingRefNo,
+                salesOrder.TubeDrawingRefNo,
+                salesOrder.LabelDrawingRefNo,
+                salesOrder.PmOuterCtnStock,
+                salesOrder.PmInnerCtnStock,
+                salesOrder.PmFoilStock,
+                salesOrder.PmLeafletStock,
+                salesOrder.PmTubeStock,
+                salesOrder.PmLabelStock,
+                salesOrder.DrugApprovalUnder,
+                salesOrder.CurrentStatus,
+                salesOrder.Comments,
+                IsSubmitted = salesOrder.IsSubmitted ? 1 : 0,
+                IsDeleted = salesOrder.IsDeleted ? 1 : 0,
+                salesOrder.AssignedDesigner,
+                PlantEmailSent = salesOrder.PlantEmailSent.HasValue ? (salesOrder.PlantEmailSent.Value ? 1 : 0) : (int?)null,
+                salesOrder.CreatedBy,
+                CreatedTime = salesOrder.CreatedAt,
+                salesOrder.UpdatedBy,
+                UpdatedTime = salesOrder.UpdatedAt
+            };
+            
             var query = @"
                 INSERT INTO sales_orders (
                     so_number, so_date, so_status, organization_id, customer_id, payment_term,
@@ -365,9 +429,7 @@ namespace Xcianify.Repository
                     label_drawing_ref_no, pm_outer_ctn_stock, pm_inner_ctn_stock, pm_foil_stock,
                     pm_leaflet_stock, pm_tube_stock, pm_label_stock, drug_approval_under,
                     current_status, comments, is_submitted, is_deleted, assigned_designer,
-                    plant_email_sent, created_by, created_at, updated_by, updated_at,
-                    -- Additional fields for product info form
-                    shelf_life, colour
+                    plant_email_sent, created_by, created_at, updated_by, updated_at
                 ) VALUES (
                     @SoNumber, @SoDate, @SoStatus, @OrganizationId, @CustomerId, @PaymentTerm,
                     @QuotationDate, @QuotationNo, @HsnCode, @ItemId, @DosageName, @DivisionId,
@@ -380,17 +442,77 @@ namespace Xcianify.Repository
                     @LabelDrawingRefNo, @PmOuterCtnStock, @PmInnerCtnStock, @PmFoilStock,
                     @PmLeafletStock, @PmTubeStock, @PmLabelStock, @DrugApprovalUnder,
                     @CurrentStatus, @Comments, @IsSubmitted, @IsDeleted, @AssignedDesigner,
-                    @PlantEmailSent, @CreatedBy, @CreatedTime, @UpdatedBy, @UpdatedTime,
-                    -- Additional fields for product info form
-                    @ShelfLife, @Colour
+                    @PlantEmailSent, @CreatedBy, @CreatedTime, @UpdatedBy, @UpdatedTime
                 ) RETURNING *";
 
-            return await connection.QuerySingleAsync<SalesOrder>(query, salesOrder);
+            return await connection.QuerySingleAsync<SalesOrder>(query, parameters);
         }
 
         public async Task<SalesOrder> UpdateAsync(SalesOrder salesOrder)
         {
             using var connection = _context.GetConnection();
+            
+            // Convert boolean values to integers for database compatibility
+            var parameters = new
+            {
+                salesOrder.Id,
+                salesOrder.SoNumber,
+                salesOrder.SoDate,
+                salesOrder.SoStatus,
+                salesOrder.OrganizationId,
+                salesOrder.CustomerId,
+                salesOrder.PaymentTerm,
+                salesOrder.QuotationDate,
+                salesOrder.QuotationNo,
+                salesOrder.HsnCode,
+                salesOrder.ItemId,
+                salesOrder.DosageName,
+                salesOrder.DivisionId,
+                salesOrder.DesignUnder,
+                salesOrder.PackingStyleDescription,
+                salesOrder.Composition,
+                salesOrder.PackShort,
+                salesOrder.TabletType,
+                salesOrder.TabletSize,
+                salesOrder.ChangePart,
+                salesOrder.CapsuleSize,
+                salesOrder.ShipperSize,
+                salesOrder.QtyPerShipper,
+                salesOrder.NoOfShipper,
+                salesOrder.Flavour,
+                salesOrder.Fragrance,
+                salesOrder.Quantity,
+                salesOrder.FocQty,
+                salesOrder.Mrp,
+                salesOrder.BillingRate,
+                salesOrder.Costing,
+                salesOrder.InventoryCharges,
+                salesOrder.CylinderCharge,
+                salesOrder.PlateCharges,
+                salesOrder.Domino,
+                salesOrder.Stereo,
+                salesOrder.ShipperDrawingRefCode,
+                salesOrder.CtnOuterDrawingRefNo,
+                salesOrder.CtnInnerDrawingRefNo,
+                salesOrder.FoilDrawingRefNo,
+                salesOrder.LeafletDrawingRefNo,
+                salesOrder.TubeDrawingRefNo,
+                salesOrder.LabelDrawingRefNo,
+                salesOrder.PmOuterCtnStock,
+                salesOrder.PmInnerCtnStock,
+                salesOrder.PmFoilStock,
+                salesOrder.PmLeafletStock,
+                salesOrder.PmTubeStock,
+                salesOrder.PmLabelStock,
+                salesOrder.DrugApprovalUnder,
+                salesOrder.CurrentStatus,
+                salesOrder.Comments,
+                IsSubmitted = salesOrder.IsSubmitted ? 1 : 0,
+                salesOrder.AssignedDesigner,
+                PlantEmailSent = salesOrder.PlantEmailSent.HasValue ? (salesOrder.PlantEmailSent.Value ? 1 : 0) : (int?)null,
+                salesOrder.UpdatedBy,
+                salesOrder.UpdatedAt
+            };
             
             var query = @"
                 UPDATE sales_orders SET
@@ -414,13 +536,11 @@ namespace Xcianify.Repository
                     pm_label_stock = @PmLabelStock, drug_approval_under = @DrugApprovalUnder,
                     current_status = @CurrentStatus, comments = @Comments, is_submitted = @IsSubmitted,
                     assigned_designer = @AssignedDesigner, plant_email_sent = @PlantEmailSent,
-                    updated_by = @UpdatedBy, updated_at = @UpdatedAt,
-                    -- Additional fields for product info form
-                    shelf_life = @ShelfLife, colour = @Colour
+                    updated_by = @UpdatedBy, updated_at = @UpdatedAt
                 WHERE id = @Id AND is_deleted = 0
                 RETURNING *";
 
-            return await connection.QuerySingleAsync<SalesOrder>(query, salesOrder);
+            return await connection.QuerySingleAsync<SalesOrder>(query, parameters);
         }
 
         public async Task DeleteAsync(int id)
@@ -475,16 +595,12 @@ namespace Xcianify.Repository
                     dosage_name,
                     created_by,
                     created_at,
-                    updated_by,
-                    updated_at,
                     current_status,
                     is_deleted,
                     is_submitted
                 ) VALUES (
                     @SoStatus,
                     @DosageName,
-                    @CreatedBy,
-                    @CreatedAt,
                     @CreatedBy,
                     @CreatedAt,
                     'IN-PROGRESS',

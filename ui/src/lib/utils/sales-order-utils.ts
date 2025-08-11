@@ -177,11 +177,86 @@ export const sortOptions: SelectOption[] = [
   { value: "item_name", label: "Item" }
 ];
 
-// Sort Order Options
-export const sortOrderOptions: SelectOption[] = [
-  { value: "desc", label: "Descending" },
-  { value: "asc", label: "Ascending" }
-];
+  // Sort Order Options
+  export const sortOrderOptions: SelectOption[] = [
+    { value: "desc", label: "Descending" },
+    { value: "asc", label: "Ascending" }
+  ];
+
+  // Shelf Life Options
+  export const shelfLifeOptions: SelectOption[] = [
+    { label: "NA", value: "NA" },
+    { label: "18 Months", value: "18" },
+    { label: "24 Months", value: "24" },
+    { label: "36 Months", value: "36" },
+  ];
+
+  // Payment Terms
+  export const paymentTerms: SelectOption[] = [
+    { label: "Advance 100%", value: "ADVANCE_100" },
+    { label: "Advance 50%", value: "ADVANCE_50" },
+    { label: "Advance 30%", value: "ADVANCE_30" },
+    { label: "Net 30 Days", value: "NET_30" },
+    { label: "Net 45 Days", value: "NET_45" },
+    { label: "Net 60 Days", value: "NET_60" },
+    { label: "Net 90 Days", value: "NET_90" },
+  ];
+
+  // Tablet Types
+  export const tabletTypes: SelectOption[] = [
+    { label: "Round", value: "ROUND" },
+    { label: "Oval", value: "OVAL" },
+    { label: "Rectangle", value: "RECTANGLE" },
+    { label: "Triangle", value: "TRIANGLE" },
+    { label: "Diamond", value: "DIAMOND" },
+    { label: "Custom", value: "CUSTOM" },
+  ];
+
+  // Tablet Sizes
+  export const tabletSizes: SelectOption[] = [
+    { label: "6mm", value: "6mm" },
+    { label: "8mm", value: "8mm" },
+    { label: "10mm", value: "10mm" },
+    { label: "12mm", value: "12mm" },
+    { label: "14mm", value: "14mm" },
+    { label: "16mm", value: "16mm" },
+    { label: "18mm", value: "18mm" },
+    { label: "20mm", value: "20mm" },
+  ];
+
+    // Shipper Sizes
+    export const shipperSizes: SelectOption[] = [
+      { label: "Small", value: "SMALL" },
+      { label: "Medium", value: "MEDIUM" },
+      { label: "Large", value: "LARGE" },
+      { label: "Extra Large", value: "EXTRA_LARGE" },
+    ];
+
+      // Flavour Options
+  export const flavours: SelectOption[] = [
+    { label: "None", value: "NONE" },
+    { label: "Mint", value: "MINT" },
+    { label: "Orange", value: "ORANGE" },
+    { label: "Strawberry", value: "STRAWBERRY" },
+    { label: "Vanilla", value: "VANILLA" },
+    { label: "Chocolate", value: "CHOCOLATE" },
+    { label: "Lemon", value: "LEMON" },
+    { label: "Custom", value: "CUSTOM" },
+  ];
+
+  // Fragrance Options
+  export const fragrances: SelectOption[] = [
+    { label: "None", value: "NONE" },
+    { label: "Lavender", value: "LAVENDER" },
+    { label: "Rose", value: "ROSE" },
+    { label: "Jasmine", value: "JASMINE" },
+    { label: "Citrus", value: "CITRUS" },
+    { label: "Custom", value: "CUSTOM" },
+  ];
+  export const domino: SelectOption[] = [
+    { label: "DOMINO", value: "DOMINO" },
+    { label: "STEREO", value: "STEREO" },
+  ];
 
 // nuqs Parsers
 export const salesOrderParsers = {

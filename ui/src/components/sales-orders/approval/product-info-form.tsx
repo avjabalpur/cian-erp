@@ -4,12 +4,10 @@ import { Control, useWatch } from "react-hook-form";
 import { FormInput } from "@/components/shared/forms/form-input";
 import { FormSelect } from "@/components/shared/forms/form-select";
 import { SalesOrderUpdateFormValues } from "@/validations/sales-order";
-import { SalesOrderOptionsMaster } from "@/lib/constants/sales-order-options";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormTextArea } from "@/components/shared/forms/form-text-area";
 import { useDosageOptions } from "@/components/shared/options";
-import { Separator } from "@/components/ui/separator";
 import { MetricsDisplay } from "./metrics-display";
+import { domino, flavours, fragrances, shelfLifeOptions, shipperSizes, tabletSizes, tabletTypes } from "@/lib/utils/sales-order-utils";
 
 interface ProductInfoFormProps {
   control: Control<SalesOrderUpdateFormValues>;
@@ -68,7 +66,7 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
             control={control}
             name="shelfLife"
             label="Shelf Life"
-            options={SalesOrderOptionsMaster.shelfLife}
+            options={shelfLifeOptions}
             disabled={disabled}
           />
 
@@ -148,7 +146,7 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
               control={control}
               name="tabletType"
               label="Tablet Type"
-              options={SalesOrderOptionsMaster.tabletTypes}
+              options={tabletTypes}
               disabled={disabled}
             />
 
@@ -156,7 +154,7 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
               control={control}
               name="tabletSize"
               label="Tablet Size"
-              options={SalesOrderOptionsMaster.tabletSizes}
+              options={tabletSizes}
               disabled={disabled}
             />
 
@@ -179,7 +177,7 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
             control={control}
             name="shipperSize"
             label="Shipper Size"
-            options={SalesOrderOptionsMaster.shipperSizes}
+            options={shipperSizes}
             disabled={disabled}
           />
 
@@ -203,7 +201,7 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
             control={control}
             name="flavour"
             label="Flavour"
-            options={SalesOrderOptionsMaster.flavours}
+            options={flavours}
             disabled={disabled}
           />
 
@@ -211,7 +209,7 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
             control={control}
             name="fragrance"
             label="Fragrance"
-            options={SalesOrderOptionsMaster.fragrances}
+            options={fragrances}
             disabled={disabled}
           />
         </div>
@@ -248,7 +246,7 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
             control={control}
             name="domino"
             label="Domino/Stereo"
-            options={SalesOrderOptionsMaster.domino}
+            options={domino}
             disabled={disabled}
           />
 

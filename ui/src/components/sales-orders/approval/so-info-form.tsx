@@ -12,7 +12,6 @@ import { CustomerFilter } from "@/types/customer";
 import { Control, useWatch } from "react-hook-form";
 import { SalesOrderUpdateFormValues } from "@/validations/sales-order";
 import { useState } from "react";
-import { SalesOrderOptionsMaster } from "@/lib/constants/sales-order-options";
 import { Separator } from "@/components/ui/separator";
 import { 
   useManufacturerOptions, 
@@ -143,7 +142,6 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect }
           name="soStatus"
           label="SO Status"
           options={salesOrderStatusOptions}
-          disabled={true} // Read-only
           required
         />
 
@@ -276,28 +274,6 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect }
           />
         </div>
       </div>
-      <Separator />
-      {/* Quotation Information */}
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormDateInput
-            control={control}
-            name="quotationDate"
-            label="Quotation Date"
-            placeholder="Pick quotation date"
-            disabled={disabled}
-          />
-
-          <FormInput
-            control={control}
-            name="quotationNo"
-            label="Quotation No"
-            placeholder="Enter quotation number"
-            disabled={disabled}
-          />
-        </div>
-      </div>
-
       <Separator />
       {/* Division and Design Information */}
       <div className="space-y-4">
