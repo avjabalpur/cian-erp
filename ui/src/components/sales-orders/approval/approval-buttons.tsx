@@ -319,6 +319,7 @@ export function ApprovalButtons({
                     onClick={() => handleStageAction(stage, "approve")}
                     className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                     disabled={approveStageMutation.isPending || rejectStageMutation.isPending}
+                    type="button"
                   >
                     <CheckCircle className="h-3 w-3 mr-1" />
                     Approve
@@ -329,7 +330,8 @@ export function ApprovalButtons({
                     onClick={() => handleStageAction(stage, "reject")}
                     className="flex-1 border-red-300 text-red-600 hover:bg-red-50"
                     disabled={approveStageMutation.isPending || rejectStageMutation.isPending}
-                  >
+                    type="button"
+                    >
                     <XCircle className="h-3 w-3 mr-1" />
                     Reject
                   </Button>

@@ -37,7 +37,7 @@ namespace Xcianify.Repository
                 FROM {TableName} s
                 LEFT JOIN users creator ON s.created_by = creator.id
                 LEFT JOIN users updater ON s.updated_by = updater.id
-                WHERE s.is_deleted = 0
+                WHERE s.is_deleted = false
                 ORDER BY s.created_at DESC";
 
             using var connection = _dbContext.GetConnection();
@@ -62,7 +62,7 @@ namespace Xcianify.Repository
                 FROM {TableName} s
                 LEFT JOIN users creator ON s.created_by = creator.id
                 LEFT JOIN users updater ON s.updated_by = updater.id
-                WHERE s.id = @Id AND s.is_deleted = 0";
+                WHERE s.id = @Id AND s.is_deleted = false";
 
             using var connection = _dbContext.GetConnection();
             return await connection.QueryFirstOrDefaultAsync<SalesOrderStage>(query, new { Id = id });
@@ -103,7 +103,7 @@ namespace Xcianify.Repository
                     is_approved = @isApproved,
                     updated_at = @updatedAt,
                     updated_by = @updatedBy
-                WHERE id = @id AND is_deleted = 0
+                WHERE id = @id AND is_deleted = false
                 RETURNING 
                     id as id,
                     sales_order_id as salesOrderId,
@@ -125,7 +125,7 @@ namespace Xcianify.Repository
         {
             var query = $@"
                 UPDATE {TableName} 
-                SET is_deleted = 1, updated_at = @updatedAt
+                SET is_deleted = true, updated_at = @updatedAt
                 WHERE id = @Id";
 
             using var connection = _dbContext.GetConnection();
@@ -134,7 +134,7 @@ namespace Xcianify.Repository
 
         public async Task<bool> ExistsAsync(int id)
         {
-            var query = $"SELECT COUNT(*) FROM {TableName} WHERE id = @Id AND is_deleted = 0";
+            var query = $"SELECT COUNT(*) FROM {TableName} WHERE id = @Id AND is_deleted = false";
             using var connection = _dbContext.GetConnection();
             var count = await connection.ExecuteScalarAsync<int>(query, new { Id = id });
             return count > 0;
@@ -158,7 +158,7 @@ namespace Xcianify.Repository
                 FROM {TableName} s
                 LEFT JOIN users creator ON s.created_by = creator.id
                 LEFT JOIN users updater ON s.updated_by = updater.id
-                WHERE s.sales_order_id = @SalesOrderId AND s.is_deleted = 0
+                WHERE s.sales_order_id = @SalesOrderId AND s.is_deleted = false
                 ORDER BY s.created_at ASC";
 
             using var connection = _dbContext.GetConnection();
@@ -183,7 +183,7 @@ namespace Xcianify.Repository
                 FROM {TableName} s
                 LEFT JOIN users creator ON s.created_by = creator.id
                 LEFT JOIN users updater ON s.updated_by = updater.id
-                WHERE s.sales_order_id = @SalesOrderId AND s.stage_name = @StageName AND s.is_deleted = 0";
+                WHERE s.sales_order_id = @SalesOrderId AND s.stage_name = @StageName AND s.is_deleted = false";
 
             using var connection = _dbContext.GetConnection();
             return await connection.QueryFirstOrDefaultAsync<SalesOrderStage>(query, new { SalesOrderId = salesOrderId, StageName = stageName });

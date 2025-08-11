@@ -29,7 +29,7 @@ namespace Xcianify.Repository
                 FROM sales_order_performa_invoice pi
                 LEFT JOIN users u1 ON pi.created_by = u1.id
                 LEFT JOIN users u2 ON pi.updated_by = u2.id
-                WHERE pi.is_deleted = 0
+                WHERE pi.is_deleted = false
                 ORDER BY pi.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderPerformaInvoice>(query);
@@ -47,7 +47,7 @@ namespace Xcianify.Repository
                 FROM sales_order_performa_invoice pi
                 LEFT JOIN users u1 ON pi.created_by = u1.id
                 LEFT JOIN users u2 ON pi.updated_by = u2.id
-                WHERE pi.id = @Id AND pi.is_deleted = 0";
+                WHERE pi.id = @Id AND pi.is_deleted = false";
 
             return await connection.QuerySingleOrDefaultAsync<SalesOrderPerformaInvoice>(query, new { Id = id });
         }
@@ -64,7 +64,7 @@ namespace Xcianify.Repository
                 FROM sales_order_performa_invoice pi
                 LEFT JOIN users u1 ON pi.created_by = u1.id
                 LEFT JOIN users u2 ON pi.updated_by = u2.id
-                WHERE pi.performa_invoice_number = @InvoiceNumber AND pi.is_deleted = 0";
+                WHERE pi.performa_invoice_number = @InvoiceNumber AND pi.is_deleted = false";
 
             return await connection.QuerySingleOrDefaultAsync<SalesOrderPerformaInvoice>(query, new { InvoiceNumber = invoiceNumber });
         }
@@ -116,7 +116,7 @@ namespace Xcianify.Repository
                     additionalcharges = @AdditionalCharges, total_amount = @TotalAmount,
                     previous_performa_invoice_id = @PreviousPerformaInvoiceId,
                     updated_by = @UpdatedBy, updated_at = @UpdatedTime
-                WHERE id = @Id AND is_deleted = 0
+                WHERE id = @Id AND is_deleted = false
                 RETURNING *";
 
             return await connection.QuerySingleAsync<SalesOrderPerformaInvoice>(query, performaInvoice);
@@ -126,7 +126,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var query = "UPDATE sales_order_performa_invoice SET is_deleted = 1 WHERE id = @Id";
+            var query = "UPDATE sales_order_performa_invoice SET is_deleted = true WHERE id = @Id";
             await connection.ExecuteAsync(query, new { Id = id });
         }
 
@@ -134,7 +134,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var query = "SELECT COUNT(*) FROM sales_order_performa_invoice WHERE id = @Id AND is_deleted = 0";
+            var query = "SELECT COUNT(*) FROM sales_order_performa_invoice WHERE id = @Id AND is_deleted = false";
             var count = await connection.QuerySingleAsync<int>(query, new { Id = id });
             return count > 0;
         }
@@ -145,7 +145,7 @@ namespace Xcianify.Repository
             
             var query = $@"SELECT COUNT(*) 
                             FROM sales_order_performa_invoice 
-                            WHERE performa_invoice_number = @InvoiceNumber AND is_deleted = 0";
+                            WHERE performa_invoice_number = @InvoiceNumber AND is_deleted = false";
               var parameters = new { InvoiceNumber = invoiceNumber };
             var count = await connection.QuerySingleAsync<int>(query, parameters);
             return count > 0;
@@ -163,7 +163,7 @@ namespace Xcianify.Repository
                 FROM sales_order_performa_invoice pi
                 LEFT JOIN users u1 ON pi.created_by = u1.id
                 LEFT JOIN users u2 ON pi.updated_by = u2.id
-                WHERE pi.is_deleted = 0
+                WHERE pi.is_deleted = false
                 ORDER BY pi.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderPerformaInvoice>(query);

@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import {
   Save,
@@ -20,9 +19,6 @@ import { useChatMessagesBySalesOrder } from "@/hooks/sales-order/use-sales-order
 import { useDocumentsBySalesOrder } from "@/hooks/sales-order/use-sales-order-documents";
 import { useSaveTransactionsBySalesOrder } from "@/hooks/sales-order/use-sales-order-transactions";
 import { useSalesOrderStages } from "@/hooks/sales-order/use-sales-order-stages";
-import { useQuotationsBySalesOrder } from "@/hooks/quotation/use-quotations";
-import SalesOrderQuotationsTable from "../quotation/sales-order-quotations-table";
-import { QuotationFormModal } from "../quotation/quotation-form-modal";
 import { ApprovalButtons } from "./approval-buttons";
 import { ReferenceDocuments } from "./reference-documents";
 import { SOInfoForm } from "./so-info-form";
@@ -61,14 +57,10 @@ export function SalesOrderApprovalContent({
   const router = useRouter();
   
   const [userLookupOpen, setUserLookupOpen] = useState(false);
-  const [quotationFormOpen, setQuotationFormOpen] = useState(false);
-  const [selectedQuotationId, setSelectedQuotationId] = useState<number | null>(null);
   const { data: salesOrder, isLoading } = useSalesOrderById(salesOrderId.toString());
   const { data: chatMessages = [], isLoading: chatMessagesLoading } = useChatMessagesBySalesOrder(salesOrderId);
-  const { data: comments = [], isLoading: commentsLoading } = useCommentsBySalesOrder(salesOrderId);
   const { data: documents = [], isLoading: documentsLoading } = useDocumentsBySalesOrder(salesOrderId);
   const { data: saveTransactions = [], isLoading: transactionsLoading } = useSaveTransactionsBySalesOrder(salesOrderId);
-  const { data: quotations = [], isLoading: quotationsLoading } = useQuotationsBySalesOrder(salesOrderId);
   // Get approval stages for this sales order
   const { data: stages = [], isLoading: stagesLoading } = useSalesOrderStages(salesOrderId);
   
@@ -405,30 +397,6 @@ export function SalesOrderApprovalContent({
     // Handle chat settings logic here
   };
 
-  // Quotation handlers
-  const handleCreateQuotation = () => {
-    setSelectedQuotationId(null);
-    setQuotationFormOpen(true);
-  };
-
-  const handleEditQuotation = (quotationId: number) => {
-    setSelectedQuotationId(quotationId);
-    setQuotationFormOpen(true);
-  };
-
-  const handleViewQuotation = (quotationId: number) => {
-    window.open(`/quotations/${quotationId}`, '_blank');
-  };
-
-  const handleQuotationFormSuccess = (quotationId: number) => {
-    setQuotationFormOpen(false);
-    setSelectedQuotationId(null);
-    toast({
-      title: "Success",
-      description: selectedQuotationId ? "Quotation updated successfully" : "Quotation created successfully",
-    });
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -634,13 +602,11 @@ export function SalesOrderApprovalContent({
                   </TabsContent>
 
                   <TabsContent value="quotations">
-                    <SalesOrderQuotationsTable
-                      quotations={quotations}
-                      salesOrderId={salesOrderId}
-                      onView={(quotation) => handleViewQuotation(quotation.id)}
-                      onEdit={(quotation) => handleEditQuotation(quotation.id)}
-                      onCreate={handleCreateQuotation}
-                    />
+                    <Card>
+                      <CardContent className="p-6">
+                        <p className="text-muted-foreground">Quotations functionality will be implemented here.</p>
+                      </CardContent>
+                    </Card>
                   </TabsContent>
 
                   <TabsContent value="performa-invoice">
@@ -722,14 +688,6 @@ export function SalesOrderApprovalContent({
          onClose={() => setUserLookupOpen(false)}
          onSelect={handleUserSelect}
          title="Select Assigned Designer"
-       />
-
-       {/* Quotation Form Modal */}
-       <QuotationFormModal
-         isOpen={quotationFormOpen}
-         onClose={() => setQuotationFormOpen(false)}
-         onSuccess={handleQuotationFormSuccess}
-         quotationId={selectedQuotationId}
        />
      </div>
    );

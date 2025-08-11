@@ -23,13 +23,35 @@ namespace Xcianify.Repository
             
             var query = @"
                 SELECT 
-                    soq.*,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name
-                FROM sales_order_quotation soq
-                LEFT JOIN users u1 ON soq.created_by = u1.id
-                LEFT JOIN users u2 ON soq.updated_by = u2.id
-                WHERE soq.is_deleted = 0
+                    soq.id as id,
+                    soq.created_at as createdAt,
+                    soq.created_by as createdBy,
+                    soq.is_deleted as isDeleted,
+                    soq.exporter_name as exporterName,
+                    soq.organization_id as organizationId,
+                    soq.consignee_name as consigneeName,
+                    soq.consignee_contact_details as consigneeContactDetails,
+                    soq.consignee_address as consigneeAddress,
+                    soq.performa_invoice_number as performaInvoiceNumber,
+                    soq.performa_invoice_date as performaInvoiceDate,
+                    soq.exporters_reference_number as exportersReferenceNumber,
+                    soq.other_references as otherReferences,
+                    soq.other_buyer_name as otherBuyerName,
+                    soq.country_of_origin as countryOfOrigin,
+                    soq.country_of_final_destination as countryOfFinalDestination,
+                    soq.prepration,
+                    soq.port_of_discharge as portOfDischarge,
+                    soq.place_of_receipt_by_pre_carrier as placeOfReceiptByPreCarrier,
+                    soq.final_destination as finalDestination,
+                    soq.terms_of_delivery as termsOfDelivery,
+                    soq.payment_terms as paymentTerms,
+                    soq.shipment_mode as shipmentMode,
+                    soq.port_of_loading as portOfLoading,
+                    soq.additionalCharges,
+                    soq.total_amount as totalAmount,
+                    soq.previous_performa_invoice_id as previousPerformaInvoiceId
+                FROM sales_order_performa_invoice soq
+                WHERE soq.is_deleted = false
                 ORDER BY soq.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderQuotation>(query);
@@ -37,18 +59,39 @@ namespace Xcianify.Repository
 
         public async Task<SalesOrderQuotation> GetByIdAsync(int id)
         {
-            using var connection = _context.GetConnection();
-            
             var query = @"
                 SELECT 
-                    soq.*,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name
-                FROM sales_order_quotation soq
-                LEFT JOIN users u1 ON soq.created_by = u1.id
-                LEFT JOIN users u2 ON soq.updated_by = u2.id
-                WHERE soq.id = @Id AND soq.is_deleted = 0";
+                    soq.id as id,
+                    soq.created_at as createdAt,
+                    soq.created_by as createdBy,
+                    soq.is_deleted as isDeleted,
+                    soq.exporter_name as exporterName,
+                    soq.organization_id as organizationId,
+                    soq.consignee_name as consigneeName,
+                    soq.consignee_contact_details as consigneeContactDetails,
+                    soq.consignee_address as consigneeAddress,
+                    soq.performa_invoice_number as performaInvoiceNumber,
+                    soq.performa_invoice_date as performaInvoiceDate,
+                    soq.exporters_reference_number as exportersReferenceNumber,
+                    soq.other_references as otherReferences,
+                    soq.other_buyer_name as otherBuyerName,
+                    soq.country_of_origin as countryOfOrigin,
+                    soq.country_of_final_destination as countryOfFinalDestination,
+                    soq.prepration,
+                    soq.port_of_discharge as portOfDischarge,
+                    soq.place_of_receipt_by_pre_carrier as placeOfReceiptByPreCarrier,
+                    soq.final_destination as finalDestination,
+                    soq.terms_of_delivery as termsOfDelivery,
+                    soq.payment_terms as paymentTerms,
+                    soq.shipment_mode as shipmentMode,
+                    soq.port_of_loading as portOfLoading,
+                    soq.additionalCharges,
+                    soq.total_amount as totalAmount,
+                    soq.previous_performa_invoice_id as previousPerformaInvoiceId
+                FROM sales_order_performa_invoice soq
+                WHERE soq.id = @Id AND soq.is_deleted = false";
 
+            using var connection = _context.GetConnection();
             return await connection.QuerySingleOrDefaultAsync<SalesOrderQuotation>(query, new { Id = id });
         }
 
@@ -64,7 +107,7 @@ namespace Xcianify.Repository
                 FROM sales_order_quotation soq
                 LEFT JOIN users u1 ON soq.created_by = u1.id
                 LEFT JOIN users u2 ON soq.updated_by = u2.id
-                WHERE soq.quotation_number = @QuotationNumber AND soq.is_deleted = 0";
+                WHERE soq.quotation_number = @QuotationNumber AND soq.is_deleted = false";
 
             return await connection.QuerySingleOrDefaultAsync<SalesOrderQuotation>(query, new { QuotationNumber = quotationNumber });
         }
@@ -101,7 +144,7 @@ namespace Xcianify.Repository
                     total_amount = @TotalAmount, advance_amount = @AdvanceAmount,
                     prev_copy_quotation_id = @PrevCopyQuotationId,
                     updated_by = @UpdatedBy, updated_at = @UpdatedAt
-                WHERE id = @Id AND is_deleted = 0
+                WHERE id = @Id AND is_deleted = false
                 RETURNING *";
 
             return await connection.QuerySingleAsync<SalesOrderQuotation>(query, quotation);
@@ -119,7 +162,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var query = "SELECT COUNT(*) FROM sales_order_quotation WHERE id = @Id AND is_deleted = 0";
+            var query = "SELECT COUNT(*) FROM sales_order_quotation WHERE id = @Id AND is_deleted = false";
             var count = await connection.QuerySingleAsync<int>(query, new { Id = id });
             return count > 0;
         }
@@ -128,7 +171,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var query = "SELECT COUNT(*) FROM sales_order_quotation WHERE quotation_number = @QuotationNumber AND is_deleted = 0";
+            var query = "SELECT COUNT(*) FROM sales_order_quotation WHERE quotation_number = @QuotationNumber AND is_deleted = false";
             var parameters = new { QuotationNumber = quotationNumber };
             
             var count = await connection.QuerySingleAsync<int>(query, parameters);
@@ -147,7 +190,7 @@ namespace Xcianify.Repository
                 FROM sales_order_quotation soq
                 LEFT JOIN users u1 ON soq.created_by = u1.id
                 LEFT JOIN users u2 ON soq.updated_by = u2.id
-                WHERE soq.customer_id = @CustomerId AND soq.is_deleted = 0
+                WHERE soq.customer_id = @CustomerId AND soq.is_deleted = false
                 ORDER BY soq.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderQuotation>(query, new { CustomerId = customerId });
@@ -165,7 +208,7 @@ namespace Xcianify.Repository
                 FROM sales_order_quotation soq
                 LEFT JOIN users u1 ON soq.created_by = u1.id
                 LEFT JOIN users u2 ON soq.updated_by = u2.id
-                WHERE soq.organization_id = @OrganizationId AND soq.is_deleted = 0
+                WHERE soq.organization_id = @OrganizationId AND soq.is_deleted = false
                 ORDER BY soq.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderQuotation>(query, new { OrganizationId = organizationId });
@@ -183,7 +226,7 @@ namespace Xcianify.Repository
                 FROM sales_order_quotation soq
                 LEFT JOIN users u1 ON soq.created_by = u1.id
                 LEFT JOIN users u2 ON soq.updated_by = u2.id
-                WHERE soq.quotation_date BETWEEN @StartDate AND @EndDate AND soq.is_deleted = 0
+                WHERE soq.quotation_date BETWEEN @StartDate AND @EndDate AND soq.is_deleted = false
                 ORDER BY soq.quotation_date DESC";
 
             return await connection.QueryAsync<SalesOrderQuotation>(query, new { StartDate = startDate, EndDate = endDate });
