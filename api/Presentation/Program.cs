@@ -52,6 +52,9 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 
+// Add HttpContextAccessor for accessing current user context
+builder.Services.AddHttpContextAccessor();
+
 // Add Swagger/OpenAPI support
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(

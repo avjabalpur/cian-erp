@@ -8,31 +8,31 @@ import type {
 
 // --- Sales Order Save Transactions API Functions ---
 const getSalesOrderSaveTransactions = async (): Promise<SalesOrderSaveTransaction[]> => {
-  const { data } = await api.get('/salesordersavetransaction');
+  const { data } = await api.get('/sales-order-transaction');
   return data;
 };
 
 const getSalesOrderSaveTransactionById = async (id: number): Promise<SalesOrderSaveTransaction | null> => {
   if (!id) return null;
-  const { data } = await api.get(`/salesordersavetransaction/${id}`);
+  const { data } = await api.get(`/sales-order-transaction/${id}`);
   return data;
 };
 
 const createSalesOrderSaveTransaction = async (saveTransactionData: CreateSalesOrderSaveTransactionData): Promise<SalesOrderSaveTransaction> => {
-  const { data } = await api.post('/salesordersavetransaction', saveTransactionData);
+  const { data } = await api.post('/sales-order-transaction', saveTransactionData);
   return data;
 };
 
 const updateSalesOrderSaveTransaction = async ({ id, ...saveTransactionData }: { id: number; data: CreateSalesOrderSaveTransactionData }): Promise<void> => {
-  await api.put(`/salesordersavetransaction/${id}`, saveTransactionData.data);
+  await api.put(`/sales-order-transaction/${id}`, saveTransactionData.data);
 };
 
 const deleteSalesOrderSaveTransaction = async (id: number): Promise<void> => {
-  await api.delete(`/salesordersavetransaction/${id}`);
+  await api.delete(`/sales-order-transaction/${id}`);
 };
 
 const getSaveTransactionsBySalesOrder = async (salesOrderId: number): Promise<SalesOrderSaveTransaction[]> => {
-  const { data } = await api.get(`/salesordersavetransaction/sales-order/${salesOrderId}`);
+  const { data } = await api.get(`/sales-order-transaction/sales-order/${salesOrderId}`);
   return data;
 };
 

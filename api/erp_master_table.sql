@@ -192,7 +192,7 @@ CREATE TABLE organizations (
 -- organization account details
 CREATE TABLE organization_accounts (
     id SERIAL PRIMARY KEY,
-    organization_id INTEGER NOT NULL REFERENCES organizations(organization_id),
+    organization_id INTEGER NOT NULL REFERENCES organizations(id),
     account_type VARCHAR(20) NOT NULL, -- BANK, PAYPAL, etc.
     account_number VARCHAR(50) NOT NULL,
     bank_name VARCHAR(100),
@@ -670,7 +670,9 @@ CREATE INDEX idx_customer_banking_customer_id ON customer_banking_details(custom
 CREATE INDEX idx_customer_business_customer_id ON customer_business_terms(customer_id);
 CREATE INDEX idx_customer_tax_customer_id ON customer_tax_compliance(customer_id);
 
-
+-- ============================================
+-- 6. Sales Order Management
+-- ============================================
 
 CREATE TABLE IF NOT EXISTS sales_orders (
   id SERIAL PRIMARY KEY,
@@ -680,10 +682,10 @@ CREATE TABLE IF NOT EXISTS sales_orders (
   updated_at TIMESTAMP NULL,
   current_status VARCHAR(200),
   comments TEXT,
-  is_submitted INTEGER DEFAULT 0,
-  is_deleted INTEGER DEFAULT 0,
+  is_submitted boolean DEFAULT false,
+  is_deleted boolean DEFAULT false,
   assigned_designer INTEGER,
-  plant_email_sent INTEGER,
+  plant_email_sent boolean,
   so_number VARCHAR(200),
   so_date TIMESTAMP,
   so_status TEXT CHECK (so_status IN ('new', 'repeat', 'revised')),
@@ -739,12 +741,12 @@ CREATE TABLE IF NOT EXISTS sales_order_stages (
   id SERIAL PRIMARY KEY,
   sales_order_id INTEGER,
   stage_name VARCHAR(200),
-  is_approved INTEGER DEFAULT 0,
+  is_approved boolean DEFAULT false,
   created_by INTEGER,
   created_at TIMESTAMP NULL,
   updated_by INTEGER,
   updated_at TIMESTAMP NULL,
-  is_deleted INTEGER DEFAULT 0
+  is_deleted boolean DEFAULT false
 );
 
 
@@ -768,7 +770,7 @@ CREATE TABLE IF NOT EXISTS sales_order_comments (
   comments VARCHAR(500),
   status VARCHAR(200),
   type VARCHAR(200),
-  is_deleted INTEGER DEFAULT 0,
+  is_deleted boolean DEFAULT false,
   CONSTRAINT fk_sales_order_comments
     FOREIGN KEY (sales_order_id) 
     REFERENCES sales_orders(id)
@@ -783,7 +785,7 @@ CREATE TABLE IF NOT EXISTS sales_order_documents (
   file_path VARCHAR(500),
   file_type VARCHAR(100),
   metadata TEXT,
-  is_deleted INTEGER DEFAULT 0,
+  is_deleted boolean DEFAULT false,
   created_by INTEGER,
   created_at TIMESTAMP NULL,
   CONSTRAINT fk_sales_order_documents
@@ -796,7 +798,7 @@ CREATE TABLE IF NOT EXISTS sales_order_performa_invoice (
   id SERIAL PRIMARY KEY,
   created_at TIMESTAMP NULL,
   created_by INTEGER,
-  is_deleted INTEGER DEFAULT 0,
+  is_deleted boolean DEFAULT false,
   exporter_name VARCHAR(200),
   organization_id INTEGER,
   consignee_name VARCHAR(400),
@@ -826,7 +828,7 @@ CREATE TABLE IF NOT EXISTS sales_order_performa_invoice_items (
   id SERIAL PRIMARY KEY,
   performa_invoice_id INTEGER,
   sales_order_id INTEGER,
-  is_deleted INTEGER DEFAULT 0,
+  is_deleted boolean DEFAULT false,
   item_id INTEGER,
   composition TEXT,
   dosage_name VARCHAR(200),
@@ -841,7 +843,7 @@ CREATE TABLE IF NOT EXISTS sales_order_quotation (
   id SERIAL PRIMARY KEY,
   created_at TIMESTAMP NULL,
   created_by INTEGER,
-  is_deleted INTEGER DEFAULT 0,
+  is_deleted boolean DEFAULT false,
   organization_id INTEGER,
   quotation_number VARCHAR(200),
   quotation_date DATE,
@@ -857,7 +859,7 @@ CREATE TABLE IF NOT EXISTS sales_order_quotation_items (
   id SERIAL PRIMARY KEY,
   quotation_id INTEGER,
   sales_order_id INTEGER,
-  is_deleted INTEGER DEFAULT 0,
+  is_deleted boolean DEFAULT false,
   item_id INTEGER,
   composition TEXT,
   dosage_name VARCHAR(200),
@@ -881,520 +883,6 @@ CREATE TABLE IF NOT EXISTS sales_order_save_transactions (
   created_at TIMESTAMP NULL,
   diff TEXT
 );
-
--- ============================================
--- 5. WAREHOUSE & INVENTORY MANAGEMENT
--- ============================================
-CREATE TABLE warehouses (
-    id SERIAL PRIMARY KEY,
-    code VARCHAR(10) UNIQUE NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    warehouse_type VARCHAR(20) NOT NULL, -- MAIN, TRANSIT, QUARANTINE, DAMAGE
-    address_line1 VARCHAR(100),
-    address_line2 VARCHAR(100),
-    city VARCHAR(50),
-    state VARCHAR(50),
-    postal_code VARCHAR(10),
-    total_capacity DECIMAL(10,2), -- in sq ft
-    available_capacity DECIMAL(10,2),
-    cold_storage_capacity DECIMAL(10,2),
-    temperature_controlled BOOLEAN DEFAULT FALSE,
-    temperature_range VARCHAR(20), -- 2-8°C, 15-25°C, etc.
-    warehouse_manager_id INTEGER REFERENCES users(user_id),
-    phone VARCHAR(15),
-    email VARCHAR(100),
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_by INTEGER,
-    updated_by INTEGER
-);
-
-CREATE TABLE inventory (
-    id SERIAL PRIMARY KEY,
-    item_id INTEGER NOT NULL REFERENCES item_master(item_id),
-    warehouse_id INTEGER NOT NULL REFERENCES warehouses(warehouse_id),
-    batch_number VARCHAR(50),
-    available_quantity DECIMAL(12,3) DEFAULT 0,
-    reserved_quantity DECIMAL(12,3) DEFAULT 0, -- Reserved for orders
-    blocked_quantity DECIMAL(12,3) DEFAULT 0, -- Quality hold
-    damaged_quantity DECIMAL(12,3) DEFAULT 0,
-    manufacturing_date DATE,
-    expiry_date DATE,
-    unit_cost DECIMAL(10,2),
-    total_cost DECIMAL(15,2),
-    stock_status VARCHAR(20) DEFAULT 'AVAILABLE', -- AVAILABLE, RESERVED, BLOCKED, EXPIRED
-    reorder_level DECIMAL(10,2),
-    reorder_quantity DECIMAL(10,2),
-    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(item_id, warehouse_id, batch_number)
-);
-
-
-CREATE TABLE inventory_stock_movements (
-    id SERIAL PRIMARY KEY,
-    inventory_id INTEGER NOT NULL REFERENCES inventory(id),
-    movement_type VARCHAR(10) NOT NULL, -- IN, OUT
-    quantity DECIMAL(12,3) NOT NULL,
-    unit_cost DECIMAL(10,2),
-    total_cost DECIMAL(15,2),    
-    movement_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    reference_number VARCHAR(50), -- Order number, GRN, etc.
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-
--- ============================================
--- 6. VENDOR MASTER & CLASSIFICATIONS
--- ============================================
-
--- Vendor Types
-CREATE TABLE vendor_types (
-    id SERIAL PRIMARY KEY,
-    code VARCHAR(10) UNIQUE NOT NULL,
-    name VARCHAR(50) NOT NULL,
-    description TEXT,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Vendor Master
-CREATE TABLE vendors (
-    id SERIAL PRIMARY KEY,
-    code VARCHAR(20) UNIQUE NOT NULL,
-    name VARCHAR(200) NOT NULL,
-    vendor_type_id INTEGER REFERENCES vendor_types(id),
-    legal_name VARCHAR(200),
-    business_type VARCHAR(50), -- PROPRIETORSHIP, PARTNERSHIP, PRIVATE_LIMITED, PUBLIC_LIMITED
-    incorporation_date DATE,
-    business_registration_number VARCHAR(50),
-    contact_person VARCHAR(100),
-    designation VARCHAR(50),
-    phone VARCHAR(15),
-    mobile VARCHAR(15),
-    email VARCHAR(100),
-    website VARCHAR(100),
-    tax_registration_number VARCHAR(50),
-    gst_number VARCHAR(15),
-    pan_number VARCHAR(10),
-    tan_number VARCHAR(10),
-    
-    -- Drug & Regulatory Information
-    drug_license_number VARCHAR(50),
-    drug_license_expiry DATE,
-    manufacturing_license VARCHAR(50),
-    manufacturing_license_expiry DATE,
-    who_gmp_certificate VARCHAR(50),
-    who_gmp_expiry DATE,
-    iso_certificate VARCHAR(50),
-    iso_expiry DATE,
-    
-    -- Banking Information
-    bank_name VARCHAR(100),
-    account_number VARCHAR(30),
-    ifsc_code VARCHAR(15),
-    bank_branch VARCHAR(100),
-    account_type VARCHAR(20),
-    
-    -- Credit Information
-    credit_limit DECIMAL(15,2) DEFAULT 0.00,
-    credit_days INTEGER DEFAULT 0,
-    payment_terms VARCHAR(100),
-    advance_payment_required BOOLEAN DEFAULT FALSE,
-    advance_percentage DECIMAL(5,2) DEFAULT 0.00,
-    
-    -- Operational Information
-    lead_time_days INTEGER DEFAULT 0,
-    minimum_order_value DECIMAL(12,2) DEFAULT 0.00,
-    currency_code VARCHAR(3) DEFAULT 'INR',
-    
-    -- Purchase Information
-    purchase_manager_id INTEGER REFERENCES users(user_id),
-    vendor_rating DECIMAL(3,2) DEFAULT 0.00, -- Out of 5
-    
-    -- Status & Classification
-    vendor_status VARCHAR(20) DEFAULT 'ACTIVE', -- ACTIVE, INACTIVE, BLACKLISTED, SUSPENDED
-    preferred_vendor BOOLEAN DEFAULT FALSE,
-    critical_vendor BOOLEAN DEFAULT FALSE,
-    
-    -- Approval Workflow
-    approval_status VARCHAR(20) DEFAULT 'PENDING', -- PENDING, APPROVED, REJECTED
-    approved_by INTEGER REFERENCES users(user_id),
-    approved_at TIMESTAMP,
-    
-    -- Audit Information
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_by INTEGER,
-    updated_by INTEGER
-);
-
--- Vendor Additional Addresses
-CREATE TABLE vendor_addresses (
-    id SERIAL PRIMARY KEY,
-    vendor_id INTEGER NOT NULL REFERENCES vendors(id),
-    address_type VARCHAR(20) NOT NULL, -- BILLING, SHIPPING, MANUFACTURING, OFFICE
-    address_name VARCHAR(100),
-    address_line1 VARCHAR(100),
-    address_line2 VARCHAR(100),
-    city VARCHAR(50),
-    state VARCHAR(50),
-    country VARCHAR(50),
-    postal_code VARCHAR(10),
-    
-    -- Contact Information
-    contact_person VARCHAR(100),
-    phone VARCHAR(15),
-    email VARCHAR(100),
-    
-    -- Logistics Information
-    delivery_time_hours INTEGER,
-    freight_terms VARCHAR(50), -- FOB, CIF, CNF, etc.
-    
-    is_default BOOLEAN DEFAULT FALSE,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Vendor Contacts (Multiple contact persons)
-CREATE TABLE vendor_contacts (
-    id SERIAL PRIMARY KEY,
-    vendor_id INTEGER NOT NULL REFERENCES vendors(id),
-    contact_type VARCHAR(20) NOT NULL, -- PRIMARY, SALES, TECHNICAL, FINANCE, LOGISTICS
-    
-    -- Contact Information
-    contact_name VARCHAR(100) NOT NULL,
-    designation VARCHAR(50),
-    department VARCHAR(50),
-    phone VARCHAR(15),
-    mobile VARCHAR(15),
-    email VARCHAR(100),
-    
-    -- Communication Preferences
-    preferred_communication VARCHAR(20), -- EMAIL, PHONE, SMS, WHATSAPP
-    
-    is_primary BOOLEAN DEFAULT FALSE,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- ============================================
--- 7. Purchase order Management
--- ============================================
-CREATE TABLE IF NOT EXISTS purchase_orders (
-    id SERIAL PRIMARY KEY,
-    order_number VARCHAR(50) UNIQUE NOT NULL,
-    vendor_id INTEGER NOT NULL REFERENCES vendors(id),
-    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expected_delivery_date TIMESTAMP,
-    total_amount DECIMAL(15,2) DEFAULT 0.00,
-    status VARCHAR(20) DEFAULT 'PENDING', -- PENDING, APPROVED, REJECTED, COMPLETED
-    created_by INTEGER REFERENCES users(user_id),
-    updated_by INTEGER REFERENCES users(user_id),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS purchase_order_items (
-    id SERIAL PRIMARY KEY,
-    order_id INTEGER NOT NULL REFERENCES purchase_orders(id),
-    item_id INTEGER NOT NULL REFERENCES item_master(id),
-    quantity DECIMAL(12,3) NOT NULL,
-    unit_price DECIMAL(10,2) NOT NULL,
-    total_price DECIMAL(15,2) GENERATED ALWAYS AS (quantity * unit_price) STORED,
-    batch_number VARCHAR(50),
-    expiry_date DATE,
-    is_received BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE purchase_order_approvals (
-    id SERIAL PRIMARY KEY,
-    order_id INTEGER NOT NULL REFERENCES purchase_orders(id),
-    approver_id INTEGER NOT NULL REFERENCES users(user_id),
-    approval_status VARCHAR(20) DEFAULT 'PENDING', -- PENDING, APPROVED, REJECTED
-    comments TEXT,
-    approved_at TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-
-CREATE TABLE IF NOT EXISTS purchase_order_chat (
-  id SERIAL PRIMARY KEY,
-  order_id INTEGER,
-  comment TEXT,
-  created_by INTEGER,
-  created_at TIMESTAMP NULL
-);
-
-CREATE TABLE IF NOT EXISTS purchase_order_comments (
-  id SERIAL PRIMARY KEY,
-  order_id INTEGER,
-  created_by INTEGER,
-  created_at TIMESTAMP NULL,
-  comments VARCHAR(500),
-  status VARCHAR(200),
-  type VARCHAR(200),
-  is_deleted INTEGER DEFAULT 0
-);
-
--- ============================================
--- 8. Sales Order Management
--- ============================================
-
-CREATE TABLE IF NOT EXISTS sales_orders (
-  id SERIAL PRIMARY KEY,
-  created_by INTEGER,
-  created_at TIMESTAMP NULL,
-  updated_by INTEGER,
-  updated_at TIMESTAMP NULL,
-  current_status VARCHAR(200),
-  comments TEXT,
-  is_submitted INTEGER DEFAULT 0,
-  is_deleted INTEGER DEFAULT 0,
-  assigned_designer INTEGER,
-  plant_email_sent INTEGER,
-  so_number VARCHAR(200),
-  so_date TIMESTAMP,
-  so_status TEXT CHECK (so_status IN ('new', 'repeat', 'revised')),
-  organization_id INTEGER,
-  customer_id INTEGER,
-  payment_term VARCHAR(200),
-  quotation_date TIMESTAMP,
-  quotation_no VARCHAR(200),
-  hsn_code VARCHAR(200),
-  item_id INTEGER,
-  dosage_name VARCHAR(200),
-  divisionId INTEGER,
-  design_under VARCHAR(200),
-  packing_style_description TEXT,
-  composition TEXT,
-  pack_short VARCHAR(200),
-  tablet_type VARCHAR(200),
-  tablet_size VARCHAR(200),
-  change_part VARCHAR(200),
-  capsule_size VARCHAR(200),
-  shipper_size VARCHAR(200),
-  qty_per_shipper VARCHAR(200),
-  no_of_shipper VARCHAR(200),
-  flavour VARCHAR(200),
-  fragrance VARCHAR(200),
-  quantity VARCHAR(200),
-  foc_qty VARCHAR(20),
-  mrp VARCHAR(200),
-  billing_rate VARCHAR(200),
-  costing VARCHAR(200),
-  inventory_charges VARCHAR(200),
-  cylinder_charge VARCHAR(200),
-  plate_charges VARCHAR(200),
-  domino VARCHAR(200),
-  stereo VARCHAR(200),
-  shipper_drawing_ref_code VARCHAR(200),
-  ctn_outer_drawing_ref_no VARCHAR(200),
-  ctn_inner_drawing_ref_no VARCHAR(200),
-  foil_drawing_ref_no VARCHAR(200),
-  leaflet_drawing_ref_no VARCHAR(200),
-  tube_drawing_ref_no VARCHAR(200),
-  label_drawing_ref_no VARCHAR(200),
-  pm_outer_ctn_stock VARCHAR(200),
-  pm_inner_ctn_stock VARCHAR(200),
-  pm_foil_stock VARCHAR(200),
-  pm_leaflet_stock VARCHAR(200),
-  pm_tube_stock VARCHAR(200),
-  pm_label_stock VARCHAR(200),
-  drug_approval_under VARCHAR(200)
-);
-
-CREATE TABLE IF NOT EXISTS sales_order_stages (
-  id SERIAL PRIMARY KEY,
-  sales_order_id INTEGER,
-  stage_name VARCHAR(200),
-  is_approved INTEGER DEFAULT 0,
-  created_by INTEGER,
-  created_at TIMESTAMP NULL,
-  updated_by INTEGER,
-  updated_at TIMESTAMP NULL,
-  is_deleted INTEGER DEFAULT 0
-);
-
-
-CREATE TABLE IF NOT EXISTS sales_order_chat (
-  id SERIAL PRIMARY KEY,
-  sales_order_id INTEGER,
-  comment TEXT,
-  created_by INTEGER,
-  created_at TIMESTAMP NULL,
-  updated_by INTEGER,
-  updated_at TIMESTAMP NULL,
-  CONSTRAINT fk_sales_order
-    FOREIGN KEY (sales_order_id) 
-    REFERENCES sales_orders(id)
-    ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS sales_order_comments (
-  id SERIAL PRIMARY KEY,
-  sales_order_id INTEGER,
- created_by INTEGER,
-  created_at TIMESTAMP NULL,
-  updated_by INTEGER,
-  updated_at TIMESTAMP NULL,
-  comments VARCHAR(500),
-  status VARCHAR(200),
-  type VARCHAR(200),
-  is_deleted INTEGER DEFAULT 0,
-  CONSTRAINT fk_sales_order_comments
-    FOREIGN KEY (sales_order_id) 
-    REFERENCES sales_orders(id)
-    ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS sales_order_documents (
-  id SERIAL PRIMARY KEY,
-  sales_order_id INTEGER,
-  tag VARCHAR(200),
-  file_name VARCHAR(200),
-  file_path VARCHAR(500),
-  file_type VARCHAR(100),
-  metadata TEXT,
-  is_deleted INTEGER DEFAULT 0,
- created_by INTEGER,
-  created_at TIMESTAMP NULL,
-  updated_by INTEGER,
-  updated_at TIMESTAMP NULL,
-  CONSTRAINT fk_sales_order_documents
-    FOREIGN KEY (sales_order_id) 
-    REFERENCES sales_orders(id)
-    ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS sales_order_performa_invoice (
-  id SERIAL PRIMARY KEY,
- 
-  is_deleted INTEGER DEFAULT 0,
-  exporter_name VARCHAR(200),
-  organization_name VARCHAR(200),
-  consignee_name VARCHAR(400),
-  consignee_contact_details VARCHAR(400),
-  consignee_address TEXT,
-  performa_invoice_number VARCHAR(40),
-  performa_invoice_date DATE,
-  exporters_reference_number VARCHAR(200),
-  other_references VARCHAR(400),
-  other_buyer_name VARCHAR(400),
-  country_of_origin VARCHAR(60),
-  country_of_final_destination VARCHAR(60),
-  prepration VARCHAR(200),
-  port_of_discharge VARCHAR(400),
-  place_of_receipt_by_pre_carrier VARCHAR(200),
-  final_destination VARCHAR(200),
-  terms_of_delivery VARCHAR(400),
-  payment_terms VARCHAR(400),
-  shipment_mode VARCHAR(60),
-  port_of_loading VARCHAR(60),
-  additionalCharges TEXT,
-  total_amount FLOAT,
-  previous_performa_invoice_id INTEGER DEFAULT 0,
-  created_by INTEGER,
-  created_at TIMESTAMP NULL,
-  updated_by INTEGER,
-  updated_at TIMESTAMP NULL
-);
-
-CREATE TABLE IF NOT EXISTS sales_order_performa_invoice_items (
-  id SERIAL PRIMARY KEY,
-  performa_invoice_id INTEGER,
-  sales_order_id INTEGER,
-  is_deleted INTEGER DEFAULT 0,
-  item_id INTEGER,
-  composition TEXT,
-  dosage_name VARCHAR(200),
-  product_cast VARCHAR(200),
-  p_pack_short TEXT,
-  p_quantity FLOAT,
-  p_foc_qty FLOAT,
-  p_billing_rate FLOAT,
-  created_by INTEGER,
-  created_at TIMESTAMP NULL,
-  updated_by INTEGER,
-  updated_at TIMESTAMP NULL
-);
-
-CREATE TABLE IF NOT EXISTS sales_order_quotation (
-  id SERIAL PRIMARY KEY,
-  is_deleted INTEGER DEFAULT 0,
-  organization_id INTEGER,
-  quotation_number VARCHAR(200),
-  quotation_date DATE,
-  customer_id INTEGER,
-  advance_percentage FLOAT,
-  charges TEXT,
-  total_amount FLOAT,
-  advance_amount FLOAT,
-  prev_copy_quotation_id INTEGER DEFAULT 0,
-  created_by INTEGER,
-  created_at TIMESTAMP NULL,
-  updated_by INTEGER,
-  updated_at TIMESTAMP NULL
-);
-
-CREATE TABLE IF NOT EXISTS sales_order_quotation_items (
-  id SERIAL PRIMARY KEY,
-  quotation_id INTEGER,
-  sales_order_id INTEGER,
-  is_deleted INTEGER DEFAULT 0,
-  item_id INTEGER,
-  composition TEXT,
-  dosage_name VARCHAR(200),
-  product_cast VARCHAR(200),
-  p_pack_short TEXT,
-  so_status VARCHAR(200),
-  p_quantity FLOAT,
-  p_foc_qty FLOAT,
-  p_mrp FLOAT,
-  p_billing_rate FLOAT,
-  comments TEXT,
-  tax_percent FLOAT,
-  product_extra_charges FLOAT,
-  product_extra_charges_tax_percent FLOAT,
-  created_by INTEGER,
-  created_at TIMESTAMP NULL,
-  updated_by INTEGER,
-  updated_at TIMESTAMP NULL
-);
-
-CREATE TABLE IF NOT EXISTS sales_order_save_transactions (
-  id SERIAL PRIMARY KEY,
-  sales_order_id INTEGER,
-  diff TEXT,
-  created_by INTEGER,
-  created_at TIMESTAMP NULL,
-  updated_by INTEGER,
-  updated_at TIMESTAMP NULL
-);
-
-
--- ============================================
--- 9. Shared Master Data
--- ============================================
-CREATE TABLE IF NOT EXISTS currencies
-(
-    id SERIAL PRIMARY KEY,
-    currency_code character varying(10) ,
-    exchange_usd numeric(18,6),
-    is_active boolean DEFAULT true,
-    created_at timestamp without time zone DEFAULT (now() AT TIME ZONE 'UTC'::text),
-    updated_at timestamp without time zone DEFAULT (now() AT TIME ZONE 'UTC'::text),
-    CONSTRAINT currencies_pkey PRIMARY KEY (id),
-    CONSTRAINT currencies_currency_code_key UNIQUE (currency_code)
-)
-
-
 
 
 -- ============================================

@@ -39,7 +39,7 @@ export function QuickActions() {
       icon: FileText,
       color: "text-purple-600",
       bgColor: "bg-purple-50",
-      href: "/sales-orders",
+      href: "/sales/order-approval",
       action: "view"
     }
   ]

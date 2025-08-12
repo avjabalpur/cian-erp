@@ -76,8 +76,16 @@ namespace Xcianify.Services
                     throw new ValidationException("Sales order number already in use by another order");
             }
 
+            // Debug: Log the DTO values
+            Console.WriteLine($"UpdateSalesOrderDto - DosageName: '{salesOrderDto.DosageName}'");
+            Console.WriteLine($"UpdateSalesOrderDto - OrganizationId: {salesOrderDto.OrganizationId}");
+
             _mapper.Map(salesOrderDto, existingSalesOrder);
             existingSalesOrder.UpdatedAt = DateTime.UtcNow;
+
+            // Debug: Log the mapped model values
+            Console.WriteLine($"Mapped SalesOrder - DosageName: '{existingSalesOrder.DosageName}'");
+            Console.WriteLine($"Mapped SalesOrder - OrganizationId: {existingSalesOrder.OrganizationId}");
 
             await _salesOrderRepository.UpdateAsync(existingSalesOrder);
         }

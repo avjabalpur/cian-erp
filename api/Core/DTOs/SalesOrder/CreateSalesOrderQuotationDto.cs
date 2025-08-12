@@ -5,7 +5,8 @@ namespace Xcianify.Core.DTOs.SalesOrder
 {
     public class CreateSalesOrderQuotationDto
     {
-        public int? OrganizationId { get; set; }
+        [Required]
+        public int OrganizationId { get; set; }
         
         [Required]
         public string QuotationNumber { get; set; }
@@ -13,7 +14,7 @@ namespace Xcianify.Core.DTOs.SalesOrder
         public DateTime? QuotationDate { get; set; }
         
         [Required]
-        public int? CustomerId { get; set; }
+        public int CustomerId { get; set; }
         
         public double? AdvancePercentage { get; set; }
         public string Charges { get; set; }

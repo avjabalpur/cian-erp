@@ -4,7 +4,7 @@ export const salesOrderSchema = z.object({
   soNumber: z.string().optional(),
   soDate: z.string().optional(),
   soStatus: z.string().optional(),
-  organizationId: z.coerce.number().optional(),
+  organizationId: z.string().optional(),
   customerId: z.coerce.number().optional(),
   paymentTerm: z.string().optional(),
   quotationDate: z.string().optional(),
@@ -59,7 +59,6 @@ export const salesOrderSchema = z.object({
   country: z.string().optional(),
   customerGstNo: z.string().optional(),
   // New fields for SO Info form
-  manufacturerName: z.string().optional(),
   customerName: z.string().optional(),
   customerCode: z.string().optional(),
   productName: z.string().optional(),

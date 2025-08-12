@@ -14,5 +14,6 @@ namespace Xcianify.Core.Domain.Services
         Task<IEnumerable<SalesOrderDocumentDto>> GetDocumentsBySalesOrderAsync(int salesOrderId);
         Task<IEnumerable<SalesOrderDocumentDto>> GetDocumentsByTagAsync(string tag);
         Task<IEnumerable<SalesOrderDocumentDto>> GetDocumentsByFileTypeAsync(string fileType);
+        Task<SalesOrderDocumentDto> UploadDocumentAsync(UploadSalesOrderDocumentDto uploadDto);
     }
 } 

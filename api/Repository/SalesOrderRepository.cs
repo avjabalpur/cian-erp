@@ -24,7 +24,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var whereClause = "WHERE so.is_deleted = 0";
+            var whereClause = "WHERE so.is_deleted = false";
             var parameters = new DynamicParameters();
 
             if (!string.IsNullOrEmpty(filterDto.search))
@@ -84,7 +84,7 @@ namespace Xcianify.Repository
             if (filterDto.IsSubmitted.HasValue)
             {
                 whereClause += " AND so.is_submitted = @IsSubmitted";
-                parameters.Add("@IsSubmitted", filterDto.IsSubmitted.Value ? 1 : 0);
+                parameters.Add("@IsSubmitted", filterDto.IsSubmitted.Value);
             }
 
             if (filterDto.AssignedDesigner.HasValue)
@@ -163,10 +163,10 @@ namespace Xcianify.Repository
                     so.drug_approval_under as drugApprovalUnder,
                     so.current_status as currentStatus,
                     so.comments,
-                    so.is_submitted = 1 as isSubmitted,
-                    so.is_deleted = 1 as isDeleted,
+                    so.is_submitted = true as isSubmitted,
+                    so.is_deleted = true as isDeleted,
                     so.assigned_designer as assignedDesigner,
-                    so.plant_email_sent = 1 as plantEmailSent,
+                    so.plant_email_sent = true as plantEmailSent,
                     so.created_at as createdAt,
                     so.updated_at as updatedAt,
                     so.created_by as createdBy,
@@ -246,10 +246,10 @@ namespace Xcianify.Repository
                     so.drug_approval_under as drugApprovalUnder,
                     so.current_status as currentStatus,
                     so.comments,
-                    so.is_submitted = 1 as isSubmitted,
-                    so.is_deleted = 1 as isDeleted,
+                    so.is_submitted = true as isSubmitted,
+                    so.is_deleted = true as isDeleted,
                     so.assigned_designer as assignedDesigner,
-                    so.plant_email_sent = 1 as plantEmailSent,
+                    so.plant_email_sent = true as plantEmailSent,
                     so.created_at as createdAt,
                     so.updated_at as updatedAt,
                     so.created_by as createdBy,
@@ -263,7 +263,7 @@ namespace Xcianify.Repository
                 LEFT JOIN users u1 ON so.created_by = u1.id
                 LEFT JOIN users u2 ON so.updated_by = u2.id
                 LEFT JOIN users u3 ON so.assigned_designer = u3.id
-                WHERE so.id = @Id AND so.is_deleted = 0";
+                WHERE so.id = @Id AND so.is_deleted = false";
 
             return await connection.QuerySingleOrDefaultAsync<SalesOrder>(query, new { Id = id });
         }
@@ -326,10 +326,10 @@ namespace Xcianify.Repository
                     so.drug_approval_under as drugApprovalUnder,
                     so.current_status as currentStatus,
                     so.comments,
-                    so.is_submitted = 1 as isSubmitted,
-                    so.is_deleted = 1 as isDeleted,
+                    so.is_submitted = true as isSubmitted,
+                    so.is_deleted = true as isDeleted,
                     so.assigned_designer as assignedDesigner,
-                    so.plant_email_sent = 1 as plantEmailSent,
+                    so.plant_email_sent = true as plantEmailSent,
                     so.created_at as createdAt,
                     so.updated_at as updatedAt,
                     so.created_by as createdBy,
@@ -343,7 +343,7 @@ namespace Xcianify.Repository
                 LEFT JOIN users u1 ON so.created_by = u1.id
                 LEFT JOIN users u2 ON so.updated_by = u2.id
                 LEFT JOIN users u3 ON so.assigned_designer = u3.id
-                WHERE so.so_number = @SoNumber AND so.is_deleted = 0";
+                WHERE so.so_number = @SoNumber AND so.is_deleted = false";
 
             return await connection.QuerySingleOrDefaultAsync<SalesOrder>(query, new { SoNumber = soNumber });
         }
@@ -406,10 +406,10 @@ namespace Xcianify.Repository
                 salesOrder.DrugApprovalUnder,
                 salesOrder.CurrentStatus,
                 salesOrder.Comments,
-                IsSubmitted = salesOrder.IsSubmitted ? 1 : 0,
-                IsDeleted = salesOrder.IsDeleted ? 1 : 0,
+                IsSubmitted = salesOrder.IsSubmitted,
+                IsDeleted = salesOrder.IsDeleted,
                 salesOrder.AssignedDesigner,
-                PlantEmailSent = salesOrder.PlantEmailSent.HasValue ? (salesOrder.PlantEmailSent.Value ? 1 : 0) : (int?)null,
+                PlantEmailSent = salesOrder.PlantEmailSent,
                 salesOrder.CreatedBy,
                 CreatedTime = salesOrder.CreatedAt,
                 salesOrder.UpdatedBy,
@@ -451,6 +451,10 @@ namespace Xcianify.Repository
         public async Task<SalesOrder> UpdateAsync(SalesOrder salesOrder)
         {
             using var connection = _context.GetConnection();
+            
+            // Debug: Log the values being sent to database
+            Console.WriteLine($"Repository UpdateAsync - DosageName: '{salesOrder.DosageName}'");
+            Console.WriteLine($"Repository UpdateAsync - OrganizationId: {salesOrder.OrganizationId}");
             
             // Convert boolean values to integers for database compatibility
             var parameters = new
@@ -507,9 +511,9 @@ namespace Xcianify.Repository
                 salesOrder.DrugApprovalUnder,
                 salesOrder.CurrentStatus,
                 salesOrder.Comments,
-                IsSubmitted = salesOrder.IsSubmitted ? 1 : 0,
+                IsSubmitted = salesOrder.IsSubmitted,
                 salesOrder.AssignedDesigner,
-                PlantEmailSent = salesOrder.PlantEmailSent.HasValue ? (salesOrder.PlantEmailSent.Value ? 1 : 0) : (int?)null,
+                PlantEmailSent = salesOrder.PlantEmailSent,
                 salesOrder.UpdatedBy,
                 salesOrder.UpdatedAt
             };
@@ -537,8 +541,12 @@ namespace Xcianify.Repository
                     current_status = @CurrentStatus, comments = @Comments, is_submitted = @IsSubmitted,
                     assigned_designer = @AssignedDesigner, plant_email_sent = @PlantEmailSent,
                     updated_by = @UpdatedBy, updated_at = @UpdatedAt
-                WHERE id = @Id AND is_deleted = 0
+                WHERE id = @Id AND is_deleted = false
                 RETURNING *";
+
+            // Debug: Log the SQL query and parameters
+            Console.WriteLine($"SQL Query: {query}");
+            Console.WriteLine($"Parameters - DosageName: '{parameters.DosageName}', OrganizationId: {parameters.OrganizationId}");
 
             return await connection.QuerySingleAsync<SalesOrder>(query, parameters);
         }
@@ -547,7 +555,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var query = "UPDATE sales_orders SET is_deleted = 1 WHERE id = @Id";
+            var query = "UPDATE sales_orders SET is_deleted = true WHERE id = @Id";
             await connection.ExecuteAsync(query, new { Id = id });
         }
 
@@ -555,7 +563,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var query = "SELECT COUNT(*) FROM sales_orders WHERE id = @Id AND is_deleted = 0";
+            var query = "SELECT COUNT(*) FROM sales_orders WHERE id = @Id AND is_deleted = false";
             var count = await connection.QuerySingleAsync<int>(query, new { Id = id });
             return count > 0;
         }
@@ -564,7 +572,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var query = "SELECT COUNT(*) FROM sales_orders WHERE so_number = @SoNumber AND is_deleted = 0";
+            var query = "SELECT COUNT(*) FROM sales_orders WHERE so_number = @SoNumber AND is_deleted = false";
             var parameters = new { SoNumber = soNumber };
             
             var count = await connection.QuerySingleAsync<int>(query, parameters);
@@ -578,7 +586,7 @@ namespace Xcianify.Repository
             var query = @"
                 SELECT COALESCE(MAX(CAST(SUBSTRING(so_number FROM 3) AS INTEGER)), 0) + 1
                 FROM sales_orders 
-                WHERE so_number LIKE 'SO%' AND is_deleted = 0";
+                WHERE so_number LIKE 'SO%' AND is_deleted = false";
 
             return await connection.QuerySingleAsync<int>(query);
         }
@@ -604,8 +612,8 @@ namespace Xcianify.Repository
                     @CreatedBy,
                     @CreatedAt,
                     'IN-PROGRESS',
-                    0,
-                    0
+                    false,
+                    false
                 ) RETURNING id";
 
             var parameters = new

@@ -24,12 +24,10 @@ namespace Xcianify.Repository
             var query = @"
                 SELECT 
                     sod.*,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name
+                    u1.first_name || ' ' || u1.last_name as created_by_name
                 FROM sales_order_documents sod
                 LEFT JOIN users u1 ON sod.created_by = u1.id
-                LEFT JOIN users u2 ON sod.updated_by = u2.id
-                WHERE sod.is_deleted = 0
+                WHERE sod.is_deleted = false
                 ORDER BY sod.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderDocument>(query);
@@ -42,12 +40,10 @@ namespace Xcianify.Repository
             var query = @"
                 SELECT 
                     sod.*,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name
+                    u1.first_name || ' ' || u1.last_name as created_by_name
                 FROM sales_order_documents sod
                 LEFT JOIN users u1 ON sod.created_by = u1.id
-                LEFT JOIN users u2 ON sod.updated_by = u2.id
-                WHERE sod.id = @Id AND sod.is_deleted = 0";
+                WHERE sod.id = @Id AND sod.is_deleted = false";
 
             return await connection.QuerySingleOrDefaultAsync<SalesOrderDocument>(query, new { Id = id });
         }
@@ -91,7 +87,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var query = "UPDATE sales_order_documents SET is_deleted = 1 WHERE id = @Id";
+            var query = "UPDATE sales_order_documents SET is_deleted = true WHERE id = @Id";
             await connection.ExecuteAsync(query, new { Id = id });
         }
 
@@ -99,7 +95,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var query = "SELECT COUNT(*) FROM sales_order_documents WHERE id = @Id AND is_deleted = 0";
+            var query = "SELECT COUNT(*) FROM sales_order_documents WHERE id = @Id AND is_deleted = false";
             var count = await connection.QuerySingleAsync<int>(query, new { Id = id });
             return count > 0;
         }
@@ -111,12 +107,10 @@ namespace Xcianify.Repository
             var query = @"
                 SELECT 
                     sod.*,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name
+                    u1.first_name || ' ' || u1.last_name as created_by_name
                 FROM sales_order_documents sod
                 LEFT JOIN users u1 ON sod.created_by = u1.id
-                LEFT JOIN users u2 ON sod.updated_by = u2.id
-                WHERE sod.sales_order_id = @SalesOrderId AND sod.is_deleted = 0
+                WHERE sod.sales_order_id = @SalesOrderId AND sod.is_deleted = false
                 ORDER BY sod.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderDocument>(query, new { SalesOrderId = salesOrderId });
@@ -129,12 +123,10 @@ namespace Xcianify.Repository
             var query = @"
                 SELECT 
                     sod.*,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name
+                    u1.first_name || ' ' || u1.last_name as created_by_name
                 FROM sales_order_documents sod
                 LEFT JOIN users u1 ON sod.created_by = u1.id
-                LEFT JOIN users u2 ON sod.updated_by = u2.id
-                WHERE sod.tag = @Tag AND sod.is_deleted = 0
+                WHERE sod.tag = @Tag AND sod.is_deleted = false
                 ORDER BY sod.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderDocument>(query, new { Tag = tag });
@@ -147,12 +139,10 @@ namespace Xcianify.Repository
             var query = @"
                 SELECT 
                     sod.*,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name
+                    u1.first_name || ' ' || u1.last_name as created_by_name
                 FROM sales_order_documents sod
                 LEFT JOIN users u1 ON sod.created_by = u1.id
-                LEFT JOIN users u2 ON sod.updated_by = u2.id
-                WHERE sod.file_type = @FileType AND sod.is_deleted = 0
+                WHERE sod.file_type = @FileType AND sod.is_deleted = false
                 ORDER BY sod.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderDocument>(query, new { FileType = fileType });

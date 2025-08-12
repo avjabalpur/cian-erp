@@ -24,12 +24,10 @@ namespace Xcianify.Repository
             var query = @"
                 SELECT 
                     soc.*,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name
+                    u1.first_name || ' ' || u1.last_name as created_by_name
                 FROM sales_order_comments soc
                 LEFT JOIN users u1 ON soc.created_by = u1.id
-                LEFT JOIN users u2 ON soc.updated_by = u2.id
-                WHERE soc.is_deleted = 0
+                WHERE soc.is_deleted = false
                 ORDER BY soc.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderComment>(query);
@@ -42,12 +40,10 @@ namespace Xcianify.Repository
             var query = @"
                 SELECT 
                     soc.*,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name
+                    u1.first_name || ' ' || u1.last_name as created_by_name
                 FROM sales_order_comments soc
                 LEFT JOIN users u1 ON soc.created_by = u1.id
-                LEFT JOIN users u2 ON soc.updated_by = u2.id
-                WHERE soc.id = @Id AND soc.is_deleted = 0";
+                WHERE soc.id = @Id AND soc.is_deleted = false";
 
             return await connection.QuerySingleOrDefaultAsync<SalesOrderComment>(query, new { Id = id });
         }
@@ -59,10 +55,10 @@ namespace Xcianify.Repository
             var query = @"
                 INSERT INTO sales_order_comments (
                     sales_order_id, comments, status, type, 
-                    created_by, created_at, updated_by, updated_at
+                    created_by, created_at
                 ) VALUES (
                     @SalesOrderId, @Comments, @Status, @Type,
-                    @CreatedBy, @CreatedAt, @UpdatedBy, @UpdatedAt
+                    @CreatedBy, @CreatedAt
                 ) RETURNING *";
 
             return await connection.QuerySingleAsync<SalesOrderComment>(query, comment);
@@ -76,10 +72,8 @@ namespace Xcianify.Repository
                 UPDATE sales_order_comments SET
                     comments = @Comments,
                     status = @Status,
-                    type = @Type,
-                    updated_by = @UpdatedBy,
-                    updated_at = @UpdatedAt
-                WHERE id = @Id AND is_deleted = 0
+                    type = @Type
+                WHERE id = @Id AND is_deleted = false
                 RETURNING *";
 
             return await connection.QuerySingleAsync<SalesOrderComment>(query, comment);
@@ -89,7 +83,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var query = "UPDATE sales_order_comments SET is_deleted = 1 WHERE id = @Id";
+            var query = "UPDATE sales_order_comments SET is_deleted = true WHERE id = @Id";
             await connection.ExecuteAsync(query, new { Id = id });
         }
 
@@ -97,7 +91,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var query = "SELECT COUNT(*) FROM sales_order_comments WHERE id = @Id AND is_deleted = 0";
+            var query = "SELECT COUNT(*) FROM sales_order_comments WHERE id = @Id AND is_deleted = false";
             var count = await connection.QuerySingleAsync<int>(query, new { Id = id });
             return count > 0;
         }
@@ -109,12 +103,10 @@ namespace Xcianify.Repository
             var query = @"
                 SELECT 
                     soc.*,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name
+                    u1.first_name || ' ' || u1.last_name as created_by_name
                 FROM sales_order_comments soc
                 LEFT JOIN users u1 ON soc.created_by = u1.id
-                LEFT JOIN users u2 ON soc.updated_by = u2.id
-                WHERE soc.sales_order_id = @SalesOrderId AND soc.is_deleted = 0
+                WHERE soc.sales_order_id = @SalesOrderId AND soc.is_deleted = false
                 ORDER BY soc.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderComment>(query, new { SalesOrderId = salesOrderId });
@@ -127,12 +119,10 @@ namespace Xcianify.Repository
             var query = @"
                 SELECT 
                     soc.*,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name
+                    u1.first_name || ' ' || u1.last_name as created_by_name
                 FROM sales_order_comments soc
                 LEFT JOIN users u1 ON soc.created_by = u1.id
-                LEFT JOIN users u2 ON soc.updated_by = u2.id
-                WHERE soc.status = @Status AND soc.is_deleted = 0
+                WHERE soc.status = @Status AND soc.is_deleted = false
                 ORDER BY soc.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderComment>(query, new { Status = status });
@@ -145,12 +135,10 @@ namespace Xcianify.Repository
             var query = @"
                 SELECT 
                     soc.*,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name
+                    u1.first_name || ' ' || u1.last_name as created_by_name
                 FROM sales_order_comments soc
                 LEFT JOIN users u1 ON soc.created_by = u1.id
-                LEFT JOIN users u2 ON soc.updated_by = u2.id
-                WHERE soc.type = @Type AND soc.is_deleted = 0
+                WHERE soc.type = @Type AND soc.is_deleted = false
                 ORDER BY soc.created_at DESC";
 
             return await connection.QueryAsync<SalesOrderComment>(query, new { Type = type });

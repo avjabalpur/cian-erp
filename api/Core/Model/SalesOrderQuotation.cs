@@ -15,5 +15,15 @@ namespace Xcianify.Core.Model
         public double? AdvanceAmount { get; set; }
         public int? PrevCopyQuotationId { get; set; }
         public bool IsDeleted { get; set; }
+
+        // Computed properties for backward compatibility
+        public string CompanyName { get; set; }
+        public string CustomerName { get; set; }
+        public string CustomerContactPerson { get; set; }
+        public string CustomerMobileNumber { get; set; }
+        public string CustomerEmail { get; set; }
+        public string PaymentTerms { get; set; }
+        public string FinalComment { get; set; }
+        public string Terms { get; set; }
     }
 } 

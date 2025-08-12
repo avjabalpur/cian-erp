@@ -7,6 +7,8 @@ using Xcianify.Core.Domain.Services;
 using Xcianify.Core.DTOs.SalesOrder;
 using Xcianify.Core.Model;
 using Xcianify.Core.Exceptions;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace Xcianify.Services
 {
@@ -14,13 +16,16 @@ namespace Xcianify.Services
     {
         private readonly ISalesOrderChatRepository _chatRepository;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public SalesOrderChatService(
             ISalesOrderChatRepository chatRepository,
-            IMapper mapper)
+            IMapper mapper,
+            IHttpContextAccessor httpContextAccessor)
         {
             _chatRepository = chatRepository ?? throw new ArgumentNullException(nameof(chatRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         public async Task<IEnumerable<SalesOrderChatDto>> GetAllChatMessagesAsync()
@@ -43,6 +48,13 @@ namespace Xcianify.Services
             var chatMessage = _mapper.Map<SalesOrderChat>(chatDto);
             chatMessage.CreatedAt = DateTime.UtcNow;
             chatMessage.UpdatedAt = DateTime.UtcNow;
+            
+            // Get current user ID from claims
+            var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            {
+                chatMessage.CreatedBy = userId;
+            }
 
             var createdChatMessage = await _chatRepository.AddAsync(chatMessage);
             return _mapper.Map<SalesOrderChatDto>(createdChatMessage);
@@ -56,6 +68,13 @@ namespace Xcianify.Services
 
             _mapper.Map(chatDto, existingChatMessage);
             existingChatMessage.UpdatedAt = DateTime.UtcNow;
+            
+            // Get current user ID from claims
+            var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            {
+                existingChatMessage.UpdatedBy = userId;
+            }
 
             await _chatRepository.UpdateAsync(existingChatMessage);
         }
