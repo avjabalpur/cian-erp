@@ -9,6 +9,7 @@ namespace Xcianify.Core.Model
         public DateTime? SoDate { get; set; }
         public string SoStatus { get; set; }
         public int? OrganizationId { get; set; }
+        public string OrganizationName { get; set; }
         public int? CustomerId { get; set; }
         public string CustomerName { get; set; }
         public string PaymentTerm { get; set; }
@@ -66,7 +67,5 @@ namespace Xcianify.Core.Model
         public bool? PlantEmailSent { get; set; }
         
         // Additional fields for product info form
-        public string ShelfLife { get; set; }
-        public string Colour { get; set; }
     }
 } 

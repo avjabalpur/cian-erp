@@ -9,6 +9,7 @@ namespace Xcianify.Core.DTOs.SalesOrder
         public DateTime? SoDate { get; set; }
         public string SoStatus { get; set; }
         public int? OrganizationId { get; set; }
+        public string OrganizationName { get; set; }
         public int? CustomerId { get; set; }
         public string CustomerName { get; set; }
         public string PaymentTerm { get; set; }
@@ -70,9 +71,5 @@ namespace Xcianify.Core.DTOs.SalesOrder
         public string CreatedByName { get; set; }
         public int? UpdatedBy { get; set; }
         public string UpdatedByName { get; set; }
-        
-        // Additional fields for product info form
-        public string ShelfLife { get; set; }
-        public string Colour { get; set; }
     }
 } 

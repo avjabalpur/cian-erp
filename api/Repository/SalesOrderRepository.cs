@@ -29,7 +29,7 @@ namespace Xcianify.Repository
 
             if (!string.IsNullOrEmpty(filterDto.search))
             {
-                whereClause += " AND (so.so_number ILIKE @search OR so.so_status ILIKE @search OR c.customer_name ILIKE @search)";
+                whereClause += " AND (so.so_number ILIKE @search OR so.so_status ILIKE @search OR c.customer_name ILIKE @search OR o.name ILIKE @search OR im.item_name ILIKE @search)";
                 parameters.Add("@search", $"%{filterDto.search}%");
             }
 
@@ -97,6 +97,7 @@ namespace Xcianify.Repository
                 SELECT COUNT(*)
                 FROM sales_orders so
                 LEFT JOIN customers c ON so.customer_id = c.id
+                LEFT JOIN organizations o ON so.organization_id = o.id
                 LEFT JOIN item_master im ON so.item_id = im.id
                 LEFT JOIN divisions d ON so.divisionid = d.id
                 LEFT JOIN users u1 ON so.created_by = u1.id
@@ -106,7 +107,27 @@ namespace Xcianify.Repository
 
             var totalCount = await connection.QuerySingleAsync<int>(countQuery, parameters);
 
-            var orderClause = $"ORDER BY so.{filterDto.SortBy} {filterDto.SortOrder}";
+            // Map sort fields to actual table columns
+            var sortField = filterDto.SortBy?.ToLower() switch
+            {
+                "customername" => "c.customer_name",
+                "organizationname" => "o.name",
+                "itemname" => "im.item_name",
+                "divisionname" => "d.name",
+                "assigneddesignername" => "u3.first_name",
+                "createdbyname" => "u1.first_name",
+                "updatedbyname" => "u2.first_name",
+                "sonumber" => "so.so_number",
+                "sostatus" => "so.so_status",
+                "sodate" => "so.so_date",
+                "quotationdate" => "so.quotation_date",
+                "quotationno" => "so.quotation_no",
+                "createdat" => "so.created_at",
+                "updatedat" => "so.updated_at",
+                _ => "so.created_at" // default
+            };
+
+            var orderClause = $"ORDER BY {sortField} {filterDto.SortOrder}";
             var limitClause = $"LIMIT {filterDto.PageSize} OFFSET {(filterDto.Page - 1) * filterDto.PageSize}";
 
             var query = $@"
@@ -116,14 +137,18 @@ namespace Xcianify.Repository
                     so.so_date as soDate,
                     so.so_status as soStatus,
                     so.organization_id as organizationId,
+                    o.name as organizationName,
                     so.customer_id as customerId,
+                    c.customer_name as customerName,
                     so.payment_term as paymentTerm,
                     so.quotation_date as quotationDate,
                     so.quotation_no as quotationNo,
                     so.hsn_code as hsnCode,
                     so.item_id as itemId,
+                    im.item_name as itemName,
                     so.dosage_name as dosageName,
                     so.divisionid as divisionId,
+                    d.name as divisionName,
                     so.design_under as designUnder,
                     so.packing_style_description as packingStyleDescription,
                     so.composition,
@@ -163,14 +188,17 @@ namespace Xcianify.Repository
                     so.drug_approval_under as drugApprovalUnder,
                     so.current_status as currentStatus,
                     so.comments,
-                    so.is_submitted = true as isSubmitted,
-                    so.is_deleted = true as isDeleted,
+                    so.is_submitted as isSubmitted,
+                    so.is_deleted as isDeleted,
                     so.assigned_designer as assignedDesigner,
-                    so.plant_email_sent = true as plantEmailSent,
+                    u3.first_name || ' ' || u3.last_name as assignedDesignerName,
+                    so.plant_email_sent as plantEmailSent,
                     so.created_at as createdAt,
                     so.updated_at as updatedAt,
                     so.created_by as createdBy,
-                    so.updated_by as updatedBy
+                    u1.first_name || ' ' || u1.last_name as createdByName,
+                    so.updated_by as updatedBy,
+                    u2.first_name || ' ' || u2.last_name as updatedByName
                 FROM sales_orders so
                 LEFT JOIN customers c ON so.customer_id = c.id
                 LEFT JOIN organizations o ON so.organization_id = o.id
@@ -199,14 +227,18 @@ namespace Xcianify.Repository
                     so.so_date as soDate,
                     so.so_status as soStatus,
                     so.organization_id as organizationId,
+                    o.name as organizationName,
                     so.customer_id as customerId,
+                    c.customer_name as customerName,
                     so.payment_term as paymentTerm,
                     so.quotation_date as quotationDate,
                     so.quotation_no as quotationNo,
                     so.hsn_code as hsnCode,
                     so.item_id as itemId,
+                    im.item_name as itemName,
                     so.dosage_name as dosageName,
                     so.divisionid as divisionId,
+                    d.name as divisionName,
                     so.design_under as designUnder,
                     so.packing_style_description as packingStyleDescription,
                     so.composition,
@@ -246,15 +278,17 @@ namespace Xcianify.Repository
                     so.drug_approval_under as drugApprovalUnder,
                     so.current_status as currentStatus,
                     so.comments,
-                    so.is_submitted = true as isSubmitted,
-                    so.is_deleted = true as isDeleted,
+                    so.is_submitted as isSubmitted,
+                    so.is_deleted as isDeleted,
                     so.assigned_designer as assignedDesigner,
-                    so.plant_email_sent = true as plantEmailSent,
+                    u3.first_name || ' ' || u3.last_name as assignedDesignerName,
+                    so.plant_email_sent as plantEmailSent,
                     so.created_at as createdAt,
                     so.updated_at as updatedAt,
                     so.created_by as createdBy,
-                    so.updated_by as updatedBy
-                   
+                    u1.first_name || ' ' || u1.last_name as createdByName,
+                    so.updated_by as updatedBy,
+                    u2.first_name || ' ' || u2.last_name as updatedByName
                 FROM sales_orders so
                 LEFT JOIN customers c ON so.customer_id = c.id
                 LEFT JOIN organizations o ON so.organization_id = o.id
@@ -279,14 +313,18 @@ namespace Xcianify.Repository
                     so.so_date as soDate,
                     so.so_status as soStatus,
                     so.organization_id as organizationId,
+                    o.name as organizationName,
                     so.customer_id as customerId,
+                    c.customer_name as customerName,
                     so.payment_term as paymentTerm,
                     so.quotation_date as quotationDate,
                     so.quotation_no as quotationNo,
                     so.hsn_code as hsnCode,
                     so.item_id as itemId,
+                    im.item_name as itemName,
                     so.dosage_name as dosageName,
                     so.divisionid as divisionId,
+                    d.name as divisionName,
                     so.design_under as designUnder,
                     so.packing_style_description as packingStyleDescription,
                     so.composition,
@@ -326,15 +364,17 @@ namespace Xcianify.Repository
                     so.drug_approval_under as drugApprovalUnder,
                     so.current_status as currentStatus,
                     so.comments,
-                    so.is_submitted = true as isSubmitted,
-                    so.is_deleted = true as isDeleted,
+                    so.is_submitted as isSubmitted,
+                    so.is_deleted as isDeleted,
                     so.assigned_designer as assignedDesigner,
-                    so.plant_email_sent = true as plantEmailSent,
+                    u3.first_name || ' ' || u3.last_name as assignedDesignerName,
+                    so.plant_email_sent as plantEmailSent,
                     so.created_at as createdAt,
                     so.updated_at as updatedAt,
                     so.created_by as createdBy,
-                    so.updated_by as updatedBy
-                   
+                    u1.first_name || ' ' || u1.last_name as createdByName,
+                    so.updated_by as updatedBy,
+                    u2.first_name || ' ' || u2.last_name as updatedByName
                 FROM sales_orders so
                 LEFT JOIN customers c ON so.customer_id = c.id
                 LEFT JOIN organizations o ON so.organization_id = o.id
