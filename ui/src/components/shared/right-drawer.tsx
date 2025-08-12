@@ -49,7 +49,7 @@ export function RightDrawer({
             <SheetContent
                 side="right"
                 className={cn(
-                    "w-full p-2 gap-0 ",
+                    "w-full p-2 gap-0 [&>button]:hidden",
                     sizeClasses[size],
                     className
                 )}>
@@ -69,6 +69,13 @@ export function RightDrawer({
                         {children}
                     </div>
                 </ScrollArea>
+                
+                {/* Hidden title for accessibility when no title is provided */}
+                {!title && (
+                    <SheetTitle className="sr-only">
+                        Drawer Content
+                    </SheetTitle>
+                )}
             </SheetContent>
         </Sheet>
 

@@ -39,14 +39,19 @@ namespace Xcianify.Services
 
         public async Task<ItemExportDetailsDto> CreateAsync(CreateItemExportDetailsDto createDto, int userId)
         {
-            var entity = _mapper.Map<ItemExportDetails>(createDto);
-            entity.CreatedBy = userId;
-            entity.UpdatedBy = userId;
-            entity.CreatedAt = DateTime.UtcNow;
-            entity.UpdatedAt = DateTime.UtcNow;
-            var id = await _repository.CreateAsync(entity);
-            entity.Id = id;
-            return _mapper.Map<ItemExportDetailsDto>(entity);
+            try
+            {
+                var entity = _mapper.Map<ItemExportDetails>(createDto);
+              
+               var id = await _repository.CreateAsync(entity);
+               entity.Id = id;
+                return _mapper.Map<ItemExportDetailsDto>(entity);
+            }
+            catch (Exception ex)
+            {
+                // Log the error and rethrow with more context
+                throw new Exception($"Error creating ItemExportDetails: {ex.Message}", ex);
+            }
         }
 
         public async Task<ItemExportDetailsDto> UpdateAsync(int id, UpdateItemExportDetailsDto updateDto, int userId)
@@ -55,8 +60,8 @@ namespace Xcianify.Services
             if (existing == null)
                 throw new NotFoundException("ItemExportDetails not found");
             var entity = _mapper.Map(updateDto, existing);
-            entity.UpdatedBy = userId;
-            entity.UpdatedAt = DateTime.UtcNow;
+            //entity.UpdatedBy = userId;
+            //entity.UpdatedAt = DateTime.UtcNow;
             await _repository.UpdateAsync(entity);
             return _mapper.Map<ItemExportDetailsDto>(entity);
         }
@@ -66,6 +71,7 @@ namespace Xcianify.Services
             return await _repository.DeleteAsync(id);
         }
 
-
+        //  
+      
     }
 }

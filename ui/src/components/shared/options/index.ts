@@ -4,4 +4,5 @@ export * from "./manufacturer-options";
 export * from "./payment-terms-options";
 export * from "./sales-order-status-options";
 export * from "./product-type-options";
-export * from "./product-group-options"; 
+export * from "./product-group-options";
+export * from "./item-type-options"; 

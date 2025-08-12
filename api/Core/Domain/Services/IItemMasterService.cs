@@ -10,7 +10,7 @@ namespace Xcianify.Core.Domain.Services
         Task<(IEnumerable<ItemMasterDto> Items, int TotalCount)> GetAllItemsAsync(ItemMasterFilterDto filter);
         Task<ItemMasterDto> GetItemByIdAsync(int id);
         Task<ItemMasterDto> GetItemByCodeAsync(string itemCode);
-        Task<ItemMasterDto> CreateItemAsync(CreateItemMasterDto createDto);
+        Task<ItemMasterDto> CreateItemAsync(CreateItemMasterDto createDto,int userId);
         Task<ItemMasterDto> UpdateItemAsync(int id, UpdateItemMasterDto updateDto);
         Task DeleteItemAsync(int id);
     }

@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { FormInput } from "@/components/shared/forms/form-input"
 import { FormHorizontalRadioGroup } from "@/components/shared/forms/form-horizontal-radio-group"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Info } from "lucide-react"

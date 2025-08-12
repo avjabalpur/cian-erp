@@ -7,8 +7,10 @@ export interface ItemMedia {
   itemId: number;
   itemName?: string;
   fileName: string;
-  filePath: string;
-  fileSize?: number;
+  fileExtension: string;
+  fileSizeBytes?: number;
+  mimeType: string;
+  mediaUrl: string;
   mediaType: string;
   description?: string;
   isActive: boolean;
@@ -73,8 +75,12 @@ const getItemMediaByItemId = async (itemId: number): Promise<ItemMedia[]> => {
   return data;
 };
 
-const createItemMedia = async (itemId: number, mediaData: CreateItemMediaData): Promise<ItemMedia> => {
-  const { data } = await api.post(`/items/${itemId}/media`, mediaData);
+const createItemMedia = async (itemId: number, formData: FormData): Promise<ItemMedia> => {
+  const { data } = await api.post(`/items/${itemId}/media`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return data;
 };
 
@@ -113,8 +119,8 @@ export const useItemMediaByItemId = (itemId: number) => {
 
 export const useCreateItemMedia = () => {
   const queryClient = useQueryClient();
-  return useMutation<ItemMedia, Error, { itemId: number; data: CreateItemMediaData }>({
-    mutationFn: ({ itemId, data }) => createItemMedia(itemId, data),
+  return useMutation<ItemMedia, Error, { itemId: number; formData: FormData }>({
+    mutationFn: ({ itemId, formData }) => createItemMedia(itemId, formData),
     onSuccess: (data, { itemId }) => {
       queryClient.invalidateQueries({ queryKey: ['item-media', itemId] });
       queryClient.invalidateQueries({ queryKey: ['item-master', itemId] });

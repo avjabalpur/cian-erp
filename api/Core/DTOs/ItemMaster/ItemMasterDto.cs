@@ -1,5 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Xcianify.Core.DTOs.ItemBoughtOut;
+using Xcianify.Core.DTOs.ItemExportDetails;
+using Xcianify.Core.DTOs.ItemMedia;
+using Xcianify.Core.DTOs.ItemOtherDetails;
 
 namespace Xcianify.Core.DTOs.ItemMaster
 {
@@ -118,6 +123,13 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public int? UpdatedBy { get; set; }
         public bool IsDeleted { get; set; }
         
+        // Related data properties
         public virtual ItemSpecificationDto Specification { get; set; }
+        public virtual ItemSalesDetailDto SalesDetail { get; set; }
+        public virtual ItemExportDetailsDto ExportDetails { get; set; }
+        public virtual ItemStockAnalysisDto StockAnalysis { get; set; }
+        public virtual ItemBoughtOutDetailsDto BoughtOutDetails { get; set; }
+        public virtual ItemOtherDetailsDto OtherDetails { get; set; }
+        public virtual ICollection<ItemMediaDto> Media { get; set; }
     }
 }

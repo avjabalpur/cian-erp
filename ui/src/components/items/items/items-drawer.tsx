@@ -6,13 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { useCreateItemMaster, useUpdateItemMaster } from "@/hooks/items/use-item-master";
-import { useCreateItemSpecification, useUpdateItemSpecification } from "@/hooks/items/use-item-specifications";
-import { useCreateItemSalesDetail, useUpdateItemSalesDetail } from "@/hooks/items/use-item-sales-details";
-import { useCreateItemBoughtOutDetails, useUpdateItemBoughtOutDetails } from "@/hooks/items/use-item-bought-out-details";
-import { useCreateItemStockAnalysis, useUpdateItemStockAnalysis } from "@/hooks/items/use-item-stock-analysis";
-import { useCreateItemExportDetails, useUpdateItemExportDetails } from "@/hooks/items/use-item-export-details";
-import { useCreateItemOtherDetail, useUpdateItemOtherDetail } from "@/hooks/items/use-item-other-details";
+import { useCreateItemMaster, useUpdateItemMaster, useItemMasterById } from "@/hooks/items/use-item-master";
+
 import { useCreateItemMedia, useUpdateItemMedia } from "@/hooks/items/use-item-media";
 import { RightDrawer } from "@/components/shared/right-drawer";
 import { ItemBasicInfoForm } from "./forms/item-basic-info-form";
@@ -23,6 +18,8 @@ import { ItemExportForm } from "./forms/item-export-form";
 import { ItemSpecificationsForm } from "./forms/item-specifications-form";
 import { ItemOtherDetailsForm } from "./forms/item-other-details-form";
 import { ItemMediaForm } from "./forms/item-media-form";
+import ItemCodeGenerator from "./forms/ItemCodeSequence";
+import { KeyValueForm } from "@/components/shared/dynamic-form/dynamic-form";
 import { CreateItemMasterData, UpdateItemMasterData, ItemMaster, UpdateItemSalesDetailData } from "@/types/item-master";
 import { ItemMasterFormData, itemMasterSchema } from "@/validations/item-master";
 import { getItemMasterDefaultValues, mapItemToFormData, transformFormDataToApi } from "@/lib/utils/item-master-utils";
@@ -41,30 +38,16 @@ export default function ItemsDrawer({
   onSuccess,
 }: ItemsDrawerProps) {
   const { toast } = useToast();
+  const [generatedItemCode, setGeneratedItemCode] = useState<string>("");
+  
+  // Fetch complete item data when editing
+  const { data: completeItemData, isLoading: isLoadingItem } = useItemMasterById(item?.id || 0);
   
   // Main item mutations
   const createItemMutation = useCreateItemMaster();
   const updateItemMutation = useUpdateItemMaster();
   
-  // Related data mutations
-  const createSpecificationMutation = useCreateItemSpecification();
-  const updateSpecificationMutation = useUpdateItemSpecification();
-  
-  const createSalesDetailMutation = useCreateItemSalesDetail();
-  const updateSalesDetailMutation = useUpdateItemSalesDetail();
-  
-  const createBoughtOutDetailsMutation = useCreateItemBoughtOutDetails();
-  const updateBoughtOutDetailsMutation = useUpdateItemBoughtOutDetails();
-  
-  const createStockAnalysisMutation = useCreateItemStockAnalysis();
-  const updateStockAnalysisMutation = useUpdateItemStockAnalysis();
-  
-  const createExportDetailsMutation = useCreateItemExportDetails();
-  const updateExportDetailsMutation = useUpdateItemExportDetails();
-  
-  const createOtherDetailsMutation = useCreateItemOtherDetail();
-  const updateOtherDetailsMutation = useUpdateItemOtherDetail();
-
+  // Media mutations (kept for separate file uploads)
   const createMediaMutation = useCreateItemMedia();
   const updateMediaMutation = useUpdateItemMedia();
 
@@ -72,20 +55,34 @@ export default function ItemsDrawer({
     resolver: zodResolver(itemMasterSchema),
     defaultValues: getItemMasterDefaultValues(),
   });
-
+ const onError = (errors: typeof form.formState.errors) => {
+  const currentValues = form.getValues();
+  console.log("❌ Errors:", errors);
+  console.log("⚠️ Data at time of error:", currentValues);
+};
+  
   useEffect(() => {
     if (isOpen) {
       if (item) {
-        console.log('Loading item data:', item);
+        // If we have a complete item data from the API, use it
+        if (completeItemData) {
+          console.log('Loading complete item data:', completeItemData);
+          const formData = mapItemToFormData(completeItemData);
+          console.log('Mapped form data:', formData);
+          form.reset(formData);
+        } else if (!isLoadingItem) {
+          // Fallback to the item passed as prop if API data is not available
+          console.log('Loading item data from prop:', item);
         const formData = mapItemToFormData(item);
         console.log('Mapped form data:', formData);
         form.reset(formData);
+        }
       } else {
         console.log('Resetting to default values');
         form.reset(getItemMasterDefaultValues());
       }
     }
-  }, [item, form, isOpen]);
+  }, [item, completeItemData, isLoadingItem, form, isOpen]);
 
   // Force re-render of child components when item changes
   const [currentItemId, setCurrentItemId] = useState<number | undefined>(undefined);
@@ -94,200 +91,7 @@ export default function ItemsDrawer({
     setCurrentItemId(item?.id);
   }, [item?.id]);
 
-  const saveRelatedData = async (itemId: number, formData: ItemMasterFormData) => {
-    const promises = [];
-
-    // Save specification
-    if (formData.itemSpecification) {
-      const specData = { 
-        itemId,
-        specification: formData.itemSpecification,
-        substituteItemFor: formData.substituteItemFor,
-        customTariffNo: formData.customTariffNo,
-        exciseTariffNo: formData.exciseTariffNo,
-        vatCommCode: formData.vatCommCode,
-        convFactor: formData.convFactor ? formData.convFactor : undefined,
-        oldCode: formData.oldCode,
-        standardWeight: formData.standardWeight ? formData.standardWeight : undefined,
-        standardConversionCostFactor: formData.standardConversionCostFactor ? formData.standardConversionCostFactor : undefined,
-        standardPackingCostFactor: formData.standardPackingCostFactor ? formData.standardPackingCostFactor : undefined,
-        costFactorPercent: formData.costFactorPercent ? formData.costFactorPercent : undefined,
-        packingCostRs: formData.packingCostRs ? formData.packingCostRs : undefined,
-      };
-      if (item?.specification) {
-        promises.push(updateSpecificationMutation.mutateAsync({ itemId, data: specData }));
-      } else {
-        promises.push(createSpecificationMutation.mutateAsync({ itemId, data: specData }));
-      }
-    }
-
-    // Save sales details
-    if (formData.sellingPrice || formData.currencyId || formData.isTaxInclusive !== undefined) {
-      const salesData = {
-        itemId,
-        sellingPrice: formData.sellingPrice ? formData.sellingPrice : undefined,
-        currencyId: formData.currencyId ? formData.currencyId : undefined,
-        isTaxInclusive: formData.isTaxInclusive || false,
-        discountPercentage: formData.discountPercentage ? formData.discountPercentage : undefined,
-        minimumOrderQuantity: formData.minimumOrderQuantity ? formData.minimumOrderQuantity : undefined,
-        isActive: true,
-        notes: formData.notes,
-      };
-      
-      if (item?.salesDetail) {
-        promises.push(updateSalesDetailMutation.mutateAsync({ 
-          itemId, 
-          id: item.salesDetail.id, 
-          data: salesData  as any
-        }));
-      } else {
-        promises.push(createSalesDetailMutation.mutateAsync({ itemId, data: salesData as any }));
-      }
-    }
-
-    // Save bought out details
-    if (formData.purchaseBasedOn || formData.excessPlanningPercent !== undefined) {
-      const boughtOutData = {
-        itemId,
-        purchaseBasedOn: formData.purchaseBasedOn,
-        excessPlanningPercent: formData.excessPlanningPercent ? formData.excessPlanningPercent : undefined,
-        reorderLevel: formData.reorderLevel ? formData.reorderLevel : undefined,
-        minStockLevel: formData.minStockLevel ? formData.minStockLevel : undefined,
-        maxStockLevel: formData.maxStockLevel ? formData.maxStockLevel : undefined,
-        minBalanceShelfLifeDays: formData.minBalanceShelfLifeDays ? formData.minBalanceShelfLifeDays : undefined,
-        customDutyPercent: formData.customDutyPercent ? formData.customDutyPercent : undefined,
-        igstPercent: formData.igstPercent ? formData.igstPercent : undefined,
-        swsPercent: formData.swsPercent ? formData.swsPercent : undefined,
-        maxPurchaseRate: formData.maxPurchaseRate ? formData.maxPurchaseRate : undefined,
-        stopProcurement: formData.stopProcurement || false,
-      };
-      
-      if (item?.boughtOutDetails) {
-        promises.push(updateBoughtOutDetailsMutation.mutateAsync({ 
-          itemId, 
-          id: item.boughtOutDetails.id, 
-          data: boughtOutData as any
-        }));
-      } else {
-        promises.push(createBoughtOutDetailsMutation.mutateAsync({ itemId, data: boughtOutData as any }));
-      }
-    }
-
-    // Save stock analysis
-    if (formData.abcConsumptionValue || formData.xyzStockValue || formData.fsnMovement || formData.vedAnalysis) {
-      const stockAnalysisData = {
-        itemId,
-        minimumStockLevel: formData.minimumStockLevel ? formData.minimumStockLevel : undefined,
-        maximumStockLevel: formData.maximumStockLevel ? formData.maximumStockLevel : undefined,
-        reorderLevel: formData.reorderLevel ? formData.reorderLevel : undefined,
-        economicOrderQuantity: formData.economicOrderQuantity ? formData.economicOrderQuantity : undefined,
-        leadTimeDays: formData.leadTimeDays ? formData.leadTimeDays : undefined,
-        averageUsagePerDay: formData.averageUsagePerDay ? formData.averageUsagePerDay : undefined,
-        lastStockCheckDate: formData.lastStockCheckDate,
-        lastStockQuantity: formData.lastStockQuantity ? formData.lastStockQuantity : undefined,
-        nextStockCheckDate: formData.nextStockCheckDate,
-        isActive: true,
-        notes: formData.notes,
-      };
-      
-      if (item?.stockAnalysis) {
-        promises.push(updateStockAnalysisMutation.mutateAsync({ 
-          itemId, 
-          id: item.stockAnalysis.id, 
-          data: stockAnalysisData as any
-        }));
-      } else {
-        promises.push(createStockAnalysisMutation.mutateAsync({ itemId, data: stockAnalysisData as any }));
-      }
-    }
-
-    // Save export details
-    if (formData.itemDescriptionForExports || formData.exportProductGroupCode) {
-      const exportData = {
-        itemId,
-        itemDescriptionForExports: formData.itemDescriptionForExports,
-        exportProductGroupCode: formData.exportProductGroupCode,
-        exportProductGroupName: formData.exportProductGroupName,
-        depbRateListSrlNo: formData.depbRateListSrlNo,
-        depbRate: formData.depbRate ? formData.depbRate : undefined,
-        depbValueCap: formData.depbValueCap ? formData.depbValueCap : undefined,
-        depbRemarks: formData.depbRemarks,
-        dutyDrawbackSrlNo: formData.dutyDrawbackSrlNo,
-        dutyDrawbackRateType: formData.dutyDrawbackRateType,
-        dutyDrawbackRatePercent: formData.dutyDrawbackRatePercent ? formData.dutyDrawbackRatePercent : undefined,
-        dutyDrawbackRateFixed: formData.dutyDrawbackRateFixed ? formData.dutyDrawbackRateFixed : undefined,
-        dutyDrawbackValueCap: formData.dutyDrawbackValueCap ? formData.dutyDrawbackValueCap : undefined,
-        dutyDrawbackRemarks: formData.dutyDrawbackRemarks,
-      };
-      
-      if (item?.exportDetails) {
-        promises.push(updateExportDetailsMutation.mutateAsync({ 
-          itemId, 
-          id: item.exportDetails.id, 
-          data: exportData 
-        }));
-      } else {
-        promises.push(createExportDetailsMutation.mutateAsync({ itemId, data: exportData }));
-      }
-    }
-
-    // Save other details
-    if (formData.packShort || formData.productCast || formData.pvcColor) {
-      const otherDetailsData = {
-        itemId,
-        packShort: formData.packShort,
-        productCast: formData.productCast,
-        pvcColor: formData.pvcColor,
-        color: formData.color,
-        flavour: formData.flavour,
-        fragrance: formData.fragrance,
-        form: formData.form,
-        packagingStyle: formData.packagingStyle,
-        changePart: formData.changePart,
-        size: formData.size,
-        withLeaflet: formData.withLeaflet || false,
-        withApplicator: formData.withApplicator || false,
-        withWad: formData.withWad || false,
-        withSilica: formData.withSilica || false,
-        withCotton: formData.withCotton || false,
-        withMeasuringCap: formData.withMeasuringCap || false,
-        withSpoon: formData.withSpoon || false,
-        packingNp: formData.packingNp,
-        packingNpQty: formData.packingNpQty ? formData.packingNpQty : undefined,
-        packingStylePtd: formData.packingStylePtd,
-        packingStylePtdQty: formData.packingStylePtdQty ? formData.packingStylePtdQty : undefined,
-        notePerStrip: formData.notePerStrip,
-        packShortPtdSpec: formData.packShortPtdSpec,
-        packShortPtdSize: formData.packShortPtdSize,
-        packShortPtdQty: formData.packShortPtdQty ? formData.packShortPtdQty : undefined,
-        packingStyleNpSize: formData.packingStyleNpSize,
-        packingStyleNpQty: formData.packingStyleNpQty ? formData.packingStyleNpQty : undefined,
-        noteForCtn: formData.noteForCtn,
-        outerSize: formData.outerSize,
-        outerQty: formData.outerQty ? formData.outerQty : undefined,
-        shrink: formData.shrink,
-        shrinkPacking: formData.shrinkPacking,
-        shipperSize: formData.shipperSize,
-        qtyPerShipper: formData.qtyPerShipper ? formData.qtyPerShipper : undefined,
-        shipperNote: formData.shipperNote,
-      };
-      
-      if (item?.otherDetails) {
-        promises.push(updateOtherDetailsMutation.mutateAsync({ 
-          itemId, 
-          id: item.otherDetails.id, 
-          data: otherDetailsData as any
-        }));
-      } else {
-        promises.push(createOtherDetailsMutation.mutateAsync({ itemId, data: otherDetailsData as any }));
-      }
-    }
-
-    // Execute all promises
-    if (promises.length > 0) {
-      await Promise.all(promises);
-    }
-  };
+  // Removed saveRelatedData function - all related data is now included in the main payload via transformFormDataToApi
 
   const onSubmit = async (data: ItemMasterFormData) => {
     try {
@@ -300,7 +104,7 @@ export default function ItemsDrawer({
       if (item) {
         const result = await updateItemMutation.mutateAsync({
           id: item.id,
-          data: transformedData as unknown as UpdateItemMasterData,
+          data: {...transformedData, itemCode: generatedItemCode || item.itemCode} as unknown as UpdateItemMasterData,
         });
         if (result) {
           createdItemId = item.id;
@@ -310,9 +114,10 @@ export default function ItemsDrawer({
           });
         }
       } else {
-        const result = await createItemMutation.mutateAsync(transformedData as unknown as CreateItemMasterData);
+        const result = await createItemMutation.mutateAsync({...transformedData, itemCode: generatedItemCode} as unknown as CreateItemMasterData);
         if (result) {
           createdItemId = result.id;
+          setCurrentItemId(result.id); // Set the currentItemId for new items
           toast({
             title: "Success",
             description: "Item created successfully",
@@ -320,23 +125,8 @@ export default function ItemsDrawer({
         }
       }
 
-      // Save related data
-      if (createdItemId > 0) {
-        try {
-          await saveRelatedData(createdItemId, data);
-          toast({
-            title: "Success",
-            description: "Item and related data saved successfully",
-          });
-        } catch (relatedDataError: any) {
-          console.error('Related data save error:', relatedDataError);
-          toast({
-            title: "Warning",
-            description: "Item saved but some related data could not be saved. Please check the details.",
-            variant: "destructive",
-          });
-        }
-      }
+      // Remove the separate saveRelatedData call since all data is already included in transformedData
+      // The transformFormDataToApi function includes all related data in the main payload
 
       onSuccess();
     } catch (error: any) {
@@ -354,24 +144,41 @@ export default function ItemsDrawer({
     onClose();
   };
 
-  const isLoading = createItemMutation.isPending || updateItemMutation.isPending;
+  const isLoading = createItemMutation.isPending || updateItemMutation.isPending || isLoadingItem;
 
   return (
     <RightDrawer 
       isOpen={isOpen} 
       onClose={handleClose}
-      title={item ? "Edit Item" : "Create New Item"}
-      description={item 
-        ? "Update the item information below." 
-        : "Fill in the information below to create a new item."
-      }
       size="full"
     >
       <div className="mx-auto w-full">
+        {/* Custom Header with Item Code Generator */}
+        <div className="flex items-start p-4 border-b bg-[#d1f2ff]">
+          <div className="flex-1">
+            <h2 className="text-lg font-semibold">
+              {item ? "Edit Item" : "Create New Item"}
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              {item 
+                ? "Update the item information below." 
+                : "Fill in the information below to create a new item."
+              }
+            </p>
+          </div>
+          <div className="flex-1 flex justify-center">
+            <ItemCodeGenerator 
+              onCodeGenerated={setGeneratedItemCode}
+              initialValue={item?.itemCode}
+            />
+          </div>
+          <div className="flex-1"></div>
+        </div>
+
         <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit,onError)} className="space-y-4">
             <Tabs defaultValue="basic" className="w-full">
-              <TabsList className="grid w-full grid-cols-8">
+              <TabsList className="grid w-full grid-cols-9">
                 <TabsTrigger value="basic">Basic Info</TabsTrigger>
                 <TabsTrigger value="sales">Sales</TabsTrigger>
                 <TabsTrigger value="bought-out">Bought Out</TabsTrigger>
@@ -380,6 +187,7 @@ export default function ItemsDrawer({
                 <TabsTrigger value="specifications">Specifications</TabsTrigger>
                 {/* <TabsTrigger value="other">Other Details</TabsTrigger> */}
                 <TabsTrigger value="media">Media</TabsTrigger>
+                <TabsTrigger value="properties">Properties</TabsTrigger>
               </TabsList>
 
               <TabsContent value="basic" className="space-y-3">
@@ -411,7 +219,20 @@ export default function ItemsDrawer({
               </TabsContent> */}
 
               <TabsContent value="media" className="space-y-3">
-                <ItemMediaForm control={form.control} itemId={currentItemId} />
+                <ItemMediaForm 
+                  control={form.control} 
+                  itemId={currentItemId} 
+                  mediaData={completeItemData?.media}
+                />
+              </TabsContent>
+
+              <TabsContent value="properties" className="space-y-3">
+                <KeyValueForm 
+                  control={form.control} 
+                  name="properties"
+                  itemId={currentItemId}
+                  entityType="itemMaster"
+                />
               </TabsContent>
             </Tabs>
 

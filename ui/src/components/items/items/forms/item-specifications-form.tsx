@@ -22,7 +22,7 @@ export function ItemSpecificationsForm({ control, itemId }: ItemSpecificationsFo
         <CardContent>
           <FormTextArea
             control={control}
-            name="specification"
+            name="itemSpecification"
             label="Item's Specification"
             placeholder="Enter detailed item specification..."
             rows={8}
