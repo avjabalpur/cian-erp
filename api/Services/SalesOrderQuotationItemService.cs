@@ -41,8 +41,6 @@ namespace Xcianify.Services
         public async Task<SalesOrderQuotationItemDto> CreateItemAsync(CreateSalesOrderQuotationItemDto quotationItemDto)
         {
             var quotationItem = _mapper.Map<SalesOrderQuotationItem>(quotationItemDto);
-            quotationItem.CreatedAt = DateTime.UtcNow;
-            quotationItem.UpdatedAt = DateTime.UtcNow;
             quotationItem.IsDeleted = false;
 
             var createdQuotationItem = await _quotationItemRepository.AddAsync(quotationItem);
@@ -56,7 +54,6 @@ namespace Xcianify.Services
                 throw new NotFoundException("Quotation item not found");
 
             _mapper.Map(quotationItemDto, existingQuotationItem);
-            existingQuotationItem.UpdatedAt = DateTime.UtcNow;
 
             await _quotationItemRepository.UpdateAsync(existingQuotationItem);
         }

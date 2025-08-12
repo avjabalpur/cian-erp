@@ -33,23 +33,6 @@ export const companyOptions: SelectOption[] = [
   { label: "JM LIFESCIENCES PVT. LTD.", value: "JM LIFESCIENCES PVT. LTD." },
 ];
 
-// Sort Options for Quotations
-export const quotationSortOptions: SelectOption[] = [
-  { value: "created_at", label: "Created Date" },
-  { value: "updated_at", label: "Updated Date" },
-  { value: "quotation_number", label: "Quotation Number" },
-  { value: "quotation_date", label: "Quotation Date" },
-  { value: "customer_name", label: "Customer" },
-  { value: "total_amount", label: "Total Amount" },
-  { value: "company_name", label: "Company" }
-];
-
-// Sort Order Options
-export const sortOrderOptions: SelectOption[] = [
-  { value: "desc", label: "Descending" },
-  { value: "asc", label: "Ascending" }
-];
-
 // nuqs Parsers for Quotations
 export const quotationParsers = {
   page: parseAsInteger.withDefault(1),
@@ -74,37 +57,6 @@ export const getQuotationStatusColor = (status: string): StatusOption => {
 export const getCompanyOption = (company: string): SelectOption => {
   return companyOptions.find(option => option.value === company) || 
          companyOptions[0]; // Default to first option
-};
-
-export const formatCurrency = (amount: string | number): string => {
-  if (!amount) return "₹0.00";
-  const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-  return `₹${num.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-};
-
-export const formatDate = (date: string | Date): string => {
-  if (!date) return "-";
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
-};
-
-export const formatDateTime = (date: string | Date): string => {
-  if (!date) return "-";
-  return new Date(date).toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-};
-
-export const formatPercentage = (percentage: number): string => {
-  if (!percentage) return "0%";
-  return `${percentage.toFixed(1)}%`;
 };
 
 // Filter Default Values

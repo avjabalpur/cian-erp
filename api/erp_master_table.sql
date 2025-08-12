@@ -192,7 +192,7 @@ CREATE TABLE organizations (
 -- organization account details
 CREATE TABLE organization_accounts (
     id SERIAL PRIMARY KEY,
-    organization_id INTEGER NOT NULL REFERENCES organizations(organization_id),
+    organization_id INTEGER NOT NULL REFERENCES organizations(id),
     account_type VARCHAR(20) NOT NULL, -- BANK, PAYPAL, etc.
     account_number VARCHAR(50) NOT NULL,
     bank_name VARCHAR(100),

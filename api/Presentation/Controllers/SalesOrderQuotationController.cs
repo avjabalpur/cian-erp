@@ -20,10 +20,13 @@ namespace Xcianify.Presentation.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] QuotationFilterDto? filterDto = null)
         {
-            var quotations = await _quotationService.GetAllQuotationsAsync();
-            return Ok(quotations);
+            // If no filter provided, create default one
+            filterDto ??= new QuotationFilterDto();
+            
+            var (items, totalCount) = await _quotationService.GetAllAsync(filterDto);
+            return Ok(new { Items = items, TotalCount = totalCount });
         }
 
         [HttpGet("{id}")]
@@ -60,22 +63,7 @@ namespace Xcianify.Presentation.Controllers
             var quotation = await _quotationService.GetQuotationByNumberAsync(quotationNumber);
             return Ok(quotation);
         }
-
-
-
-        [HttpGet("customer/{customerName}")]
-        public async Task<IActionResult> GetByCustomer(string customerName)
-        {
-            var quotations = await _quotationService.GetQuotationsByCustomerAsync(customerName);
-            return Ok(quotations);
-        }
-
-        [HttpGet("company/{companyName}")]
-        public async Task<IActionResult> GetByCompany(string companyName)
-        {
-            var quotations = await _quotationService.GetQuotationsByCompanyAsync(companyName);
-            return Ok(quotations);
-        }
+        
 
         // --- Sales Order Quotation Items Endpoints ---
 

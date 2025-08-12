@@ -23,10 +23,11 @@ namespace Xcianify.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<IEnumerable<SalesOrderQuotationDto>> GetAllQuotationsAsync()
+        public async Task<(IEnumerable<SalesOrderQuotationDto> Items, int TotalCount)> GetAllAsync(QuotationFilterDto filterDto)
         {
-            var quotations = await _quotationRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<SalesOrderQuotationDto>>(quotations);
+            var (items, totalCount) = await _quotationRepository.GetAllAsync(filterDto);
+            var mappedItems = _mapper.Map<IEnumerable<SalesOrderQuotationDto>>(items);
+            return (mappedItems, totalCount);
         }
 
         public async Task<SalesOrderQuotationDto> GetQuotationByIdAsync(int id)
@@ -88,24 +89,6 @@ namespace Xcianify.Services
                 throw new NotFoundException("Quotation not found");
 
             await _quotationRepository.DeleteAsync(id);
-        }
-
-        public async Task<IEnumerable<SalesOrderQuotationDto>> GetQuotationsByCustomerAsync(string customerName)
-        {
-            var quotations = await _quotationRepository.GetByCustomerNameAsync(customerName);
-            return _mapper.Map<IEnumerable<SalesOrderQuotationDto>>(quotations);
-        }
-
-        public async Task<IEnumerable<SalesOrderQuotationDto>> GetQuotationsByCompanyAsync(string companyName)
-        {
-            var quotations = await _quotationRepository.GetByCompanyNameAsync(companyName);
-            return _mapper.Map<IEnumerable<SalesOrderQuotationDto>>(quotations);
-        }
-
-        public async Task<IEnumerable<SalesOrderQuotationDto>> GetQuotationsByDateRangeAsync(DateTime startDate, DateTime endDate)
-        {
-            var quotations = await _quotationRepository.GetByDateRangeAsync(startDate, endDate);
-            return _mapper.Map<IEnumerable<SalesOrderQuotationDto>>(quotations);
         }
     }
 } 
