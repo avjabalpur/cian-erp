@@ -1,5 +1,6 @@
 
 import { ItemMedia } from "@/hooks/items/use-item-media";
+import { PropertyPair } from "@/types/property";
 
 export interface ItemMaster {
   id: number;
@@ -68,6 +69,7 @@ export interface ItemMaster {
   exportDetails?: ItemExportDetails;
   otherDetails?: ItemOtherDetail;
   media?: ItemMedia[];
+  properties?: PropertyPair[];
 }
 
 export interface CreateItemMasterData {
@@ -128,6 +130,7 @@ export interface CreateItemMasterData {
   boughtOutDetails?: CreateItemBoughtOutDetailsData;
   salesDetail?: CreateItemSalesDetailData;
   stockAnalysis?: CreateItemStockAnalysisData;
+  properties?: PropertyPair[];
 }
 
 export interface UpdateItemMasterData {
@@ -190,6 +193,7 @@ export interface UpdateItemMasterData {
   stockAnalysis?: UpdateItemStockAnalysisData;
   exportDetails?: UpdateItemExportDetailsData;
   otherDetails?: UpdateItemOtherDetailData;
+  properties?: PropertyPair[];
 }
 
 export interface ItemMasterFilter {
@@ -555,4 +559,14 @@ export interface PaginatedResponse<T> {
   totalPages: number;
   hasNextPage: boolean;
   hasPreviousPage: boolean;
+}
+
+// Item Code Sequence Types
+export interface CreateItemCodeSequenceData {
+  itemCode: string;
+}
+
+export interface ItemCodeSequenceResponse {
+  id: number;
+  itemCode: string;
 } 

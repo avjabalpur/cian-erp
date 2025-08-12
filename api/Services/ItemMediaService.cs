@@ -9,20 +9,24 @@ using Xcianify.Core.Domain.Services;
 using Xcianify.Core.DTOs.ItemMedia;
 using Xcianify.Core.Exceptions;
 using Xcianify.Core.Model;
+using System.Linq;
 
 namespace Xcianify.Services
 {
     public class ItemMediaService : IItemMediaService
     {
         private readonly IItemMediaRepository _repository;
+        private readonly IItemMasterRepository _itemMasterRepository;
         private readonly IMapper _mapper;
         private readonly string _uploadPath;
 
         public ItemMediaService(
             IItemMediaRepository repository,
+            IItemMasterRepository itemMasterRepository,
             IMapper mapper)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _itemMasterRepository = itemMasterRepository ?? throw new ArgumentNullException(nameof(itemMasterRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "item-media");
             
@@ -49,7 +53,41 @@ namespace Xcianify.Services
 
         public async Task<ItemMediaDto> CreateAsync(CreateItemMediaDto createDto, int userId)
         {
-            var entity = _mapper.Map<ItemMedia>(createDto);
+            // Validate that the item exists
+            try
+            {
+                //var item = await _itemMasterRepository.GetItemByIdAsync(createDto.ItemId);
+                //if (item == null)
+                //    throw new NotFoundException($"Item with ID {createDto.ItemId} not found");
+            }
+            catch (NotFoundException)
+            {
+                throw new NotFoundException($"Item with ID {createDto.ItemId} not found");
+            }
+
+            // Validate file
+            if (createDto.File == null || createDto.File.Length == 0)
+                throw new ArgumentException("File is required and cannot be empty");
+
+            // Validate file size (e.g., 10MB limit)
+            const long maxFileSize = 10 * 1024 * 1024; // 10MB
+            if (createDto.File.Length > maxFileSize)
+                throw new ArgumentException($"File size cannot exceed {maxFileSize / (1024 * 1024)}MB");
+
+            // Validate file type
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".mp4", ".avi", ".mov", ".wmv", ".mp3", ".wav", ".aac", ".pdf", ".doc", ".docx", ".txt" };
+            var fileExtension = Path.GetExtension(createDto.File.FileName).ToLowerInvariant();
+            if (!allowedExtensions.Contains(fileExtension))
+                throw new ArgumentException($"File type {fileExtension} is not allowed");
+
+            var entity = new ItemMedia
+            {
+                ItemId = createDto.ItemId,
+                Description = createDto.Description,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = userId,
+                IsDeleted = false
+            };
             
             // Handle file upload if file is provided
             if (createDto.File != null)
@@ -57,7 +95,7 @@ namespace Xcianify.Services
                 var fileInfo = await SaveFileAsync(createDto.File);
                 entity.FileName = fileInfo.FileName;
                 entity.FileExtension = fileInfo.FileExtension;
-                entity.FileSizeBytes = fileInfo.FileSizeBytes;
+                entity.FileSizeBytes = (int?)fileInfo.FileSizeBytes;
                 entity.MimeType = fileInfo.MimeType;
                 entity.MediaUrl = fileInfo.MediaUrl;
                 entity.MediaType = GetMediaType(fileInfo.FileExtension);
@@ -74,9 +112,15 @@ namespace Xcianify.Services
             if (existing == null)
                 throw new NotFoundException("ItemMedia not found");
             
-            var entity = _mapper.Map<ItemMedia>(updateDto);
-            entity.Id = id;
-            entity.ItemId = existing.ItemId; // Preserve the original ItemId
+            var entity = new ItemMedia
+            {
+                Id = id,
+                ItemId = existing.ItemId, // Preserve the original ItemId
+                Description = updateDto.Description,
+                UpdatedAt = DateTime.UtcNow,
+                UpdatedBy = userId,
+                IsDeleted = false
+            };
             
             // Handle file upload if new file is provided
             if (updateDto.File != null)
@@ -90,7 +134,7 @@ namespace Xcianify.Services
                 var fileInfo = await SaveFileAsync(updateDto.File);
                 entity.FileName = fileInfo.FileName;
                 entity.FileExtension = fileInfo.FileExtension;
-                entity.FileSizeBytes = fileInfo.FileSizeBytes;
+                entity.FileSizeBytes = (int?)fileInfo.FileSizeBytes;
                 entity.MimeType = fileInfo.MimeType;
                 entity.MediaUrl = fileInfo.MediaUrl;
                 entity.MediaType = GetMediaType(fileInfo.FileExtension);
@@ -128,9 +172,15 @@ namespace Xcianify.Services
             if (file == null || file.Length == 0)
                 throw new ArgumentException("File is empty or null");
 
-            // Generate unique filename
+            // Use original filename with timestamp to ensure uniqueness
+            var originalFileName = Path.GetFileNameWithoutExtension(file.FileName);
             var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
-            var fileName = $"{Guid.NewGuid()}{fileExtension}";
+            var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+            var fileName = $"{originalFileName}_{timestamp}{fileExtension}";
+            
+            // Ensure filename is safe for file system
+            fileName = MakeSafeFileName(fileName);
+            
             var filePath = Path.Combine(_uploadPath, fileName);
             
             // Save file to disk
@@ -175,6 +225,37 @@ namespace Xcianify.Services
                 ".pdf" => "document",
                 _ => "other"
             };
+        }
+
+        private string MakeSafeFileName(string fileName)
+        {
+            // Remove or replace invalid characters for file system
+            var invalidChars = Path.GetInvalidFileNameChars();
+            var safeFileName = fileName;
+            
+            foreach (var invalidChar in invalidChars)
+            {
+                safeFileName = safeFileName.Replace(invalidChar, '_');
+            }
+            
+            // Remove any double underscores that might have been created
+            while (safeFileName.Contains("__"))
+            {
+                safeFileName = safeFileName.Replace("__", "_");
+            }
+            
+            // Trim underscores from start and end
+            safeFileName = safeFileName.Trim('_');
+            
+            // Ensure the filename is not too long (Windows has a 255 character limit for the full path)
+            if (safeFileName.Length > 200) // Leave some room for path
+            {
+                var extension = Path.GetExtension(safeFileName);
+                var nameWithoutExtension = Path.GetFileNameWithoutExtension(safeFileName);
+                safeFileName = nameWithoutExtension.Substring(0, 200 - extension.Length) + extension;
+            }
+            
+            return safeFileName;
         }
     }
 }

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
-import { ItemMaster, CreateItemMasterData, UpdateItemMasterData, ItemMasterFilter, PaginatedResponse } from '@/types/item-master';
+import { ItemMaster, CreateItemMasterData, UpdateItemMasterData, ItemMasterFilter, PaginatedResponse, CreateItemCodeSequenceData, ItemCodeSequenceResponse } from '@/types/item-master';
 
 // API Functions
 const getItemMasters = async (filter?: ItemMasterFilter): Promise<PaginatedResponse<ItemMaster>> => {
@@ -98,4 +98,16 @@ export const useDeleteItemMaster = () => {
       queryClient.invalidateQueries({ queryKey: ['item-masters'] });
     },
   });
-}; 
+}
+
+// Item Code Sequence API
+const generateItemCode = async (data: CreateItemCodeSequenceData): Promise<ItemCodeSequenceResponse> => {
+  const { data: response } = await api.post('/items/ItemCodeSequence', data);
+  return response;
+};
+
+export const useGenerateItemCode = () => {
+  return useMutation<ItemCodeSequenceResponse, Error, CreateItemCodeSequenceData>({
+    mutationFn: generateItemCode,
+  });
+};; 

@@ -9,6 +9,7 @@ namespace Xcianify.Core.Domain.Repositories
 {
     public interface IItemCodeSequenceRepository
     {
-        Task<int> CreateAsync(ItemCodeSequence entity);
+        Task<ItemCodeSequence> CreateAsync(ItemCodeSequence entity);
+        Task<int> GetNextSequenceNumberAsync();
     }
 }

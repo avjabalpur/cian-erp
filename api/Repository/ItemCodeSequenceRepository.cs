@@ -24,15 +24,28 @@ namespace Xcianify.Repository
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public async Task<int> CreateAsync(ItemCodeSequence entity)
+        public async Task<ItemCodeSequence> CreateAsync(ItemCodeSequence entity)
         {
             const string query = @"
-                INSERT INTO item_code_sequences (item_code)
-                VALUES (@ItemCode)
-                RETURNING id;";
+        INSERT INTO item_code_sequences (item_code)
+        VALUES (@ItemCode)
+        RETURNING id, item_code As ItemCode;"; // Return both columns
 
             using var connection = _dbContext.GetConnection();
-            return await connection.QueryFirstAsync<int>(query, entity);
+            return await connection.QueryFirstAsync<ItemCodeSequence>(query, entity);
         }
+
+        public async Task<int> GetNextSequenceNumberAsync()
+        {
+            const string query = @"
+        SELECT COALESCE(MAX(
+            CAST(REGEXP_REPLACE(item_code, '\D', '', 'g') AS INTEGER)
+        ), 0) + 1 
+        FROM item_code_sequences;";
+
+            using var connection = _dbContext.GetConnection();
+            return await connection.QueryFirstAsync<int>(query);
+        }
+
     }
 }

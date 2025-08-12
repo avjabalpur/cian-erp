@@ -33,6 +33,49 @@ export function ItemMediaForm({ control, itemId, mediaData }: ItemMediaFormProps
   const updateMediaMutation = useUpdateItemMedia();
   const deleteMediaMutation = useDeleteItemMedia();
 
+  // Upload pending files when itemId becomes available
+  useEffect(() => {
+    if (itemId && pendingFiles.length > 0) {
+      uploadPendingFiles();
+    }
+  }, [itemId, pendingFiles.length]);
+
+  const uploadPendingFiles = async () => {
+    if (!itemId || pendingFiles.length === 0) return;
+
+    setUploading(true);
+    try {
+      for (const file of pendingFiles) {
+        const formData = new FormData();
+        formData.append('File', file);
+        formData.append('ItemId', itemId.toString());
+        formData.append('MediaType', getMediaTypeFromFile(file));
+        formData.append('FileName', file.name || 'temp_file');
+        formData.append('FileExtension', file.name.split('.').pop() || 'tmp');
+        formData.append('FileSizeBytes', file.size.toString());
+        formData.append('MimeType', file.type || 'application/octet-stream');
+        formData.append('Description', 'Uploaded file');
+        
+        await createMediaMutation.mutateAsync({ itemId, formData });
+      }
+      
+      setPendingFiles([]);
+      toast({
+        title: "Success",
+        description: `${pendingFiles.length} pending file(s) uploaded successfully`,
+      });
+      refetch();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to upload pending files",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const mediaTypeOptions = [
     { label: "Select media type", value: "-1" },
     { label: "Image", value: "image" },
@@ -113,12 +156,17 @@ export function ItemMediaForm({ control, itemId, mediaData }: ItemMediaFormProps
 
     setUploading(true);
     try {
-      // Create FormData for file upload
+      // Create FormData for file upload with all required fields
       const formData = new FormData();
       formData.append('File', selectedFile);
       formData.append('ItemId', itemId.toString());
-      formData.append('Description', '');
       formData.append('MediaType', getMediaTypeFromFile(selectedFile));
+      formData.append('FileName', selectedFile.name || 'temp_file');
+      formData.append('FileExtension', selectedFile.name.split('.').pop() || 'tmp');
+      formData.append('FileSizeBytes', selectedFile.size.toString());
+      formData.append('MimeType', selectedFile.type || 'application/octet-stream');
+      // Remove hardcoded MediaUrl - let backend handle file path generation
+      formData.append('Description', 'Uploaded file');
       
       await createMediaMutation.mutateAsync({ itemId, formData });
       
@@ -182,7 +230,7 @@ export function ItemMediaForm({ control, itemId, mediaData }: ItemMediaFormProps
           {!itemId && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
               <p className="text-sm text-yellow-800">
-                💡 Save the item first to upload media files. You can select files now and they will be uploaded after saving.
+                💡 Create the item first to upload media files.
               </p>
             </div>
           )}
@@ -193,31 +241,31 @@ export function ItemMediaForm({ control, itemId, mediaData }: ItemMediaFormProps
               label="Media Type"
               options={mediaTypeOptions}
             />
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <div className="flex-1">
-                  <label className="text-[12px] font-medium">File</label>
-                  <input
-                    type="file"
-                    onChange={handleFileSelect}
-                    className="w-full p-2 border border-gray-300 rounded text-[12px]"
-                    accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
-                  />
-                </div>
-                <Button
-                  type="button"
-                  disabled={!selectedFile || uploading}
-                  className="px-4 py-2 h-[42px] bg-blue-600 hover:bg-blue-700 text-white"
-                  title={!selectedFile ? "Please select a file first" : ""}
-                  onClick={() => {
-                    console.log('Button clicked - selectedFile:', selectedFile, 'itemId:', itemId, 'uploading:', uploading);
-                    handleUpload();
-                  }}
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  {uploading ? "Uploading..." : !itemId ? "Queue File" : "Upload"}
-                </Button>
-              </div>
+                         <div className="space-y-3">
+               <div className="flex items-end gap-3">
+                 <div className="flex-1">
+                   <label className="text-[12px] font-medium">File</label>
+                   <input
+                     type="file"
+                     onChange={handleFileSelect}
+                     className="w-full p-2 border border-gray-300 rounded text-[12px]"
+                     accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
+                   />
+                 </div>
+                 <Button
+                   type="button"
+                   disabled={!selectedFile || uploading}
+                   className="px-4 py-2 h-[42px] bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm transition-colors duration-200"
+                   title={!selectedFile ? "Please select a file first" : ""}
+                   onClick={() => {
+                     console.log('Button clicked - selectedFile:', selectedFile, 'itemId:', itemId, 'uploading:', uploading);
+                     handleUpload();
+                   }}
+                 >
+                   <Upload className="h-4 w-4 mr-2" />
+                   {uploading ? "Uploading..." : !itemId ? "Queue File" : "Upload"}
+                 </Button>
+               </div>
               {selectedFile && (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                   <p className="text-sm text-green-800 flex items-center">
@@ -243,7 +291,7 @@ export function ItemMediaForm({ control, itemId, mediaData }: ItemMediaFormProps
                       </div>
           </CardContent>
         </Card>
-      ) 
+    
       
       {/* Media List */}
       <Card>

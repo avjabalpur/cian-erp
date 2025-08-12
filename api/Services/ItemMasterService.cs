@@ -6,6 +6,7 @@ using Xcianify.Core.Exceptions;
 using System.Transactions;
 using Xcianify.Core.Model;
 using System.Linq;
+using Xcianify.Core.DTOs.ItemMedia;
 
 namespace Xcianify.Services
 {
@@ -18,7 +19,7 @@ namespace Xcianify.Services
         private readonly IItemStockAnalysisService _itemStockAnalysisService;
         private readonly IItemBoughtOutDetailsService _itemBoughtOutDetailsService;
         private readonly IItemOtherDetailsService _itemOtherDetailsService;
-        private readonly IItemMediaService _itemMediaService;
+        private readonly IItemMediaRepository _itemMediaRepository;
         private readonly IMapper _mapper;
 
         public ItemMasterService(
@@ -29,7 +30,7 @@ namespace Xcianify.Services
             IItemStockAnalysisService itemStockAnalysisService,
             IItemBoughtOutDetailsService itemBoughtOutDetailsService,
             IItemOtherDetailsService itemOtherDetailsService,
-            IItemMediaService itemMediaService,
+            IItemMediaRepository itemMediaRepository,
             IMapper mapper)
         {
             _itemMasterRepository = itemMasterRepository ?? throw new ArgumentNullException(nameof(itemMasterRepository));
@@ -39,7 +40,7 @@ namespace Xcianify.Services
             _itemStockAnalysisService = itemStockAnalysisService ?? throw new ArgumentNullException(nameof(itemStockAnalysisService));
             _itemBoughtOutDetailsService = itemBoughtOutDetailsService ?? throw new ArgumentNullException(nameof(itemBoughtOutDetailsService));
             _itemOtherDetailsService = itemOtherDetailsService ?? throw new ArgumentNullException(nameof(itemOtherDetailsService));
-            _itemMediaService = itemMediaService ?? throw new ArgumentNullException(nameof(itemMediaService));
+            _itemMediaRepository = itemMediaRepository ?? throw new ArgumentNullException(nameof(itemMediaRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
@@ -106,10 +107,10 @@ namespace Xcianify.Services
                 itemDto.OtherDetails = otherDetails.First();
             }
 
-            var media = await _itemMediaService.GetByItemIdAsync(id);
+            var media = await _itemMediaRepository.GetByItemIdAsync(id);
             if (media != null && media.Any())
             {
-                itemDto.Media = media.ToList();
+                itemDto.Media = _mapper.Map<List<ItemMediaDto>>(media);
             }
             
             return itemDto;
@@ -133,7 +134,7 @@ namespace Xcianify.Services
             return itemDto;
         }
 
-        public async Task<ItemMasterDto> CreateItemAsync(CreateItemMasterDto createDto)
+        public async Task<ItemMasterDto> CreateItemAsync(CreateItemMasterDto createDto,int userId)
         {
             // Check if item code already exists
             if (await _itemMasterRepository.ItemCodeExistsAsync(createDto.ItemCode))
@@ -148,8 +149,8 @@ namespace Xcianify.Services
                 // Create the item master
                 var item = _mapper.Map<ItemMaster>(createDto);
                 item.CreatedAt = DateTime.UtcNow;
-                item.CreatedBy = 1; // TODO: Get from current user context
-                item.UpdatedBy = 1; 
+                item.CreatedBy = userId; // TODO: Get from current user context
+                item.UpdatedBy = userId; 
 
                 var createdItem = await _itemMasterRepository.AddAsync(item);
 
@@ -158,8 +159,8 @@ namespace Xcianify.Services
                 {
                     var specification = _mapper.Map<ItemSpecification>(createDto.Specification);
                     specification.ItemId = createdItem.Id;
-                    specification.CreatedBy = 1; // TODO: Get from current user context
-                    specification.UpdatedBy = 1;
+                    specification.CreatedBy = userId; // TODO: Get from current user context
+                    specification.UpdatedBy = userId;
                     specification.CreatedAt = DateTime.UtcNow;
                     specification.UpdatedAt = DateTime.UtcNow;
                     
@@ -201,12 +202,8 @@ namespace Xcianify.Services
                     await _itemOtherDetailsService.CreateAsync(createDto.OtherDetails, 1);
                 }
 
-                // Create media if provided
-                if (createDto.Media != null)
-                {
-                    createDto.Media.ItemId = createdItem.Id;
-                    await _itemMediaService.CreateAsync(createDto.Media, 1);
-                }
+                // Note: Media should be handled separately via dedicated media endpoints
+                // This prevents circular dependencies and allows for better file handling
                
                 // Get the created item without related data to avoid exceptions
                 var result = _mapper.Map<ItemMasterDto>(createdItem);

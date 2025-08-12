@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xcianify.Core.DTOs.ItemMaster;
+using Xcianify.Core.Model;
 
 namespace Xcianify.Core.Domain.Services
 {
     public interface IItemCodeSequenceService
     {
-        Task<int> CreateAsync(CreateItemCodeSequenceDto dto);
+        Task<ItemCodeSequence> CreateAsync(CreateItemCodeSequenceDto dto);
     }
 }

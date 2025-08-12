@@ -19,14 +19,22 @@ namespace Xcianify.Services
             _repository = repository;
         }
 
-        public async Task<int> CreateAsync(CreateItemCodeSequenceDto dto)
+        public async Task<ItemCodeSequence> CreateAsync(CreateItemCodeSequenceDto dto)
         {
+            // 1. Get next integer
+            int nextNumber = await _repository.GetNextSequenceNumberAsync(); // starts at 1
+
+            // 2. Build final code
+            string finalItemCode = $"{dto.ItemCode}{nextNumber}";
+
+            // 3. Create entity
             var entity = new ItemCodeSequence
             {
-                ItemCode = dto.ItemCode
+                ItemCode = finalItemCode
             };
-
-            return await _repository.CreateAsync(entity);
+            var result= await _repository.CreateAsync(entity);
+            // 4. Save
+            return result;
         }
     }
 }

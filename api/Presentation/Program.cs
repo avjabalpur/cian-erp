@@ -193,6 +193,8 @@ builder.Services.AddScoped<IItemOtherDetailsRepository, ItemOtherDetailsReposito
 builder.Services.AddScoped<IItemOtherDetailsService, ItemOtherDetailsService>();
 builder.Services.AddScoped<IItemExportDetailsRepository, ItemExportDetailsRepository>();
 builder.Services.AddScoped<IItemExportDetailsService, ItemExportDetailsService>();
+builder.Services.AddScoped<IItemCodeSequenceService, ItemCodeSequenceService>();
+builder.Services.AddScoped<IItemCodeSequenceRepository, ItemCodeSequenceRepository>();
 
 // Register custom mappers
 builder.Services.AddScoped<ItemSpecificationMapper>();
@@ -216,6 +218,11 @@ builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 // Register role-related services
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+
+//Register ExtensionData
+builder.Services.AddScoped<IExtensionDataRepository, ExtensionDataRepository>();
+builder.Services.AddScoped<IExtensionDataService, ExtensionDataService>();
+
 
 // Register Sales Order repositories
 builder.Services.AddScoped<ISalesOrderRepository, SalesOrderRepository>();

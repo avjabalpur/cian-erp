@@ -32,7 +32,7 @@ namespace Xcianify.Repository
                     media_url as MediaUrl,
                     description as Description
                 FROM item_media 
-                WHERE id = @Id";
+                WHERE id = @Id AND is_deleted = 0";
             using var connection = _dbContext.GetConnection();
             return await connection.QueryFirstOrDefaultAsync<ItemMedia>(query, new { Id = id });
         }
@@ -49,9 +49,11 @@ namespace Xcianify.Repository
                     file_size_bytes as FileSizeBytes,
                     mime_type as MimeType,
                     media_url as MediaUrl,
-                    description as Description
+                    description as Description,
+                    is_deleted as IsDeleted
                 FROM item_media 
-                WHERE item_id = @ItemId";
+                WHERE item_id = @ItemId AND is_deleted = false
+                ORDER BY created_at DESC";
             using var connection = _dbContext.GetConnection();
             return await connection.QueryAsync<ItemMedia>(query, new { ItemId = itemId });
         }
@@ -61,10 +63,10 @@ namespace Xcianify.Repository
             const string query = @"
                 INSERT INTO item_media (
                     item_id, media_type, file_name, file_extension, file_size_bytes, 
-                    mime_type, media_url, description
+                    mime_type, media_url, description, created_at, created_by, is_deleted
                 ) VALUES (
                     @ItemId, @MediaType, @FileName, @FileExtension, @FileSizeBytes, 
-                    @MimeType, @MediaUrl, @Description
+                    @MimeType, @MediaUrl, @Description, @CreatedAt, @CreatedBy, @IsDeleted
                 ) RETURNING id;";
             using var connection = _dbContext.GetConnection();
             return await connection.ExecuteScalarAsync<int>(query, entity);
@@ -89,9 +91,9 @@ namespace Xcianify.Repository
 
         public async Task<bool> DeleteAsync(int id)
         {
-            const string query = @"DELETE FROM item_media WHERE id = @Id";
+            const string query = @"UPDATE item_media SET is_deleted = 1, updated_at = @UpdatedAt WHERE id = @Id AND is_deleted = 0";
             using var connection = _dbContext.GetConnection();
-            return await connection.ExecuteAsync(query, new { Id = id }) > 0;
+            return await connection.ExecuteAsync(query, new { Id = id, UpdatedAt = DateTime.UtcNow }) > 0;
         }
     }
 }

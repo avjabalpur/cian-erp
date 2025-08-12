@@ -9,6 +9,7 @@ using Xcianify.Core.DTOs.ItemMaster;
 using Xcianify.Core.DTOs.ItemMedia;
 using Xcianify.Core.DTOs.ItemOtherDetails;
 using Xcianify.Core.Exceptions;
+using Xcianify.Services;
 using static Xcianify.Core.DTOs.ItemMaster.CreateItemSalesDetailDto;
 
 namespace Xcianify.Presentation.Controllers
@@ -24,6 +25,7 @@ namespace Xcianify.Presentation.Controllers
         private readonly IItemStockAnalysisService _itemStockAnalysisService;
         private readonly IItemSpecificationService _itemSpecificationService;
         private readonly IItemBoughtOutDetailsService _itemBoughtOutDetailsService;
+        private readonly IItemCodeSequenceService _itemCodeSequenceService;
         private readonly ILogger<ItemMasterController> _logger;
 
         public ItemMasterController(
@@ -35,6 +37,7 @@ namespace Xcianify.Presentation.Controllers
             IItemStockAnalysisService itemStockAnalysisService,
             IItemSpecificationService itemSpecificationService,
             IItemBoughtOutDetailsService itemBoughtOutDetailsService,
+            IItemCodeSequenceService itemCodeSequenceService,
             ILogger<ItemMasterController> logger)
         {
             _itemMasterService = itemMasterService;
@@ -45,6 +48,7 @@ namespace Xcianify.Presentation.Controllers
             _itemStockAnalysisService = itemStockAnalysisService;
             _itemSpecificationService = itemSpecificationService;
             _itemBoughtOutDetailsService = itemBoughtOutDetailsService;
+            _itemCodeSequenceService = itemCodeSequenceService;
             _logger = logger;
         }
 
@@ -64,19 +68,14 @@ namespace Xcianify.Presentation.Controllers
             return Ok(item);
         }
 
-        [HttpGet("code/{itemCode}")]
-        public async Task<IActionResult> GetByItemCode(string itemCode)
-        {
-            var item = await _itemMasterService.GetItemByCodeAsync(itemCode);
-            return Ok(item);
-        }
-
+  
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateItemMasterDto request)
         {
+            var userId = CurrentUserId;
             if (request == null)
                 return BadRequest("Request body is required.");
-            var item = await _itemMasterService.CreateItemAsync(request);
+            var item = await _itemMasterService.CreateItemAsync(request,userId);
             return CreatedAtAction(nameof(GetById), new { itemId = item.Id }, item);
         }
 
@@ -467,5 +466,17 @@ namespace Xcianify.Presentation.Controllers
 
             return NoContent();
         }
+        [HttpPost("ItemCodeSequence")]
+        public async Task<IActionResult> Createitem_code_sequence([FromBody] CreateItemCodeSequenceDto createDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var newcode = await _itemCodeSequenceService.CreateAsync(createDto);
+
+            // Create the response object
+            return Ok(newcode);
+        }
+
     }
 }

@@ -11,10 +11,10 @@ namespace Xcianify.Core.Mappers
             CreateMap<ItemMedia, ItemMediaDto>();
 
             CreateMap<CreateItemMediaDto, ItemMedia>()
-                .ForMember(dest => dest.File, opt => opt.Ignore());
+               .ForSourceMember(src => src.File, opt => opt.DoNotValidate());
 
             CreateMap<UpdateItemMediaDto, ItemMedia>()
-                .ForMember(dest => dest.File, opt => opt.Ignore());
+               .ForSourceMember(src => src.File, opt => opt.DoNotValidate());
         }
     }
 } 

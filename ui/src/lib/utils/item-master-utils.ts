@@ -299,6 +299,9 @@ export const getItemMasterDefaultValues = (): ItemMasterFormData => ({
   shipperSize: "",
   qtyPerShipper: "",
   shipperNote: "",
+  
+  // Properties
+  properties: [],
 });
 
 export const mapItemToFormData = (item: any): ItemMasterFormData => {
@@ -462,6 +465,9 @@ export const mapItemToFormData = (item: any): ItemMasterFormData => {
     shipperSize: item.otherDetails?.shipperSize || "",
     qtyPerShipper: item.otherDetails?.qtyPerShipper ? item.otherDetails.qtyPerShipper.toString() : "",
     shipperNote: item.otherDetails?.shipperNote || "",
+    
+    // Properties
+    properties: item.properties || [],
   };
 };
 
@@ -763,6 +769,8 @@ export const transformFormDataToApi = (data: ItemMasterFormData) => {
       qtyPerShipper: qtyPerShipper || "",
       shipperNote: shipperNote || "",
     } : undefined,
+    
+    // Properties are now handled separately via extension-data API
   };
 };
 

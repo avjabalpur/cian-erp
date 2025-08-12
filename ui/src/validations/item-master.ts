@@ -509,6 +509,15 @@ export const itemMasterSchema = z.object({
   shipperSize: z.string().optional(),
   qtyPerShipper: z.string().optional(),
   shipperNote: z.string().optional(),
+  
+  // Properties
+  properties: z.array(z.object({
+    id: z.string(),
+    propertyKey: z.string(),
+    propertyLabel: z.string(),
+    propertyDescription: z.string().optional(),
+    propertyValue: z.string().optional(),
+  })).optional().default([]),
 });
 
 export type ItemTypeFormData = z.infer<typeof itemTypeSchema>;
