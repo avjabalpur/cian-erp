@@ -66,6 +66,14 @@ namespace Xcianify.Core.Model
         public string AssignedDesignerName { get; set; }
         public bool? PlantEmailSent { get; set; }
         
+        // Approval status properties from sales_order_stages
+        public bool? CostingApproved { get; set; }
+        public bool? QaApproved { get; set; }
+        public bool? DesignerApproved { get; set; }
+        public bool? IsFinalAuthorized { get; set; }
+        public bool? FinalQaApproved { get; set; }
+        public bool? PmApproved { get; set; }
+        
         // Additional fields for product info form
     }
 } 
