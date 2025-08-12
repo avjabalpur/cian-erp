@@ -20,15 +20,33 @@ namespace Xcianify.Repository
             using var connection = _context.GetConnection();
             var sql = @"
                 SELECT 
-                    id, customer_id, destination_code, transport_mode_code, transporter_code,
-                    lead_days, customer_distance, freight_indicator, supply_stock_location,
-                    allow_consignment_on_booking, customer_account_code, credit_limit,
-                    minimum_invoice_amount, customer_scheme_code, customer_broker_code,
-                    customer_broker_rate, cash_discount_percentage, misc_charge_percentage,
-                    misc_discount_percentage, payment_term_code, credit_period_days,
-                    new_party_credit_period_days, is_overdue_check, number_of_bills,
-                    outstanding_bill_period_days, outstanding_bill_account_indicator,
-                    created_at, updated_at
+                    id, customer_id AS CustomerId,
+    destination_code AS DestinationCode,
+    transport_mode_code AS TransportModeCode,
+    transporter_code AS TransporterCode,
+    lead_days AS LeadDays,
+    customer_distance AS CustomerDistance,
+    freight_indicator AS FreightIndicator,
+    supply_stock_location AS SupplyStockLocation,
+    allow_consignment_on_booking AS AllowConsignmentOnBooking,
+    customer_account_code AS CustomerAccountCode,
+    credit_limit AS CreditLimit,
+    minimum_invoice_amount AS MinimumInvoiceAmount,
+    customer_scheme_code AS CustomerSchemeCode,
+    customer_broker_code AS CustomerBrokerCode,
+    customer_broker_rate AS CustomerBrokerRate,
+    cash_discount_percentage AS CashDiscountPercentage,
+    misc_charge_percentage AS MiscChargePercentage,
+    misc_discount_percentage AS MiscDiscountPercentage,
+    payment_term_code AS PaymentTermCode,
+    credit_period_days AS CreditPeriodDays,
+    new_party_credit_period_days AS NewPartyCreditPeriodDays,
+    is_overdue_check AS IsOverdueCheck,
+    number_of_bills AS NumberOfBills,
+    outstanding_bill_period_days AS OutstandingBillPeriodDays,
+    outstanding_bill_account_indicator AS OutstandingBillAccountIndicator,
+    created_at AS CreatedAt,
+    updated_at AS UpdatedAt
                 FROM customer_business_terms 
                 WHERE customer_id = @CustomerId
                 ORDER BY created_at DESC";
@@ -42,15 +60,33 @@ namespace Xcianify.Repository
             using var connection = _context.GetConnection();
             var sql = @"
                 SELECT 
-                    id, customer_id, destination_code, transport_mode_code, transporter_code,
-                    lead_days, customer_distance, freight_indicator, supply_stock_location,
-                    allow_consignment_on_booking, customer_account_code, credit_limit,
-                    minimum_invoice_amount, customer_scheme_code, customer_broker_code,
-                    customer_broker_rate, cash_discount_percentage, misc_charge_percentage,
-                    misc_discount_percentage, payment_term_code, credit_period_days,
-                    new_party_credit_period_days, is_overdue_check, number_of_bills,
-                    outstanding_bill_period_days, outstanding_bill_account_indicator,
-                    created_at, updated_at
+                    id,  customer_id AS CustomerId,
+    destination_code AS DestinationCode,
+    transport_mode_code AS TransportModeCode,
+    transporter_code AS TransporterCode,
+    lead_days AS LeadDays,
+    customer_distance AS CustomerDistance,
+    freight_indicator AS FreightIndicator,
+    supply_stock_location AS SupplyStockLocation,
+    allow_consignment_on_booking AS AllowConsignmentOnBooking,
+    customer_account_code AS CustomerAccountCode,
+    credit_limit AS CreditLimit,
+    minimum_invoice_amount AS MinimumInvoiceAmount,
+    customer_scheme_code AS CustomerSchemeCode,
+    customer_broker_code AS CustomerBrokerCode,
+    customer_broker_rate AS CustomerBrokerRate,
+    cash_discount_percentage AS CashDiscountPercentage,
+    misc_charge_percentage AS MiscChargePercentage,
+    misc_discount_percentage AS MiscDiscountPercentage,
+    payment_term_code AS PaymentTermCode,
+    credit_period_days AS CreditPeriodDays,
+    new_party_credit_period_days AS NewPartyCreditPeriodDays,
+    is_overdue_check AS IsOverdueCheck,
+    number_of_bills AS NumberOfBills,
+    outstanding_bill_period_days AS OutstandingBillPeriodDays,
+    outstanding_bill_account_indicator AS OutstandingBillAccountIndicator,
+    created_at AS CreatedAt,
+    updated_at AS UpdatedAt
                 FROM customer_business_terms 
                 WHERE id = @Id";
 

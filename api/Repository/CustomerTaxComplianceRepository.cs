@@ -20,12 +20,27 @@ namespace Xcianify.Repository
             using var connection = _context.GetConnection();
             var sql = @"
                 SELECT 
-                    id, customer_id, vat_form_code, central_form_code, is_eligible_for_tcs,
-                    tcs_type, is_applicable_higher_rate, is_deemed_non_resident,
-                    is_deemed_permanent_establishment, is_bill_discount, is_reverse_end_of_year,
-                    customer_interface_code, interface_file_format, projection_ratio,
-                    number_of_displays, label_layout, number_of_copies, special_terms,
-                    documents_through, created_at, updated_at
+                    id, customer_id AS CustomerId,
+vat_form_code AS VatFormCode,
+central_form_code AS CentralFormCode,
+is_eligible_for_tcs AS IsEligibleForTcs,
+tcs_type AS TcsType,
+is_applicable_higher_rate AS IsApplicableHigherRate,
+is_deemed_non_resident AS IsDeemedNonResident,
+is_deemed_permanent_establishment AS IsDeemedPermanentEstablishment,
+is_bill_discount AS IsBillDiscount,
+is_reverse_end_of_year AS IsReverseEndOfYear,
+customer_interface_code AS CustomerInterfaceCode,
+interface_file_format AS InterfaceFileFormat,
+projection_ratio AS ProjectionRatio,
+number_of_displays AS NumberOfDisplays,
+label_layout AS LabelLayout,
+number_of_copies AS NumberOfCopies,
+special_terms AS SpecialTerms,
+documents_through AS DocumentsThrough,
+created_at AS CreatedAt,
+updated_at AS UpdatedAt
+
                 FROM customer_tax_compliance 
                 WHERE customer_id = @CustomerId
                 ORDER BY created_at DESC";
@@ -39,12 +54,27 @@ namespace Xcianify.Repository
             using var connection = _context.GetConnection();
             var sql = @"
                 SELECT 
-                    id, customer_id, vat_form_code, central_form_code, is_eligible_for_tcs,
-                    tcs_type, is_applicable_higher_rate, is_deemed_non_resident,
-                    is_deemed_permanent_establishment, is_bill_discount, is_reverse_end_of_year,
-                    customer_interface_code, interface_file_format, projection_ratio,
-                    number_of_displays, label_layout, number_of_copies, special_terms,
-                    documents_through, created_at, updated_at
+                    id,customer_id AS CustomerId,
+vat_form_code AS VatFormCode,
+central_form_code AS CentralFormCode,
+is_eligible_for_tcs AS IsEligibleForTcs,
+tcs_type AS TcsType,
+is_applicable_higher_rate AS IsApplicableHigherRate,
+is_deemed_non_resident AS IsDeemedNonResident,
+is_deemed_permanent_establishment AS IsDeemedPermanentEstablishment,
+is_bill_discount AS IsBillDiscount,
+is_reverse_end_of_year AS IsReverseEndOfYear,
+customer_interface_code AS CustomerInterfaceCode,
+interface_file_format AS InterfaceFileFormat,
+projection_ratio AS ProjectionRatio,
+number_of_displays AS NumberOfDisplays,
+label_layout AS LabelLayout,
+number_of_copies AS NumberOfCopies,
+special_terms AS SpecialTerms,
+documents_through AS DocumentsThrough,
+created_at AS CreatedAt,
+updated_at AS UpdatedAt
+
                 FROM customer_tax_compliance 
                 WHERE id = @Id";
 

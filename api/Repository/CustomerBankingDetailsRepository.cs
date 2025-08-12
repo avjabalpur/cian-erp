@@ -20,9 +20,9 @@ namespace Xcianify.Repository
             using var connection = _context.GetConnection();
             var sql = @"
                 SELECT 
-                    id, customer_id, bank_ifsc_code, bank_account_number, bank_name,
-                    customer_banker, customer_vpa, bank_account_type_code, bank_branch,
-                    bank_location, is_primary, created_at, updated_at
+                    id, customer_id AS CustomerId, bank_ifsc_code AS BankIfscCode, bank_account_number AS BankAccountNumber, bank_name AS BankName,
+                    customer_banker AS CustomerBanker, customer_vpa AS CustomerVpa, bank_account_type_code AS BankAccountTypeCode,bank_branch AS BankBranch,
+                   bank_location AS BankLocation, is_primary, created_at AS CreatedAt, updated_at AS UpdatedAt
                 FROM customer_banking_details 
                 WHERE customer_id = @CustomerId
                 ORDER BY is_primary DESC, created_at DESC";
@@ -36,9 +36,9 @@ namespace Xcianify.Repository
             using var connection = _context.GetConnection();
             var sql = @"
                 SELECT 
-                    id, customer_id, bank_ifsc_code, bank_account_number, bank_name,
-                    customer_banker, customer_vpa, bank_account_type_code, bank_branch,
-                    bank_location, is_primary, created_at, updated_at
+                     id, customer_id AS CustomerId, bank_ifsc_code AS BankIfscCode, bank_account_number AS BankAccountNumber, bank_name AS BankName,
+                    customer_banker AS CustomerBanker, customer_vpa AS CustomerVpa, bank_account_type_code AS BankAccountTypeCode,bank_branch AS BankBranch,
+                   bank_location AS BankLocation, is_primary, created_at AS CreatedAt, updated_at AS UpdatedAt
                 FROM customer_banking_details 
                 WHERE id = @Id";
 

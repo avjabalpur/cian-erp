@@ -20,10 +20,10 @@ namespace Xcianify.Repository
             using var connection = _context.GetConnection();
             var sql = @"
                 SELECT 
-                    id, customer_id, address_line_1, address_line_2, address_line_3,
-                    city, zip_code, country, state_code, gst_state_code,
-                    contact_person, telephone_number, mobile_number, fax_number,
-                    email_id, website, is_primary, created_at, updated_at
+                    id, customer_id, address_line_1 AS AddressLine1, address_line_2 AS AddressLine2, address_line_3 AS AddressLine3,
+                    city, zip_code AS ZipCode, country, state_code AS StateCode, gst_state_code AS GstStateCode,
+                    contact_person AS ContactPerson, telephone_number AS TelephoneNumber, mobile_number AS MobileNumber, fax_number  AS FaxNumber,
+                    email_id AS EmailId, website, is_primary, created_at, updated_at
                 FROM customer_addresses 
                 WHERE customer_id = @CustomerId
                 ORDER BY is_primary DESC, created_at DESC";
@@ -37,10 +37,10 @@ namespace Xcianify.Repository
             using var connection = _context.GetConnection();
             var sql = @"
                 SELECT 
-                    id, customer_id, address_line_1, address_line_2, address_line_3,
-                    city, zip_code, country, state_code, gst_state_code,
-                    contact_person, telephone_number, mobile_number, fax_number,
-                    email_id, website, is_primary, created_at, updated_at
+                    id, customer_id, address_line_1 AS AddressLine1, address_line_2 AS AddressLine2, address_line_3 AS AddressLine3,
+                    city, zip_code AS ZipCode, country, state_code AS StateCode, gst_state_code AS GstStateCode,
+                    contact_person AS ContactPerson, telephone_number AS TelephoneNumber, mobile_number AS MobileNumber, fax_number  AS FaxNumber,
+                    email_id AS EmailId, website, is_primary, created_at, updated_at
                 FROM customer_addresses 
                 WHERE id = @Id";
 
