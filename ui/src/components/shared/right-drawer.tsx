@@ -51,13 +51,13 @@ export function RightDrawer({
             <SheetContent
                 side="right"
                 className={cn(
-                    "w-full p-0 gap-0",
+                    "w-full p-0 gap-0 ",
                     sizeClasses[size],
                     className
                 )}>
                 <ScrollArea className="h-full rounded-md border">
                     {(title || description) && (
-                        <SheetHeader className="p-0 border-b bg-[#d1f2ff]">
+                        <SheetHeader className="p-2 border-b bg-[#d1f2ff]">
                             <div className="flex items-center justify-between w-full">
                                 <div className="flex-1 min-w-0">
                                     {title && <SheetTitle className="text-lg font-semibold">{title}</SheetTitle>}
@@ -67,14 +67,7 @@ export function RightDrawer({
                                         </SheetDescription>
                                     )}
                                 </div>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={onClose}
-                                    className="h-8 w-8 p-0 hover:bg-gray-200 rounded-full flex-shrink-0 ml-2"
-                                >
-                                    <X className="h-5 w-5" />
-                                </Button>
+                                
                             </div>
                         </SheetHeader>
                     )}

@@ -132,6 +132,7 @@ builder.Services.AddAutoMapper(
     typeof(UserMapper),
     typeof(RoleMapper),
     typeof(PermissionMapper),
+     typeof(DepartmentMapper),
     typeof(OrganizationMapper),
     typeof(ItemMasterMapper),
     typeof(ItemTypeMapper),
