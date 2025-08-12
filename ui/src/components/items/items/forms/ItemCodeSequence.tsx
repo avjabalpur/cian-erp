@@ -80,8 +80,8 @@ export default function ItemCodeGenerator({ onCodeGenerated, initialValue }: Ite
         value={itemType}
         onChange={handleItemTypeChange}
         onBlur={handleBlur}
-        placeholder="Type"
-        className={`w-24 h-8 text-xs ${error ? "border-red-500" : isValid ? "border-green-500" : ""} ${isReadonly ? "bg-muted font-mono font-semibold" : ""}`}
+        placeholder="Item code"
+        className={` h-8 text-xs ${error ? "border-red-500" : isValid ? "border-green-500" : ""} ${isReadonly ? "bg-muted font-mono font-semibold" : ""}`}
         disabled={isReadonly || generateItemCodeMutation.isPending}
         maxLength={isReadonly ? undefined : 2}
       />

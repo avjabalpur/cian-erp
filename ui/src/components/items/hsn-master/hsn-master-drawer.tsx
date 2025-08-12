@@ -14,7 +14,7 @@ import { HsnMasterFormData, hsnMasterSchema } from "@/validations/item-master";
 import { HsnMaster } from "@/types/hsn-master";
 import { FormTextArea } from "@/components/shared/forms/form-text-area";
 import { FormSwitch } from "@/components/shared/forms/form-switch";
-import { useHsnTypeOptions } from "@/components/shared/options";
+import { useHsnTypeOptions } from "@/components/shared/options/hsn-type-options";
 
 interface HsnMasterDrawerProps {
   isOpen: boolean;

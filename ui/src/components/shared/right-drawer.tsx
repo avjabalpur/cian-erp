@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
 import { ScrollArea } from "../ui/scroll-area"
+import { X } from "lucide-react"
+import { Button } from "../ui/button"
 
 interface RightDrawerProps {
     isOpen: boolean
@@ -49,19 +51,31 @@ export function RightDrawer({
             <SheetContent
                 side="right"
                 className={cn(
-                    "w-full p-2 gap-0 [&>button]:hidden",
+                    "w-full p-0 gap-0",
                     sizeClasses[size],
                     className
                 )}>
                 <ScrollArea className="h-full rounded-md border">
                     {(title || description) && (
-                        <SheetHeader className="p-2 px-4 border-b bg-[#d1f2ff]">
-                            {title && <SheetTitle className="text-lg font-semibold">{title}</SheetTitle>}
-                            {description && (
-                                <SheetDescription className="text-sm text-muted-foreground">
-                                    {description}
-                                </SheetDescription>
-                            )}
+                        <SheetHeader className="p-0 border-b bg-[#d1f2ff]">
+                            <div className="flex items-center justify-between w-full">
+                                <div className="flex-1 min-w-0">
+                                    {title && <SheetTitle className="text-lg font-semibold">{title}</SheetTitle>}
+                                    {description && (
+                                        <SheetDescription className="text-sm text-muted-foreground">
+                                            {description}
+                                        </SheetDescription>
+                                    )}
+                                </div>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={onClose}
+                                    className="h-8 w-8 p-0 hover:bg-gray-200 rounded-full flex-shrink-0 ml-2"
+                                >
+                                    <X className="h-5 w-5" />
+                                </Button>
+                            </div>
                         </SheetHeader>
                     )}
 
