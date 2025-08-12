@@ -1,12 +1,11 @@
 "use client";
-
 import { useQueryState } from "nuqs";
 import { parseAsString, parseAsBoolean } from "nuqs";
 import { FilterWrapper } from "@/components/shared/filter/filter-wrapper";
 import { NuqsFormInput } from "@/components/shared/filter/nuqs-form-input";
 import { NuqsFormSelect } from "@/components/shared/filter/nuqs-form-select";
 import { useState } from "react";
-import { useItemTypeOptions } from "@/components/shared/options";
+import { useItemTypeOptions } from "@/components/shared/options/item-type-options";
 
 export default function ItemsFilter() {
   const [search, setSearch] = useQueryState("search", parseAsString.withDefault(""));

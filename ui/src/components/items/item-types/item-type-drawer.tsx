@@ -14,7 +14,7 @@ import { ItemType } from "@/types/item";
 import { FormCheckbox } from "@/components/shared/forms/form-checkbox";
 import { FormTextArea } from "@/components/shared/forms/form-text-area";
 import { FormSelect } from "@/components/shared/forms/form-select";
-import { useItemTypeOptions } from "@/components/shared/options";
+import { useItemTypeOptions } from "@/components/shared/options/item-type-options";
 
 interface ItemTypeDrawerProps {
   isOpen: boolean;
