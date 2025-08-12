@@ -31,20 +31,40 @@ interface SalesOrderApprovalTableProps {
 const ApprovalStatusRenderer = ({ value }: { value: boolean | null }) => {
   if (value === null || value === undefined) {
     return (
-      <div className="flex justify-center">
-        <Clock className="h-4 w-4 text-gray-400" />
-      </div>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="flex justify-center">
+            <Clock className="h-4 w-4 text-gray-400" />
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Pending</p>
+        </TooltipContent>
+      </Tooltip>
     )
   }
   
   return (
-    <div className="flex justify-center">
-      {value ? (
-        <CheckCircle className="h-4 w-4 text-green-600" />
-      ) : (
-        <XCircle className="h-4 w-4 text-red-600" />
-      )}
-    </div>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className="flex justify-center">
+          {value ? (
+            <div className="flex items-center gap-1">
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <span className="text-xs text-green-600 font-medium">✓</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1">
+              <XCircle className="h-4 w-4 text-red-600" />
+              <span className="text-xs text-red-600 font-medium">✗</span>
+            </div>
+          )}
+        </div>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{value ? 'Approved' : 'Rejected'}</p>
+      </TooltipContent>
+    </Tooltip>
   )
 }
 
@@ -91,26 +111,42 @@ const ProductNameRenderer = ({ value, row }: { value: string; row: any }) => {
 // Current status renderer with badges
 const CurrentStatusRenderer = ({ value }: { value: string }) => {
   const getStatusColor = (status: string) => {
-    switch (status) {
+    const normalizedStatus = status?.toUpperCase() || '';
+    switch (normalizedStatus) {
       case "IN-PROGRESS":
+      case "IN_PROGRESS":
         return "bg-orange-100 text-orange-800 border-orange-200"
       case "COMPLETED":
         return "bg-green-100 text-green-800 border-green-200"
       case "PENDING":
         return "bg-yellow-100 text-yellow-800 border-yellow-200"
+      case "APPROVED":
+        return "bg-blue-100 text-blue-800 border-blue-200"
+      case "REJECTED":
+        return "bg-red-100 text-red-800 border-red-200"
+      case "DRAFT":
+        return "bg-gray-100 text-gray-800 border-gray-200"
       default:
         return "bg-gray-100 text-gray-800 border-gray-200"
     }
   }
 
   const getShortName = (status: string) => {
-    switch (status) {
+    const normalizedStatus = status?.toUpperCase() || '';
+    switch (normalizedStatus) {
       case "IN-PROGRESS":
+      case "IN_PROGRESS":
         return "IN-PROG"
       case "COMPLETED":
         return "COMP"
       case "PENDING":
         return "PEND"
+      case "APPROVED":
+        return "APP"
+      case "REJECTED":
+        return "REJ"
+      case "DRAFT":
+        return "DRAFT"
       default:
         return status || "-"
     }
@@ -371,13 +407,6 @@ export default function SalesOrderApprovalTable({
   const transformedSalesOrders = useMemo(() => {
     return salesOrders.map(salesOrder => ({
       ...salesOrder,
-      // Add approval stage fields (these would come from the stages API)
-      costingApproved: null, // Will be populated from stages
-      qaApproved: null,
-      isFinalAuthorized: null,
-      designerApproved: null,
-      finalQaApproved: null,
-      pmApproved: null,
       // Format dates
       createdAt: salesOrder.createdAt ? formatDate(salesOrder.createdAt) : '',
       // Ensure all required fields have values
@@ -390,6 +419,8 @@ export default function SalesOrderApprovalTable({
       assignedDesignerName: salesOrder.assignedDesignerName || '',
       currentStatus: salesOrder.currentStatus || 'IN-PROGRESS',
       plantEmailSent: salesOrder.plantEmailSent || false,
+      // Approval statuses are now coming from the backend API
+      // No need to override them with null values
     }))
   }, [salesOrders])
 
