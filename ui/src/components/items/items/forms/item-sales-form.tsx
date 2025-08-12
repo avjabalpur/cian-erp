@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FormInput } from "@/components/shared/forms/form-input"
 import { FormSwitch } from "@/components/shared/forms/form-switch"
 import { FormSelect } from "@/components/shared/forms/form-select"
+import { FormDateInput } from "@/components/shared/forms/form-date-input"
 
 interface ItemSalesFormProps {
   control: any;
@@ -44,13 +45,13 @@ export function ItemSalesForm({ control, itemId }: ItemSalesFormProps) {
 
       <Card>
         <CardContent>
-          <FormInput
-            control={control}
-            name="saleableUnitQty"
-            label=" Saleable Unit contains"
-            placeholder="0"
-            inputProps={{ type: "number", step: "0.01" }}
-          />
+                        <FormInput
+                control={control}
+                name="saleableUnitContains"
+                label="Saleable Unit contains"
+                placeholder="0"
+                inputProps={{ type: "number", step: "0.01" }}
+              />
         </CardContent>
       </Card>
 
@@ -110,7 +111,7 @@ export function ItemSalesForm({ control, itemId }: ItemSalesFormProps) {
                 control={control}
                 name="qtyPerCase"
                 placeholder="100.00"
-                label="Packing Rate"
+                label="Qty Per Case"
                 inputProps={{ type: "number", step: "0.01" }}
               />
               <span className="text-sm text-gray-500">NOS</span>
@@ -118,7 +119,7 @@ export function ItemSalesForm({ control, itemId }: ItemSalesFormProps) {
             <div className="flex-1 flex items-center space-x-2">
               <FormInput
                 control={control}
-                name="netWeightPerCase"
+                name="netWeightCase"
                 placeholder="0.000"
                 label="Net Wt./Case"
                 inputProps={{ type: "number", step: "0.001" }}
@@ -129,7 +130,7 @@ export function ItemSalesForm({ control, itemId }: ItemSalesFormProps) {
             <div className="flex-1 flex items-center space-x-2">
               <FormInput
                 control={control}
-                name="tareWeightPerCase"
+                name="tareWeightCase"
                 placeholder="0.000"
                 inputProps={{ type: "number", step: "0.001" }}
                 label="Tare Wt./Case"
@@ -140,7 +141,7 @@ export function ItemSalesForm({ control, itemId }: ItemSalesFormProps) {
             <div className="flex-1 flex items-center space-x-2">
               <FormInput
                 control={control}
-                name="grossWeightPerCase"
+                name="grossWeightCase"
                 placeholder="0.000"
                 inputProps={{ type: "number", step: "0.001" }}
                 label="Gross Wt./Case"
@@ -151,7 +152,7 @@ export function ItemSalesForm({ control, itemId }: ItemSalesFormProps) {
             <div className="flex-1 flex items-center space-x-2">
               <FormInput
                 control={control}
-                name="grossWeightPerUnit"
+                name="grossWeightUnit"
                 placeholder="0.00000"
                 inputProps={{ type: "number", step: "0.00001" }}
                 label="Gross Wt./Unit"
@@ -249,17 +250,17 @@ export function ItemSalesForm({ control, itemId }: ItemSalesFormProps) {
 
             <FormInput
               control={control}
-              name="minBatchQtyForAutoloading"
+              name="minBatchQtyAutoloading"
               placeholder="0.000"
               inputProps={{ type: "number", step: "0.001" }}
               label="Min. Batch Qty. for Autoloading"
             />
 
-            <FormInput
+            <FormDateInput
               control={control}
               name="considerAsNewProductTill"
-              placeholder="//"
               label="Consider as New Product till"
+              placeholder="Select date"
             />
           </CardContent>
         </Card>
@@ -274,8 +275,8 @@ export function ItemSalesForm({ control, itemId }: ItemSalesFormProps) {
             />
             <FormInput
               control={control}
-              name="interfaceAdditional"
-              label="Additional Interface"
+              name="specs"
+              label="Specifications"
               placeholder=""
             />
           </CardContent>

@@ -7,39 +7,11 @@ namespace Xcianify.Core.DTOs.ItemMaster
     {
         public int Id { get; set; }
         
-        [Required]
         public int ItemId { get; set; }
         
-        [StringLength(1000)]
-        public string Specification1 { get; set; }
-        
-        [StringLength(1000)]
-        public string Specification2 { get; set; }
-        
-        [StringLength(1000)]
-        public string Specification3 { get; set; }
-        
-        [StringLength(1000)]
-        public string Specification4 { get; set; }
-        
-        [StringLength(1000)]
-        public string Specification5 { get; set; }
-        
-        [StringLength(1000)]
-        public string Specification6 { get; set; }
-        
-        [StringLength(1000)]
-        public string Specification7 { get; set; }
-        
-        [StringLength(1000)]
-        public string Specification8 { get; set; }
-        
-        [StringLength(1000)]
-        public string Specification9 { get; set; }
-        
-        [StringLength(1000)]
-        public string Specification10 { get; set; }
-        
+        [StringLength(50)]
+        public string Specification { get; set; }
+      
         [StringLength(50)]
         public string SubstituteForItemCode { get; set; }
         
@@ -63,9 +35,5 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public decimal? MarkupPercentage { get; set; }
         public decimal? MarkupAmount { get; set; }
         
-        public int CreatedBy { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public int? UpdatedBy { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 }

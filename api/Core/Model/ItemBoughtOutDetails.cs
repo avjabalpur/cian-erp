@@ -21,5 +21,6 @@ namespace Xcianify.Core.Model
         public decimal? SwsPercent { get; set; }
         public decimal? MaxPurchaseRate { get; set; }
         public bool StopProcurement { get; set; } = false;
+        public bool IsDeleted { get; set; }
     }
 }

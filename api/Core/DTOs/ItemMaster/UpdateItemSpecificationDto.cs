@@ -1,16 +1,37 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Xcianify.Core.DTOs.ItemMaster
 {
     public class UpdateItemSpecificationDto
     {
-        public string Specification1 { get; set; }
-        public string Specification2 { get; set; }
-        public string Specification3 { get; set; }
-        public string Specification4 { get; set; }
-        public string Specification5 { get; set; }
-        public string Specification6 { get; set; }
-        public string Specification7 { get; set; }
-        public string Specification8 { get; set; }
-        public string Specification9 { get; set; }
-        public string Specification10 { get; set; }
+        public int Id { get; set; }
+
+        public int ItemId { get; set; }
+
+        [StringLength(50)]
+        public string SubstituteForItemCode { get; set; }
+
+        [StringLength(50)]
+        public string CustomTariffNo { get; set; }
+
+        [StringLength(50)]
+        public string ExciseTariffNo { get; set; }
+
+        [StringLength(50)]
+        public string VatCommCode { get; set; }
+
+        public decimal? ConversionFactor { get; set; }
+
+        [StringLength(50)]
+        public string OldCode { get; set; }
+
+        public decimal? StandardWeight { get; set; }
+        public decimal? StandardConversionCostFactor { get; set; }
+        public decimal? StandardPackingCostFactor { get; set; }
+        public decimal? MarkupPercentage { get; set; }
+        public decimal? MarkupAmount { get; set; }
+        public string Specification { get; set; }
+
+
     }
 }

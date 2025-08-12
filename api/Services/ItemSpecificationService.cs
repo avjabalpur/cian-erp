@@ -43,7 +43,9 @@ namespace Xcianify.Services
             var specification = _mapper.MapToEntity(createDto);
             specification.ItemId = createDto.ItemId;
             specification.CreatedBy = userId;
+            specification.UpdatedBy = userId;
             specification.CreatedAt = DateTime.UtcNow;
+            specification.UpdatedAt = DateTime.UtcNow;
 
             await _itemSpecificationRepository.CreateAsync(specification);
             return _mapper.MapToDto(specification);
@@ -62,6 +64,8 @@ namespace Xcianify.Services
             var specification = _mapper.MapToEntity(updateDto);
             specification.Id = existingSpecification.Id;
             specification.ItemId = itemId;
+            specification.CreatedBy = existingSpecification.CreatedBy;
+            specification.CreatedAt = existingSpecification.CreatedAt;
             specification.UpdatedBy = userId;
             specification.UpdatedAt = DateTime.UtcNow;
 

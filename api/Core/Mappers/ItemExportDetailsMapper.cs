@@ -8,14 +8,11 @@ namespace Xcianify.Core.Mappers
     {
         public ItemExportDetailsMapper()
         {
-            CreateMap<ItemExportDetails, ItemExportDetailsDto>()
-                .ForMember(dest => dest.ItemId, opt => opt.MapFrom(src => src.Id));
+            CreateMap<ItemExportDetails, ItemExportDetailsDto>().ReverseMap();
 
-            CreateMap<CreateItemExportDetailsDto, ItemExportDetails>()
-                .ForMember(dest => dest.ItemCode, opt => opt.MapFrom(src => src.ItemId.ToString()));
-
-            CreateMap<UpdateItemExportDetailsDto, ItemExportDetails>()
-                .ForMember(dest => dest.ItemCode, opt => opt.MapFrom(src => src.ItemId.ToString()));
+            CreateMap<CreateItemExportDetailsDto, ItemExportDetails>();
+              
+            CreateMap<UpdateItemExportDetailsDto, ItemExportDetails>();
         }
     }
 } 

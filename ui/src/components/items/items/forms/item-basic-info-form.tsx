@@ -4,12 +4,14 @@ import { FormSelect } from "@/components/shared/forms/form-select"
 import { FormSwitch } from "@/components/shared/forms/form-switch"
 import { ConfigListSelect } from "@/components/shared/config-list-select"
 import { useProductGroupOptions } from "@/components/shared/options"
-import { useItemTypeOptions, useProductTypeOptions } from "@/components/shared/options"
+import {  useProductTypeOptions } from "@/components/shared/options"
+import { useItemTypeOptions } from "@/components/shared/options/item-type-options"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Search } from "lucide-react"
+import { useController} from "react-hook-form"
 import { DivisionLookup } from "@/components/shared/lookups/division-lookup"
 import { ItemOtherDetailsForm } from "./item-other-details-form"
 import { useParentTypes } from "@/hooks/items/use-item-types"
@@ -21,6 +23,12 @@ interface ItemBasicInfoFormProps {
 
 export function ItemBasicInfoForm({ control, itemId }: ItemBasicInfoFormProps) {
   const [isDivisionLookupOpen, setIsDivisionLookupOpen] = useState(false);
+  
+  // Use controller for GS Ind field
+  const gsIndController = useController({
+    name: "gsInd",
+    control,
+  });
   
   // Fetch parent types
   const { data: parentTypes = [] } = useParentTypes();
@@ -82,16 +90,16 @@ export function ItemBasicInfoForm({ control, itemId }: ItemBasicInfoFormProps) {
           <label className="text-[12px] font-medium">GS Ind.</label>
           <ConfigListSelect
             listCode="gs_id"
-            value={control._formValues?.gsInd}
+            value={gsIndController.field.value || ""}
             onChange={(value) => {
-              control.setValue("gsInd", value);
+              gsIndController.field.onChange(value);
             }}
             placeholder="Select GS Ind."
           />
         </div>
         <FormInput
           control={control}
-          name="hsn"
+          name="revNo"
           label="HSN"
           placeholder="Enter HSN code"
         />
