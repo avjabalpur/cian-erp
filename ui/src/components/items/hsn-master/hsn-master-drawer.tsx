@@ -89,7 +89,7 @@ export default function HsnMasterDrawer({
   const onSubmit = async (data: HsnMasterFormData) => {
     console.log('Form submitted with data:', data);
     console.log('Current hsnMaster:', hsnMaster);
-    
+
     try {
       const payload = {
         code: data.code,
@@ -138,12 +138,12 @@ export default function HsnMasterDrawer({
         status: error?.response?.status,
         data: error?.response?.data
       });
-      
+
       // Handle specific error cases
-      let errorMessage = hsnMaster 
-        ? "Failed to update HSN master" 
+      let errorMessage = hsnMaster
+        ? "Failed to update HSN master"
         : "Failed to create HSN master";
-      
+
       if (error?.response?.status === 401) {
         errorMessage = "Authentication failed. Please log in again.";
       } else if (error?.response?.status === 403) {
@@ -153,7 +153,7 @@ export default function HsnMasterDrawer({
       } else if (error?.message) {
         errorMessage = error.message;
       }
-      
+
       toast({
         title: "Error",
         description: errorMessage,
@@ -186,8 +186,8 @@ export default function HsnMasterDrawer({
       onClose={handleClose}
       title={hsnMaster ? "Edit HSN Master" : "Create New HSN Master"}
       size="2xl"
-      description={hsnMaster 
-        ? "Update the HSN master information below." 
+      description={hsnMaster
+        ? "Update the HSN master information below."
         : "Fill in the information below to create a new HSN master."
       }
     >
@@ -210,7 +210,7 @@ export default function HsnMasterDrawer({
               required
             />
 
-<FormSelect
+            <FormSelect
               control={control}
               name="hsnType"
               label="HSN Type"
@@ -225,12 +225,12 @@ export default function HsnMasterDrawer({
               placeholder="Enter UQC"
             />
 
-<FormInput
+            <FormInput
               control={control}
               name="igstRate"
               label="IGST Rate (%)"
               placeholder="Enter IGST rate"
-              inputProps={{ 
+              inputProps={{
                 type: "number",
                 min: "0",
                 max: "100",
@@ -243,7 +243,7 @@ export default function HsnMasterDrawer({
               name="cgstRate"
               label="CGST Rate (%)"
               placeholder="Enter CGST rate"
-              inputProps={{ 
+              inputProps={{
                 type: "number",
                 min: "0",
                 max: "100",
@@ -255,7 +255,7 @@ export default function HsnMasterDrawer({
               name="sgstRate"
               label="SGST Rate (%)"
               placeholder="Enter SGST rate"
-              inputProps={{ 
+              inputProps={{
                 type: "number",
                 min: "0",
                 max: "100",
@@ -268,7 +268,7 @@ export default function HsnMasterDrawer({
               name="cessRate"
               label="CESS Rate (%)"
               placeholder="Enter CESS rate"
-              inputProps={{ 
+              inputProps={{
                 type: "number",
                 min: "0",
                 max: "100",
@@ -285,17 +285,17 @@ export default function HsnMasterDrawer({
             required
           />
 
-        <FormSwitch
-          control={control}
-          name="isReverseCharges"
-          label="Reverse Charges" 
-        />
+          <FormSwitch
+            control={control}
+            name="isReverseCharges"
+            label="Reverse Charges"
+          />
 
-        <FormSwitch
-          control={control}
-          name="isActive"
-          label="Active Status"
-        />
+          <FormSwitch
+            control={control}
+            name="isActive"
+            label="Active Status"
+          />
 
           <div className="flex justify-end gap-4 pt-4">
             <Button

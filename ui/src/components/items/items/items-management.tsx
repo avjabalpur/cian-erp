@@ -97,21 +97,22 @@ export default function ItemsManagement() {
           Add Item
         </Button>
       </div>
-
-      <ItemsFilter />
-
-      <ItemsTable
-        items={items}
-        onEdit={handleEditItem}
-        onDelete={handleDeleteItem}
-        isLoading={isLoading}
-        pageCount={Math.ceil(totalCount / (pageSize || 20))}
-        pageSize={pageSize || 20}
-        pageIndex={(page || 1) - 1} 
-        totalCount={totalCount}
-        onPaginationChange={handlePaginationChange}
-      />
-
+      <Card>
+        <CardContent className="space-y-4 pt-4">
+          <ItemsFilter />
+          <ItemsTable
+            items={items}
+            onEdit={handleEditItem}
+            onDelete={handleDeleteItem}
+            isLoading={isLoading}
+            pageCount={Math.ceil(totalCount / (pageSize || 20))}
+            pageSize={pageSize || 20}
+            pageIndex={(page || 1) - 1}
+            totalCount={totalCount}
+            onPaginationChange={handlePaginationChange}
+          />
+        </CardContent>
+      </Card>
       {/* Drawer */}
       <ItemsDrawer
         isOpen={drawerOpen}
