@@ -27,30 +27,22 @@ namespace Xcianify.Repository
                     soq.created_at as createdAt,
                     soq.created_by as createdBy,
                     soq.is_deleted as isDeleted,
-                    soq.exporter_name as exporterName,
-                    soq.organization_id as organizationId,
-                    soq.consignee_name as consigneeName,
-                    soq.consignee_contact_details as consigneeContactDetails,
-                    soq.consignee_address as consigneeAddress,
-                    soq.performa_invoice_number as performaInvoiceNumber,
-                    soq.performa_invoice_date as performaInvoiceDate,
-                    soq.exporters_reference_number as exportersReferenceNumber,
-                    soq.other_references as otherReferences,
-                    soq.other_buyer_name as otherBuyerName,
-                    soq.country_of_origin as countryOfOrigin,
-                    soq.country_of_final_destination as countryOfFinalDestination,
-                    soq.prepration,
-                    soq.port_of_discharge as portOfDischarge,
-                    soq.place_of_receipt_by_pre_carrier as placeOfReceiptByPreCarrier,
-                    soq.final_destination as finalDestination,
-                    soq.terms_of_delivery as termsOfDelivery,
+                    soq.company_name as companyName,
+                    soq.quotation_number as quotationNumber,
+                    soq.quotation_date as quotationDate,
+                    soq.customer_name as customerName,
+                    soq.customer_contact_person as customerContactPerson,
+                    soq.customer_mobile_number as customerMobileNumber,
+                    soq.customer_email as customerEmail,
                     soq.payment_terms as paymentTerms,
-                    soq.shipment_mode as shipmentMode,
-                    soq.port_of_loading as portOfLoading,
-                    soq.additionalCharges,
+                    soq.advance_percentage as advancePercentage,
+                    soq.charges,
                     soq.total_amount as totalAmount,
-                    soq.previous_performa_invoice_id as previousPerformaInvoiceId
-                FROM sales_order_performa_invoice soq
+                    soq.advance_amount as advanceAmount,
+                    soq.prev_copy_quotation_id as prevCopyQuotationId,
+                    soq.final_comment as finalComment,
+                    soq.terms
+                FROM sales_order_quotation soq
                 WHERE soq.is_deleted = false
                 ORDER BY soq.created_at DESC";
 
@@ -65,30 +57,22 @@ namespace Xcianify.Repository
                     soq.created_at as createdAt,
                     soq.created_by as createdBy,
                     soq.is_deleted as isDeleted,
-                    soq.exporter_name as exporterName,
-                    soq.organization_id as organizationId,
-                    soq.consignee_name as consigneeName,
-                    soq.consignee_contact_details as consigneeContactDetails,
-                    soq.consignee_address as consigneeAddress,
-                    soq.performa_invoice_number as performaInvoiceNumber,
-                    soq.performa_invoice_date as performaInvoiceDate,
-                    soq.exporters_reference_number as exportersReferenceNumber,
-                    soq.other_references as otherReferences,
-                    soq.other_buyer_name as otherBuyerName,
-                    soq.country_of_origin as countryOfOrigin,
-                    soq.country_of_final_destination as countryOfFinalDestination,
-                    soq.prepration,
-                    soq.port_of_discharge as portOfDischarge,
-                    soq.place_of_receipt_by_pre_carrier as placeOfReceiptByPreCarrier,
-                    soq.final_destination as finalDestination,
-                    soq.terms_of_delivery as termsOfDelivery,
+                    soq.company_name as companyName,
+                    soq.quotation_number as quotationNumber,
+                    soq.quotation_date as quotationDate,
+                    soq.customer_name as customerName,
+                    soq.customer_contact_person as customerContactPerson,
+                    soq.customer_mobile_number as customerMobileNumber,
+                    soq.customer_email as customerEmail,
                     soq.payment_terms as paymentTerms,
-                    soq.shipment_mode as shipmentMode,
-                    soq.port_of_loading as portOfLoading,
-                    soq.additionalCharges,
+                    soq.advance_percentage as advancePercentage,
+                    soq.charges,
                     soq.total_amount as totalAmount,
-                    soq.previous_performa_invoice_id as previousPerformaInvoiceId
-                FROM sales_order_performa_invoice soq
+                    soq.advance_amount as advanceAmount,
+                    soq.prev_copy_quotation_id as prevCopyQuotationId,
+                    soq.final_comment as finalComment,
+                    soq.terms
+                FROM sales_order_quotation soq
                 WHERE soq.id = @Id AND soq.is_deleted = false";
 
             using var connection = _context.GetConnection();
@@ -101,12 +85,26 @@ namespace Xcianify.Repository
             
             var query = @"
                 SELECT 
-                    soq.*,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name
+                    soq.id as id,
+                    soq.created_at as createdAt,
+                    soq.created_by as createdBy,
+                    soq.is_deleted as isDeleted,
+                    soq.company_name as companyName,
+                    soq.quotation_number as quotationNumber,
+                    soq.quotation_date as quotationDate,
+                    soq.customer_name as customerName,
+                    soq.customer_contact_person as customerContactPerson,
+                    soq.customer_mobile_number as customerMobileNumber,
+                    soq.customer_email as customerEmail,
+                    soq.payment_terms as paymentTerms,
+                    soq.advance_percentage as advancePercentage,
+                    soq.charges,
+                    soq.total_amount as totalAmount,
+                    soq.advance_amount as advanceAmount,
+                    soq.prev_copy_quotation_id as prevCopyQuotationId,
+                    soq.final_comment as finalComment,
+                    soq.terms
                 FROM sales_order_quotation soq
-                LEFT JOIN users u1 ON soq.created_by = u1.id
-                LEFT JOIN users u2 ON soq.updated_by = u2.id
                 WHERE soq.quotation_number = @QuotationNumber AND soq.is_deleted = false";
 
             return await connection.QuerySingleOrDefaultAsync<SalesOrderQuotation>(query, new { QuotationNumber = quotationNumber });
@@ -118,14 +116,16 @@ namespace Xcianify.Repository
             
             var query = @"
                 INSERT INTO sales_order_quotation (
-                    organization_id, quotation_number, quotation_date, customer_id,
-                    advance_percentage, charges, total_amount, advance_amount,
-                    prev_copy_quotation_id, is_deleted, created_by, created_at,
+                    company_name, quotation_number, quotation_date, customer_name,
+                    customer_contact_person, customer_mobile_number, customer_email,
+                    payment_terms, advance_percentage, charges, total_amount, advance_amount,
+                    prev_copy_quotation_id, final_comment, terms, is_deleted, created_by, created_at,
                     updated_by, updated_at
                 ) VALUES (
-                    @OrganizationId, @QuotationNumber, @QuotationDate, @CustomerId,
-                    @AdvancePercentage, @Charges, @TotalAmount, @AdvanceAmount,
-                    @PrevCopyQuotationId, @IsDeleted, @CreatedBy, @CreatedAt,
+                    @CompanyName, @QuotationNumber, @QuotationDate, @CustomerName,
+                    @CustomerContactPerson, @CustomerMobileNumber, @CustomerEmail,
+                    @PaymentTerms, @AdvancePercentage, @Charges, @TotalAmount, @AdvanceAmount,
+                    @PrevCopyQuotationId, @FinalComment, @Terms, @IsDeleted, @CreatedBy, @CreatedAt,
                     @UpdatedBy, @UpdatedAt
                 ) RETURNING *";
 
@@ -138,12 +138,14 @@ namespace Xcianify.Repository
             
             var query = @"
                 UPDATE sales_order_quotation SET
-                    organization_id = @OrganizationId, quotation_number = @QuotationNumber,
-                    quotation_date = @QuotationDate, customer_id = @CustomerId,
+                    company_name = @CompanyName, quotation_number = @QuotationNumber,
+                    quotation_date = @QuotationDate, customer_name = @CustomerName,
+                    customer_contact_person = @CustomerContactPerson, customer_mobile_number = @CustomerMobileNumber,
+                    customer_email = @CustomerEmail, payment_terms = @PaymentTerms,
                     advance_percentage = @AdvancePercentage, charges = @Charges,
                     total_amount = @TotalAmount, advance_amount = @AdvanceAmount,
-                    prev_copy_quotation_id = @PrevCopyQuotationId,
-                    updated_by = @UpdatedBy, updated_at = @UpdatedAt
+                    prev_copy_quotation_id = @PrevCopyQuotationId, final_comment = @FinalComment,
+                    terms = @Terms, updated_by = @UpdatedBy, updated_at = @UpdatedAt
                 WHERE id = @Id AND is_deleted = false
                 RETURNING *";
 
@@ -154,7 +156,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var query = "UPDATE sales_order_quotation SET is_deleted = 1 WHERE id = @Id";
+            var query = "UPDATE sales_order_quotation SET is_deleted = true WHERE id = @Id";
             await connection.ExecuteAsync(query, new { Id = id });
         }
 
@@ -178,40 +180,68 @@ namespace Xcianify.Repository
             return count > 0;
         }
 
-        public async Task<IEnumerable<SalesOrderQuotation>> GetByCustomerIdAsync(int customerId)
+        public async Task<IEnumerable<SalesOrderQuotation>> GetByCustomerNameAsync(string customerName)
         {
             using var connection = _context.GetConnection();
             
             var query = @"
                 SELECT 
-                    soq.*,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name
+                    soq.id as id,
+                    soq.created_at as createdAt,
+                    soq.created_by as createdBy,
+                    soq.is_deleted as isDeleted,
+                    soq.company_name as companyName,
+                    soq.quotation_number as quotationNumber,
+                    soq.quotation_date as quotationDate,
+                    soq.customer_name as customerName,
+                    soq.customer_contact_person as customerContactPerson,
+                    soq.customer_mobile_number as customerMobileNumber,
+                    soq.customer_email as customerEmail,
+                    soq.payment_terms as paymentTerms,
+                    soq.advance_percentage as advancePercentage,
+                    soq.charges,
+                    soq.total_amount as totalAmount,
+                    soq.advance_amount as advanceAmount,
+                    soq.prev_copy_quotation_id as prevCopyQuotationId,
+                    soq.final_comment as finalComment,
+                    soq.terms
                 FROM sales_order_quotation soq
-                LEFT JOIN users u1 ON soq.created_by = u1.id
-                LEFT JOIN users u2 ON soq.updated_by = u2.id
-                WHERE soq.customer_id = @CustomerId AND soq.is_deleted = false
+                WHERE soq.customer_name ILIKE @CustomerName AND soq.is_deleted = false
                 ORDER BY soq.created_at DESC";
 
-            return await connection.QueryAsync<SalesOrderQuotation>(query, new { CustomerId = customerId });
+            return await connection.QueryAsync<SalesOrderQuotation>(query, new { CustomerName = $"%{customerName}%" });
         }
 
-        public async Task<IEnumerable<SalesOrderQuotation>> GetByOrganizationIdAsync(int organizationId)
+        public async Task<IEnumerable<SalesOrderQuotation>> GetByCompanyNameAsync(string companyName)
         {
             using var connection = _context.GetConnection();
             
             var query = @"
                 SELECT 
-                    soq.*,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name
+                    soq.id as id,
+                    soq.created_at as createdAt,
+                    soq.created_by as createdBy,
+                    soq.is_deleted as isDeleted,
+                    soq.company_name as companyName,
+                    soq.quotation_number as quotationNumber,
+                    soq.quotation_date as quotationDate,
+                    soq.customer_name as customerName,
+                    soq.customer_contact_person as customerContactPerson,
+                    soq.customer_mobile_number as customerMobileNumber,
+                    soq.customer_email as customerEmail,
+                    soq.payment_terms as paymentTerms,
+                    soq.advance_percentage as advancePercentage,
+                    soq.charges,
+                    soq.total_amount as totalAmount,
+                    soq.advance_amount as advanceAmount,
+                    soq.prev_copy_quotation_id as prevCopyQuotationId,
+                    soq.final_comment as finalComment,
+                    soq.terms
                 FROM sales_order_quotation soq
-                LEFT JOIN users u1 ON soq.created_by = u1.id
-                LEFT JOIN users u2 ON soq.updated_by = u2.id
-                WHERE soq.organization_id = @OrganizationId AND soq.is_deleted = false
+                WHERE soq.company_name ILIKE @CompanyName AND soq.is_deleted = false
                 ORDER BY soq.created_at DESC";
 
-            return await connection.QueryAsync<SalesOrderQuotation>(query, new { OrganizationId = organizationId });
+            return await connection.QueryAsync<SalesOrderQuotation>(query, new { CompanyName = $"%{companyName}%" });
         }
 
         public async Task<IEnumerable<SalesOrderQuotation>> GetByDateRangeAsync(DateTime startDate, DateTime endDate)
@@ -220,12 +250,26 @@ namespace Xcianify.Repository
             
             var query = @"
                 SELECT 
-                    soq.*,
-                    u1.first_name || ' ' || u1.last_name as created_by_name,
-                    u2.first_name || ' ' || u2.last_name as updated_by_name
+                    soq.id as id,
+                    soq.created_at as createdAt,
+                    soq.created_by as createdBy,
+                    soq.is_deleted as isDeleted,
+                    soq.company_name as companyName,
+                    soq.quotation_number as quotationNumber,
+                    soq.quotation_date as quotationDate,
+                    soq.customer_name as customerName,
+                    soq.customer_contact_person as customerContactPerson,
+                    soq.customer_mobile_number as customerMobileNumber,
+                    soq.customer_email as customerEmail,
+                    soq.payment_terms as paymentTerms,
+                    soq.advance_percentage as advancePercentage,
+                    soq.charges,
+                    soq.total_amount as totalAmount,
+                    soq.advance_amount as advanceAmount,
+                    soq.prev_copy_quotation_id as prevCopyQuotationId,
+                    soq.final_comment as finalComment,
+                    soq.terms
                 FROM sales_order_quotation soq
-                LEFT JOIN users u1 ON soq.created_by = u1.id
-                LEFT JOIN users u2 ON soq.updated_by = u2.id
                 WHERE soq.quotation_date BETWEEN @StartDate AND @EndDate AND soq.is_deleted = false
                 ORDER BY soq.quotation_date DESC";
 

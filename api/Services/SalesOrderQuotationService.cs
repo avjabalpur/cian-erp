@@ -90,15 +90,15 @@ namespace Xcianify.Services
             await _quotationRepository.DeleteAsync(id);
         }
 
-        public async Task<IEnumerable<SalesOrderQuotationDto>> GetQuotationsByCustomerAsync(int customerId)
+        public async Task<IEnumerable<SalesOrderQuotationDto>> GetQuotationsByCustomerAsync(string customerName)
         {
-            var quotations = await _quotationRepository.GetByCustomerIdAsync(customerId);
+            var quotations = await _quotationRepository.GetByCustomerNameAsync(customerName);
             return _mapper.Map<IEnumerable<SalesOrderQuotationDto>>(quotations);
         }
 
-        public async Task<IEnumerable<SalesOrderQuotationDto>> GetQuotationsByOrganizationAsync(int organizationId)
+        public async Task<IEnumerable<SalesOrderQuotationDto>> GetQuotationsByCompanyAsync(string companyName)
         {
-            var quotations = await _quotationRepository.GetByOrganizationIdAsync(organizationId);
+            var quotations = await _quotationRepository.GetByCompanyNameAsync(companyName);
             return _mapper.Map<IEnumerable<SalesOrderQuotationDto>>(quotations);
         }
 

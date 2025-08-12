@@ -13,8 +13,8 @@ namespace Xcianify.Core.Domain.Services
         Task<SalesOrderQuotationDto> CreateQuotationAsync(CreateSalesOrderQuotationDto quotationDto);
         Task UpdateQuotationAsync(int id, CreateSalesOrderQuotationDto quotationDto);
         Task DeleteQuotationAsync(int id);
-        Task<IEnumerable<SalesOrderQuotationDto>> GetQuotationsByCustomerAsync(int customerId);
-        Task<IEnumerable<SalesOrderQuotationDto>> GetQuotationsByOrganizationAsync(int organizationId);
+        Task<IEnumerable<SalesOrderQuotationDto>> GetQuotationsByCustomerAsync(string customerName);
+        Task<IEnumerable<SalesOrderQuotationDto>> GetQuotationsByCompanyAsync(string companyName);
         Task<IEnumerable<SalesOrderQuotationDto>> GetQuotationsByDateRangeAsync(DateTime startDate, DateTime endDate);
     }
 } 

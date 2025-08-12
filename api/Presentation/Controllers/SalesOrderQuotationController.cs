@@ -61,10 +61,19 @@ namespace Xcianify.Presentation.Controllers
             return Ok(quotation);
         }
 
-        [HttpGet("sales-order/{salesOrderId}")]
-        public async Task<IActionResult> GetBySalesOrder(int salesOrderId)
+
+
+        [HttpGet("customer/{customerName}")]
+        public async Task<IActionResult> GetByCustomer(string customerName)
         {
-            var quotations = await _quotationService.GetQuotationByIdAsync(salesOrderId);
+            var quotations = await _quotationService.GetQuotationsByCustomerAsync(customerName);
+            return Ok(quotations);
+        }
+
+        [HttpGet("company/{companyName}")]
+        public async Task<IActionResult> GetByCompany(string companyName)
+        {
+            var quotations = await _quotationService.GetQuotationsByCompanyAsync(companyName);
             return Ok(quotations);
         }
 

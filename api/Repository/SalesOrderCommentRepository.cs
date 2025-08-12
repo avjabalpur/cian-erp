@@ -83,7 +83,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var query = "UPDATE sales_order_comments SET is_deleted = 1 WHERE id = @Id";
+            var query = "UPDATE sales_order_comments SET is_deleted = true WHERE id = @Id";
             await connection.ExecuteAsync(query, new { Id = id });
         }
 

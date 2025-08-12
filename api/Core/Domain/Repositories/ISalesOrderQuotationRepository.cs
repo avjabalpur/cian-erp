@@ -14,8 +14,8 @@ namespace Xcianify.Core.Domain.Repositories
         Task DeleteAsync(int id);
         Task<bool> ExistsAsync(int id);
         Task<bool> QuotationNumberExistsAsync(string quotationNumber, int? excludeId = null);
-        Task<IEnumerable<SalesOrderQuotation>> GetByCustomerIdAsync(int customerId);
-        Task<IEnumerable<SalesOrderQuotation>> GetByOrganizationIdAsync(int organizationId);
-        Task<IEnumerable<SalesOrderQuotation>> GetByDateRangeAsync(DateTime startDate, DateTime endDate);
+        Task<IEnumerable<SalesOrderQuotation>> GetByCustomerNameAsync(string customerName);
+        Task<IEnumerable<SalesOrderQuotation>> GetByCompanyNameAsync(string companyName);
+        Task<IEnumerable<SalesOrderQuotation>> GetByDateRangeAsync(System.DateTime startDate, System.DateTime endDate);
     }
 } 
