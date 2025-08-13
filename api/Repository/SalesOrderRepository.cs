@@ -24,7 +24,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var whereClause = "WHERE so.is_deleted = 0";
+            var whereClause = "WHERE so.is_deleted = false";
             var parameters = new DynamicParameters();
 
             if (!string.IsNullOrEmpty(filterDto.search))
@@ -84,7 +84,7 @@ namespace Xcianify.Repository
             if (filterDto.IsSubmitted.HasValue)
             {
                 whereClause += " AND so.is_submitted = @IsSubmitted";
-                parameters.Add("@IsSubmitted", filterDto.IsSubmitted.Value ? 1 : 0);
+                parameters.Add("@IsSubmitted", filterDto.IsSubmitted.Value ? true  : false);
             }
 
             if (filterDto.AssignedDesigner.HasValue)
@@ -163,10 +163,10 @@ namespace Xcianify.Repository
                     so.drug_approval_under as drugApprovalUnder,
                     so.current_status as currentStatus,
                     so.comments,
-                    so.is_submitted = 1 as isSubmitted,
-                    so.is_deleted = 1 as isDeleted,
+                    so.is_submitted = true as isSubmitted,
+                    so.is_deleted = false as isDeleted,
                     so.assigned_designer as assignedDesigner,
-                    so.plant_email_sent = 1 as plantEmailSent,
+                    so.plant_email_sent = true as plantEmailSent,
                     so.created_at as createdAt,
                     so.updated_at as updatedAt,
                     so.created_by as createdBy,

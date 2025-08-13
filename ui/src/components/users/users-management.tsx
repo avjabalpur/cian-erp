@@ -5,15 +5,28 @@ import { Button } from "@/components/ui/button"
 import UsersTable from "./users-table"
 import { useRouter, useSearchParams } from "next/navigation"
 import { User } from "@/types/user"
-import { useUsers } from "@/hooks/use-users"
+import { useUsers, useDeleteUser } from "@/hooks/use-users"
 import { Plus } from "lucide-react"
 import { UserDrawer } from "./user-drawer"
 import { UserDetailsDrawer } from "./user-details-drawer"
+import { toast } from "@/hooks/use-toast"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 export default function UsersManagement() {
   const [search, setsearch] = useState("")
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [detailsDrawerOpen, setDetailsDrawerOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [userToDelete, setUserToDelete] = useState<User | null>(null)
 
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
@@ -34,6 +47,9 @@ export default function UsersManagement() {
     sorting: sorting,
     globalFilter: globalFilter
   })
+  
+  const deleteUserMutation = useDeleteUser()
+  
   const users = usersData?.items || []
   const totalCount = usersData?.totalCount || 0
   const pageCount = 10 // TODO: get from API
@@ -49,7 +65,28 @@ export default function UsersManagement() {
   }
 
   const handleDelete = (user: User) => {
-    // Implement delete logic here
+    setUserToDelete(user)
+    setDeleteDialogOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    if (!userToDelete) return
+
+    try {
+      await deleteUserMutation.mutateAsync(userToDelete.id.toString())
+      toast({
+        title: "Success",
+        description: "User deleted successfully",
+      })
+      setDeleteDialogOpen(false)
+      setUserToDelete(null)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete user. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   const handleGlobalFilterChange = (filter: string) => {
@@ -113,6 +150,27 @@ export default function UsersManagement() {
         onClose={() => setDetailsDrawerOpen(false)}
         userId={selectedUser?.id || null}
       />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the user "{userToDelete?.firstName} {userToDelete?.lastName}".
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete} 
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={deleteUserMutation.isPending}
+            >
+              {deleteUserMutation.isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

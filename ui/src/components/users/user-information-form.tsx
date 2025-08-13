@@ -1,12 +1,12 @@
 import { FormInput } from "@/components/shared/forms/form-input"
 import { FormCustom } from "@/components/shared/forms/form-custom"
 import { Control } from "react-hook-form";
-import { User } from "@/types/user";
+import { UserFormValues } from "@/validations/user";
 import { FormSelect } from "@/components/shared/forms/form-select";
 import { UserSelector } from "@/components/shared/user-selector";
 
 interface UserInformationFormProps {
-  control: Control<User>
+  control: Control<UserFormValues>
 }
 
 export function UserInformationForm({ control }: UserInformationFormProps) {
