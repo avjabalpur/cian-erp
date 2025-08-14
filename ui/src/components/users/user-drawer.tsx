@@ -25,7 +25,7 @@ export function UserDrawer({ isOpen, onClose, user }: UserDrawerProps) {
         isActive: user?.isActive || true,
         department: user?.department || '',
         designation: user?.designation || '',
-        password: '', // Always start with empty password
+        password: user?.password || '', // Always start with empty password
         isEmailVerified: user?.isEmailVerified || false,
         isPhoneVerified: user?.isPhoneVerified || false,
     },
@@ -66,6 +66,7 @@ export function UserDrawer({ isOpen, onClose, user }: UserDrawerProps) {
   const onSubmit = async (data: UserFormValues) => {
     try {
       const payload = {
+        id: user?.id,
         username: data.username || data.email.split('@')[0],
         email: data.email,
         firstName: data.firstName,
@@ -91,7 +92,7 @@ export function UserDrawer({ isOpen, onClose, user }: UserDrawerProps) {
       
       if (user) {
         updateUser(
-          { id: user.id, data: payload },
+          { id: user.id.toString(), data: payload },
           {
             onSuccess: () => {
               toast({ title: 'Success', description: 'User updated successfully' })
@@ -138,7 +139,9 @@ export function UserDrawer({ isOpen, onClose, user }: UserDrawerProps) {
   const handleClose = () => {
     reset()
     onClose()
+    
   }
+  console.log(form.formState.errors);
 
   return (
     <RightDrawer

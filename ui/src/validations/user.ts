@@ -1,13 +1,14 @@
 import { z } from "zod";
 
 const baseUserSchema = z.object({
+  id: z.number().int().optional(),
   username: z.string().min(3).max(50),
   email: z.string().email().max(100),
   firstName: z.string().min(2, { message: "First name must contain at least 2 characters" }).max(50),
   lastName: z.string().min(2, { message: "Last name must contain at least 2 characters" }).max(50),
   employeeId: z.string().max(50).optional(),
   phone: z.string()
-  .length(15, { message: "Phone number must be exactly 15 digits" })
+  .length(10, { message: "Phone number must be exactly 10 digits" })
   .regex(/^\d+$/, { message: "Phone number must contain only digits" })
   .optional(),
   dob: z.string().optional(),
