@@ -26,9 +26,9 @@ const createUser = async (userData: CreateUserData): Promise<User> => {
   return data;
 };
 
-const updateUser = async ({ id, ...userData }: { id: string; data: UpdateUserData }): Promise<User> => {
-  const { data } = await api.put(`/users/${id}`, userData.data);
-  return data;
+const updateUser = async ({ id, data }: { id: string; data: UpdateUserData }): Promise<User> => {
+  const { data: responseData } = await api.put(`/users/${id}`, data);
+  return responseData;
 };
 
 const deleteUser = async (id: string): Promise<void> => {

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { useProductGroups, useDeleteProductGroup } from "@/hooks/use-product-groups";
+import { useProductGroups, useDeleteProductGroup } from "@/hooks/items/use-product-groups";
 import { useDivisions } from "@/hooks/use-divisions";
 import { ProductGroup } from "@/types/product-group";
 import { useToast } from "@/hooks/use-toast";
@@ -44,8 +44,7 @@ export default function ProductGroupManagement() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Product Group Management</h1>
-          <p className="mt-2 text-gray-600">Manage system product groups</p>
+          <h1 className="text-xl font-bold text-gray-900">Product Group Management</h1>
         </div>
         <Button onClick={() => { setSelectedProductGroup(null); setDrawerOpen(true); }}>
           <Plus className="w-4 h-4 mr-2" />

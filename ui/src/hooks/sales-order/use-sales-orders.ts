@@ -38,9 +38,23 @@ const createSalesOrder = async (salesOrderData: CreateSalesOrderData): Promise<S
   return data;
 };
 
-const updateSalesOrder = async ({ id, ...salesOrderData }: { id: string; data: UpdateSalesOrderData }): Promise<SalesOrder> => {
-  const { data } = await api.put(`/sales-order/${id}`, salesOrderData.data);
+const createSalesOrderApproval = async (approvalData: { soStatus: string; dosageName: string }): Promise<{ id: number }> => {
+  const { data } = await api.post('/sales-order/approval', approvalData);
   return data;
+};
+
+const updateSalesOrder = async ({ id, data }: { id: string; data: UpdateSalesOrderData }): Promise<SalesOrder> => {
+  // Include the id in the data and handle date formatting
+  const updateData = {
+    ...data,
+    id: parseInt(id),
+    // Convert date strings to proper format for backend
+    soDate: data.soDate ? new Date(data.soDate).toISOString() : null,
+    quotationDate: data.quotationDate ? new Date(data.quotationDate).toISOString() : null,
+  };
+  
+  const { data: responseData } = await api.put(`/sales-order`, updateData);
+  return responseData;
 };
 
 const deleteSalesOrder = async (id: string): Promise<void> => {
@@ -88,6 +102,16 @@ export const useCreateSalesOrder = () => {
   const queryClient = useQueryClient();
   return useMutation<SalesOrder, Error, CreateSalesOrderData>({
     mutationFn: createSalesOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sales-orders'] });
+    },
+  });
+};
+
+export const useCreateSalesOrderApproval = () => {
+  const queryClient = useQueryClient();
+  return useMutation<{ id: number }, Error, { soStatus: string; dosageName: string }>({
+    mutationFn: createSalesOrderApproval,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sales-orders'] });
     },

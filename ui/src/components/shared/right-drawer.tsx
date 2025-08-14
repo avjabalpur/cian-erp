@@ -45,17 +45,17 @@ export function RightDrawer({
 
     return (
 
-        <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <Sheet open={isOpen}  onOpenChange={(open) => !open && onClose()}>
             <SheetContent
                 side="right"
                 className={cn(
-                    "w-full p-0 gap-0",
+                    "w-full p-2 gap-0 ",
                     sizeClasses[size],
                     className
                 )}>
                 <ScrollArea className="h-full rounded-md border">
                     {(title || description) && (
-                        <SheetHeader className="p-2 border-b bg-muted/30">
+                        <SheetHeader className="p-2 px-4 border-b bg-[#d1f2ff]">
                             {title && <SheetTitle className="text-lg font-semibold">{title}</SheetTitle>}
                             {description && (
                                 <SheetDescription className="text-sm text-muted-foreground">
@@ -65,7 +65,7 @@ export function RightDrawer({
                         </SheetHeader>
                     )}
 
-                    <div className="flex-1 overflow-y-auto p-2">
+                    <div className="flex-1 overflow-y-auto p-4">
                         {children}
                     </div>
                 </ScrollArea>

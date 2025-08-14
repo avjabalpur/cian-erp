@@ -111,7 +111,7 @@ export default function UsersTable({
         ...user,
         createdAt: user.createdAt ? formatDate(user.createdAt) : '',
         updatedAt: user.updatedAt ? formatDate(user.updatedAt) : '',
-        isActive: user.isActive ? 'Yes' : 'No',
+       isActive: Boolean(user.isActive),
     }))
     }, [users])
 

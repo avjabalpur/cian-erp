@@ -6,19 +6,7 @@ import { DivisionInformationForm } from "./division-information-form"
 import { useCreateDivision, useUpdateDivision } from "@/hooks/use-divisions"
 import { toast } from "@/hooks/use-toast"
 import { useEffect } from "react"
-import { z } from "zod"
-
-const divisionFormSchema = z.object({
-  code: z.string().min(1).max(10),
-  name: z.string().min(1).max(100),
-  description: z.string().optional(),
-  departmentId: z.string().optional(),
-  unit: z.string().max(10).optional(),
-  conversionFactor: z.coerce.number().optional(),
-  isActive: z.boolean().optional(),
-})
-
-export type DivisionFormValues = z.infer<typeof divisionFormSchema>
+import { divisionFormSchema, DivisionFormValues } from "@/validations/division"
 
 interface DivisionDrawerProps {
   isOpen: boolean
@@ -34,7 +22,7 @@ export function DivisionDrawer({ isOpen, onClose, division, departments }: Divis
       code: division?.code || '',
       name: division?.name || '',
       description: division?.description || '',
-      departmentId: division?.departmentId ? String(division.departmentId) : '',
+      departmentId: division?.departmentId ? division.departmentId : 0,
       unit: division?.unit || '',
       conversionFactor: division?.conversionFactor ?? 1.0,
       isActive: division?.isActive ?? true,
@@ -51,7 +39,7 @@ export function DivisionDrawer({ isOpen, onClose, division, departments }: Divis
         code: division.code || '',
         name: division.name || '',
         description: division.description || '',
-        departmentId: division.departmentId ? String(division.departmentId) : '',
+        departmentId: division.departmentId ? division.departmentId : 0,
         unit: division.unit || '',
         conversionFactor: division.conversionFactor ?? 1.0,
         isActive: division.isActive ?? true,
@@ -61,7 +49,7 @@ export function DivisionDrawer({ isOpen, onClose, division, departments }: Divis
         code: '',
         name: '',
         description: '',
-        departmentId: '',
+        departmentId: 0,
         unit: '',
         conversionFactor: 1.0,
         isActive: true,

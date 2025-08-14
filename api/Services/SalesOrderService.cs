@@ -148,5 +148,14 @@ namespace Xcianify.Services
             await _salesOrderRepository.UpdateAsync(salesOrder);
             return true;
         }
+
+        public async Task<int> CreateApprovalAsync(CreateSalesOrderApprovalDto approvalDto, int currentUserId)
+        {
+            return await _salesOrderRepository.CreateApprovalAsync(
+                approvalDto.SoStatus,
+                approvalDto.DosageName,
+                currentUserId
+            );
+        }
     }
 } 

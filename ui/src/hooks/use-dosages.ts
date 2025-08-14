@@ -24,11 +24,6 @@ const getDosageById = async (id: number): Promise<Dosage | null> => {
   return data;
 };
 
-const getAllDosages = async (): Promise<Dosage[]> => {
-  const { data } = await api.get('/dosages/all');
-  return data;
-};
-
 const createDosage = async (dosageData: CreateDosageRequest): Promise<Dosage> => {
   const { data } = await api.post('/dosages', dosageData);
   return data;
@@ -57,13 +52,6 @@ export const useDosage = (id: number) => {
     queryKey: ['dosage', id],
     queryFn: () => getDosageById(id),
     enabled: !!id,
-  });
-};
-
-export const useAllDosages = () => {
-  return useQuery<Dosage[], Error>({
-    queryKey: ['dosages', 'all'],
-    queryFn: getAllDosages,
   });
 };
 

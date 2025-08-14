@@ -33,7 +33,7 @@ export function ProductGroupForm({ control, divisions = [] }: ProductGroupFormPr
   ];
 
   const divisionOptions = [
-    { label: "Select Division", value: "" },
+    { label: "Select Division", value: "-1" },
     ...divisions.map((division: any) => ({
       label: division.name,
       value: division.id.toString(),

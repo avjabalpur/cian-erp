@@ -365,7 +365,7 @@ export default function ItemsDrawer({
         ? "Update the item information below." 
         : "Fill in the information below to create a new item."
       }
-      size="5xl"
+      size="full"
     >
       <div className="mx-auto w-full">
         <FormProvider {...form}>
@@ -378,12 +378,12 @@ export default function ItemsDrawer({
                 <TabsTrigger value="stock">Stock Analysis</TabsTrigger>
                 <TabsTrigger value="export">Export</TabsTrigger>
                 <TabsTrigger value="specifications">Specifications</TabsTrigger>
-                <TabsTrigger value="other">Other Details</TabsTrigger>
+                {/* <TabsTrigger value="other">Other Details</TabsTrigger> */}
                 <TabsTrigger value="media">Media</TabsTrigger>
               </TabsList>
 
               <TabsContent value="basic" className="space-y-3">
-                <ItemBasicInfoForm control={form.control} />
+                <ItemBasicInfoForm control={form.control} itemId={currentItemId} />
               </TabsContent>
 
               <TabsContent value="sales" className="space-y-3">
@@ -406,9 +406,9 @@ export default function ItemsDrawer({
                 <ItemSpecificationsForm control={form.control} itemId={currentItemId} />
               </TabsContent>
 
-              <TabsContent value="other" className="space-y-3">
+              {/* <TabsContent value="other" className="space-y-3">
                 <ItemOtherDetailsForm control={form.control} itemId={currentItemId} />
-              </TabsContent>
+              </TabsContent> */}
 
               <TabsContent value="media" className="space-y-3">
                 <ItemMediaForm control={form.control} itemId={currentItemId} />
