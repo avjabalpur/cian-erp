@@ -191,6 +191,7 @@ export function KeyValueForm({ control, name = "properties", itemId ,entityType}
         </CardHeader>
         <CardContent>
           <Button 
+            type="button"
             onClick={handleAddNew} 
             className="w-full"
             disabled={isLoading || !itemId}
@@ -252,6 +253,7 @@ export function KeyValueForm({ control, name = "properties", itemId ,entityType}
                     <TableCell>
                       <div className="flex gap-2">
                         <Button
+                          type="button"
                           variant="outline"
                           size="sm"
                           onClick={(e) => {
@@ -264,6 +266,7 @@ export function KeyValueForm({ control, name = "properties", itemId ,entityType}
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button
+                          type="button"
                           variant="outline"
                           size="sm"
                           onClick={(e) => {

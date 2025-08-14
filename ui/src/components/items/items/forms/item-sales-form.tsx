@@ -261,6 +261,7 @@ export function ItemSalesForm({ control, itemId }: ItemSalesFormProps) {
               name="considerAsNewProductTill"
               label="Consider as New Product till"
               placeholder="Select date"
+             
             />
           </CardContent>
         </Card>

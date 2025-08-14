@@ -151,26 +151,26 @@ namespace Xcianify.Repository
             return count > 0;
         }
 
-        public async Task<IEnumerable<ItemType>> GetParentTypesAsync()
+        public async Task<IEnumerable<ItemType>> GetParentTypesAsync(int parentId)
         {
             var query = $@"
-                SELECT 
-                    id as Id,
-                    code as Code,
-                    name as Name,
-                    description as Description,
-                    parent_type_id as ParentTypeId,
-                    is_active as IsActive,
-                    created_at as CreatedAt,
-                    updated_at as UpdatedAt,
-                    created_by as CreatedBy,
-                    updated_by as UpdatedBy
-                FROM {TableName} 
-                WHERE is_active = true
-                ORDER BY name";
+        SELECT 
+            id AS Id,
+            code AS Code,
+            name AS Name,
+            description AS Description,
+            parent_type_id AS ParentTypeId,
+            is_active AS IsActive,
+            created_at AS CreatedAt,
+            updated_at AS UpdatedAt,
+            created_by AS CreatedBy,
+            updated_by AS UpdatedBy
+        FROM {TableName}
+        WHERE is_active = true AND parent_type_id = @ParentTypeId
+        ORDER BY name";
 
             using var connection = _dbContext.GetConnection();
-            return await connection.QueryAsync<ItemType>(query);
+            return await connection.QueryAsync<ItemType>(query, new { ParentTypeId = parentId });
         }
 
     }

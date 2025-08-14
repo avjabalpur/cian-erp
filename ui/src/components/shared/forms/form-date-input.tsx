@@ -46,7 +46,7 @@ export function FormDateInput<T extends FieldValues>({
   return (
     <div className="space-y-0">
       <Label htmlFor={name} className={error ? 'text-destructive' : 'text-[12px] font-medium'}>
-        {label}
+         {label} {required && <span className="text-destructive">*</span>}
       </Label>
       <Popover>
         <PopoverTrigger asChild>

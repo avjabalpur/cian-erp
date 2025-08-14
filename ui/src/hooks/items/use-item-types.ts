@@ -30,8 +30,8 @@ const getItemTypeById = async (id: number): Promise<ItemType> => {
   return data;
 };
 
-const getParentTypes = async (): Promise<ItemType[]> => {
-  const { data } = await api.get('/item-types/parent-types');
+const getParentTypes = async (id :number): Promise<ItemType[]> => {
+  const { data } = await api.get(`/item-types/parent-types?parentId=${id}`);
   return data;
 };
 
@@ -65,10 +65,10 @@ export const useItemTypeById = (id: number) => {
   });
 };
 
-export const useParentTypes = () => {
+export const useParentTypes = (id:number) => {
   return useQuery<ItemType[], Error>({
-    queryKey: ['parent-types'],
-    queryFn: getParentTypes,
+    queryKey: ['parent-types',id],
+    queryFn: () =>getParentTypes(id),
   });
 };
 

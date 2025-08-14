@@ -24,7 +24,7 @@ namespace Xcianify.Repository
         {
             using var connection = _context.GetConnection();
             
-            var whereClause = "WHERE so.is_deleted = false";
+            var whereClause = "WHERE so.is_deleted = 0";
             var parameters = new DynamicParameters();
 
             if (!string.IsNullOrEmpty(filterDto.search))
@@ -103,11 +103,11 @@ namespace Xcianify.Repository
                 LEFT JOIN users u1 ON so.created_by = u1.id
                 LEFT JOIN users u2 ON so.updated_by = u2.id
                 LEFT JOIN users u3 ON so.assigned_designer = u3.id
-                LEFT JOIN sales_order_stages s1 ON so.id = s1.sales_order_id AND s1.stage_name = 'Costing Approval' AND s1.is_deleted = false
-                LEFT JOIN sales_order_stages s2 ON so.id = s2.sales_order_id AND s2.stage_name = 'QA Approval' AND s2.is_deleted = false
-                LEFT JOIN sales_order_stages s3 ON so.id = s3.sales_order_id AND s3.stage_name = 'Designer Approval' AND s3.is_deleted = false
-                LEFT JOIN sales_order_stages s4 ON so.id = s4.sales_order_id AND s4.stage_name = 'Final Authorization' AND s4.is_deleted = false
-                LEFT JOIN sales_order_stages s5 ON so.id = s5.sales_order_id AND s5.stage_name = 'PM Approval' AND s5.is_deleted = false
+                LEFT JOIN sales_order_stages s1 ON so.id = s1.sales_order_id AND s1.stage_name = 'Costing Approval' AND s1.is_deleted = 0
+                LEFT JOIN sales_order_stages s2 ON so.id = s2.sales_order_id AND s2.stage_name = 'QA Approval' AND s2.is_deleted = 0
+                LEFT JOIN sales_order_stages s3 ON so.id = s3.sales_order_id AND s3.stage_name = 'Designer Approval' AND s3.is_deleted = 0
+                LEFT JOIN sales_order_stages s4 ON so.id = s4.sales_order_id AND s4.stage_name = 'Final Authorization' AND s4.is_deleted = 0
+                LEFT JOIN sales_order_stages s5 ON so.id = s5.sales_order_id AND s5.stage_name = 'PM Approval' AND s5.is_deleted = 0
                 {whereClause}";
 
             var totalCount = await connection.QuerySingleAsync<int>(countQuery, parameters);
@@ -218,11 +218,11 @@ namespace Xcianify.Repository
                 LEFT JOIN users u1 ON so.created_by = u1.id
                 LEFT JOIN users u2 ON so.updated_by = u2.id
                 LEFT JOIN users u3 ON so.assigned_designer = u3.id
-                LEFT JOIN sales_order_stages s1 ON so.id = s1.sales_order_id AND s1.stage_name = 'Costing Approval' AND s1.is_deleted = false
-                LEFT JOIN sales_order_stages s2 ON so.id = s2.sales_order_id AND s2.stage_name = 'QA Approval' AND s2.is_deleted = false
-                LEFT JOIN sales_order_stages s3 ON so.id = s3.sales_order_id AND s3.stage_name = 'Designer Approval' AND s3.is_deleted = false
-                LEFT JOIN sales_order_stages s4 ON so.id = s4.sales_order_id AND s4.stage_name = 'Final Authorization' AND s4.is_deleted = false
-                LEFT JOIN sales_order_stages s5 ON so.id = s5.sales_order_id AND s5.stage_name = 'PM Approval' AND s5.is_deleted = false
+                LEFT JOIN sales_order_stages s1 ON so.id = s1.sales_order_id AND s1.stage_name = 'Costing Approval' AND s1.is_deleted = 0
+                LEFT JOIN sales_order_stages s2 ON so.id = s2.sales_order_id AND s2.stage_name = 'QA Approval' AND s2.is_deleted = 0
+                LEFT JOIN sales_order_stages s3 ON so.id = s3.sales_order_id AND s3.stage_name = 'Designer Approval' AND s3.is_deleted = 0
+                LEFT JOIN sales_order_stages s4 ON so.id = s4.sales_order_id AND s4.stage_name = 'Final Authorization' AND s4.is_deleted = 0
+                LEFT JOIN sales_order_stages s5 ON so.id = s5.sales_order_id AND s5.stage_name = 'PM Approval' AND s5.is_deleted = 0
                 {whereClause}
                 {orderClause}
                 {limitClause}";
