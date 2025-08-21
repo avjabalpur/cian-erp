@@ -72,7 +72,7 @@ export function KeyValueForm({ control, name = "properties", itemId ,entityType}
     try {
       if (editingProperty) {
         // Update existing property
-        await updateExtensionDataMutation.mutateAsync({
+        const updatedProperty = await updateExtensionDataMutation.mutateAsync({
           id: parseInt(editingProperty.id),
           data: {
             entityType: entityType,
@@ -84,20 +84,44 @@ export function KeyValueForm({ control, name = "properties", itemId ,entityType}
           }
         })
 
+        // Update local state immediately
+        const updatedPairs = pairs.map((pair: PropertyPair) => 
+          pair.id === editingProperty.id 
+            ? {
+                id: updatedProperty.id.toString(),
+                propertyKey: updatedProperty.propertyKey,
+                propertyLabel: updatedProperty.propertyLabel,
+                propertyDescription: updatedProperty.propertyDescription,
+                propertyValue: updatedProperty.propertyValue,
+              }
+            : pair
+        )
+        setPairs(updatedPairs)
+
         toast({
           title: "Success",
           description: "Property updated successfully",
         })
       } else {
         // Create new property
-        await createExtensionDataMutation.mutateAsync({
-          entityType: "ItemMaster",
+        const newProperty = await createExtensionDataMutation.mutateAsync({
+          entityType: entityType,
           entityTypeId: itemId,
           propertyKey: propertyData.propertyKey,
           propertyLabel: propertyData.propertyLabel,
           propertyDescription: propertyData.propertyDescription,
           propertyValue: propertyData.propertyValue,
         })
+
+        // Add to local state immediately
+        const newPropertyPair: PropertyPair = {
+          id: newProperty.id.toString(),
+          propertyKey: newProperty.propertyKey,
+          propertyLabel: newProperty.propertyLabel,
+          propertyDescription: newProperty.propertyDescription,
+          propertyValue: newProperty.propertyValue,
+        }
+        setPairs([...pairs, newPropertyPair])
 
         toast({
           title: "Success",
@@ -132,9 +156,13 @@ export function KeyValueForm({ control, name = "properties", itemId ,entityType}
     }
 
     try {
+      // Remove from local state immediately (optimistic update)
+      const updatedPairs = pairs.filter((pair: PropertyPair) => pair.id !== id)
+      setPairs(updatedPairs)
+
       await deleteExtensionDataMutation.mutateAsync({
         id: parseInt(id),
-        entityType: "ItemMaster",
+        entityType: entityType,
         entityTypeId: itemId,
       })
 
@@ -144,6 +172,20 @@ export function KeyValueForm({ control, name = "properties", itemId ,entityType}
       })
     } catch (error: any) {
       console.error('Error deleting property:', error)
+      
+      // Revert the optimistic update on error
+      const { data: revertedProperties } = await useExtensionDataByEntity(entityType, itemId).refetch()
+      if (revertedProperties) {
+        const mappedProperties: PropertyPair[] = revertedProperties.map((prop) => ({
+          id: prop.id.toString(),
+          propertyKey: prop.propertyKey,
+          propertyLabel: prop.propertyLabel,
+          propertyDescription: prop.propertyDescription,
+          propertyValue: prop.propertyValue,
+        }))
+        setPairs(mappedProperties)
+      }
+
       toast({
         title: "Error",
         description: error?.response?.data?.message || error?.message || "Failed to delete property",
