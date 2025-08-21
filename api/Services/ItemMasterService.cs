@@ -171,41 +171,42 @@ namespace Xcianify.Services
                 if (createDto.SalesDetail != null)
                 {
                     createDto.SalesDetail.ItemId = createdItem.Id;
-                    await _itemSalesDetailService.CreateAsync(createDto.SalesDetail, 1);
+                    await _itemSalesDetailService.CreateAsync(createDto.SalesDetail, userId);
                 }
 
                 // Create export details if provided
                 if (createDto.ExportDetails != null)
                 {
                     createDto.ExportDetails.ItemId = createdItem.Id;
-                    await _itemExportDetailsService.CreateAsync(createDto.ExportDetails, 1);
+                    await _itemExportDetailsService.CreateAsync(createDto.ExportDetails, userId);
                 }
 
                 // Create stock analysis if provided
                 if (createDto.StockAnalysis != null)
                 {
                     createDto.StockAnalysis.ItemId = createdItem.Id;
-                    await _itemStockAnalysisService.CreateAsync(createDto.StockAnalysis, 1);
+                    await _itemStockAnalysisService.CreateAsync(createDto.StockAnalysis, userId);
                 }
 
                 // Create bought out details if provided
                 if (createDto.BoughtOutDetails != null)
                 {
                     createDto.BoughtOutDetails.ItemId = createdItem.Id;
-                    await _itemBoughtOutDetailsService.CreateAsync(createDto.BoughtOutDetails, 1);
+                    await _itemBoughtOutDetailsService.CreateAsync(createDto.BoughtOutDetails, userId);
                 }
 
                 // Create other details if provided
                 if (createDto.OtherDetails != null)
                 {
                     createDto.OtherDetails.ItemId = createdItem.Id;
-                    await _itemOtherDetailsService.CreateAsync(createDto.OtherDetails, 1);
+                    await _itemOtherDetailsService.CreateAsync(createDto.OtherDetails, userId);
                 }
 
                 // Note: Media should be handled separately via dedicated media endpoints
                 // This prevents circular dependencies and allows for better file handling
-               
+
                 // Get the created item without related data to avoid exceptions
+              
                 var result = _mapper.Map<ItemMasterDto>(createdItem);
                 
                 scope.Complete();

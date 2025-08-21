@@ -172,6 +172,7 @@ export default function ItemsDrawer({
               initialValue={item?.itemCode}
             />
           </div>
+          
           <div className="flex-1"></div>
         </div>
 

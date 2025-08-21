@@ -1,8 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Xcianify.Core.DTOs.ExtensionData;
 using Xcianify.Core.DTOs.ItemExportDetails;
-using Xcianify.Core.DTOs.ItemOtherDetails;
 using Xcianify.Core.DTOs.ItemMedia;
+using Xcianify.Core.DTOs.ItemOtherDetails;
 
 namespace Xcianify.Core.DTOs.ItemMaster
 {
@@ -34,13 +35,13 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public string ShortName { get; set; }
 
         [StringLength(100, ErrorMessage = "Pharmacopoeia name cannot be longer than 100 characters")]
-        public string PharmacopoeiaName { get; set; }
+        public string? PharmacopoeiaName { get; set; }
 
         [StringLength(20, ErrorMessage = "Unit of measure cannot be longer than 20 characters")]
-        public string UnitOfMeasure { get; set; }
+        public string? UnitOfMeasure { get; set; }
 
         [StringLength(20, ErrorMessage = "Issuing unit cannot be longer than 20 characters")]
-        public string IssuingUnit { get; set; }
+        public string? IssuingUnit { get; set; }
 
         [Range(0, double.MaxValue, ErrorMessage = "UOM ISS conversion factor must be a positive number")]
         public decimal? UomIssConvFactor { get; set; }
@@ -49,7 +50,7 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public decimal? UomUqcConvFactor { get; set; }
 
         [StringLength(50, ErrorMessage = "Drawing reference cannot be longer than 50 characters")]
-        public string DrawingRef { get; set; }
+        public string? DrawingRef { get; set; }
 
         [Range(0, double.MaxValue, ErrorMessage = "Standard assay strength must be a positive number")]
         public decimal? StdAssayStrength { get; set; }
@@ -77,7 +78,7 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public bool Imported { get; set; }
 
         [StringLength(100, ErrorMessage = "Current buyer cannot be longer than 100 characters")]
-        public string CurrentBuyer { get; set; }
+        public string? CurrentBuyer { get; set; }
 
         [Range(0, int.MaxValue, ErrorMessage = "Economic order quantity must be a positive number")]
         public int? EconomicOrderQty { get; set; }
@@ -88,7 +89,7 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public bool TaxCreditApplicable { get; set; }
 
         [StringLength(10, ErrorMessage = "Freight on cannot be longer than 10 characters")]
-        public string FreightOn { get; set; }
+        public string? FreightOn { get; set; }
 
         public bool Manufactured { get; set; }
 
@@ -99,26 +100,26 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public decimal? StdMfgFeesPerUnit { get; set; }
 
         [StringLength(10, ErrorMessage = "Main production center cannot be longer than 10 characters")]
-        public string MainProdCentre { get; set; }
+        public string? MainProdCentre { get; set; }
 
         public bool Sold { get; set; }
         public bool KeyProduct { get; set; }
         public bool Exported { get; set; }
 
         [StringLength(50, ErrorMessage = "Product type cannot be longer than 50 characters")]
-        public string ProductType { get; set; }
+        public string? ProductType { get; set; }
 
         [StringLength(50, ErrorMessage = "Sales division cannot be longer than 50 characters")]
-        public string SalesDivision { get; set; }
+        public string? SalesDivision { get; set; }
 
         [StringLength(50, ErrorMessage = "Product group cannot be longer than 50 characters")]
-        public string ProductGroup { get; set; }
+        public string? ProductGroup { get; set; }
 
         [Range(0, double.MaxValue, ErrorMessage = "Conversion factor must be a positive number")]
         public decimal? ConversionFactor { get; set; }
 
         [StringLength(100, ErrorMessage = "Vendor part number cannot be longer than 100 characters")]
-        public string VendorPartNo { get; set; }
+        public string? VendorPartNo { get; set; }
 
         public bool BatchNotApplicable { get; set; }
         public bool QcRequired { get; set; }
@@ -146,5 +147,9 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public CreateItemBoughtOutDetailsDto? BoughtOutDetails { get; set; }
         public CreateItemOtherDetailsDto? OtherDetails { get; set; }
         public CreateItemMediaDto? Media { get; set; }
+
+        
+
+
     }
 }

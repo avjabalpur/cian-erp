@@ -8,13 +8,14 @@ import {  useProductTypeOptions } from "@/components/shared/options"
 import { useItemTypeOptions } from "@/components/shared/options/item-type-options"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Search } from "lucide-react"
-import { useController} from "react-hook-form"
+import { useController, useWatch, useFormContext} from "react-hook-form"
 import { DivisionLookup } from "@/components/shared/lookups/division-lookup"
 import { ItemOtherDetailsForm } from "./item-other-details-form"
 import { useParentTypes } from "@/hooks/items/use-item-types"
+import { useHsnOptions } from "@/components/shared/options/hsn-options"
 
 interface ItemBasicInfoFormProps {
   control: any;
@@ -24,14 +25,51 @@ interface ItemBasicInfoFormProps {
 export function ItemBasicInfoForm({ control, itemId }: ItemBasicInfoFormProps) {
   const [isDivisionLookupOpen, setIsDivisionLookupOpen] = useState(false);
   
+  // Get form context for setValue
+  const { setValue } = useFormContext();
+  
   // Use controller for GS Ind field
   const gsIndController = useController({
     name: "gsInd",
     control,
   });
-  
+
   // Fetch parent types
-  const { data: parentTypes = [] } = useParentTypes();
+  
+  // Watch the selected itemTypeId from the form
+const selectedItemTypeId = useWatch({
+  control,
+  name: "itemTypeId",
+});
+
+// Fetch parent types for the selected item type
+
+const { data: parentTypes = [] } = useParentTypes(selectedItemTypeId);
+
+
+  // Fetch HSN options
+  const hsnOptions = useHsnOptions();
+
+  // Watch HSN field value to update UQC
+  const selectedHsnValue = useWatch({
+    control,
+    name: "revNo",
+  });
+
+  // Update UQC when HSN changes
+  useEffect(() => {
+    if (selectedHsnValue && selectedHsnValue !== "__SELECT__") {
+      const selectedHsn = hsnOptions.find(option => option.value === selectedHsnValue);
+      if (selectedHsn?.uqc) {
+        try {
+          setValue("uqc", selectedHsn.uqc);
+          setValue("issuingUnit", selectedHsn.uqc);
+        } catch (error) {
+          console.error('Error setting form values:', error);
+        }
+      }
+    }
+  }, [selectedHsnValue, hsnOptions, setValue]);
 
   // Create options for item types using shared component
   const itemTypeOptions = useItemTypeOptions();
@@ -97,14 +135,20 @@ export function ItemBasicInfoForm({ control, itemId }: ItemBasicInfoFormProps) {
             placeholder="Select GS Ind."
           />
         </div>
-        <FormInput
+        <FormSelect
           control={control}
           name="revNo"
           label="HSN"
-          placeholder="Enter HSN code"
+          options={hsnOptions}
         />
         <div className="space-y-2">
-          <span className="text-sm font-medium">UQC:</span> <span className="text-sm font-medium">KGS</span>
+          <span className="text-sm font-medium">UQC:</span> 
+          <span className="text-sm font-medium">
+            {selectedHsnValue && selectedHsnValue !== "__SELECT__" 
+              ? hsnOptions.find(option => option.value === selectedHsnValue)?.uqc || "KGS"
+              : "KGS"
+            }
+          </span>
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

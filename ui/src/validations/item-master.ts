@@ -56,7 +56,10 @@ export const hsnMasterSchema = z.object({
 export const itemMasterSchema = z.object({
   // Basic Info
   //itemCode: z.string().min(1, "Item Code is required"),
-  revNo: z.string().optional(),
+  revNo: z.string().optional().transform((val) => {
+    if (val === "__SELECT__") return "";
+    return val;
+  }),
   itemTypeId: z.string()
     .min(1, "Item Type is required")
     .transform((val) => {
@@ -308,7 +311,7 @@ export const itemMasterSchema = z.object({
       const num = parseFloat(val);
       return isNaN(num) ? undefined : num;
     }),
-  considerAsNewProductTill: z.string().optional(),
+  considerAsNewProductTill: z.string().nullable().optional(),
   interfaceCode: z.string().optional(),
   specs: z.string().optional(),
 

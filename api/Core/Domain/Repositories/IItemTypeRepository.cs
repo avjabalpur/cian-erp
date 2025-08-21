@@ -15,6 +15,6 @@ namespace Xcianify.Core.Domain.Repositories
         Task UpdateAsync(ItemType itemType);
         Task DeleteAsync(int id);
         Task<bool> ExistsAsync(string code, int? excludeId = null);
-        Task<IEnumerable<ItemType>> GetParentTypesAsync();
+        Task<IEnumerable<ItemType>> GetParentTypesAsync(int parentId);
     }
 }

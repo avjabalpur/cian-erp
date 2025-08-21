@@ -33,9 +33,9 @@ namespace Xcianify.Presentation.Controllers
         }
 
         [HttpGet("parent-types")]
-        public async Task<IActionResult> GetParentTypes()
+        public async Task<IActionResult> GetParentTypes(int parentId)
         {
-            var parentTypes = await _itemTypeService.GetParentTypesAsync();
+            var parentTypes = await _itemTypeService.GetParentTypesAsync(parentId);
             return Ok(parentTypes);
         }
 

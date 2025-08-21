@@ -32,7 +32,7 @@ namespace Xcianify.Repository
                     media_url as MediaUrl,
                     description as Description
                 FROM item_media 
-                WHERE id = @Id AND is_deleted = 0";
+                WHERE id = @Id AND is_deleted = false";
             using var connection = _dbContext.GetConnection();
             return await connection.QueryFirstOrDefaultAsync<ItemMedia>(query, new { Id = id });
         }
@@ -91,9 +91,13 @@ namespace Xcianify.Repository
 
         public async Task<bool> DeleteAsync(int id)
         {
-            const string query = @"UPDATE item_media SET is_deleted = 1, updated_at = @UpdatedAt WHERE id = @Id AND is_deleted = 0";
+            const string query = @"
+        UPDATE item_media 
+        SET is_deleted = true 
+        WHERE id = @Id AND is_deleted = false";
+
             using var connection = _dbContext.GetConnection();
-            return await connection.ExecuteAsync(query, new { Id = id, UpdatedAt = DateTime.UtcNow }) > 0;
+            return await connection.ExecuteAsync(query, new { Id = id }) > 0;
         }
     }
 }

@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { FormInput } from "@/components/shared/forms/form-input"
 import { FormSelect } from "@/components/shared/forms/form-select"
 import { Button } from "@/components/ui/button"
 import { Upload, File, Image, Video, Music, FileText, Trash2, Eye } from "lucide-react"

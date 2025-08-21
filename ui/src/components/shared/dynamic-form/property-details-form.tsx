@@ -112,10 +112,10 @@ export function PropertyDetailsForm({ isOpen, onClose, onSave, editingProperty }
         </div>
 
         <div className="flex gap-3 pt-6 border-t">
-          <Button onClick={handleSave} disabled={!isFormValid} className="flex-1">
+          <Button type="button" onClick={handleSave} disabled={!isFormValid} className="flex-1">
             {editingProperty ? "Update Property" : "Save Property"}
           </Button>
-          <Button variant="outline" onClick={handleCancel} className="flex-1">
+          <Button type="button" variant="outline" onClick={handleCancel} className="flex-1">
             Cancel
           </Button>
         </div>

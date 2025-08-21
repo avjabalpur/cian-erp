@@ -309,8 +309,8 @@ export const mapItemToFormData = (item: any): ItemMasterFormData => {
 
   return {
     revNo: item.revNo || "",
-    itemTypeId: item.itemTypeId || 0,
-    subType: item.subType || "",
+    itemTypeId: item.itemTypeId ? item.itemTypeId.toString() : "",
+    subType: item.subType ? item.subType.toString() : "",
     gsInd: item.gsInd || "",
     goodsType: item.goodsType || "",
     itemName: item.itemName || "",
@@ -384,7 +384,7 @@ export const mapItemToFormData = (item: any): ItemMasterFormData => {
     secondaryGtin: item.salesDetail?.secondaryGtin || "",
     primaryGtin: item.salesDetail?.primaryGtin || "",
     minBatchQtyAutoloading: item.salesDetail?.minBatchQtyAutoloading ? item.salesDetail.minBatchQtyAutoloading.toString() : undefined,
-    considerAsNewProductTill: item.salesDetail?.considerAsNewProductTill || "",
+    considerAsNewProductTill: item.salesDetail?.considerAsNewProductTill || null,
     interfaceCode: item.salesDetail?.interfaceCode || "",
     specs: item.salesDetail?.specs || "",
     // Map specification data
@@ -673,7 +673,7 @@ export const transformFormDataToApi = (data: ItemMasterFormData) => {
       secondaryGtin,
       primaryGtin,
       minBatchQtyAutoloading: minBatchQtyAutoloading ? minBatchQtyAutoloading.toString() : undefined,
-      considerAsNewProductTill,
+      considerAsNewProductTill: considerAsNewProductTill || null,
       interfaceCode,
       specs,
     } : undefined,

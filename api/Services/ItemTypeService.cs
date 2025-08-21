@@ -118,9 +118,9 @@ namespace Xcianify.Services
             return true;
         }
 
-        public async Task<IEnumerable<ItemTypeDto>> GetParentTypesAsync()
+        public async Task<IEnumerable<ItemTypeDto>> GetParentTypesAsync(int parentId)
         {
-            var parentTypes = await _itemTypeRepository.GetParentTypesAsync();
+            var parentTypes = await _itemTypeRepository.GetParentTypesAsync(parentId);
             return _mapper.Map<IEnumerable<ItemTypeDto>>(parentTypes);
         }
 

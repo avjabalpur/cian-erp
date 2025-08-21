@@ -9,28 +9,28 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public int ItemId { get; set; }
 
         [StringLength(50)]
-        public string SubstituteForItemCode { get; set; }
+        public string? SubstituteForItemCode { get; set; }
 
         [StringLength(50)]
-        public string CustomTariffNo { get; set; }
+        public string? CustomTariffNo { get; set; }
 
         [StringLength(50)]
-        public string ExciseTariffNo { get; set; }
+        public string? ExciseTariffNo { get; set; }
 
         [StringLength(50)]
-        public string VatCommCode { get; set; }
+        public string? VatCommCode { get; set; }
 
         public decimal? ConversionFactor { get; set; }
 
         [StringLength(50)]
-        public string OldCode { get; set; }
+        public string? OldCode { get; set; }
 
         public decimal? StandardWeight { get; set; }
         public decimal? StandardConversionCostFactor { get; set; }
         public decimal? StandardPackingCostFactor { get; set; }
         public decimal? MarkupPercentage { get; set; }
         public decimal? MarkupAmount { get; set; }
-        public string Specification { get; set; }
+        public string? Specification { get; set; }
 
 
     }

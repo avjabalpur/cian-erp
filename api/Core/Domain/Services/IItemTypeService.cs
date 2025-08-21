@@ -12,6 +12,6 @@ namespace Xcianify.Core.Domain.Services
         Task<ItemTypeDto> CreateAsync(CreateItemTypeDto dto, int userId);
         Task<ItemTypeDto> UpdateAsync(int id, UpdateItemTypeDto dto, int userId);
         Task<bool> DeleteAsync(int id);
-        Task<IEnumerable<ItemTypeDto>> GetParentTypesAsync();
+        Task<IEnumerable<ItemTypeDto>> GetParentTypesAsync(int parentId);
     }
 }
