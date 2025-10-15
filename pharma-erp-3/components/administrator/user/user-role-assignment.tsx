@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useRoles } from '@/hooks/use-roles';
-import { useUserRolesByUser, useCreateUserRole, useDeleteUserRole } from '@/hooks/use-user-roles';
+import { useGetUserRoles, useAssignUserRole, useRemoveUserRole } from '@/hooks/use-users';
 import { toast } from 'sonner';
 import { UserRole } from '@/types/user';
 import { Role } from '@/types/role';
@@ -26,12 +26,12 @@ export function UserRoleAssignment({ userId, userName, onClose }: UserRoleAssign
 
   // Fetch available roles and current user roles
   const { data: rolesData, isLoading: rolesLoading } = useRoles();
-  const roles = rolesData?.data || [];
-  const { data: userRolesData, isLoading: userRolesLoading, refetch } = useUserRolesByUser(userId);
-  const userRoles = userRolesData?.data || [];
+  const roles = rolesData?.items || [];
+  const { data: userRolesData, isLoading: userRolesLoading, refetch } = useGetUserRoles(userId.toString());
+  const userRoles = userRolesData || [];
 
-  const createUserRole = useCreateUserRole();
-  const deleteUserRole = useDeleteUserRole();
+  const createUserRole = useAssignUserRole();
+  const deleteUserRole = useRemoveUserRole();
 
   // Initialize selected roles with currently assigned roles
   useEffect(() => {
@@ -67,14 +67,14 @@ export function UserRoleAssignment({ userId, userName, onClose }: UserRoleAssign
 
       // Add new roles
       for (const roleId of rolesToAdd) {
-        await createUserRole.mutateAsync({ userId, roleId });
+        await createUserRole.mutateAsync({ id: userId.toString(), roleId, assignedBy: 1, isActive: true });
       }
 
       // Remove deselected roles
       for (const roleId of rolesToRemove) {
         const userRole = userRoles.find((ur: UserRole) => ur.roleId === roleId);
         if (userRole) {
-          await deleteUserRole.mutateAsync(userRole.id);
+          await deleteUserRole.mutateAsync({ id: userRole.id.toString(), roleId: userRole.roleId.toString() });
         }
       }
 
@@ -90,7 +90,7 @@ export function UserRoleAssignment({ userId, userName, onClose }: UserRoleAssign
 
   const handleRemoveRole = async (userRole: UserRole) => {
     try {
-      await deleteUserRole.mutateAsync(userRole.id);
+      await deleteUserRole.mutateAsync({ id: userRole.id.toString(), roleId: userRole.roleId.toString() });
       toast.success('Role removed successfully');
       refetch();
     } catch (error) {
@@ -126,9 +126,9 @@ export function UserRoleAssignment({ userId, userName, onClose }: UserRoleAssign
                   <div className="flex items-center space-x-3">
                     <Shield className="h-4 w-4 text-blue-600" />
                     <div>
-                      <div className="font-medium">{userRole.roleName || 'Unknown Role'}</div>
+                      <div className="font-medium">{userRole.name || 'Unknown Role'}</div>
                       <div className="text-sm text-muted-foreground">
-                        {userRole.roleDescription || 'No description'}
+                        {userRole.description || 'No description'}
                       </div>
                     </div>
                   </div>
@@ -153,7 +153,7 @@ export function UserRoleAssignment({ userId, userName, onClose }: UserRoleAssign
       </Card>
 
       {/* Available Roles */}
-      <Card>
+      <Card className='mt-4'>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Plus className="h-5 w-5" />

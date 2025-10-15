@@ -29,6 +29,9 @@ export interface UserRole {
   roleId:number
   assignedAt:string
   assignedBy:string
+  name?: string;
+  description?: string;
+  isActive?: boolean;
 }
 
 export interface UserActivity {

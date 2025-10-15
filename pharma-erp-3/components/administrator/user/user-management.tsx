@@ -131,12 +131,11 @@ export function UserManagement() {
           description="Assign or remove roles for this user"
           size="xl"
         >
-          dnfjkdnj
-          {/* <UserRoleAssignment
+          <UserRoleAssignment
             userId={selectedUser.id}
             userName={`${selectedUser.firstName} ${selectedUser.lastName}`}
             onClose={() => setRoleAssignmentOpen(false)}
-          /> */}
+          /> 
         </RightDrawer>
       )}
     </div>
