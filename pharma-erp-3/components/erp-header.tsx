@@ -27,25 +27,21 @@ export default function ERPHeader() {
             </div>
           </div>
           <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200">
-            Production Environment
+            Dev Environment
           </Badge>
         </div>
 
         {/* Right Side - Notifications and User Menu */}
         <div className="flex items-center gap-3">
-          {/* Notifications */}
-          <Button variant="ghost" size="sm" className="relative">
-            <Bell className="w-4 h-4" />
-            <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-          </Button>
+         
 
           {/* Administrator Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-2">
+              <div className="flex items-center gap-2 px-3 py-1 bg-green-50 rounded-md cursor-pointer">
                 <UserCog className="w-4 h-4" />
-                <span className="text-sm">Administrator</span>
-              </Button>
+                <span className="text-xs text-green-700 font-medium">Administrator</span>
+              </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuItem asChild>
@@ -74,6 +70,12 @@ export default function ERPHeader() {
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <span className="text-xs text-green-700 font-medium">System Online</span>
           </div>
+
+        {/* Notifications */}
+          <Button variant="ghost" size="sm" className="relative">
+            <Bell className="w-4 h-4" />
+            <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+          </Button>
 
           {/* User Menu */}
           <DropdownMenu>
@@ -114,6 +116,8 @@ export default function ERPHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+         
         </div>
       </div>
     </header>

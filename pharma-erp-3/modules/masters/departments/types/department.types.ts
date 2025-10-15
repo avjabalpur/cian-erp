@@ -15,3 +15,4 @@ export type CreateDepartmentData = Omit<Department, 'id' | 'createdAt' | 'update
 export type UpdateDepartmentData = Partial<Omit<Department, 'id'>> & {
   id: number;
 };
+

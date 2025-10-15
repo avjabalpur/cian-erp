@@ -1,11 +1,11 @@
-import { PermissionManagement } from "@/components/administrator/permission/permission-management"
+import { PermissionManagement } from '@/modules/administrator/permissions';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: "Permission Management",
   description: "Manage system permissions",
 }
-export default function PermissionsPage() {   
+
+export default function PermissionsPage() {
   return <PermissionManagement />;
 }
-
