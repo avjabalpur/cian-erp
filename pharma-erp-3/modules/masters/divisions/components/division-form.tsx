@@ -69,7 +69,6 @@ export function DivisionForm({ division, mode, onSubmit, onCancel, isLoading, de
     <FormProvider {...form}>
       <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
         <DivisionInformationForm control={control} departments={departments} />
-        
         {mode !== 'view' && (
           <div className="flex justify-end gap-4 pt-4">
             <Button

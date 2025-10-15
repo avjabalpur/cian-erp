@@ -49,26 +49,14 @@ namespace Xcianify.Presentation.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateDivisionDto createDto)
         {
-            var userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
-            if (userId <= 0)
-            {
-                return Unauthorized(new { message = "Invalid user" });
-            }
-
-            var division = await _divisionService.CreateAsync(createDto, userId);
+            var division = await _divisionService.CreateAsync(createDto, CurrentUserId);
             return CreatedAtAction(nameof(GetById), new { id = division.Id }, division);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateDivisionDto updateDto)
         {
-            var userId = int.Parse(User.FindFirst("userId")?.Value ?? "0");
-            if (userId <= 0)
-            {
-                return Unauthorized(new { message = "Invalid user" });
-            }
-
-            var division = await _divisionService.UpdateAsync(id, updateDto, userId);
+            var division = await _divisionService.UpdateAsync(id, updateDto, CurrentUserId);
             return Ok(division);
         }
 

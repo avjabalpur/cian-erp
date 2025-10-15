@@ -1,3 +1,5 @@
+"use client"
+
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 import { FormFieldBaseProps } from "./types";
