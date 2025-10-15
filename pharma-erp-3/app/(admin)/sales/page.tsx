@@ -1,6 +1,10 @@
-import SalesDistribution from "@/components/sales-distribution"
+
 
 export default function SalesPage() {
-  return <SalesDistribution />
+  return (
+    <div className="p-6">
+      Sales Management - Coming Soon
+    </div>
+  )
 }
 

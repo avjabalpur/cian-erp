@@ -32,7 +32,7 @@ export function DepartmentManagement() {
     pageSize: currentPagination.pageSize,
   });
 
-  const departments = departmentsData?.items || [];
+  const departments = departmentsData || [];
   const totalCount = departmentsData?.totalCount || 0;
   const pageCount = Math.ceil(totalCount / currentPagination.pageSize);
 
@@ -85,11 +85,11 @@ export function DepartmentManagement() {
 
   return (
     <div>
-      <Card className='border-none rounded-none py-1'>
-        <CardContent className="space-y-4 px-3">
-          <DepartmentFilter />
+      <Card className='border-none rounded-none py-2'>
+        <CardContent className="space-y-4 px-4">
+          {/* <DepartmentFilter /> */}
           <DepartmentTable
-            departments={departments}
+            departments={departments as Department[]}
             isLoading={isLoading}
             onEdit={handleEdit}
             onView={handleView}

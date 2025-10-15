@@ -1,6 +1,8 @@
-import InventoryManagement from "@/components/inventory-management"
-
 export default function InventoryPage() {
-  return <InventoryManagement />
+  return (
+    <div className="p-6">
+      Inventory Management - Coming Soon
+    </div>
+  )
 }
 

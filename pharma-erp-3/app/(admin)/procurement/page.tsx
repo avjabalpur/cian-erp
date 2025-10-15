@@ -1,6 +1,10 @@
-import ProcurementModule from "@/components/procurement-module"
+
 
 export default function ProcurementPage() {
-  return <ProcurementModule />
-}
+  return (
+    <div className="p-6">
+      Procurement Management - Coming Soon
+    </div>
+  )
+} 
 

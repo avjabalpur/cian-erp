@@ -9,9 +9,9 @@ import { Label } from '@/components/ui/label';
 import { useGetUserRoles, useAssignUserRole, useRemoveUserRole } from '../hooks';
 import { toast } from 'sonner';
 import { UserRole } from '../types';
-import { Role } from '@/types/role';
 import { Shield, Plus, Trash2 } from 'lucide-react';
 import { useRoles } from '../../roles/hooks/use-roles';
+import { Role } from '../../roles/types';
 
 interface UserRoleAssignmentProps {
   userId: number;

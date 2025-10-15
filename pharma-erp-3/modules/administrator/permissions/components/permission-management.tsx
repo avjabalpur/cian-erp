@@ -90,7 +90,7 @@ export function PermissionManagement() {
         <CardContent className="space-y-4 px-3">
           <PermissionFilter />
           <PermissionTable
-            permissions={permissions}
+            permissions={permissions as any}
             isLoading={isLoading}
             onView={handleView}
             onEdit={handleEdit}
