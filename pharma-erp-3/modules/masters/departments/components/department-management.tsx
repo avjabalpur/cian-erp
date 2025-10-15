@@ -8,7 +8,7 @@ import { DepartmentTable } from './department-table';
 import { DepartmentDrawer } from './department-drawer';
 import { toast } from 'sonner';
 import { Department } from '../types';
-import { useDepartments } from '../hooks';
+import { useDepartments, useDeleteDepartment } from '../hooks';
 
 export function DepartmentManagement() {
   const [search] = useQueryState('search', { defaultValue: '' });
@@ -25,15 +25,15 @@ export function DepartmentManagement() {
     pageSize: parseInt(pageSize),
   }), [page, pageSize]);
 
-  const { data: departmentsData, isLoading, error } = useDepartments({
+  const { data: departments = [], isLoading, error } = useDepartments({
     search: search || undefined,
     status: status || undefined,
     pageNumber: currentPagination.pageIndex + 1,
     pageSize: currentPagination.pageSize,
   });
 
-  const departments = departmentsData || [];
-  const totalCount = departmentsData?.totalCount || 0;
+  const deleteDepartment = useDeleteDepartment();
+  const totalCount = departments?.length || 0;
   const pageCount = Math.ceil(totalCount / currentPagination.pageSize);
 
   const handleCreate = () => {
@@ -57,7 +57,7 @@ export function DepartmentManagement() {
   const handleDelete = async (department: Department) => {
     if (confirm(`Are you sure you want to delete department "${department.name}"?`)) {
       try {
-        // Implement delete logic here
+        await deleteDepartment.mutateAsync(department.id);
         toast.success('Department deleted successfully');
       } catch (error) {
         toast.error('Failed to delete department');
@@ -85,11 +85,11 @@ export function DepartmentManagement() {
 
   return (
     <div>
-      <Card className='border-none rounded-none py-2'>
-        <CardContent className="space-y-4 px-4">
-          {/* <DepartmentFilter /> */}
+      <Card className='border-none rounded-none py-1'>
+        <CardContent className="space-y-4 px-3">
+          <DepartmentFilter />
           <DepartmentTable
-            departments={departments as Department[]}
+            departments={departments}
             isLoading={isLoading}
             onEdit={handleEdit}
             onView={handleView}

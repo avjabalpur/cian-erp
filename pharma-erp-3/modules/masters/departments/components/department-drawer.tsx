@@ -32,28 +32,16 @@ export function DepartmentDrawer({ department, open, onOpenChange, mode }: Depar
 
   const handleSubmit = async (data: any) => {
     try {
+      const payload = {
+        ...data,
+        isActive: data.isActive ?? true,
+      };
+
       if (department) {
-        const updateData: UpdateDepartmentData = {
-          id: department.id,
-          code: data.code,
-          name: data.name,
-          description: data.description,
-          status: data.status,
-          headOfDepartment: data.headOfDepartment,
-          employeeCount: data.employeeCount,
-        };
-        await updateDepartment.mutateAsync({ id: department.id.toString(), data: updateData });
+        await updateDepartment.mutateAsync({ id: department.id, data: payload });
         toast.success('Department updated successfully');
       } else {
-        const createData: CreateDepartmentData = {
-          code: data.code,
-          name: data.name,
-          description: data.description,
-          status: data.status,
-          headOfDepartment: data.headOfDepartment,
-          employeeCount: data.employeeCount,
-        };
-        await createDepartment.mutateAsync(createData);
+        await createDepartment.mutateAsync(payload);
         toast.success('Department created successfully');
       }
       onOpenChange(false);

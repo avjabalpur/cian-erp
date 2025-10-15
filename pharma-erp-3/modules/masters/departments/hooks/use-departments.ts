@@ -9,12 +9,12 @@ const getDepartments = async (params?: {
   pageSize?: number; 
   search?: string; 
   status?: string; 
-}): Promise<{ items: Department[]; totalCount: number }> => {
+}): Promise<Department[]> => {
   const { data } = await api.get('/departments', { params });
   return data;
 };
 
-const getDepartmentById = async (id: string): Promise<Department | null> => {
+const getDepartmentById = async (id: number): Promise<Department | null> => {
   if (!id) return null;
   const { data } = await api.get(`/departments/${id}`);
   return data;
@@ -25,29 +25,43 @@ const createDepartment = async (departmentData: CreateDepartmentData): Promise<D
   return data;
 };
 
-const updateDepartment = async ({ id, ...departmentData }: { id: string; data: UpdateDepartmentData }): Promise<Department> => {
+const updateDepartment = async ({ id, ...departmentData }: { id: number; data: UpdateDepartmentData }): Promise<Department> => {
   const { data } = await api.put(`/departments/${id}`, departmentData.data);
   return data;
 };
 
-const deleteDepartment = async (id: string): Promise<void> => {
+const deleteDepartment = async (id: number): Promise<void> => {
   await api.delete(`/departments/${id}`);
+};
+
+const getDepartmentByCode = async (code: string): Promise<Department | null> => {
+  if (!code) return null;
+  const { data } = await api.get(`/departments/code/${code}`);
+  return data;
 };
 
 // --- Custom Hooks ---
 
-export const useDepartments = ({ pageNumber = 1, pageSize = 10, status, search }: any = {}) => {
-  return useQuery<{ items: Department[]; totalCount: number }, Error>({
-    queryKey: ['departments', { pageNumber, pageSize, status, search }],
-    queryFn: () => getDepartments({ pageNumber, pageSize, status, search }),
+export const useDepartments = (params?: any) => {
+  return useQuery<Department[], Error>({
+    queryKey: ['departments', params],
+    queryFn: () => getDepartments(params),
   });
 };
 
-export const useDepartmentById = (id: string) => {
+export const useDepartmentById = (id: number) => {
   return useQuery<Department | null, Error>({
     queryKey: ['department', id],
     queryFn: () => getDepartmentById(id),
     enabled: !!id,
+  });
+};
+
+export const useDepartmentByCode = (code: string) => {
+  return useQuery<Department | null, Error>({
+    queryKey: ['department', code],
+    queryFn: () => getDepartmentByCode(code),
+    enabled: !!code,
   });
 };
 
@@ -63,7 +77,7 @@ export const useCreateDepartment = () => {
 
 export const useUpdateDepartment = () => {
   const queryClient = useQueryClient();
-  return useMutation<Department, Error, { id: string; data: UpdateDepartmentData }>({ 
+  return useMutation<Department, Error, { id: number; data: UpdateDepartmentData }>({ 
     mutationFn: updateDepartment,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['departments'] });
@@ -74,7 +88,7 @@ export const useUpdateDepartment = () => {
 
 export const useDeleteDepartment = () => {
   const queryClient = useQueryClient();
-  return useMutation<void, Error, string>({
+  return useMutation<void, Error, number>({
     mutationFn: deleteDepartment,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['departments'] });

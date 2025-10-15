@@ -3,16 +3,13 @@ export interface Department {
   code: string;
   name: string;
   description?: string;
-  status: string;
-  headOfDepartment?: string;
-  employeeCount?: number;
+  uomForMis?: string;
+  isActive: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
 
 export type CreateDepartmentData = Omit<Department, 'id' | 'createdAt' | 'updatedAt'>;
 
-export type UpdateDepartmentData = Partial<Omit<Department, 'id'>> & {
-  id: number;
-};
+export type UpdateDepartmentData = Partial<CreateDepartmentData>;
 

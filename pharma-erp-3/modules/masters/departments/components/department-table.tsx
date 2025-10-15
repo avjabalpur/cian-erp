@@ -4,7 +4,7 @@ import React from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataTable, createActionColumn } from '@/components/shared/data-table';
 import { Badge } from '@/components/ui/badge';
-import { Building2, Calendar, CheckCircle, XCircle, Users } from 'lucide-react';
+import { Building2, Calendar, CheckCircle, XCircle } from 'lucide-react';
 import { Department } from '../types';
 
 interface DepartmentTableProps {
@@ -67,26 +67,13 @@ export function DepartmentTable({
       ),
     },
     {
-      accessorKey: 'headOfDepartment',
-      header: 'Head of Department',
+      accessorKey: 'uomForMis',
+      header: 'UOM for MIS',
       cell: ({ row }) => (
         <div className="text-sm">
-          {row.original.headOfDepartment || '-'}
+          {row.original.uomForMis || '-'}
         </div>
       ),
-    },
-    {
-      accessorKey: 'employeeCount',
-      header: 'Employees',
-      cell: ({ row }) => {
-        const count = row.original.employeeCount || 0;
-        return (
-          <div className="flex items-center space-x-2">
-            <Users className="h-4 w-4 text-muted-foreground" />
-            <Badge variant="secondary">{count}</Badge>
-          </div>
-        );
-      },
     },
     {
       accessorKey: 'createdAt',
@@ -104,11 +91,10 @@ export function DepartmentTable({
       },
     },
     {
-      accessorKey: 'status',
+      accessorKey: 'isActive',
       header: 'Status',
       cell: ({ row }) => {
-        const status = row.original.status;
-        const isActive = status === 'Active';
+        const isActive = row.original.isActive;
         return (
           <div className="flex items-center space-x-2">
             {isActive ? (
@@ -117,7 +103,7 @@ export function DepartmentTable({
               <XCircle className="h-4 w-4 text-red-600" />
             )}
             <Badge variant={isActive ? "default" : "secondary"}>
-              {status}
+              {isActive ? "Active" : "Inactive"}
             </Badge>
           </div>
         );
