@@ -61,7 +61,7 @@ export function RoleDrawer({ role, open, onOpenChange, mode }: RoleDrawerProps) 
       open={open}
       onOpenChange={onOpenChange}
       title={getTitle()}
-      size="full"
+      size="2xl"
     >
       <RoleForm
         mode={mode}

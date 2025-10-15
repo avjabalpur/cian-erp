@@ -33,7 +33,7 @@ export function PermissionManagement() {
   });
 
   const deletePermission = useDeletePermission();
-  const permissions = permissionData?.items || [];
+  const permissions = permissionData || [];
   const totalCount = permissionData?.totalCount || 0;
   const pageCount = Math.ceil(totalCount / currentPagination.pageSize);
 
