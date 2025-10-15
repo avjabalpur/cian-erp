@@ -63,7 +63,7 @@ export default function AdminLayout({
         </div>
       </div>
 
-      <div className="mt-0">
+      <div className="mt-0 bg-secondary">
         {children}
       </div>
     </div>

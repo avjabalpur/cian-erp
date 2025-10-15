@@ -19,11 +19,11 @@ export default function AdministratorLayout({
   const pathname = usePathname()
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="p-4">
+    <div className="min-h-screen">
+      <div className="px-4 py-2">
         <div className="w-full">
           {/* Header with tabs */}
-          <div className="grid w-full grid-cols-6 gap-2 max-w-4xl mb-6">
+          <div className="grid w-full grid-cols-6 gap-2 max-w-4xl mb-2">
               {adminTabs.map((tab) => {
                 const isActive = pathname === tab.href
                 const Icon = tab.icon
