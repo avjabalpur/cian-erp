@@ -76,7 +76,7 @@ namespace Xcianify.Repository
         public async Task DeleteAsync(int id)
         {
             using var connection = _dbContext.GetConnection();
-            const string sql = "UPDATE dosage SET is_active = true WHERE id = @Id";
+            const string sql = "UPDATE dosage SET is_active = false WHERE id = @Id";
             await connection.ExecuteAsync(sql, new { Id = id });
         }
 

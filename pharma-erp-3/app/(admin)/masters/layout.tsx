@@ -23,8 +23,9 @@ const masterTabs = [
   { label: "Location Types", href: "/masters/location-types", icon: MapPin },
   { label: "Organizations", href: "/masters/organizations", icon: Building },
   { label: "Dosages", href: "/masters/dosages", icon: Pill },
+  { label: "HSNMaster", href: "/masters/hsn", icon: FolderTree },
   { label: "Items", href: "/masters/items", icon: Package },
-  { label: "Products", href: "/masters/products", icon: ShoppingCart },
+ 
   { label: "Customers", href: "/masters/customers", icon: Users },
   { label: "Vendors", href: "/masters/vendors", icon: UserCheck },
   { label: "Warehouses", href: "/masters/warehouses", icon: Warehouse },
