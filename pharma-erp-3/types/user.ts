@@ -50,4 +50,5 @@ export type CreateUserData = Omit<User, 'id'>;
 
 export type UpdateUserData = Partial<Omit<User, 'id'>> & {
   isActive: boolean;
+  id: number;
 };

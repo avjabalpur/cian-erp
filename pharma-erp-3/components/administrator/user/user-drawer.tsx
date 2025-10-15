@@ -35,6 +35,7 @@ export function UserDrawer({ user, open, onOpenChange, mode }: UserDrawerProps) 
     try {
       if (user) {
         const updateData: UpdateUserData = {
+          id: user.id,
           username: data.username,
           email: data.email,
           firstName: data.firstName,
@@ -47,7 +48,8 @@ export function UserDrawer({ user, open, onOpenChange, mode }: UserDrawerProps) 
           isPhoneVerified: user.isPhoneVerified,
           phone: data.phone,
           gender: data.gender,
-          dob: data.dateOfBirth
+          dob: data.dateOfBirth,
+          employeeId: data.employeeId
       };
         await updateUser.mutateAsync({ id: user.id.toString(), data: updateData });
         toast.success('User updated successfully');
@@ -66,7 +68,8 @@ export function UserDrawer({ user, open, onOpenChange, mode }: UserDrawerProps) 
           isPhoneVerified: false,
           phone: data.phone,
           gender: data.gender,
-          dob: data.dateOfBirth
+          dob: data.dateOfBirth,
+          employeeId: data.employeeId
       };
         await createUser.mutateAsync(createData);
         toast.success('User created successfully');
