@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const userFormSchema = z.object({
+export const userSchema = z.object({
   username: z.string().min(3).max(50),
   email: z.string().email().max(100),
   password: z.string().min(8).max(100).optional(),
@@ -18,4 +18,4 @@ export const userFormSchema = z.object({
   isPhoneVerified: z.boolean().optional()
 });
 
-export type UserFormValues = z.infer<typeof userFormSchema>;
+export type UserFormValues = z.infer<typeof userSchema>;
