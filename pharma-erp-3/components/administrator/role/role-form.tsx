@@ -11,11 +11,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Search, X } from 'lucide-react';
-import { Role } from '@/types/role-types';
-import { usePermissions } from '@/hooks/api/use-permissions';
-import { useRolePermissions } from '@/hooks/api/use-roles';
+import { Role } from '@/types/role';
+import { usePermissions } from '@/hooks/use-permissions';
+import { useGetRolePermissions } from '@/hooks/use-roles';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
-import { Permission } from '@/types/permission-types';
+import { Permission } from '@/types/permission';
 
 // Proper Zod schema for role form
 const roleSchema = z.object({
@@ -52,10 +52,10 @@ export function RoleForm({ mode, role, onSubmit, isLoading, onCancel }: RoleForm
   const permissionsData = usePermissions();
   
   // Fetch role-specific permissions when editing
-  const { data: rolePermissionsData, isLoading: isLoadingRolePermissions } = useRolePermissions(role?.id || 0);
+  const { data: rolePermissionsData, isLoading: isLoadingRolePermissions } = useGetRolePermissions(role?.id || 0);
 
   // Get available permissions from API response
-  const availablePermissions = permissionsData?.getUserPermissions() || [];
+  const availablePermissions = permissionsData?.data || [];
 
   useEffect(() => {
     if (role) {

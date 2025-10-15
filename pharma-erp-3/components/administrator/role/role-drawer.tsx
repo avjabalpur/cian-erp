@@ -2,9 +2,9 @@
 
 import { RightDrawer } from '@/components/shared/right-drawer';
 import { RoleForm } from './role-form';
-import { RoleDto, Role } from '@/types/role-types';
+import { Role } from '@/types/role';
 import { toast } from 'sonner';
-import { useCreateRole, useUpdateRole } from '@/hooks/api/use-roles';
+import { useCreateRole, useUpdateRole } from '@/hooks/use-roles';
 
 interface RoleDrawerProps {
   role: Role | undefined;
@@ -34,7 +34,7 @@ export function RoleDrawer({ role, open, onOpenChange, mode }: RoleDrawerProps) 
   const handleSubmit = async (data: any) => {
     try {
       if (role) {
-        const updateData: RoleDto = {
+        const updateData: any = {
           name: data.name,
           description: data.description,
           permissions: data.permissions || [],
@@ -44,7 +44,7 @@ export function RoleDrawer({ role, open, onOpenChange, mode }: RoleDrawerProps) 
         await updateRole.mutateAsync({ id: role.id, data: updateData });
         toast.success('Role updated successfully');
       } else {
-        const createData: RoleDto = {
+        const createData: any = {
           name: data.name,
           description: data.description,
           permissions: data.permissions || [],

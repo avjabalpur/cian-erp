@@ -2,16 +2,13 @@
 
 import { useState, useMemo } from 'react';
 import { useQueryState } from 'nuqs';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-import { useCreateRole, useDeleteRole, useUpdateRole, useRoles } from '@/hooks/api/use-roles';
+import { useCreateRole, useDeleteRole, useUpdateRole, useRoles } from '@/hooks/use-roles';
 import { RoleFilter } from './role-filter';
 import { RoleTable } from './role-table';
 import { RoleDrawer } from './role-drawer';
-import { DEFAULT_PAGE_SIZE } from '@/constants/api';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Role } from '@/types/role-types';
+import { Role } from '@/types/role';
 
 export function RoleManagement() {
   const [search] = useQueryState('search', { defaultValue: '' });
@@ -26,17 +23,15 @@ export function RoleManagement() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentPagination, setCurrentPagination] = useState({
     pageIndex: pageNumber - 1,
-    pageSize: DEFAULT_PAGE_SIZE,
+    pageSize: 10,
   });
 
-  const { data: rolesData, isLoading, error } = useRoles({
-    search: search || undefined,
-    isActive: status === 'ACTIVE' ? true : status === 'INACTIVE' ? false : undefined,
-    pageNumber: currentPagination.pageIndex + 1,
-    pageSize: currentPagination.pageSize,
-  });
+
+  const { data: roleData, isLoading } = useRoles()
   const deleteRole = useDeleteRole();
-
+  const roles = roleData?.items || []
+  const totalCount = roles?.length || 0
+  const pageCount = roles?.length || 0
   const handleView = (role: Role) => {
     setSelectedRole(role);
     setDrawerMode('view');
@@ -75,17 +70,7 @@ export function RoleManagement() {
     window.history.pushState({}, '', url.toString());
   };
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-destructive">Failed to load roles</p>
-      </div>
-    );
-  }
 
-  // Calculate pagination values
-  const totalCount = rolesData?.totalCount || 0;
-  const pageCount = Math.ceil(totalCount / currentPagination.pageSize);
 
   return (
     <div>
@@ -93,7 +78,7 @@ export function RoleManagement() {
         <CardContent className="space-y-4 px-3">
           <RoleFilter />
           <RoleTable
-            roles={rolesData?.data || []}
+            roles={roles || []}
             isLoading={isLoading}
             onView={handleView}
             onEdit={handleEdit}
