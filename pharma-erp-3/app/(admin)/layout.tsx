@@ -6,18 +6,18 @@ import ERPHeader from "@/components/erp-header"
 import { cn } from "@/lib/utils"
 
 const tabs = [
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "Masters", href: "/masters" },
-  { label: "Sales & Distribution", href: "/sales" },
-  { label: "Procurement", href: "/procurement" },
-  { label: "Manufacturing", href: "/manufacturing" },
-  { label: "Inventory", href: "/inventory" },
-  { label: "Quality Control", href: "/quality" },
-  { label: "R&D & Clinical", href: "/rd-clinical" },
-  { label: "Compliance", href: "/compliance" },
-  { label: "Financial", href: "/financial" },
-  { label: "Analytics", href: "/analytics" },
-  { label: "Reports", href: "/reports" },
+  { label: "Dashboard", href: "/dashboard", isImplemented: true },
+  { label: "Masters", href: "/masters", isImplemented: true },
+  { label: "Sales & Distribution", href: "/sales", isImplemented: true },
+  { label: "Procurement", href: "/procurement", isImplemented: false },
+  { label: "Manufacturing", href: "/manufacturing", isImplemented: false },
+  { label: "Inventory", href: "/inventory", isImplemented: false },
+  { label: "Quality Control", href: "/quality", isImplemented: false },
+  { label: "R&D & Clinical", href: "/rd-clinical", isImplemented: false },
+  { label: "Compliance", href: "/compliance", isImplemented: false },
+  { label: "Financial", href: "/financial", isImplemented: false },
+  { label: "Analytics", href: "/analytics", isImplemented: false },
+  { label: "Reports", href: "/reports", isImplemented: false },
 ]
 
 export default function AdminLayout({
@@ -41,11 +41,19 @@ export default function AdminLayout({
                   key={tab.href}
                   href={tab.href}
                   className={cn(
-                    "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-                    isActive
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    "inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                    !tab.isImplemented && "opacity-60 line-through",
+                    tab.isImplemented
+                      ? isActive
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      : "text-muted-foreground cursor-not-allowed"
                   )}
+                  onClick={(e) => {
+                    if (!tab.isImplemented) {
+                      e.preventDefault()
+                    }
+                  }}
                 >
                   {tab.label}
                 </Link>
