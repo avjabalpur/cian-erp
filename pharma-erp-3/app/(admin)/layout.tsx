@@ -7,10 +7,9 @@ import { cn } from "@/lib/utils"
 
 const tabs = [
   { label: "Dashboard", href: "/dashboard", isImplemented: true },
-  { label: "Masters", href: "/masters/departments", isImplemented: true },
-  { label: "Sales & Distribution", href: "/sales", isImplemented: true },
+  { label: "Masters", href: "/masters", isImplemented: true },
+  { label: "Sales", href: "/sales", isImplemented: true },
   { label: "Procurement", href: "/procurement", isImplemented: false },
-  { label: "Manufacturing", href: "/manufacturing", isImplemented: false },
   { label: "Inventory", href: "/inventory", isImplemented: false },
   { label: "Quality Control", href: "/quality", isImplemented: false },
   { label: "R&D & Clinical", href: "/rd-clinical", isImplemented: false },

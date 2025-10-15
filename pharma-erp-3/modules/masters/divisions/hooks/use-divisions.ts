@@ -1,11 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../lib/api';
-import { Division, CreateDivisionData, UpdateDivisionData } from '../types/division';
+import api from '@/lib/api';
+import { Division, CreateDivisionData, UpdateDivisionData } from '../types';
 
 // --- API Functions ---
-
-const getDivisions = async (): Promise<Division[]> => {
-  const { data } = await api.get('/divisions');
+const getDivisions = async (params?: {
+  pageNumber?: number;
+  pageSize?: number;
+  search?: string;
+  status?: string;
+  departmentId?: number;
+}): Promise<Division[]> => {
+  const { data } = await api.get('/divisions', { params });
   return data;
 };
 
@@ -26,8 +31,8 @@ const createDivision = async (divisionData: CreateDivisionData): Promise<Divisio
   return data;
 };
 
-const updateDivision = async ({ id, ...divisionData }: { id: number; data: UpdateDivisionData }): Promise<Division> => {
-  const { data } = await api.put(`/divisions/${id}`, divisionData.data);
+const updateDivision = async ({ id, data: divisionData }: { id: number; data: UpdateDivisionData }): Promise<Division> => {
+  const { data } = await api.put(`/divisions/${id}`, divisionData);
   return data;
 };
 
@@ -35,13 +40,11 @@ const deleteDivision = async (id: number): Promise<void> => {
   await api.delete(`/divisions/${id}`);
 };
 
-
 // --- Custom Hooks ---
-
-export const useDivisions = () => {
+export const useDivisions = (params?: any) => {
   return useQuery<Division[], Error>({
-    queryKey: ['divisions'],
-    queryFn: getDivisions,
+    queryKey: ['divisions', params],
+    queryFn: () => getDivisions(params),
   });
 };
 
@@ -73,7 +76,7 @@ export const useCreateDivision = () => {
 
 export const useUpdateDivision = () => {
   const queryClient = useQueryClient();
-  return useMutation<Division, Error, { id: number; data: UpdateDivisionData }>({ 
+  return useMutation<Division, Error, { id: number; data: UpdateDivisionData }>({
     mutationFn: updateDivision,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['divisions'] });
