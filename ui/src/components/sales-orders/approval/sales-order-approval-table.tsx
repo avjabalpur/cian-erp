@@ -51,12 +51,10 @@ const ApprovalStatusRenderer = ({ value }: { value: boolean | null }) => {
           {value ? (
             <div className="flex items-center gap-1">
               <CheckCircle className="h-4 w-4 text-green-600" />
-              <span className="text-xs text-green-600 font-medium">✓</span>
             </div>
           ) : (
             <div className="flex items-center gap-1">
               <XCircle className="h-4 w-4 text-red-600" />
-              <span className="text-xs text-red-600 font-medium">✗</span>
             </div>
           )}
         </div>
@@ -65,25 +63,6 @@ const ApprovalStatusRenderer = ({ value }: { value: boolean | null }) => {
         <p>{value ? 'Approved' : 'Rejected'}</p>
       </TooltipContent>
     </Tooltip>
-  )
-}
-
-// SO Number renderer with color coding
-const SONumberRenderer = ({ value }: { value: string }) => {
-  const isCian = value?.includes("MRK")
-  const isDrSmith = value?.includes("DRK")
-  
-  let color = "#FF9E9E" // Default red
-  if (isCian) color = "green"
-  else if (isDrSmith) color = "#fc6b03"
-  
-  return (
-    <span 
-      className="font-medium px-1 py-0.5 rounded text-xs"
-      style={{ color, fontWeight: "500" }}
-    >
-      {value?.split("/").reverse().join("/") || "-"}
-    </span>
   )
 }
 
@@ -251,7 +230,6 @@ export default function SalesOrderApprovalTable({
       description: 'SO Number', 
       isDefault: true,
       displayName: 'SO Number',
-      render: (value: string) => <SONumberRenderer value={value} />
     },
     { 
       name: 'createdAt', 

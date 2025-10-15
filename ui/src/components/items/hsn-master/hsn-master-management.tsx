@@ -87,21 +87,25 @@ export default function HsnMasterManagement() {
         </Button>
       </div>
 
+    <Card>
+     
+      <CardContent className="space-y-4 pt-4">
       <HsnMasterFilter />
+      <HsnMasterTable
+        hsnCodes={hsnCodes}
+        isLoading={isLoading}
+        onEdit={handleEditHsnCode}
+        onDelete={handleDeleteHsnCode}
+        pageCount={Math.ceil(totalCount / (pageSize || 20))}
+        pageSize={pageSize || 20}
+        pageIndex={(page || 1) - 1}
+        totalCount={totalCount}
+        onPaginationChange={handlePaginationChange}
+      />
+      </CardContent>
+    </Card>
+     
 
-      
-          <HsnMasterTable
-            hsnCodes={hsnCodes}
-            isLoading={isLoading}
-            onEdit={handleEditHsnCode}
-            onDelete={handleDeleteHsnCode}
-            pageCount={Math.ceil(totalCount / (pageSize || 20))}
-            pageSize={pageSize || 20}
-            pageIndex={(page || 1) - 1} 
-            totalCount={totalCount}
-            onPaginationChange={handlePaginationChange}
-          />
-        
 
       {/* Drawer */}
       <HsnMasterDrawer
