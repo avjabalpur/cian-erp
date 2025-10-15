@@ -29,7 +29,7 @@ type RoleFormValues = z.infer<typeof roleSchema>;
 
 interface RoleFormProps {
   mode: 'create' | 'edit' | 'view';
-  role?: Role | null | undefined;
+  role?: Role | null | undefined | any;
   onSubmit: (data: RoleFormValues) => Promise<void>;
   isLoading: boolean;
   onCancel: () => void;
@@ -73,7 +73,7 @@ export function RoleForm({ mode, role, onSubmit, isLoading, onCancel }: RoleForm
         }).filter(Boolean);
       } else if (Array.isArray(role.permissions)) {
         // Fall back to role.permissions if available
-        permissionNames = role.permissions;
+        permissionNames = role.permissions || [];
       }
       
       // Populate form with role data
@@ -103,7 +103,7 @@ export function RoleForm({ mode, role, onSubmit, isLoading, onCancel }: RoleForm
     const searchLower = searchTerm.toLowerCase();
     return availablePermissions.filter((permission: Permission) => 
       permission.name.toLowerCase().includes(searchLower) ||
-      permission.description.toLowerCase().includes(searchLower) ||
+      permission.description?.toLowerCase().includes(searchLower) ||
       permission.moduleName?.toLowerCase().includes(searchLower) ||
       permission.actionType?.toLowerCase().includes(searchLower)
     );

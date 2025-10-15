@@ -8,8 +8,8 @@ import { FormInput } from '@/components/shared/forms/form-input';
 import { FormSelect } from '@/components/shared/forms/form-select';
 import { FormCheckbox } from '@/components/shared/forms/form-checkbox';
 import { Button } from '@/components/ui/button';
-import { Permission } from '@/types/permission-types';
-import { AVAILABLE_MODULES, AVAILABLE_ACTIONS } from '@/hooks/api/use-permissions';
+import { Permission } from '@/types/permission';
+import { AVAILABLE_MODULES, AVAILABLE_ACTIONS } from '@/hooks/use-permissions';
 
 // Proper Zod schema for permission form
 const permissionSchema = z.object({
@@ -52,7 +52,7 @@ export function PermissionForm({ mode, permission, onSubmit, isLoading, onCancel
       // Populate form with permission data
       form.reset({
         name: permission.name,
-        description: permission.description,
+        description: permission.description || '',
         moduleName: permission.moduleName,
         actionType: permission.actionType,
         isActive: permission.isActive,

@@ -3,7 +3,7 @@
 import { Badge } from '@/components/ui/badge';
 import { ColumnDef } from '@tanstack/react-table';
 import { createActionColumn, DataTable } from '@/components/shared/data-table';
-import { Permission } from '@/types/permission-types';
+import { Permission } from '@/types/permission';
 import { Plus, Shield } from 'lucide-react';
 
 interface PermissionTableProps {

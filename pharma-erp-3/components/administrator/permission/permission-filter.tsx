@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { FilterWrapper } from '@/components/shared/filter-wrapper';
 import { Search, X } from 'lucide-react';
 import { Label } from '@/components/ui/label';
-import { AVAILABLE_MODULES, AVAILABLE_ACTIONS } from '@/hooks/api/use-permissions';
+import { AVAILABLE_MODULES, AVAILABLE_ACTIONS } from '@/hooks/use-permissions';
 
 export function PermissionFilter() {
   const [search, setSearch] = useQueryState('search', { defaultValue: '' });

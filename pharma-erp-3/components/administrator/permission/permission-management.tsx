@@ -4,14 +4,13 @@ import { useState, useMemo } from 'react';
 import { useQueryState } from 'nuqs';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { useCreatePermission, useDeletePermission, useUpdatePermission, usePermissions, usePermissionsList } from '@/hooks/api/use-permissions';
+import { useCreatePermission, useDeletePermission, useUpdatePermission, usePermissions } from '@/hooks/use-permissions';
 import { PermissionFilter } from './permission-filter';
 import { PermissionTable } from './permission-table';
 import { PermissionDrawer } from './permission-drawer';
-import { DEFAULT_PAGE_SIZE } from '@/constants/api';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Permission } from '@/types/permission-types';
+import { Permission } from '@/types/permission';
 
 export function PermissionManagement() {
   const [search] = useQueryState('search', { defaultValue: '' });
@@ -28,17 +27,12 @@ export function PermissionManagement() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [currentPagination, setCurrentPagination] = useState({
     pageIndex: pageNumber - 1,
-    pageSize: DEFAULT_PAGE_SIZE,
+    pageSize: 20,
   });
 
-  const { data: permissionsData, isLoading, error } = usePermissionsList({
-    search: search || undefined,
-    moduleName: moduleName || undefined,
-    actionType: actionType || undefined,
-    isActive: status === 'ACTIVE' ? true : status === 'INACTIVE' ? false : undefined,
-    pageNumber: currentPagination.pageIndex + 1,
-    pageSize: currentPagination.pageSize,
-  });
+  const { data: permissions = [], isLoading } = usePermissions()
+  const totalCount = permissions.length
+  const pageCount = permissions.length
   const deletePermission = useDeletePermission();
 
   const handleView = (permission: Permission) => {
@@ -79,17 +73,8 @@ export function PermissionManagement() {
     window.history.pushState({}, '', url.toString());
   };
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-destructive">Failed to load permissions</p>
-      </div>
-    );
-  }
+ 
 
-  // Calculate pagination values
-  const totalCount = permissionsData?.totalCount || 0;
-  const pageCount = Math.ceil(totalCount / currentPagination.pageSize);
 
   return (
     <div>
@@ -97,7 +82,7 @@ export function PermissionManagement() {
         <CardContent className="space-y-4 px-3">
           <PermissionFilter />
           <PermissionTable
-            permissions={permissionsData?.data || []}
+            permissions={permissions || []}
             isLoading={isLoading}
             onView={handleView}
             onEdit={handleEdit}

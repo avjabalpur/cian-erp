@@ -2,6 +2,39 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../lib/api';
 import { Permission } from '../types/permission';
 
+// Static list of available modules
+export const AVAILABLE_MODULES = [
+  'user',
+  'role',
+  'permission',
+  'customer',
+  'quote',
+  'order',
+  'invoice',
+  'task',
+  'sales',
+  'company',
+  'report',
+  'email',
+  'document',
+  'import',
+  'export',
+] as const;
+
+// Static list of available actions
+export const AVAILABLE_ACTIONS = [
+  'create',
+  'read',
+  'update',
+  'delete',
+  'approve',
+  'reject',
+  'export',
+  'import',
+  'view',
+  'manage',
+] as const;
+
 // --- API Function ---
 
 const getPermissions = async (): Promise<Permission[]> => {

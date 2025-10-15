@@ -37,10 +37,10 @@ namespace Xcianify.Presentation.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePermission(int id, [FromBody] UpdatePermissionDto permissionDto)
+        public async Task<IActionResult> UpdatePermission(int id, [FromBody] UpdatePermissionDto data)
         {
-
-            await _permissionService.UpdatePermissionAsync(permissionDto);
+            data.Id = id;
+            await _permissionService.UpdatePermissionAsync(data);
             return NoContent();
 
         }

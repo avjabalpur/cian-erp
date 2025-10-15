@@ -2,9 +2,9 @@
 
 import { RightDrawer } from '@/components/shared/right-drawer';
 import { PermissionForm } from './permission-form';
-import { PermissionDto, Permission } from '@/types/permission-types';
+import { Permission } from '@/types/permission';
 import { toast } from 'sonner';
-import { useCreatePermission, useUpdatePermission } from '@/hooks/api/use-permissions';
+import { useCreatePermission, useUpdatePermission } from '@/hooks/use-permissions';
 
 interface PermissionDrawerProps {
   permission: Permission | undefined;
@@ -34,7 +34,7 @@ export function PermissionDrawer({ permission, open, onOpenChange, mode }: Permi
   const handleSubmit = async (data: any) => {
     try {
       if (permission) {
-        const updateData: PermissionDto = {
+        const updateData: Permission = {
           name: data.name,
           description: data.description,
           moduleName: data.moduleName,
@@ -42,10 +42,10 @@ export function PermissionDrawer({ permission, open, onOpenChange, mode }: Permi
           isActive: data.isActive || true,
           id: permission.id,
         };
-        await updatePermission.mutateAsync({ id: permission.id, data: updateData });
+        await updatePermission.mutateAsync({ ...updateData });
         toast.success('Permission updated successfully');
       } else {
-        const createData: PermissionDto = {
+        const createData: any = {
           name: data.name,
           description: data.description,
           moduleName: data.moduleName,
