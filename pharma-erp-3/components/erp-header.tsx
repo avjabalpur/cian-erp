@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -8,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Bell, Settings, LogOut, User, Shield, Database } from "lucide-react"
+import { Bell, Settings, LogOut, User, Shield, Database, Users, UserCog, ShieldCheck } from "lucide-react"
 
 export default function ERPHeader() {
   return (
@@ -37,6 +38,36 @@ export default function ERPHeader() {
             <Bell className="w-4 h-4" />
             <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
           </Button>
+
+          {/* Administrator Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-2">
+                <UserCog className="w-4 h-4" />
+                <span className="text-sm">Administrator</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem asChild>
+                <Link href="/administrator/users" className="flex items-center gap-2 cursor-pointer">
+                  <Users className="w-4 h-4" />
+                  Users
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/administrator/roles" className="flex items-center gap-2 cursor-pointer">
+                  <ShieldCheck className="w-4 h-4" />
+                  Roles
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/administrator/permissions" className="flex items-center gap-2 cursor-pointer">
+                  <Shield className="w-4 h-4" />
+                  Permissions
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* System Status */}
           <div className="flex items-center gap-2 px-3 py-1 bg-green-50 rounded-md">

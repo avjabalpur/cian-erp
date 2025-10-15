@@ -32,7 +32,7 @@ export default function AdminLayout({
       <ERPHeader />
 
       <div className="border-b bg-white">
-        <div className="px-6 py-4">
+        <div className="px-6 py-2">
           <div className="grid grid-cols-12 gap-2 max-w-full">
             {tabs.map((tab) => {
               const isActive = pathname === tab.href
