@@ -8,11 +8,6 @@ interface LocationTypeInformationFormProps {
 
 export function LocationTypeInformationForm({ control }: LocationTypeInformationFormProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Location Type Information</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
         <div className="grid grid-cols-1 gap-4">
           <FormInput
             control={control}
@@ -36,7 +31,6 @@ export function LocationTypeInformationForm({ control }: LocationTypeInformation
             label="Active"
           />
         </div>
-      </CardContent>
-    </Card>
+     
   )
 }

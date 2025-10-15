@@ -1,19 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../lib/api';
-import { Organization, CreateOrganizationData, UpdateOrganizationData, OrganizationFilter } from '../types/organization';
+import api from '@/lib/api';
+import { Organization, CreateOrganizationData, UpdateOrganizationData } from '../types';
+import { PaginatedResponse } from '@/types/common';
 
 // --- API Functions ---
-
-const getOrganizations = async (params?: { 
-  pageNumber?: number; 
-  pageSize?: number; 
-  search?: string; 
-  isActive?: boolean; 
-  locationTypeId?: number; 
-  columnFilters?: any[];
-  sorting?: any[];
-  globalFilter?: string;
-}): Promise<{ items: Organization[]; totalCount: number; pageCount: number }> => {
+const getOrganizations = async (params?: {
+  pageNumber?: number;
+  pageSize?: number;
+  search?: string;
+  status?: string;
+  locationTypeId?: number;
+}): Promise<PaginatedResponse<Organization>> => {
   const { data } = await api.get('/organizations', { params });
   return data;
 };
@@ -45,20 +42,10 @@ const deleteOrganization = async (id: number): Promise<void> => {
 };
 
 // --- Custom Hooks ---
-
-export const useOrganizations = ({ 
-  pageNumber = 1, 
-  pageSize = 10, 
-  search, 
-  isActive, 
-  locationTypeId, 
-  columnFilters, 
-  sorting, 
-  globalFilter 
-}: any = {}) => {
-  return useQuery<{ items: Organization[]; totalCount: number; pageCount: number }, Error>({
-    queryKey: ['organizations', { pageNumber, pageSize, search, isActive, locationTypeId, columnFilters, sorting, globalFilter }],
-    queryFn: () => getOrganizations({ pageNumber, pageSize, search, isActive, locationTypeId, columnFilters, sorting, globalFilter }),
+export const useOrganizations = (params?: any) => {
+  return useQuery<PaginatedResponse<Organization>, Error>({
+    queryKey: ['organizations', params],
+    queryFn: () => getOrganizations(params),
   });
 };
 
@@ -72,7 +59,7 @@ export const useOrganizationById = (id: number) => {
 
 export const useOrganizationByCode = (code: string) => {
   return useQuery<Organization | null, Error>({
-    queryKey: ['organization-by-code', code],
+    queryKey: ['organization', code],
     queryFn: () => getOrganizationByCode(code),
     enabled: !!code,
   });
@@ -90,7 +77,7 @@ export const useCreateOrganization = () => {
 
 export const useUpdateOrganization = () => {
   const queryClient = useQueryClient();
-  return useMutation<Organization, Error, { id: number; data: UpdateOrganizationData }>({ 
+  return useMutation<Organization, Error, { id: number; data: UpdateOrganizationData }>({
     mutationFn: updateOrganization,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['organizations'] });

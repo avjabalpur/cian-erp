@@ -54,7 +54,7 @@ export function LocationTypeForm({ locationType, mode, onSubmit, onCancel, isLoa
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-2">
         <LocationTypeInformationForm control={control} />
         
         {mode !== 'view' && (
