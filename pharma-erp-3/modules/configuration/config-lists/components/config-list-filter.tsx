@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-export function ConfigListFilter() {
+export function ConfigListFilterComponent() {
   const [search, setSearch] = useQueryState('search', { defaultValue: '' });
   const [isActive, setIsActive] = useQueryState('isActive', { defaultValue: '' });
 

@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useQueryState } from 'nuqs';
-import { ConfigListFilter } from './config-list-filter';
+import { ConfigListFilterComponent } from './config-list-filter';
 import { ConfigListTable } from './config-list-table';
 import { ConfigListDrawer } from './config-list-drawer';
 import { toast } from 'sonner';
@@ -88,7 +88,7 @@ export function ConfigListManagement() {
     <div>
       <Card className='border-none rounded-none py-1'>
         <CardContent className="space-y-4 px-3">
-          <ConfigListFilter />
+          <ConfigListFilterComponent />
           <ConfigListTable
             configLists={configLists}
             isLoading={isLoading}

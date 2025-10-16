@@ -29,7 +29,7 @@ export interface CreateConfigSettingData {
 
 export type UpdateConfigSettingData = Partial<CreateConfigSettingData>;
 
-export interface ConfigSettingFilter {
+export interface ConfigSettingFilterType {
   search?: string;
   isActive?: boolean;
   pageNumber?: number;

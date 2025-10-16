@@ -3,12 +3,12 @@
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useQueryState } from 'nuqs';
-import { ConfigSettingFilter } from './config-setting-filter';
 import { ConfigSettingTable } from './config-setting-table';
 import { ConfigSettingDrawer } from './config-setting-drawer';
 import { toast } from 'sonner';
 import { ConfigSetting } from '../types';
 import { useConfigSettings, useDeleteConfigSetting } from '../hooks';
+import { ConfigSettingFilter } from './config-setting-filter';
 
 export function ConfigSettingManagement() {
   const [search] = useQueryState('search', { defaultValue: '' });

@@ -1,9 +1,9 @@
 'use client';
 
-import { DataTable } from '@/components/shared/data-table';
-import { createActionColumn } from '@/components/shared/data-table/action-column';
+import { DataTable, createActionColumn } from '@/components/shared/data-table';
 import { ConfigSetting } from '../types';
 import { Badge } from '@/components/ui/badge';
+import { Settings } from 'lucide-react';
 
 interface ConfigSettingTableProps {
   configSettings: ConfigSetting[];
@@ -75,24 +75,23 @@ export function ConfigSettingTable({
         </Badge>
       ),
     },
-    createActionColumn<ConfigSetting>({
-      onEdit,
-      onView,
-      onDelete,
-    }),
+    createActionColumn<ConfigSetting>(onView, onEdit, onDelete),
   ];
 
   return (
     <DataTable
       columns={columns}
       data={configSettings}
-      isLoading={isLoading}
+      loading={isLoading}
       totalCount={totalCount}
       pageCount={pageCount}
-      pagination={currentPagination}
+      initialPagination={currentPagination}
       onPaginationChange={onPaginationChange}
-      onCreateClick={onCreate}
-      createButtonLabel="Add Config Setting"
+      headerActions={[{
+        label: 'Create Config Setting',
+        onClick: onCreate,
+        icon: Settings,
+      }]}
     />
   );
 }
