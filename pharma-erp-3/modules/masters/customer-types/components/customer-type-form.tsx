@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { customerTypeSchema, CustomerTypeFormValues } from '../validations';
@@ -53,20 +53,22 @@ export function CustomerTypeForm({ mode, customerType, onSubmit, isLoading, onCa
   const isViewMode = mode === 'view';
 
   return (
-    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-      <CustomerTypeInformationForm control={form.control} />
-      
-      {!isViewMode && (
-        <div className="flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? 'Saving...' : customerType ? 'Update' : 'Create'}
-          </Button>
-        </div>
-      )}
-    </form>
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        <CustomerTypeInformationForm control={form.control} />
+        
+        {!isViewMode && (
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? 'Saving...' : customerType ? 'Update' : 'Create'}
+            </Button>
+          </div>
+        )}
+      </form>
+    </FormProvider>
   );
 }
 

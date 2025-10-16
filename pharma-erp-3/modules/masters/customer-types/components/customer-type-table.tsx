@@ -1,10 +1,9 @@
 'use client';
 
-import { DataTable } from '@/components/shared/data-table';
-import { createActionColumn } from '@/components/shared/data-table/action-column';
+import { createActionColumn, DataTable } from '@/components/shared/data-table';
 import { CustomerType } from '../types';
 import { Badge } from '@/components/ui/badge';
-import { Check, X } from 'lucide-react';
+import { Check, UserPlus, X } from 'lucide-react';
 
 interface CustomerTypeTableProps {
   customerTypes: CustomerType[];
@@ -88,24 +87,25 @@ export function CustomerTypeTable({
         </Badge>
       ),
     },
-    createActionColumn<CustomerType>({
-      onEdit,
-      onView,
-      onDelete,
-    }),
+    createActionColumn<CustomerType>(onView, onEdit, onDelete),
   ];
 
   return (
     <DataTable
+      title="Customer Types"
       columns={columns}
       data={customerTypes}
-      isLoading={isLoading}
+      loading={isLoading}
+      enablePagination={true}
+      headerActions={[{
+        label: 'Create Customer Type',
+        onClick: onCreate,
+        icon: UserPlus,
+      }]}
       totalCount={totalCount}
       pageCount={pageCount}
-      pagination={currentPagination}
       onPaginationChange={onPaginationChange}
-      onCreateClick={onCreate}
-      createButtonLabel="Add Customer Type"
+      initialPagination={currentPagination}
     />
   );
 }
