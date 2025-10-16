@@ -6,6 +6,7 @@ import { FormSelect } from "@/components/shared/forms/form-select";
 import { FormCheckbox } from "@/components/shared/forms/form-checkbox";
 import { FormTextArea } from "@/components/shared/forms/form-text-area";
 import { useCustomerTypes } from "@/modules/masters/customer-types/hooks";
+import { useLocationTypes } from "@/modules/masters/location-types/hooks";
 
 interface CustomerBasicInfoFormProps {
   control: any;
@@ -15,6 +16,13 @@ interface CustomerBasicInfoFormProps {
 export function CustomerBasicInfoForm({ control, customerId }: CustomerBasicInfoFormProps) {
   const { data: customerTypesData } = useCustomerTypes();
   const customerTypes = customerTypesData?.items || [];
+
+  const { data: locationTypes = [] } = useLocationTypes();
+
+  const locationCodeOptions = [
+    { label: 'Select Location Code', value: '0' },
+    ...locationTypes.map(lt => ({ label: `${lt.code} - ${lt.name}`, value: lt.code }))
+  ];
 
   const customerTypeOptions = [
     { label: 'Select Customer Type', value: '0' },
@@ -54,11 +62,12 @@ export function CustomerBasicInfoForm({ control, customerId }: CustomerBasicInfo
     <Card>
       <CardContent className="space-y-4 pt-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <FormInput
+          <FormSelect
             control={control}
             name="locationCode"
             label="Location Code"
-            placeholder="Enter location code"
+            options={locationCodeOptions}
+            placeholder="Select location code"
             required
           />
           <FormSelect

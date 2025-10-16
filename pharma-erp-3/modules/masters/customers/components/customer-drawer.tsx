@@ -68,7 +68,7 @@ export function CustomerDrawer({ customer, open, onOpenChange, onSubmit, isLoadi
         rebates: customer.rebates,
         externalInformation: customer.externalInformation,
       });
-    } else if (!item && open) {
+    } else if (!customer && open) {
       form.reset();
     }
   }, [customer, open, form]);
@@ -104,7 +104,7 @@ export function CustomerDrawer({ customer, open, onOpenChange, onSubmit, isLoadi
       size="full"
     >
       <FormProvider {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit, onError)} className="space-y-4 p-4">
+        <form onSubmit={form.handleSubmit(handleSubmit, onError)} className="space-y-4 p-0">
           <Tabs defaultValue="basic" className="w-full">
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="basic">Basic Info</TabsTrigger>
