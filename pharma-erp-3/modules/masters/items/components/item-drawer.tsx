@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { RightDrawer } from '@/components/shared/right-drawer';
 import { Button } from '@/components/ui/button';
@@ -142,65 +142,67 @@ export function ItemDrawer({ item, open, onOpenChange, onSubmit, isLoading, mode
       title={getTitle()}
       size="full"
     >
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="grid w-full grid-cols-8">
-            <TabsTrigger value="basic">Basic Info</TabsTrigger>
-            <TabsTrigger value="bought-out">Bought Out</TabsTrigger>
-            <TabsTrigger value="sales">Sales</TabsTrigger>
-            <TabsTrigger value="stock">Stock Analysis</TabsTrigger>
-            <TabsTrigger value="export">Export</TabsTrigger>
-            <TabsTrigger value="specifications">Specifications</TabsTrigger>
-            <TabsTrigger value="media">Media</TabsTrigger>
-            <TabsTrigger value="properties">Properties</TabsTrigger>
-          </TabsList>
+      <FormProvider {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <Tabs defaultValue="basic" className="w-full">
+            <TabsList className="grid w-full grid-cols-8">
+              <TabsTrigger value="basic">Basic Info</TabsTrigger>
+              <TabsTrigger value="bought-out">Bought Out</TabsTrigger>
+              <TabsTrigger value="sales">Sales</TabsTrigger>
+              <TabsTrigger value="stock">Stock Analysis</TabsTrigger>
+              <TabsTrigger value="export">Export</TabsTrigger>
+              <TabsTrigger value="specifications">Specifications</TabsTrigger>
+              <TabsTrigger value="media">Media</TabsTrigger>
+              <TabsTrigger value="properties">Properties</TabsTrigger>
+            </TabsList>
 
-          <div className="mt-4">
-            <TabsContent value="basic" className="space-y-4">
-              <ItemBasicInfoForm control={form.control} itemId={item?.id} />
-            </TabsContent>
+            <div className="mt-4">
+              <TabsContent value="basic" className="space-y-4">
+                <ItemBasicInfoForm control={form.control} itemId={item?.id} />
+              </TabsContent>
 
-            <TabsContent value="bought-out" className="space-y-4">
-              <ItemBoughtOutForm control={form.control} itemId={item?.id} />
-            </TabsContent>
+              <TabsContent value="bought-out" className="space-y-4">
+                <ItemBoughtOutForm control={form.control} itemId={item?.id} />
+              </TabsContent>
 
-            <TabsContent value="sales" className="space-y-4">
-              <ItemSalesForm control={form.control} itemId={item?.id} />
-            </TabsContent>
+              <TabsContent value="sales" className="space-y-4">
+                <ItemSalesForm control={form.control} itemId={item?.id} />
+              </TabsContent>
 
-            <TabsContent value="stock" className="space-y-4">
-              <ItemStockAnalysisForm control={form.control} itemId={item?.id} />
-            </TabsContent>
+              <TabsContent value="stock" className="space-y-4">
+                <ItemStockAnalysisForm control={form.control} itemId={item?.id} />
+              </TabsContent>
 
-            <TabsContent value="export" className="space-y-4">
-              <ItemExportForm control={form.control} itemId={item?.id} />
-            </TabsContent>
+              <TabsContent value="export" className="space-y-4">
+                <ItemExportForm control={form.control} itemId={item?.id} />
+              </TabsContent>
 
-            <TabsContent value="specifications" className="space-y-4">
-              <ItemSpecificationsForm control={form.control} itemId={item?.id} />
-            </TabsContent>
+              <TabsContent value="specifications" className="space-y-4">
+                <ItemSpecificationsForm control={form.control} itemId={item?.id} />
+              </TabsContent>
 
-            <TabsContent value="media" className="space-y-4">
-              <ItemMediaForm control={form.control} itemId={item?.id} />
-            </TabsContent>
+              <TabsContent value="media" className="space-y-4">
+                <ItemMediaForm control={form.control} itemId={item?.id} />
+              </TabsContent>
 
-            <TabsContent value="properties" className="space-y-4">
-              <div className="text-sm text-muted-foreground">Properties section</div>
-            </TabsContent>
-          </div>
-        </Tabs>
+              <TabsContent value="properties" className="space-y-4">
+                <div className="text-sm text-muted-foreground">Properties section</div>
+              </TabsContent>
+            </div>
+          </Tabs>
 
-        <div className="flex justify-end gap-2 pt-4 border-t">
-          {mode !== 'view' && (
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Saving...' : item ? 'Update Item' : 'Create Item'}
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            {mode !== 'view' && (
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? 'Saving...' : item ? 'Update Item' : 'Create Item'}
+              </Button>
+            )}
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              {mode === 'view' ? 'Close' : 'Cancel'}
             </Button>
-          )}
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            {mode === 'view' ? 'Close' : 'Cancel'}
-          </Button>
-        </div>
-      </form>
+          </div>
+        </form>
+      </FormProvider>
     </RightDrawer>
   );
 }

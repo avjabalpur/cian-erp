@@ -5,6 +5,7 @@ import { FormInput } from "@/components/shared/forms/form-input"
 import { FormSelect } from "@/components/shared/forms/form-select"
 import { FormSwitch } from "@/components/shared/forms/form-switch"
 import { useItemTypes } from "@/modules/masters/item-types/hooks"
+import { ItemOtherDetailsForm } from "./item-other-details-form"
 
 interface ItemBasicInfoFormProps {
   control: any;
@@ -317,14 +318,7 @@ export function ItemBasicInfoForm({ control, itemId }: ItemBasicInfoFormProps) {
 
         {/* Right Column - Additional Details */}
         <div className="space-y-4">
-          <Card>
-            <CardContent className="space-y-4 pt-4">
-              <p className="text-sm font-medium">Other Details</p>
-              <p className="text-xs text-muted-foreground">
-                Additional item information will be displayed here.
-              </p>
-            </CardContent>
-          </Card>
+          <ItemOtherDetailsForm control={control} itemId={itemId} />
         </div>
       </div>
     </div>
