@@ -15,6 +15,8 @@ import { ItemStockAnalysisForm } from './forms/item-stock-analysis-form';
 import { ItemExportForm } from './forms/item-export-form';
 import { ItemSpecificationsForm } from './forms/item-specifications-form';
 import { ItemMediaForm } from './forms/item-media-form';
+import { ItemCodeGenerator } from './item-code-generator';
+import { Separator } from '@/components/ui/separator';
 
 interface ItemDrawerProps {
   item: ItemMaster | undefined;
@@ -31,7 +33,7 @@ export function ItemDrawer({ item, open, onOpenChange, onSubmit, isLoading, mode
     defaultValues: {
       itemCode: '',
       itemName: '',
-      itemTypeId: 0,
+      itemTypeId: undefined as any,
       manufactured: false,
       sold: false,
       boughtOut: false,
@@ -54,6 +56,12 @@ export function ItemDrawer({ item, open, onOpenChange, onSubmit, isLoading, mode
       principalForStatutoryReporting: false,
     },
   });
+
+  const handleCodeGenerated = (code: string) => {
+    console.log('✅ Setting item code in form:', code);
+    form.setValue('itemCode', code, { shouldValidate: true });
+    console.log('📝 Form itemCode value after set:', form.getValues('itemCode'));
+  };
 
   useEffect(() => {
     if (item && open) {
@@ -131,20 +139,33 @@ export function ItemDrawer({ item, open, onOpenChange, onSubmit, isLoading, mode
   };
 
   const handleSubmit = async (data: ItemMasterFormValues) => {
+    console.log('Form data being submitted:', data);
+    console.log('Form errors:', form.formState.errors);
     await onSubmit(data);
     form.reset();
+  };
+  
+  const onError = (errors: any) => {
+    console.log('❌ Form validation errors:', errors);
+    console.log('📋 Current form values:', form.getValues());
   };
 
   return (
     <RightDrawer
       open={open}
       onOpenChange={onOpenChange}
-      title={getTitle()}
       size="full"
+      title={getTitle()}
     >
-      <FormProvider {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <Tabs defaultValue="basic" className="w-full">
+      <div className="w-full">
+        <FormProvider {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit, onError)} className="space-y-4 p-4">
+          <ItemCodeGenerator 
+              onCodeGenerated={handleCodeGenerated}
+              initialValue={item?.itemCode}
+            />
+            <Separator className="my-4" />
+            <Tabs defaultValue="basic" className="w-full">
             <TabsList className="grid w-full grid-cols-8">
               <TabsTrigger value="basic">Basic Info</TabsTrigger>
               <TabsTrigger value="bought-out">Bought Out</TabsTrigger>
@@ -203,6 +224,7 @@ export function ItemDrawer({ item, open, onOpenChange, onSubmit, isLoading, mode
           </div>
         </form>
       </FormProvider>
+      </div>
     </RightDrawer>
   );
 }

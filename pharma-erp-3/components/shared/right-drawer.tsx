@@ -66,9 +66,9 @@ export function RightDrawer({
               </div>
             </div>
           </SheetHeader>
-          <div className="flex-1 overflow-y-auto px-4 py-2">
-          <Card>
-          <CardContent>
+          <div className="flex-1 overflow-y-auto px-4">
+          <Card className='p-0'>
+          <CardContent className='p-0'>
             {children}
            </CardContent>
           </Card>
@@ -82,7 +82,7 @@ export function RightDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent 
         side="right" 
-        className={`w-full ${sizeClasses[size]} p-0 flex flex-col`}
+        className={`w-full ${sizeClasses[size]}  flex flex-col`}
       >
         <SheetHeader className="px-4 py-3 border-b">
           <div className="flex items-center justify-between">
@@ -99,11 +99,7 @@ export function RightDrawer({
           </div>
         </SheetHeader>
         <div className="flex-1 overflow-y-auto px-2 py-1">
-          <Card>
-            <CardContent className='p-4'>
-              {children}
-            </CardContent>
-          </Card>
+          {children}
         </div>
       </SheetContent>
     </Sheet>

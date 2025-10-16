@@ -2,6 +2,7 @@ export * from './item-management';
 export * from './item-table';
 export * from './item-filter';
 export * from './item-drawer';
+export * from './item-code-generator';
 export * from './forms/item-basic-info-form';
 export * from './forms/item-bought-out-form';
 export * from './forms/item-sales-form';

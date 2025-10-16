@@ -18,7 +18,7 @@ import { ItemExportForm } from "./forms/item-export-form";
 import { ItemSpecificationsForm } from "./forms/item-specifications-form";
 import { ItemOtherDetailsForm } from "./forms/item-other-details-form";
 import { ItemMediaForm } from "./forms/item-media-form";
-import ItemCodeGenerator from "./forms/ItemCodeSequence";
+import ItemCodeGenerator from "./forms/Item-code-sequence";
 import { KeyValueForm } from "@/components/shared/dynamic-form/dynamic-form";
 import { CreateItemMasterData, UpdateItemMasterData, ItemMaster, UpdateItemSalesDetailData } from "@/types/item-master";
 import { ItemMasterFormData, itemMasterSchema } from "@/validations/item-master";

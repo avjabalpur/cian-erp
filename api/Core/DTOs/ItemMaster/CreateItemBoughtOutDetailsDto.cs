@@ -7,7 +7,7 @@ namespace Xcianify.Core.DTOs.ItemMaster
         public int ItemId { get; set; }
 
         [StringLength(20)]
-        public string PurchaseBasedOn { get; set; }
+        public string? PurchaseBasedOn { get; set; }
 
         [Range(0, 9999.99)]
         public decimal? ExcessPlanningPercent { get; set; }

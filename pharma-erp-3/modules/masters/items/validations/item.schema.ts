@@ -84,21 +84,23 @@ export const itemOtherDetailSchema = z.object({
 
 // Main Item Master Schema
 export const itemMasterSchema = z.object({
-  // Basic Information
+  // Basic Information - Required Fields
   itemCode: z.string().min(1, 'Item code is required').max(50, 'Item code must be at most 50 characters'),
+  itemName: z.string().min(1, 'Item name is required').max(255, 'Item name must be at most 255 characters'),
+  itemTypeId: z.coerce.number().refine(val => val > 0, 'Item type is required'),
+  
+  // Basic Information - Optional Fields
   revNo: z.string().optional(),
-  itemTypeId: z.coerce.number().min(1, 'Item type is required'),
   subType: z.coerce.number().optional().transform(val => val === 0 ? undefined : val),
   gsInd: z.string().optional(),
-  goodsType: z.string().optional(),
-  itemName: z.string().min(1, 'Item name is required').max(255, 'Item name must be at most 255 characters'),
+  goodsType: z.coerce.string().optional(),
   shortName: z.string().optional(),
   pharmacopoeiaName: z.string().optional(),
-  unitOfMeasure: z.string().optional(),
-  issuingUnit: z.string().optional(),
+  unitOfMeasure: z.coerce.string().optional(),
+  issuingUnit: z.coerce.string().optional(),
   uomIssConvFactor: z.coerce.number().optional(),
   uomUqcConvFactor: z.coerce.number().optional(),
-  drawingRef: z.string().optional(),
+  drawingRef: z.coerce.string().optional(),
   stdAssayStrength: z.coerce.number().optional(),
   shelfLifeMonths: z.coerce.number().optional(),
   shelfLifeDays: z.coerce.number().optional(),
@@ -111,27 +113,27 @@ export const itemMasterSchema = z.object({
   boughtOut: z.boolean().optional(),
   jobWork: z.boolean().optional(),
   imported: z.boolean().optional(),
-  currentBuyer: z.string().optional(),
+  currentBuyer: z.coerce.string().optional(),
   economicOrderQty: z.coerce.number().optional(),
   desiredPackSize: z.coerce.number().optional(),
   taxCreditApplicable: z.boolean().optional(),
-  freightOn: z.string().optional(),
+  freightOn: z.coerce.string().optional(),
   
   // Manufacturing Details
   manufactured: z.boolean().optional(),
   allowedAllergenPercent: z.coerce.number().optional(),
   stdMfgFeesPerUnit: z.coerce.number().optional(),
-  mainProdCentre: z.string().optional(),
+  mainProdCentre: z.coerce.string().optional(),
   
   // Sales Details
   sold: z.boolean().optional(),
   keyProduct: z.boolean().optional(),
   exported: z.boolean().optional(),
-  productType: z.string().optional(),
-  salesDivision: z.string().optional(),
-  productGroup: z.string().optional(),
+  productType: z.coerce.string().optional(),
+  salesDivision: z.coerce.string().optional(),
+  productGroup: z.coerce.string().optional(),
   conversionFactor: z.coerce.number().optional(),
-  vendorPartNo: z.string().optional(),
+  vendorPartNo: z.coerce.string().optional(),
   
   // Quality Control
   batchNotApplicable: z.boolean().optional(),
@@ -148,13 +150,13 @@ export const itemMasterSchema = z.object({
   principalForStatutoryReporting: z.boolean().optional(),
   
   // Other Details
-  packShort: z.string().optional(),
-  productCast: z.string().optional(),
+  packShort: z.coerce.string().optional(),
+  productCast: z.coerce.string().optional(),
   pvcColor: z.string().optional(),
   color: z.string().optional(),
-  flavour: z.string().optional(),
-  fragrance: z.string().optional(),
-  form: z.string().optional(),
+  flavour: z.coerce.string().optional(),
+  fragrance: z.coerce.string().optional(),
+  form: z.coerce.string().optional(),
   packagingStyle: z.string().optional(),
   changePart: z.string().optional(),
   size: z.string().optional(),
