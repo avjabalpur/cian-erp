@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Bell, Settings, LogOut, User, Shield, Database, Users, UserCog, ShieldCheck } from "lucide-react"
+import { Bell, Settings, LogOut, User, Shield, Database, Users, UserCog, ShieldCheck, List, Sliders } from "lucide-react"
 
 export default function ERPHeader() {
   return (
@@ -60,6 +60,30 @@ export default function ERPHeader() {
                 <Link href="/administrator/permissions" className="flex items-center gap-2 cursor-pointer">
                   <Shield className="w-4 h-4" />
                   Permissions
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Configuration Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-md cursor-pointer">
+                <Settings className="w-4 h-4" />
+                <span className="text-xs text-blue-700 font-medium">Configuration</span>
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem asChild>
+                <Link href="/configuration/config-lists" className="flex items-center gap-2 cursor-pointer">
+                  <List className="w-4 h-4" />
+                  Config Lists
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/configuration/config-settings" className="flex items-center gap-2 cursor-pointer">
+                  <Sliders className="w-4 h-4" />
+                  Config Settings
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>

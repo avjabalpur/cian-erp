@@ -105,6 +105,7 @@ export function CustomerDrawer({ customer, open, onOpenChange, onSubmit, isLoadi
     >
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit, onError)} className="space-y-4 p-0">
+          jfklfjdkljf {JSON.stringify(form.formState.errors)}
           <Tabs defaultValue="basic" className="w-full">
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="basic">Basic Info</TabsTrigger>

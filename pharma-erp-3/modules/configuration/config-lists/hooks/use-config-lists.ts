@@ -1,8 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '../../lib/api';
-import { ConfigList, CreateConfigListData, UpdateConfigListData, ConfigListFilter, PaginatedResponse, ConfigListValue, CreateConfigListValueData, UpdateConfigListValueData, ConfigListValueFilter } from '@/types/config-list';
+import api from '@/lib/api';
+import {
+  ConfigList,
+  CreateConfigListData,
+  UpdateConfigListData,
+  ConfigListFilter,
+  ConfigListValue,
+  CreateConfigListValueData,
+  UpdateConfigListValueData,
+  ConfigListValueFilter,
+} from '../types';
+import { PaginatedResponse } from '@/types/common';
 
-// API Functions for Config Lists
+// --- Config Lists API Functions ---
 const getConfigLists = async (filter?: ConfigListFilter): Promise<PaginatedResponse<ConfigList>> => {
   const params = new URLSearchParams();
   if (filter?.search) params.append('search', filter.search);
@@ -35,7 +45,7 @@ const deleteConfigList = async (id: number): Promise<void> => {
   await api.delete(`/config-list/${id}`);
 };
 
-// API Functions for Config List Values
+// --- Config List Values API Functions ---
 const getConfigListValues = async (filter?: ConfigListValueFilter): Promise<PaginatedResponse<ConfigListValue>> => {
   const params = new URLSearchParams();
   if (filter?.listId) params.append('listId', filter.listId.toString());
@@ -60,11 +70,6 @@ const getConfigListValuesByListCode = async (listCode: string): Promise<ConfigLi
   return data;
 };
 
-const getConfigListValueById = async (id: number): Promise<ConfigListValue> => {
-  const { data } = await api.get(`/config-list/values/${id}`);
-  return data;
-};
-
 const createConfigListValue = async (configListValueData: CreateConfigListValueData): Promise<ConfigListValue> => {
   const { data } = await api.post('/config-list/values', configListValueData);
   return data;
@@ -79,7 +84,7 @@ const deleteConfigListValue = async (id: number): Promise<void> => {
   await api.delete(`/config-list/values/${id}`);
 };
 
-// React Query Hooks for Config Lists
+// --- React Query Hooks for Config Lists ---
 export const useConfigLists = (filter?: ConfigListFilter) => {
   return useQuery<PaginatedResponse<ConfigList>, Error>({
     queryKey: ['config-lists', filter],
@@ -126,7 +131,7 @@ export const useDeleteConfigList = () => {
   });
 };
 
-// React Query Hooks for Config List Values
+// --- React Query Hooks for Config List Values ---
 export const useConfigListValues = (filter?: ConfigListValueFilter) => {
   return useQuery<PaginatedResponse<ConfigListValue>, Error>({
     queryKey: ['config-list-values', filter],
@@ -147,14 +152,6 @@ export const useConfigListValuesByListCode = (listCode: string) => {
     queryKey: ['config-list-values-by-code', listCode],
     queryFn: () => getConfigListValuesByListCode(listCode),
     enabled: !!listCode,
-  });
-};
-
-export const useConfigListValueById = (id: number) => {
-  return useQuery<ConfigListValue, Error>({
-    queryKey: ['config-list-value', id],
-    queryFn: () => getConfigListValueById(id),
-    enabled: !!id,
   });
 };
 
@@ -189,4 +186,5 @@ export const useDeleteConfigListValue = () => {
       queryClient.invalidateQueries({ queryKey: ['config-list-values'] });
     },
   });
-}; 
+};
+
