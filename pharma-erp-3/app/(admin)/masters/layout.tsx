@@ -14,7 +14,9 @@ import {
   Users, 
   UserCheck, 
   Warehouse,
-  FolderTree
+  FolderTree,
+  Tags,
+  Box
 } from "lucide-react"
 
 const masterTabs = [
@@ -23,9 +25,10 @@ const masterTabs = [
   { label: "Location Types", href: "/masters/location-types", icon: MapPin },
   { label: "Organizations", href: "/masters/organizations", icon: Building },
   { label: "Dosages", href: "/masters/dosages", icon: Pill },
-  { label: "HSNMaster", href: "/masters/hsn", icon: FolderTree },
+  { label: "HSN Master", href: "/masters/hsn", icon: FolderTree },
+  { label: "Item Types", href: "/masters/item-types", icon: Tags },
+  { label: "Product Types", href: "/masters/product-types", icon: Box },
   { label: "Items", href: "/masters/items", icon: Package },
- 
   { label: "Customers", href: "/masters/customers", icon: Users },
   { label: "Vendors", href: "/masters/vendors", icon: UserCheck },
   { label: "Warehouses", href: "/masters/warehouses", icon: Warehouse },
@@ -43,7 +46,7 @@ export default function MastersLayout({
       <div className="px-4 py-2">
         <div className="w-full">
           {/* Header with tabs */}
-          <div className="grid w-full grid-cols-10 gap-2 mb-2">
+          <div className="grid w-full grid-cols-12 gap-2 mb-2">
             {masterTabs.map((tab) => {
               const isActive = pathname === tab.href
               const Icon = tab.icon

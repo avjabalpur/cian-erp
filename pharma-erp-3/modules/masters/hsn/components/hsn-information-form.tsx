@@ -3,27 +3,20 @@ import { FormInput } from "@/components/shared/forms/form-input"
 import { FormSelect } from "@/components/shared/forms/form-select"
 import { FormSwitch } from "@/components/shared/forms/form-switch"
 import { FormTextArea } from "@/components/shared/forms/form-text-area"
-import { useHsnTypes } from "../hooks"
 
 interface HsnInformationFormProps {
   control: any;
 }
 
 export function HsnInformationForm({ control }: HsnInformationFormProps) {
-  const { data: hsnTypes = [], isLoading: isLoadingTypes } = useHsnTypes();
-  
   const hsnTypeOptions = [
-    { label: 'Select HSN type', value: '' },
-    ...hsnTypes.map(type => ({ label: type, value: type }))
+    { label: 'Select HSN type', value: '-1' },
+    { label: 'G - Goods', value: 'G' },
+    { label: 'S - Services', value: 'S' },
   ];
   return (
     <div className="space-y-6">
       {/* Basic Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Basic Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormInput
               control={control}
@@ -45,9 +38,8 @@ export function HsnInformationForm({ control }: HsnInformationFormProps) {
               control={control}
               name="hsnType"
               label="HSN Type"
-              placeholder={isLoadingTypes ? "Loading..." : "Select HSN type"}
+              placeholder="Select HSN type"
               options={hsnTypeOptions}
-              disabled={isLoadingTypes}
             />
             <FormInput
               control={control}
@@ -64,15 +56,10 @@ export function HsnInformationForm({ control }: HsnInformationFormProps) {
             placeholder="Enter description"
             rows={3}
           />
-        </CardContent>
-      </Card>
+        
 
       {/* Tax Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Tax Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+     
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormInput
               control={control}
@@ -135,8 +122,7 @@ export function HsnInformationForm({ control }: HsnInformationFormProps) {
               label="Active"
             />
           </div>
-        </CardContent>
-      </Card>
+       
     </div>
   )
 }
