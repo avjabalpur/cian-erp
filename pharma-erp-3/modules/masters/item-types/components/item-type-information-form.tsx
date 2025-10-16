@@ -16,18 +16,13 @@ export function ItemTypeInformationForm({ control, currentItemTypeId }: ItemType
 
   // Filter out the current item type from parent options to prevent circular reference
   const parentTypeOptions = [
-    { label: 'None (Root Level)', value: '' },
+    { label: 'None (Root Level)', value: '0' },
     ...itemTypes
       .filter(it => it.id !== currentItemTypeId)
       .map(it => ({ label: it.name, value: String(it.id) }))
   ];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Item Type Information</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
         <div className="grid grid-cols-1 gap-4">
           <FormSelect
             control={control}
@@ -66,7 +61,6 @@ export function ItemTypeInformationForm({ control, currentItemTypeId }: ItemType
             inline={true}
           />
         </div>
-      </CardContent>
-    </Card>
+    
   )
 }

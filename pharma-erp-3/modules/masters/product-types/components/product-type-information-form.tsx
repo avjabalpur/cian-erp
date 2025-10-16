@@ -16,7 +16,7 @@ export function ProductTypeInformationForm({ control, currentProductTypeId }: Pr
 
   // Filter out the current product type from parent options to prevent circular reference
   const parentTypeOptions = [
-    { label: 'None (Root Level)', value: '' },
+    { label: 'None (Root Level)', value: '0' },
     ...productTypes
       .filter(pt => pt.id !== currentProductTypeId)
       .map(pt => ({ label: pt.name, value: String(pt.id) }))

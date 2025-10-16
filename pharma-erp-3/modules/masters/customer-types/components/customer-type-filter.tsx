@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-export function ItemTypeFilter() {
+export function CustomerTypeFilter() {
   const [search, setSearch] = useQueryState('search', { defaultValue: '' });
   const [isActive, setIsActive] = useQueryState('isActive', { defaultValue: '' });
 
@@ -25,7 +25,7 @@ export function ItemTypeFilter() {
 
   return (
     <FilterWrapper
-      title="Filter Item Types"
+      title="Filter Customer Types"
       activeFiltersCount={activeFiltersCount}
       onClearFilters={clearFilters}
     >
@@ -34,7 +34,7 @@ export function ItemTypeFilter() {
           <Label htmlFor="search" className="text-[12px] font-medium">Search</Label>
           <Input
             id="search"
-            placeholder="Search item types..."
+            placeholder="Search customer types..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -59,3 +59,4 @@ export function ItemTypeFilter() {
     </FilterWrapper>
   );
 }
+

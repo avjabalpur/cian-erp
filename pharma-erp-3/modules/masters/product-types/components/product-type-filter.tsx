@@ -2,8 +2,9 @@
 
 import { useQueryState } from 'nuqs';
 import { FilterWrapper } from '@/components/shared/filter-wrapper';
-import { FormInput } from '@/components/shared/forms/form-input';
-import { FormSelect } from '@/components/shared/forms/form-select';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export function ProductTypeFilter() {
   const [search, setSearch] = useQueryState('search', { defaultValue: '' });
@@ -29,23 +30,31 @@ export function ProductTypeFilter() {
       onClearFilters={clearFilters}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormInput
-          name="search"
-          label="Search"
-          placeholder="Search product types..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          inputProps={{ type: "text" }}
-        />
+        <div className="space-y-2">
+          <Label htmlFor="search" className="text-[12px] font-medium">Search</Label>
+          <Input
+            id="search"
+            placeholder="Search product types..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
         
-        <FormSelect
-          name="isActive"
-          label="Status"
-          options={statusOptions}
-          value={isActive}
-          onChange={(value) => setIsActive(value)}
-          placeholder="Select status"
-        />
+        <div className="space-y-2">
+          <Label htmlFor="isActive" className="text-[12px] font-medium">Status</Label>
+          <Select value={isActive} onValueChange={(value) => setIsActive(value)}>
+            <SelectTrigger id="isActive">
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              {statusOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </FilterWrapper>
   );
