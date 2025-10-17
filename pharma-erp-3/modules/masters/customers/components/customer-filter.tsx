@@ -12,7 +12,7 @@ export function CustomerFilter() {
   const [isExportCustomer, setIsExportCustomer] = useQueryState('isExportCustomer', { defaultValue: '' });
 
   const statusOptions = [
-    { label: 'All Status', value: '' },
+    { label: 'All Status', value: '-1' },
     { label: 'Active', value: 'true' },
     { label: 'Inactive', value: 'false' },
   ];

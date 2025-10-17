@@ -3,7 +3,9 @@
 import { DataTable, createActionColumn } from '@/components/shared/data-table';
 import { SalesOrderWithApprovals } from '../types';
 import { Badge } from '@/components/ui/badge';
-import { Check, X, Clock, FileText } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Check, X, Clock, FileText, Copy, Edit } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface SalesOrderTableProps {
   salesOrders: SalesOrderWithApprovals[];
@@ -11,6 +13,7 @@ interface SalesOrderTableProps {
   onEdit: (salesOrder: SalesOrderWithApprovals) => void;
   onView: (salesOrder: SalesOrderWithApprovals) => void;
   onDelete: (salesOrder: SalesOrderWithApprovals) => void;
+  onCopyLink: (salesOrder: SalesOrderWithApprovals) => void;
   onCreate: () => void;
   totalCount: number;
   pageCount: number;
@@ -24,6 +27,7 @@ export function SalesOrderTable({
   onEdit,
   onView,
   onDelete,
+  onCopyLink,
   onCreate,
   totalCount,
   pageCount,
@@ -45,17 +49,44 @@ export function SalesOrderTable({
       ),
     },
     {
+      accessorKey: 'soDate',
+      header: 'Date',
+      cell: ({ row }: any) => {
+        if (!row.original.createdAt) return '-';
+        const date = new Date(row.original.createdAt);
+        return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+      },
+    },
+    {
       accessorKey: 'customerName',
       header: 'Customer',
       cell: ({ row }: any) => (
-        <div className="max-w-[200px] truncate">{row.original.customerName || '-'}</div>
+        <div className="max-w-[200px] truncate text-orange-600 font-medium">
+          {row.original.customerName || '-'}
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'organizationName',
+      header: 'Company',
+      cell: ({ row }: any) => (
+        <div className="max-w-[150px] truncate">{row.original.organizationName || '-'}</div>
       ),
     },
     {
       accessorKey: 'itemName',
-      header: 'Item',
+      header: 'Product',
       cell: ({ row }: any) => (
-        <div className="max-w-[200px] truncate">{row.original.itemName || '-'}</div>
+        <div className="max-w-[200px] truncate text-purple-600 font-medium cursor-pointer hover:underline" onClick={() => onEdit(row.original)}>
+          {row.original.itemName || '-'}
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'assignedDesignerName',
+      header: 'Designer',
+      cell: ({ row }: any) => (
+        <div className="text-sm">{row.original.assignedDesignerName || '-'}</div>
       ),
     },
     {
@@ -91,13 +122,66 @@ export function SalesOrderTable({
       cell: ({ row }: any) => getApprovalIcon(row.original.pmApproved),
     },
     {
-      accessorKey: 'soStatus',
-      header: 'Status',
+      accessorKey: 'finalQaApproved',
+      header: 'Final QA',
+      cell: ({ row }: any) => getApprovalIcon(row.original.finalQaApproved),
+    },
+    {
+      accessorKey: 'isFinalAuthorized',
+      header: 'Final Auth',
+      cell: ({ row }: any) => getApprovalIcon(row.original.isFinalAuthorized),
+    },
+    {
+      accessorKey: 'plantEmailSent',
+      header: 'Email',
       cell: ({ row }: any) => (
-        <Badge>{row.original.soStatus}</Badge>
+        row.original.plantEmailSent ? (
+          <Check className="h-4 w-4 text-green-600 mx-auto" />
+        ) : (
+          <X className="h-4 w-4 text-red-600 mx-auto" />
+        )
       ),
     },
-    createActionColumn<SalesOrderWithApprovals>(onView, onEdit, onDelete),
+    {
+      accessorKey: 'actions',
+      header: 'Actions',
+      cell: ({ row }: any) => (
+        <TooltipProvider>
+          <div className="flex gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(row.original);
+                  }}
+                >
+                  <Edit className="h-3 w-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Edit</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCopyLink(row.original);
+                  }}
+                >
+                  <Copy className="h-3 w-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Copy Form Link</TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
+      ),
+    },
   ];
 
   return (

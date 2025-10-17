@@ -5,18 +5,24 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useQueryState } from 'nuqs';
 import { SalesOrderFilterComponent } from './sales-order-filter';
 import { SalesOrderTable } from './sales-order-table';
+import { CreateSalesOrderModal } from './create-sales-order-modal';
+import { SalesOrderDrawer } from './sales-order-drawer';
 import { toast } from 'sonner';
 import { SalesOrderWithApprovals } from '../types';
 import { useSalesOrdersWithApprovals, useDeleteSalesOrder } from '../hooks';
+import { useRouter } from 'next/navigation';
 
 export function SalesOrderApprovalManagement() {
+  const router = useRouter();
   const [search] = useQueryState('search', { defaultValue: '' });
   const [soStatus] = useQueryState('soStatus', { defaultValue: '' });
   const [currentStatus] = useQueryState('currentStatus', { defaultValue: '' });
   const [page] = useQueryState('page', { defaultValue: '1' });
   const [pageSize] = useQueryState('pageSize', { defaultValue: '10' });
 
-  const [selectedSalesOrder, setSelectedSalesOrder] = useState<SalesOrderWithApprovals | undefined>(undefined);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedSalesOrderId, setSelectedSalesOrderId] = useState<number | null>(null);
 
   const currentPagination = useMemo(() => ({
     pageIndex: parseInt(page) - 1,
@@ -38,15 +44,28 @@ export function SalesOrderApprovalManagement() {
   const pageCount = Math.ceil(totalCount / currentPagination.pageSize);
 
   const handleCreate = () => {
-    toast.info('Create Sales Order functionality will be available soon');
+    setCreateModalOpen(true);
+  };
+
+  const handleCreateSuccess = (salesOrderId: number) => {
+    setSelectedSalesOrderId(salesOrderId);
+    setDrawerOpen(true);
   };
 
   const handleView = (salesOrder: SalesOrderWithApprovals) => {
-    toast.info(`Viewing SO: ${salesOrder.soNumber}`);
+    setSelectedSalesOrderId(salesOrder.id);
+    setDrawerOpen(true);
   };
 
   const handleEdit = (salesOrder: SalesOrderWithApprovals) => {
-    toast.info(`Editing SO: ${salesOrder.soNumber}`);
+    setSelectedSalesOrderId(salesOrder.id);
+    setDrawerOpen(true);
+  };
+
+  const handleCopyLink = (salesOrder: SalesOrderWithApprovals) => {
+    const link = `${window.location.origin}/sales/order-approvals/${salesOrder.id}`;
+    navigator.clipboard.writeText(link);
+    toast.success('Link copied to clipboard');
   };
 
   const handleDelete = async (salesOrder: SalesOrderWithApprovals) => {
@@ -89,6 +108,7 @@ export function SalesOrderApprovalManagement() {
             onEdit={handleEdit}
             onView={handleView}
             onDelete={handleDelete}
+            onCopyLink={handleCopyLink}
             onCreate={handleCreate}
             totalCount={totalCount}
             pageCount={pageCount}
@@ -97,6 +117,22 @@ export function SalesOrderApprovalManagement() {
           />
         </CardContent>
       </Card>
+
+      <CreateSalesOrderModal
+        open={createModalOpen}
+        onOpenChange={setCreateModalOpen}
+        onSuccess={handleCreateSuccess}
+      />
+
+      <SalesOrderDrawer
+        salesOrderId={selectedSalesOrderId}
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        onSuccess={() => {
+          setDrawerOpen(false);
+          setSelectedSalesOrderId(null);
+        }}
+      />
     </div>
   );
 }
