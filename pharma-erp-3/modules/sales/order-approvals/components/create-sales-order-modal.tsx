@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { FormSelect } from '@/components/shared/forms/form-select';
 import { useDosages } from '@/modules/masters/dosages/hooks';
 import { toast } from 'sonner';
-import { useCreateSalesOrder } from '../hooks';
+import { useCreateSalesOrderApproval } from '../hooks';
 import {
   Dialog,
   DialogContent,
@@ -35,7 +35,7 @@ export function CreateSalesOrderModal({
   onOpenChange,
   onSuccess,
 }: CreateSalesOrderModalProps) {
-  const createSalesOrder = useCreateSalesOrder();
+  const createSalesOrderApproval = useCreateSalesOrderApproval();
   const { data: dosagesData } = useDosages();
   const dosages = dosagesData?.items || [];
 

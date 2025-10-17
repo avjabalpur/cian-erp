@@ -96,6 +96,11 @@ const createSalesOrder = async (salesOrderData: CreateSalesOrderData): Promise<S
   return data;
 };
 
+const createSalesOrderApproval = async (approvalData: { soStatus: string; dosageName: string }): Promise<{ id: number }> => {
+  const { data } = await api.post('/sales-order/approval', approvalData);
+  return data;
+};
+
 const updateSalesOrder = async (id: number, salesOrderData: UpdateSalesOrderData): Promise<SalesOrder> => {
   const { data } = await api.put(`/sales-order/${id}`, salesOrderData);
   return data;
@@ -125,6 +130,16 @@ export const useCreateSalesOrder = () => {
   const queryClient = useQueryClient();
   return useMutation<SalesOrder, Error, CreateSalesOrderData>({
     mutationFn: createSalesOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sales-orders-with-approvals'] });
+    },
+  });
+};
+
+export const useCreateSalesOrderApproval = () => {
+  const queryClient = useQueryClient();
+  return useMutation<{ id: number }, Error, { soStatus: string; dosageName: string }>({
+    mutationFn: createSalesOrderApproval,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sales-orders-with-approvals'] });
     },
