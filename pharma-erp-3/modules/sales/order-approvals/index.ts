@@ -21,6 +21,7 @@ export {
   useSalesOrdersWithApprovals,
   useSalesOrderById,
   useCreateSalesOrder,
+  useCreateSalesOrderApproval,
   useUpdateSalesOrder,
   useDeleteSalesOrder,
 } from './hooks';

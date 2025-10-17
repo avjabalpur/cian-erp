@@ -46,9 +46,9 @@ export function CreateSalesOrderModal({
 
   const soStatusOptions = [
     { label: 'Select SO Status', value: '0' },
-    { label: 'Repeat', value: 'REPEAT' },
-    { label: 'New', value: 'NEW' },
-    { label: 'Modification', value: 'MODIFICATION' },
+    { label: 'REPEAT', value: 'repeat' },
+    { label: 'NEW', value: 'new' },
+    { label: 'REVISED', value: 'revised' },
   ];
 
   const form = useForm<CreateSalesOrderFormData>({
@@ -61,21 +61,17 @@ export function CreateSalesOrderModal({
 
   const onSubmit = async (data: CreateSalesOrderFormData) => {
     try {
-      // Generate SO Number (simplified for now)
-      const soNumber = `SO-${Date.now()}`;
-      
-      const result = await createSalesOrder.mutateAsync({
-        soNumber,
+      const result = await createSalesOrderApproval.mutateAsync({
         soStatus: data.soStatus,
-        // Add other minimal required fields
+        dosageName: data.dosageName,
       });
 
-      toast.success('Sales order created successfully');
+      toast.success('Sales order approval created successfully');
       form.reset();
       onOpenChange(false);
       onSuccess(result.id);
     } catch (error: any) {
-      toast.error(error?.message || 'Failed to create sales order');
+      toast.error(error?.message || 'Failed to create sales order approval');
     }
   };
 
@@ -115,8 +111,8 @@ export function CreateSalesOrderModal({
               <Button type="button" variant="outline" onClick={handleClose}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={createSalesOrder.isPending}>
-                {createSalesOrder.isPending ? 'Creating...' : 'Create'}
+              <Button type="submit" disabled={createSalesOrderApproval.isPending}>
+                {createSalesOrderApproval.isPending ? 'Creating...' : 'Create'}
               </Button>
             </DialogFooter>
           </form>
