@@ -168,7 +168,7 @@ export function SalesDashboard() {
           </CardContent>
         </Card>
       </div>
-      
+
       {/* Quick Actions */}
       <div>
         <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
@@ -224,8 +224,6 @@ export function SalesDashboard() {
           </CardContent>
         </Card>
       </div>
-
-    
     </div>
   );
 }
