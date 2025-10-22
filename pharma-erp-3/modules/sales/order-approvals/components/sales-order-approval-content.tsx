@@ -240,44 +240,44 @@ export function SalesOrderApprovalContent({
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="h-full flex flex-col">
             {/* Header Bar */}
-            <div className="border-b bg-gradient-to-r from-slate-50 to-gray-50 p-2 shadow-sm">
+            <div className="border-b bg-gradient-to-r from-slate-50 to-gray-50 px-3 py-1.5 shadow-sm">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center">
-                    <span className="text-sm font-semibold text-gray-700">Current Status:</span>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-gray-700">Status:</span>
                     <Select
                       value={form.watch("currentStatus") || salesOrder?.currentStatus || "IN-PROGRESS"}
                       onValueChange={(value) => form.setValue("currentStatus", value)}
                       disabled={updateSalesOrderMutation.isPending}
                     >
-                      <SelectTrigger className="w-48 border-gray-300 bg-white ml-2">
+                      <SelectTrigger className="w-40 h-7 text-xs border-gray-300 bg-white">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         {currentStatusOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
+                          <SelectItem key={option.value} value={option.value} className="text-xs">
                             {option.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
-                </div>
-
-                <div className="flex items-center gap-6">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-gray-700">Created By:</span>
-                    <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                    <span className="text-xs text-gray-600">Created By:</span>
+                    <span className="text-xs text-gray-700 bg-gray-100 px-2 py-0.5 rounded-full">
                       {salesOrder?.createdByName || "Unknown"}
                     </span>
                   </div>
+                </div>
 
+                <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-gray-700">Email Sent:</span>
+                    <span className="text-xs font-semibold text-gray-700">Email Sent:</span>
                     <Switch 
                       checked={form.watch("plantEmailSent") || salesOrder?.plantEmailSent || false}
                       onCheckedChange={(checked) => form.setValue("plantEmailSent", checked)}
                       disabled={updateSalesOrderMutation.isPending}
+                      className="scale-75"
                     />
                   </div>
 
@@ -285,9 +285,9 @@ export function SalesOrderApprovalContent({
                     size="sm"
                     type="submit"
                     disabled={updateSalesOrderMutation.isPending}
-                    className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
+                    className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 h-7 text-xs"
                   >
-                    <Save className="h-4 w-4 mr-2" />
+                    <Save className="h-3 w-3 mr-1" />
                     {updateSalesOrderMutation.isPending ? "Saving..." : "Save"}
                   </Button>
                 </div>
@@ -297,24 +297,25 @@ export function SalesOrderApprovalContent({
             {/* Content with Tabs */}
             <div className="flex-1 flex flex-col">
               <Tabs defaultValue="basic-info" className="flex-1 flex flex-col">
-                <div className="px-3 pt-2">
-                  <TabsList className="grid w-full grid-cols-4">
-                    <TabsTrigger value="basic-info">Basic Info</TabsTrigger>
-                    <TabsTrigger value="compare-progen">Compare With Progen</TabsTrigger>
-                    <TabsTrigger value="quotations">Quotations</TabsTrigger>
-                    <TabsTrigger value="save-history">Save History</TabsTrigger>
+                <div className="px-2 pt-1">
+                  <TabsList className="grid w-full grid-cols-4 h-8">
+                    <TabsTrigger value="basic-info" className="text-xs">Basic Info</TabsTrigger>
+                    <TabsTrigger value="compare-progen" className="text-xs">Compare Progen</TabsTrigger>
+                    <TabsTrigger value="quotations" className="text-xs">Quotations</TabsTrigger>
+                    <TabsTrigger value="save-history" className="text-xs">Save History</TabsTrigger>
                   </TabsList>
                 </div>
 
-                <div className="flex-1 p-3 overflow-y-auto">
-                  <TabsContent value="basic-info" className="space-y-3 h-full">
-                    <Card className="border-0 shadow-lg">
-                      <CardHeader className="p-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
-                        <CardTitle className="text-lg font-semibold">Approval Stages</CardTitle>
+                <div className="flex-1 p-2 overflow-y-auto">
+                  <TabsContent value="basic-info" className="space-y-2 mt-0">
+                    {/* Approval Stages */}
+                    <Card className="border shadow-sm">
+                      <CardHeader className="p-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                        <CardTitle className="text-sm font-semibold">Approval Stages</CardTitle>
                       </CardHeader>
-                      <CardContent className="pt-2">
+                      <CardContent className="p-2">
                         {stagesLoading ? (
-                          <div className="text-center py-4">Loading approval stages...</div>
+                          <div className="text-center py-2 text-xs">Loading...</div>
                         ) : (
                           <ApprovalButtons
                             salesOrderId={salesOrderId}
@@ -326,38 +327,42 @@ export function SalesOrderApprovalContent({
                       </CardContent>
                     </Card>
 
-                    <Card className="border-0 shadow-md">
-                      <CardHeader className="p-2 bg-gradient-to-r from-slate-600 to-gray-600 text-white rounded-t-lg">
-                        <CardTitle className="text-lg font-semibold">SO Info</CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-4">
-                        <SOInfoForm
-                          control={form.control}
-                          disabled={updateSalesOrderMutation.isPending}
-                          onCustomerSelect={handleCustomerSelect}
-                          onItemSelect={handleItemSelect}
-                          onManufacturerSelect={handleManufacturerSelect}
-                        />
-                      </CardContent>
-                    </Card>
+                    {/* SO Info & Product Info Side by Side */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <Card className="border shadow-sm">
+                        <CardHeader className="p-2 bg-gradient-to-r from-slate-600 to-gray-600 text-white">
+                          <CardTitle className="text-sm font-semibold">SO Info</CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-2">
+                          <SOInfoForm
+                            control={form.control}
+                            disabled={updateSalesOrderMutation.isPending}
+                            onCustomerSelect={handleCustomerSelect}
+                            onItemSelect={handleItemSelect}
+                            onManufacturerSelect={handleManufacturerSelect}
+                          />
+                        </CardContent>
+                      </Card>
 
-                    <Card className="border-0 shadow-md">
-                      <CardHeader className="p-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-t-lg">
-                        <CardTitle className="text-lg font-semibold">Product Info</CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-4">
-                        <ProductInfoForm
-                          control={form.control}
-                          disabled={updateSalesOrderMutation.isPending}
-                        />
-                      </CardContent>
-                    </Card>
+                      <Card className="border shadow-sm">
+                        <CardHeader className="p-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white">
+                          <CardTitle className="text-sm font-semibold">Product Info</CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-2">
+                          <ProductInfoForm
+                            control={form.control}
+                            disabled={updateSalesOrderMutation.isPending}
+                          />
+                        </CardContent>
+                      </Card>
+                    </div>
 
-                    <Card className="border-0 shadow-md">
-                      <CardHeader className="p-2 bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-t-lg">
-                        <CardTitle className="text-lg font-semibold">Reference Documents</CardTitle>
+                    {/* Reference Documents */}
+                    <Card className="border shadow-sm">
+                      <CardHeader className="p-2 bg-gradient-to-r from-amber-600 to-orange-600 text-white">
+                        <CardTitle className="text-sm font-semibold">Reference Documents</CardTitle>
                       </CardHeader>
-                      <CardContent className="pt-4">
+                      <CardContent className="p-2">
                         <ReferenceDocuments
                           salesOrderId={salesOrderId}
                           disabled={updateSalesOrderMutation.isPending}
@@ -368,41 +373,41 @@ export function SalesOrderApprovalContent({
                     </Card>
                   </TabsContent>
 
-                  <TabsContent value="compare-progen">
-                    <Card>
-                      <CardContent className="p-6">
-                        <p className="text-muted-foreground">Compare With Progen functionality will be implemented here.</p>
+                  <TabsContent value="compare-progen" className="mt-0">
+                    <Card className="border shadow-sm">
+                      <CardContent className="p-4">
+                        <p className="text-sm text-muted-foreground">Compare With Progen functionality will be implemented here.</p>
                       </CardContent>
                     </Card>
                   </TabsContent>
 
-                  <TabsContent value="quotations">
-                    <Card>
-                      <CardContent className="p-6">
-                        <p className="text-muted-foreground">Quotations functionality will be implemented here.</p>
+                  <TabsContent value="quotations" className="mt-0">
+                    <Card className="border shadow-sm">
+                      <CardContent className="p-4">
+                        <p className="text-sm text-muted-foreground">Quotations functionality will be implemented here.</p>
                       </CardContent>
                     </Card>
                   </TabsContent>
 
-                  <TabsContent value="save-history">
-                    <Card>
-                      <CardContent className="pt-4">
+                  <TabsContent value="save-history" className="mt-0">
+                    <Card className="border shadow-sm">
+                      <CardContent className="p-2">
                         {transactionsLoading ? (
-                          <div className="text-center py-8">Loading save history...</div>
+                          <div className="text-center py-4 text-xs">Loading...</div>
                         ) : saveTransactions.length === 0 ? (
-                          <div className="text-center py-12 text-muted-foreground">
+                          <div className="text-center py-8 text-sm text-muted-foreground">
                             No save history found
                           </div>
                         ) : (
-                          <div className="space-y-3">
+                          <div className="space-y-2">
                             {saveTransactions.map((transaction) => (
-                              <div key={transaction.id} className="bg-white border rounded-lg p-4">
-                                <div className="flex items-center justify-between mb-3">
-                                  <span className="text-sm font-semibold">{transaction.createdByName || "Unknown User"}</span>
+                              <div key={transaction.id} className="bg-white border rounded p-2">
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-xs font-semibold">{transaction.createdByName || "Unknown"}</span>
                                   <span className="text-xs text-gray-500">{new Date(transaction.createdAt).toLocaleString()}</span>
                                 </div>
                                 {transaction.diff && (
-                                  <pre className="text-xs whitespace-pre-wrap">{transaction.diff}</pre>
+                                  <pre className="text-xs whitespace-pre-wrap bg-gray-50 p-1 rounded">{transaction.diff}</pre>
                                 )}
                               </div>
                             ))}

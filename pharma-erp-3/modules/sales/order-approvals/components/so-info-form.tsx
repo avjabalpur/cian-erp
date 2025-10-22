@@ -7,9 +7,13 @@ import { FormInput } from "@/components/shared/forms/form-input";
 import { FormDateInput } from "@/components/shared/forms/form-date-input";
 import { FormSelect } from "@/components/shared/forms/form-select";
 import { FormLookup } from "@/components/shared/forms/form-lookup";
+import { CustomerLookup } from "@/components/shared/lookups/customer-lookup";
+import { ItemLookup } from "@/components/shared/lookups/item-lookup";
+import { UserLookup } from "@/components/shared/lookups/user-lookup";
 import { SalesOrderUpdateFormValues } from "../validations/sales-order.schema";
 import { useOrganizations } from "@/modules/masters/organizations/hooks";
 import { useDosages } from "@/modules/masters/dosages/hooks";
+import { useUsers } from "@/modules/administrator/users";
 
 interface SOInfoFormProps {
   control: Control<SalesOrderUpdateFormValues>;
@@ -22,12 +26,22 @@ interface SOInfoFormProps {
 export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect, onManufacturerSelect }: SOInfoFormProps) {
   const [isCustomerLookupOpen, setIsCustomerLookupOpen] = useState(false);
   const [isItemLookupOpen, setIsItemLookupOpen] = useState(false);
+  const [isUserLookupOpen, setIsUserLookupOpen] = useState(false);
   const lastProcessedManufacturer = useRef<string>("");
 
   const watchedValues = useWatch({ control });
   const customerId = watchedValues.customerId;
   const itemId = watchedValues.itemId;
   const organizationId = watchedValues.organizationId;
+  const assignedDesigner = watchedValues.assignedDesigner;
+
+  // Get user data for assigned designer
+  const { data: usersData } = useUsers({ 
+    pageNumber: 1, 
+    pageSize: 1,
+    id: assignedDesigner 
+  });
+  const assignedDesignerUser = usersData?.items?.[0];
 
   // Get organizations for manufacturer dropdown
   const { data: organizationsData } = useOrganizations();
@@ -35,7 +49,7 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect, 
 
   const manufacturerOptions = [
     { label: 'Select manufacturer', value: '-1' },
-    ...organizations.map(org => ({ label: org.organizationName, value: org.id.toString(), country: org.country }))
+    ...organizations.map(org => ({ label: org.name, value: org.id.toString(), country: org.country }))
   ];
 
   // Get dosages
@@ -89,6 +103,17 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect, 
       return `${productCode} - ${productName}`;
     }
     return value || "Select item";
+  };
+
+  const getUserDisplayValue = (value: string) => {
+    if (assignedDesigner && assignedDesignerUser) {
+      return `${assignedDesignerUser.firstName} ${assignedDesignerUser.lastName}`;
+    }
+    return value || "Select designer";
+  };
+
+  const handleUserSelect = (userId: number) => {
+    onCustomerSelect?.({ id: userId }); // This will be handled by parent
   };
 
   return (
@@ -260,7 +285,22 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect, 
         </div>
       </div>
 
-      {/* TODO: Add Customer and Item Lookup modals when needed */}
+      {/* Lookups */}
+      <CustomerLookup
+        isOpen={isCustomerLookupOpen}
+        onClose={() => setIsCustomerLookupOpen(false)}
+        onSelect={(customer) => {
+          if (onCustomerSelect) onCustomerSelect(customer);
+        }}
+      />
+
+      <ItemLookup
+        isOpen={isItemLookupOpen}
+        onClose={() => setIsItemLookupOpen(false)}
+        onSelect={(item) => {
+          if (onItemSelect) onItemSelect(item);
+        }}
+      />
     </div>
   );
 }

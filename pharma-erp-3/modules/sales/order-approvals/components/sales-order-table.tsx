@@ -4,8 +4,9 @@ import { DataTable, createActionColumn } from '@/components/shared/data-table';
 import { SalesOrderWithApprovals } from '../types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Check, X, Clock, FileText, Copy, Edit } from 'lucide-react';
+import { Check, X, Clock, FileText, Copy, Edit, ExternalLink } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { toast } from 'sonner';
 
 interface SalesOrderTableProps {
   salesOrders: SalesOrderWithApprovals[];
@@ -162,6 +163,21 @@ export function SalesOrderTable({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Edit</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(`/sales/order-approvals/${row.original.id}`, '_blank');
+                  }}
+                >
+                  <ExternalLink className="h-3 w-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Open in New Tab</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
