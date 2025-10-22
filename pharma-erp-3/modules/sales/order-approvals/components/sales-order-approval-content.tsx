@@ -295,7 +295,7 @@ export function SalesOrderApprovalContent({
             </div>
 
             {/* Content with Tabs */}
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="flex-1 flex flex-col">
               <Tabs defaultValue="basic-info" className="flex-1 flex flex-col">
                 <div className="px-3 pt-2">
                   <TabsList className="grid w-full grid-cols-4">
