@@ -117,9 +117,9 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect, 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Basic SO Information */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
         <FormInput
           control={control}
           name="soNumber"
@@ -150,7 +150,7 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect, 
       <Separator />
 
       {/* Manufacturer Information */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         <FormSelect
           control={control}
           name="organizationId"
@@ -171,8 +171,8 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect, 
       <Separator />
 
       {/* Customer Information */}
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="space-y-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
           <FormLookup
             control={control}
             name="customerId"
@@ -221,8 +221,8 @@ export function SOInfoForm({ control, disabled, onCustomerSelect, onItemSelect, 
       <Separator />
 
       {/* Product Information */}
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="space-y-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
           <FormLookup
             control={control}
             name="itemId"

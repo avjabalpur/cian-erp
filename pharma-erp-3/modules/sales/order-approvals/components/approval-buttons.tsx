@@ -8,7 +8,8 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { CheckCircle, XCircle, Clock, User, Calendar } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { CheckCircle, XCircle, Clock, User, Calendar, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { useApproveStage, useRejectStage } from "../hooks/use-sales-order-stages";
 import { useCreateSalesOrderComment } from "../hooks/use-sales-order-comments";
@@ -228,72 +229,71 @@ export function ApprovalButtons({
     return true;
   };
 
-  return (
-    <div className="space-y-2">
-      {/* Progress Overview */}
-      <div className="bg-white rounded-lg p-2 border border-gray-200">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-gray-800">Approval Progress</h3>
-          <Badge variant="outline" className="text-sm">
-            {completedStages}/{totalStages} Complete
-          </Badge>
-        </div>
-        <Progress value={progressPercentage} className="h-3" />
-        <div className="flex justify-between text-xs text-gray-500 mt-2">
-          <span>0%</span>
-          <span>{Math.round(progressPercentage)}%</span>
-          <span>100%</span>
-        </div>
-      </div>
-
-      {/* Approval Stages Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  const accordionContent = (
+    <Accordion type="single" collapsible defaultValue="approval-stages" className="w-full">
+      <AccordionItem value="approval-stages" className="border rounded-md">
+        <AccordionTrigger className="px-3 py-2 hover:no-underline">
+          <div className="flex items-center justify-between w-full pr-2">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold">Approval Stages</span>
+              <Badge variant="outline" className="text-xs h-5">
+                {completedStages}/{totalStages}
+              </Badge>
+            </div>
+            <div className="flex items-center gap-2">
+              <Progress value={progressPercentage} className="h-1.5 w-24" />
+              <span className="text-xs text-gray-500 w-10">{Math.round(progressPercentage)}%</span>
+            </div>
+          </div>
+        </AccordionTrigger>
+        <AccordionContent className="px-3 pb-3">
+          {/* Approval Stages Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mt-2">
         {approvalStages.map((stage) => (
           <Card 
             key={stage.key} 
-            className={`border-2 transition-all duration-200 hover:shadow-md ${
+            className={`border transition-all duration-200 hover:shadow-sm ${
               stage.isApproved === true
-                ? 'border-green-200 bg-green-50' 
+                ? 'border-green-300 bg-green-50' 
                 : stage.isApproved === false
-                ? 'border-red-200 bg-red-50'
+                ? 'border-red-300 bg-red-50'
                 : 'border-gray-200 bg-white hover:border-blue-300'
             }`}
           >
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+            <CardHeader className="p-2 pb-1">
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-1.5">
                   {getStageIcon(stage)}
-                  <CardTitle className="text-base font-semibold text-gray-800">
+                  <CardTitle className="text-xs font-semibold text-gray-800">
                     {stage.title}
                   </CardTitle>
                 </div>
-                <Badge variant={getStageBadgeVariant(stage)} className="text-xs">
+                <Badge variant={getStageBadgeVariant(stage)} className="text-xs h-4 px-1.5">
                   {getStageBadgeText(stage)}
                 </Badge>
               </div>
-              <p className="text-sm text-gray-600">{stage.description}</p>
             </CardHeader>
             
-            <CardContent className="space-y-3">
+            <CardContent className="p-2 pt-0 space-y-1.5">
               {/* Stage Info */}
               {stage.approvedBy && stage.isApproved === true && (
-                <div className="flex items-center gap-2 text-xs text-green-600">
+                <div className="flex items-center gap-1 text-xs text-green-600">
                   <User className="h-3 w-3" />
-                  <span>Approved by {stage.approvedBy}</span>
+                  <span>{stage.approvedBy}</span>
                 </div>
               )}
               {stage.rejectedBy && stage.isApproved === false && (
-                <div className="flex items-center gap-2 text-xs text-red-600">
+                <div className="flex items-center gap-1 text-xs text-red-600">
                   <User className="h-3 w-3" />
-                  <span>Rejected by {stage.rejectedBy}</span>
+                  <span>{stage.rejectedBy}</span>
                 </div>
               )}
               {(stage.approvedAt || stage.rejectedAt) && (
-                <div className="flex items-center gap-2 text-xs text-gray-500">
+                <div className="flex items-center gap-1 text-xs text-gray-500">
                   <Calendar className="h-3 w-3" />
                   <span>
                     {stage.approvedAt || stage.rejectedAt 
-                      ? new Date(stage.approvedAt || stage.rejectedAt!).toLocaleDateString()
+                      ? new Date(stage.approvedAt || stage.rejectedAt!).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
                       : ''
                     }
                   </span>
@@ -302,11 +302,11 @@ export function ApprovalButtons({
 
               {/* Action Buttons */}
               {canUserActOnStage(stage) && (
-                <div className="flex gap-2">
+                <div className="flex gap-1.5 pt-1">
                   <Button
                     size="sm"
                     onClick={() => handleStageAction(stage, "approve")}
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white h-6 text-xs"
                     disabled={approveStageMutation.isPending || rejectStageMutation.isPending}
                     type="button"
                   >
@@ -317,10 +317,10 @@ export function ApprovalButtons({
                     size="sm"
                     variant="outline"
                     onClick={() => handleStageAction(stage, "reject")}
-                    className="flex-1 border-red-300 text-red-600 hover:bg-red-50"
+                    className="flex-1 border-red-300 text-red-600 hover:bg-red-50 h-6 text-xs"
                     disabled={approveStageMutation.isPending || rejectStageMutation.isPending}
                     type="button"
-                  >
+                    >
                     <XCircle className="h-3 w-3 mr-1" />
                     Reject
                   </Button>
@@ -329,7 +329,16 @@ export function ApprovalButtons({
             </CardContent>
           </Card>
         ))}
-      </div>
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  );
+
+  return (
+    <>
+      {/* Approval Stages Accordion Section */}
+      {accordionContent}
 
       {/* Approval/Rejection Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -387,7 +396,7 @@ export function ApprovalButtons({
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
 

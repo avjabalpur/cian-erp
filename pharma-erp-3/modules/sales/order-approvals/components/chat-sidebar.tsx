@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Settings, Eye } from "lucide-react";
+import { Send, X } from "lucide-react";
 
 interface ChatMessage {
   id: string;
@@ -16,12 +16,11 @@ interface ChatMessage {
 interface ChatSidebarProps {
   messages: ChatMessage[];
   onSendMessage: (message: string) => void;
-  onLastRead: () => void;
-  onSettings: () => void;
+  onClose?: () => void;
   disabled?: boolean;
 }
 
-export function ChatSidebar({ messages, onSendMessage, onLastRead, onSettings, disabled }: ChatSidebarProps) {
+export function ChatSidebar({ messages, onSendMessage, onClose, disabled }: ChatSidebarProps) {
   const [newMessage, setNewMessage] = useState("");
 
   const handleSend = () => {
@@ -39,29 +38,22 @@ export function ChatSidebar({ messages, onSendMessage, onLastRead, onSettings, d
   };
 
   return (
-    <div className="w-80 border-l bg-gray-50 flex flex-col h-full">
+    <div className="w-80 min-w-80 border-l bg-gray-50 flex flex-col h-full">
       {/* Header */}
       <div className="p-3 border-b bg-white">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold text-sm">Team Chat</h3>
-          <div className="flex gap-1">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-sm">Chat Comments</h3>
+          {onClose && (
             <Button
               size="sm"
               variant="ghost"
-              onClick={onLastRead}
-              className="h-7 w-7 p-0"
+              onClick={onClose}
+              className="h-7 w-7 p-0 hover:bg-gray-100"
+              title="Close chat"
             >
-              <Eye className="h-4 w-4" />
+              <X className="h-4 w-4" />
             </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={onSettings}
-              className="h-7 w-7 p-0"
-            >
-              <Settings className="h-4 w-4" />
-            </Button>
-          </div>
+          )}
         </div>
       </div>
 

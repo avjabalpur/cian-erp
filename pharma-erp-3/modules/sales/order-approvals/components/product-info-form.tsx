@@ -48,7 +48,7 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
   const watchedValues = useWatch({ control });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {/* Basic Product Information */}
       <div className="space-y-2">
         <FormTextArea
@@ -72,8 +72,8 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
 
       {/* Quantity and Pricing */}
       <div className="space-y-2">
-        <h3 className="text-lg font-medium">Quantity and Pricing</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <h3 className="text-sm font-medium">Quantity and Pricing</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
           <FormInput
             control={control}
             name="quantity"
@@ -118,7 +118,7 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
 
       {/* Tablet Specifications */}
       <div className="space-y-2">
-        <h3 className="text-lg font-medium">Tablet Specifications</h3>
+        <h3 className="text-sm font-medium">Tablet Specifications</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormSelect
             control={control}
@@ -156,8 +156,8 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
 
       {/* Packaging Information */}
       <div className="space-y-2">
-        <h3 className="text-lg font-medium">Packaging Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <h3 className="text-sm font-medium">Packaging Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
           <FormSelect
             control={control}
             name="shipperSize"
@@ -202,8 +202,8 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
 
       {/* Manufacturing Charges */}
       <div className="space-y-2">
-        <h3 className="text-lg font-medium">Manufacturing</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <h3 className="text-sm font-medium">Manufacturing</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
           <FormInput
             control={control}
             name="inventoryCharges"
@@ -248,8 +248,8 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
 
       {/* Drawing References */}
       <div className="space-y-2">
-        <h3 className="text-lg font-medium">Drawing References</h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <h3 className="text-sm font-medium">Drawing References</h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
           <FormInput
             control={control}
             name="shipperDrawingRefCode"
@@ -310,8 +310,8 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
 
       {/* PM Stock */}
       <div className="space-y-2">
-        <h3 className="text-lg font-medium">PM Stock</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <h3 className="text-sm font-medium">PM Stock</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
           <FormInput
             control={control}
             name="pmOuterCtnStock"
@@ -364,8 +364,8 @@ export function ProductInfoForm({ control, disabled }: ProductInfoFormProps) {
 
       {/* Additional Information */}
       <div className="space-y-2">
-        <h3 className="text-lg font-medium">Additional Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <h3 className="text-sm font-medium">Additional Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <FormInput
             control={control}
             name="designUnder"

@@ -4,11 +4,13 @@ import React, { useState, useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Save } from "lucide-react";
+import { Save, MessageSquare, X } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { SalesOrderUpdateFormValues, salesOrderUpdateSchema } from "../validations/sales-order.schema";
 import { 
   useSalesOrderById, 
@@ -48,6 +50,7 @@ export function SalesOrderApprovalContent({
   onSuccess
 }: SalesOrderApprovalContentProps) {
   const queryClient = useQueryClient();
+  const [isChatOpen, setIsChatOpen] = useState(true);
 
   const { data: salesOrder, isLoading } = useSalesOrderById(salesOrderId);
   const { data: chatMessages = [], isLoading: chatMessagesLoading } = useChatMessagesBySalesOrder(salesOrderId);
@@ -192,12 +195,8 @@ export function SalesOrderApprovalContent({
     }
   };
 
-  const handleLastRead = () => {
-    console.log("Last read clicked");
-  };
-
-  const handleChatSettings = () => {
-    console.log("Chat settings clicked");
+  const handleChatClose = () => {
+    setIsChatOpen(false);
   };
 
   const handleCustomerSelect = (customer: any) => {
@@ -283,6 +282,17 @@ export function SalesOrderApprovalContent({
 
                   <Button
                     size="sm"
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsChatOpen(!isChatOpen)}
+                    className="h-7 text-xs"
+                  >
+                    <MessageSquare className="h-3 w-3 mr-1" />
+                    Chat
+                  </Button>
+
+                  <Button
+                    size="sm"
                     type="submit"
                     disabled={updateSalesOrderMutation.isPending}
                     className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 h-7 text-xs"
@@ -309,112 +319,94 @@ export function SalesOrderApprovalContent({
                 <div className="flex-1 p-2 overflow-y-auto">
                   <TabsContent value="basic-info" className="space-y-2 mt-0">
                     {/* Approval Stages */}
-                    <Card className="border shadow-sm">
-                      <CardHeader className="p-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-                        <CardTitle className="text-sm font-semibold">Approval Stages</CardTitle>
-                      </CardHeader>
-                      <CardContent className="p-2">
-                        {stagesLoading ? (
-                          <div className="text-center py-2 text-xs">Loading...</div>
-                        ) : (
-                          <ApprovalButtons
+                    {stagesLoading ? (
+                      <div className="text-center py-2 text-xs">Loading...</div>
+                    ) : (
+                      <ApprovalButtons
+                        salesOrderId={salesOrderId}
+                        stages={stages}
+                        onStageUpdate={handleStageUpdate}
+                        disabled={updateSalesOrderMutation.isPending}
+                      />
+                    )}
+
+                      {/* SO Info Accordion */}
+                      <Accordion type="single" collapsible defaultValue="so-info" className="w-full">
+                        <AccordionItem value="so-info" className="border rounded-md">
+                          <AccordionTrigger className="px-3 py-2 hover:no-underline">
+                            <span className="text-sm font-semibold">SO Info</span>
+                          </AccordionTrigger>
+                          <AccordionContent className="px-3 pb-3">
+                            <SOInfoForm
+                              control={form.control}
+                              disabled={updateSalesOrderMutation.isPending}
+                              onCustomerSelect={handleCustomerSelect}
+                              onItemSelect={handleItemSelect}
+                              onManufacturerSelect={handleManufacturerSelect}
+                            />
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+
+                      {/* Product Info Accordion */}
+                      <Accordion type="single" collapsible defaultValue="product-info" className="w-full">
+                        <AccordionItem value="product-info" className="border rounded-md">
+                          <AccordionTrigger className="px-3 py-2 hover:no-underline">
+                            <span className="text-sm font-semibold">Product Info</span>
+                          </AccordionTrigger>
+                          <AccordionContent className="px-3 pb-3">
+                            <ProductInfoForm
+                              control={form.control}
+                              disabled={updateSalesOrderMutation.isPending}
+                            />
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+
+                    {/* Reference Documents Accordion */}
+                    <Accordion type="single" collapsible defaultValue="documents" className="w-full">
+                      <AccordionItem value="documents" className="border rounded-md">
+                        <AccordionTrigger className="px-3 py-2 hover:no-underline">
+                          <div className="flex items-center justify-between w-full pr-2">
+                            <span className="text-sm font-semibold">Reference Documents</span>
+                            {!documentsLoading && documents.length > 0 && (
+                              <Badge variant="outline" className="text-xs h-5">
+                                {documents.length} file{documents.length !== 1 ? 's' : ''}
+                              </Badge>
+                            )}
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-3 pb-3">
+                          <ReferenceDocuments
                             salesOrderId={salesOrderId}
-                            stages={stages}
-                            onStageUpdate={handleStageUpdate}
                             disabled={updateSalesOrderMutation.isPending}
+                            documents={documents}
+                            isLoading={documentsLoading}
                           />
-                        )}
-                      </CardContent>
-                    </Card>
-
-                    {/* SO Info & Product Info Side by Side */}
-                    <div className="grid grid-cols-2 gap-2">
-                      <Card className="border shadow-sm">
-                        <CardHeader className="p-2 bg-gradient-to-r from-slate-600 to-gray-600 text-white">
-                          <CardTitle className="text-sm font-semibold">SO Info</CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-2">
-                          <SOInfoForm
-                            control={form.control}
-                            disabled={updateSalesOrderMutation.isPending}
-                            onCustomerSelect={handleCustomerSelect}
-                            onItemSelect={handleItemSelect}
-                            onManufacturerSelect={handleManufacturerSelect}
-                          />
-                        </CardContent>
-                      </Card>
-
-                      <Card className="border shadow-sm">
-                        <CardHeader className="p-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white">
-                          <CardTitle className="text-sm font-semibold">Product Info</CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-2">
-                          <ProductInfoForm
-                            control={form.control}
-                            disabled={updateSalesOrderMutation.isPending}
-                          />
-                        </CardContent>
-                      </Card>
-                    </div>
-
-                    {/* Reference Documents */}
-                    <Card className="border shadow-sm">
-                      <CardHeader className="p-2 bg-gradient-to-r from-amber-600 to-orange-600 text-white">
-                        <CardTitle className="text-sm font-semibold">Reference Documents</CardTitle>
-                      </CardHeader>
-                      <CardContent className="p-2">
-                        <ReferenceDocuments
-                          salesOrderId={salesOrderId}
-                          disabled={updateSalesOrderMutation.isPending}
-                          documents={documents}
-                          isLoading={documentsLoading}
-                        />
-                      </CardContent>
-                    </Card>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
                   </TabsContent>
 
                   <TabsContent value="compare-progen" className="mt-0">
-                    <Card className="border shadow-sm">
-                      <CardContent className="p-4">
-                        <p className="text-sm text-muted-foreground">Compare With Progen functionality will be implemented here.</p>
-                      </CardContent>
-                    </Card>
+                    <div>
+                      <h3 className="text-sm font-semibold">Compare With Progen</h3>
+                      <p className="text-sm text-muted-foreground">Compare With Progen functionality will be implemented here.</p>
+                    </div>
                   </TabsContent>
 
                   <TabsContent value="quotations" className="mt-0">
-                    <Card className="border shadow-sm">
-                      <CardContent className="p-4">
-                        <p className="text-sm text-muted-foreground">Quotations functionality will be implemented here.</p>
-                      </CardContent>
-                    </Card>
+                    <div>
+                      <h3 className="text-sm font-semibold">Quotations</h3>
+                      <p className="text-sm text-muted-foreground">Quotations functionality will be implemented here.</p>
+                    </div>
                   </TabsContent>
 
                   <TabsContent value="save-history" className="mt-0">
-                    <Card className="border shadow-sm">
-                      <CardContent className="p-2">
-                        {transactionsLoading ? (
-                          <div className="text-center py-4 text-xs">Loading...</div>
-                        ) : saveTransactions.length === 0 ? (
-                          <div className="text-center py-8 text-sm text-muted-foreground">
-                            No save history found
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            {saveTransactions.map((transaction) => (
-                              <div key={transaction.id} className="bg-white border rounded p-2">
-                                <div className="flex items-center justify-between mb-1">
-                                  <span className="text-xs font-semibold">{transaction.createdByName || "Unknown"}</span>
-                                  <span className="text-xs text-gray-500">{new Date(transaction.createdAt).toLocaleString()}</span>
-                                </div>
-                                {transaction.diff && (
-                                  <pre className="text-xs whitespace-pre-wrap bg-gray-50 p-1 rounded">{transaction.diff}</pre>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
+                    <div>
+                      <h3 className="text-sm font-semibold">Save History</h3>
+                      <p className="text-sm text-muted-foreground">Save History functionality will be implemented here.</p>
+                    </div>
                   </TabsContent>
                 </div>
               </Tabs>
@@ -423,14 +415,19 @@ export function SalesOrderApprovalContent({
         </FormProvider>
       </div>
 
-      {/* Chat Sidebar */}
-      <ChatSidebar
-        messages={transformedChatMessages}
-        onSendMessage={handleSendMessage}
-        onLastRead={handleLastRead}
-        onSettings={handleChatSettings}
-        disabled={updateSalesOrderMutation.isPending}
-      />
+      {/* Chat Sidebar - Toggleable with slide animation */}
+      <div 
+        className={`transition-all duration-300 ease-in-out ${
+          isChatOpen ? 'w-80' : 'w-0'
+        } overflow-hidden`}
+      >
+        <ChatSidebar
+          messages={transformedChatMessages}
+          onSendMessage={handleSendMessage}
+          onClose={handleChatClose}
+          disabled={updateSalesOrderMutation.isPending}
+        />
+      </div>
     </div>
   );
 }
